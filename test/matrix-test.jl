@@ -87,7 +87,7 @@ end
 
   E6m = eigenvalues_with_multiplicities(A6)
   @test length(E6m) == 2
-  @test E6m[1][2] == 2 && E6m[2][2] == 2
+  @test issetequal(E6m, [(ZZ(-1),2), (ZZ(1),2)])
 
 
   A6b = matrix(ZZ,6,6, [0,1,0,-1,1,0,  1,1,-2,0,-2,0,  -1,0,1,1,1,0,  1,-1,2,1,0,0,  1,1,-2,-2,-1,-2,  2,-2,0,2,-2,0])
