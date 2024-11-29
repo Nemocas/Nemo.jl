@@ -83,11 +83,21 @@ end
   A6 = matrix(ZZ,6,6, [0,0,-1,0,1,0,  0,0,0,1,-1,0,  -1,0,0,0,1,0,  0,1,1,1,-1,0,  1,-1,1,1,-1,0,  1,-1,0,0,-1,-1])
   E6 = eigenvalues(A6)
   @test length(E6) == 2
-  @test issetequal(E, [1,-1])
+  @test issetequal(E6, [1,-1])
 
   E6m = eigenvalues_with_multiplicities(A6)
   @test length(E6m) == 2
   @test E6m[1][2] == 2 && E6m[2][2] == 2
+
+
+  A6b = matrix(ZZ,6,6, [0,1,0,-1,1,0,  1,1,-2,0,-2,0,  -1,0,1,1,1,0,  1,-1,2,1,0,0,  1,1,-2,-2,-1,-2,  2,-2,0,2,-2,0])
+  E6b = eigenvalues(A6b)
+  @test length(E6b) == 2
+  @test issetequal(E6b, [1,-1])
+
+  E6bm = eigenvalues_with_multiplicities(A6b)
+  @test length(E6bm) == 2
+  @test issetequal(E6bm, [(ZZ(-1),1), (ZZ(1),2)])
 
   # eigenvalues_simple not defined for integer matrices, so not tested.
 end
