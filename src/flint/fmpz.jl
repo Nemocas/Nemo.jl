@@ -410,9 +410,9 @@ function Base.div(x::ZZRingElem, y::ZZRingElem)
   return z
 end
 
-Base.div(x::ZZRingElem, c::ZZRingElem, ::typeof(RoundToZero)) = tdiv(x, c)
-Base.div(x::ZZRingElem, c::ZZRingElem, ::typeof(RoundUp)) = cdiv(x, c)
-Base.div(x::ZZRingElem, c::ZZRingElem, ::typeof(RoundDown)) = fdiv(x, c)
+Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundToZero)) = tdiv(x, y)
+Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundUp)) = cdiv(x, y)
+Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundDown)) = fdiv(x, y)
 
 function divexact(x::ZZRingElem, y::ZZRingElem; check::Bool=true)
   iszero(y) && throw(DivideError())
@@ -645,17 +645,32 @@ div(x::Integer, y::ZZRingElem) = div(ZZRingElem(x), y)
 
 # Note Base.div is different to Nemo.div
 Base.div(x::Integer, y::ZZRingElem) = Base.div(ZZRingElem(x), y)
+Base.div(x::Integer, y::ZZRingElem, ::typeof(RoundToZero)) = Base.div(ZZ(x), y, RoundToZero)
+Base.div(x::Integer, y::ZZRingElem, ::typeof(RoundUp)) = Base.div(ZZ(x), y, RoundUp)
+Base.div(x::Integer, y::ZZRingElem, ::typeof(RoundDown)) = Base.div(ZZ(x), y, RoundDown)
 
 div(x::ZZRingElem, y::Integer) = div(x, ZZRingElem(y))
 
 # Note Base.div is different to Nemo.div
 Base.div(x::ZZRingElem, y::Integer) = Base.div(x, ZZRingElem(y))
+Base.div(x::ZZRingElem, y::Integer, ::typeof(RoundToZero)) = Base.div(x, ZZ(y), RoundToZero)
+Base.div(x::ZZRingElem, y::Integer, ::typeof(RoundUp)) = Base.div(x, ZZ(y), RoundUp)
+Base.div(x::ZZRingElem, y::Integer, ::typeof(RoundDown)) = Base.div(x, ZZ(y), RoundDown)
 
 divrem(x::ZZRingElem, y::Integer) = divrem(x, ZZRingElem(y))
 
 divrem(x::Integer, y::ZZRingElem) = divrem(ZZRingElem(x), y)
 
-Base.divrem(x::ZZRingElem, y::Int) = (Base.div(x, y), Base.rem(x, y))
+Base.divrem(x::ZZRingElem, y::Integer) = Base.divrem(x, ZZ(y))
+Base.divrem(x::ZZRingElem, y::Integer, ::typeof(RoundToZero)) = (
+  Base.divrem(x, ZZ(y), RoundToZero)
+)
+Base.divrem(x::ZZRingElem, y::Integer, ::typeof(RoundUp)) = (
+  Base.divrem(x, ZZ(y), RoundUp)
+)
+Base.divrem(x::ZZRingElem, y::Integer, ::typeof(RoundDown)) = (
+  Base.divrem(x, ZZ(y), RoundDown)
+)
 
 ###############################################################################
 #
@@ -668,13 +683,10 @@ function divrem(x::ZZRingElem, y::ZZRingElem)
 end
 
 # N.B. Base.divrem differs from Nemo.divrem
-function Base.divrem(x::ZZRingElem, y::ZZRingElem)
-  return tdivrem(x, y)
-end
-
-Base.divrem(x::ZZRingElem, c::ZZRingElem, ::typeof(RoundToZero)) = tdivrem(x, c)
-Base.divrem(x::ZZRingElem, c::ZZRingElem, ::typeof(RoundUp)) = cdivrem(x, c)
-Base.divrem(x::ZZRingElem, c::ZZRingElem, ::typeof(RoundDown)) = fdivrem(x, c)
+Base.divrem(x::ZZRingElem, y::ZZRingElem) = tdivrem(x, y)
+Base.divrem(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundToZero)) = tdivrem(x, y)
+Base.divrem(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundUp)) = cdivrem(x, y)
+Base.divrem(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundDown)) = fdivrem(x, y)
 
 function tdivrem(x::ZZRingElem, y::ZZRingElem)
   iszero(y) && throw(DivideError())
