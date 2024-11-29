@@ -15,8 +15,8 @@
   # trivial case: input is 1
   F1 = factor(1)
   F1_ZZ = factor(ZZ(1))
-  @test length(F1.fac) == 0
-  @test length(F1_ZZ.fac) == 0
+  @test length(F1) == 0
+  @test length(F1_ZZ) == 0
   @test unit(F1) == 1
   @test unit(F1_ZZ) == 1
 
