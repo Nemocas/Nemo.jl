@@ -410,6 +410,10 @@ function Base.div(x::ZZRingElem, y::ZZRingElem)
   return z
 end
 
+Base.div(x::ZZRingElem, c::ZZRingElem, ::typeof(RoundToZero)) = tdiv(x, c)
+Base.div(x::ZZRingElem, c::ZZRingElem, ::typeof(RoundUp)) = cdiv(x, c)
+Base.div(x::ZZRingElem, c::ZZRingElem, ::typeof(RoundDown)) = fdiv(x, c)
+
 function divexact(x::ZZRingElem, y::ZZRingElem; check::Bool=true)
   iszero(y) && throw(DivideError())
   if check
@@ -667,6 +671,10 @@ end
 function Base.divrem(x::ZZRingElem, y::ZZRingElem)
   return tdivrem(x, y)
 end
+
+Base.divrem(x::ZZRingElem, c::ZZRingElem, ::typeof(RoundToZero)) = tdivrem(x, c)
+Base.divrem(x::ZZRingElem, c::ZZRingElem, ::typeof(RoundUp)) = cdivrem(x, c)
+Base.divrem(x::ZZRingElem, c::ZZRingElem, ::typeof(RoundDown)) = fdivrem(x, c)
 
 function tdivrem(x::ZZRingElem, y::ZZRingElem)
   iszero(y) && throw(DivideError())
