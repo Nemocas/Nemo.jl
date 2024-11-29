@@ -61,33 +61,33 @@ end
 end
 
 @testset "Eigenvalues of ZZMatrix" begin
-  A4 = matrix(ZZ,4,4, [6,-8,9,5,  5,-6,5,0,  0,6,5,4,  -6,8,-1,7]);
-  E4 = eigenvalues(A4);
-  @test length(E4) == 2;
+  A4 = matrix(ZZ,4,4, [6,-8,9,5,  5,-6,5,0,  0,6,5,4,  -6,8,-1,7])
+  E4 = eigenvalues(A4)
+  @test length(E4) == 2
   @test issetequal(E4, [2,4])
-  E4m = eigenvalues_with_multiplicities(A4);
-  @test length(E4m) == 2;
+  E4m = eigenvalues_with_multiplicities(A4)
+  @test length(E4m) == 2
   @test E4m[1][2] == 1 || E4m[2][2] == 1
 
 
   A5 = matrix(ZZ,5,5, [0,0,1,-1,-1,  -1,-1,1,1,-1,  0,0,1,-1,-1,  -1,1,1,-1,-1,  1,1,-1,-1,1])
-  E5 = eigenvalues(A5);  # [0,1,-2]
-  @test length(E5) == 3;
+  E5 = eigenvalues(A5)
+  @test length(E5) == 3
   @test issetequal(E5, [0,1,-2])
 
-  E5m = eigenvalues_with_multiplicities(A5);
-  @test length(E5m) == 3;
-  @test E5m[1][2] + E5m[2][2] + E5m[3][2] == 5;
+  E5m = eigenvalues_with_multiplicities(A5)
+  @test length(E5m) == 3
+  @test E5m[1][2] + E5m[2][2] + E5m[3][2] == 5
 
 
-  A6 = matrix(ZZ,6,6, [0,0,-1,0,1,0,  0,0,0,1,-1,0,  -1,0,0,0,1,0,  0,1,1,1,-1,0,  1,-1,1,1,-1,0,  1,-1,0,0,-1,-1]);
-  E6 = eigenvalues(A6);
-  @test length(E6) == 2; # -1 and +1
-  @test issetequal(E6, [1,-1])
+  A6 = matrix(ZZ,6,6, [0,0,-1,0,1,0,  0,0,0,1,-1,0,  -1,0,0,0,1,0,  0,1,1,1,-1,0,  1,-1,1,1,-1,0,  1,-1,0,0,-1,-1])
+  E6 = eigenvalues(A6)
+  @test length(E6) == 2
+  @test issetequal(E, [1,-1])
 
-  E6m = eigenvalues_with_multiplicities(A6);
-  @test length(E6m) == 2;
-  @test E6m[1][2] == 2 && E6m[2][2] == 2;
+  E6m = eigenvalues_with_multiplicities(A6)
+  @test length(E6m) == 2
+  @test E6m[1][2] == 2 && E6m[2][2] == 2
 
   # eigenvalues_simple not defined for integer matrices, so not tested.
 end
