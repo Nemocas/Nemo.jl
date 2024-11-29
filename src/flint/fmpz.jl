@@ -661,7 +661,10 @@ divrem(x::ZZRingElem, y::Integer) = divrem(x, ZZRingElem(y))
 
 divrem(x::Integer, y::ZZRingElem) = divrem(ZZRingElem(x), y)
 
-Base.divrem(x::ZZRingElem, y::Integer) = Base.divrem(x, ZZ(y))
+# Without the functions below, Julia defaults to `(div(x, y), rem(x, y))`
+Base.divrem(x::ZZRingElem, y::Integer) = (
+  Base.divrem(x, ZZ(y))
+)
 Base.divrem(x::ZZRingElem, y::Integer, ::typeof(RoundToZero)) = (
   Base.divrem(x, ZZ(y), RoundToZero)
 )
@@ -670,6 +673,18 @@ Base.divrem(x::ZZRingElem, y::Integer, ::typeof(RoundUp)) = (
 )
 Base.divrem(x::ZZRingElem, y::Integer, ::typeof(RoundDown)) = (
   Base.divrem(x, ZZ(y), RoundDown)
+)
+Base.divrem(x::Integer, y::ZZRingElem) = (
+  Base.divrem(ZZ(x), y)
+)
+Base.divrem(x::Integer, y::ZZRingElem, ::typeof(RoundToZero)) = (
+  Base.divrem(ZZ(x), y, RoundToZero)
+)
+Base.divrem(x::Integer, y::ZZRingElem, ::typeof(RoundUp)) = (
+  Base.divrem(ZZ(x), y, RoundUp)
+)
+Base.divrem(x::Integer, y::ZZRingElem, ::typeof(RoundDown)) = (
+  Base.divrem(ZZ(x), y, RoundDown)
 )
 
 ###############################################################################
