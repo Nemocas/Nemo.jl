@@ -67,7 +67,7 @@ end
   @test issetequal(E4, [2,4])
   E4m = eigenvalues_with_multiplicities(A4)
   @test length(E4m) == 2
-  @test E4m[1][2] == 1 || E4m[2][2] == 1
+  @test issetequal(E4m, [(ZZ(2),1), (ZZ(4),1)])
 
 
   A5 = matrix(ZZ,5,5, [0,0,1,-1,-1,  -1,-1,1,1,-1,  0,0,1,-1,-1,  -1,1,1,-1,-1,  1,1,-1,-1,1])
@@ -77,7 +77,7 @@ end
 
   E5m = eigenvalues_with_multiplicities(A5)
   @test length(E5m) == 3
-  @test E5m[1][2] + E5m[2][2] + E5m[3][2] == 5
+  @test issetequal(E5m, [(ZZ(0),2), (ZZ(1),2), (ZZ(-2),1)])
 
 
   A6 = matrix(ZZ,6,6, [0,0,-1,0,1,0,  0,0,0,1,-1,0,  -1,0,0,0,1,0,  0,1,1,1,-1,0,  1,-1,1,1,-1,0,  1,-1,0,0,-1,-1])
