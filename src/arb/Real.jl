@@ -336,6 +336,11 @@ function isequal(x::RealFieldElem, y::RealFieldElem)
   return Bool(r)
 end
 
+function Base.hash(x::RealFieldElem, h::UInt)
+  # TODO: improve me
+  return h
+end
+
 function ==(x::RealFieldElem, y::RealFieldElem)
   return Bool(@ccall libflint.arb_eq(x::Ref{RealFieldElem}, y::Ref{RealFieldElem})::Cint)
 end
