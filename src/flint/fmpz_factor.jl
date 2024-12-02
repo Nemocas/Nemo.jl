@@ -18,30 +18,45 @@ function _factor(a::ZZRingElem)
 end
 
 # Just to give a helpful error message if someone tries to factor a boolean
-function factor(b::Bool)
-  throw(DomainError("Cannot factorize a boolean"));
+function factor(::Bool)
+  throw(DomainError("Cannot factorize a boolean"))
 end
 
-# This function handles machine integer types (up to 64 bits)
-function factor(a::T) where T <: Union{Int, UInt}
+function factor(::Type{Bool}, ::Int)
+  throw(DomainError("Cannot factorize a boolean"))
+end
+
+function factor(::Type{Bool}, ::ZZRingElem)
+  throw(DomainError("Cannot factorize a boolean"))
+end
+
+
+# The main dispatch function: flintify gives either Int or ZZRingElem,
+# then use Julia's dispatcher to select the worker function.
+function factor(a::T)  where T <: Integer
   iszero(a) && throw(ArgumentError("Argument must be non-zero"))
-  u = sign(a)
-  a = u < 0 ? -a : a
+  return factor(typeof(a), Nemo.flintify(a))
+end
+
+# Two worker functions: one for Int, one for ZZRingElem
+function factor(::Type{T}, a::Int)  where T <: Int
+  iszero(a) && throw(ArgumentError("Argument must be non-zero"))
+  u = T(sign(a))
+  abs_a = reinterpret(UInt, a < 0 ? -a : a) # supposedly correct when a is most negative Int value
   F = n_factor()
-  @ccall libflint.n_factor(F::Ref{n_factor}, a::UInt)::Nothing
+  @ccall libflint.n_factor(F::Ref{n_factor}, abs_a::UInt)::Nothing
   res = Dict{T, Int}()  # factor-multiplicity pairs
   for i in 1:F.num
-    z = F.p[i]
+    z = T(F.p[i])
     res[z] = F.exp[i]
   end
   return Fac(u, res)
 end
 
-# This is supposed to be called only for T in [Int128, UInt128, BigInt]
-function factor(a::T) where T <: Integer
+function factor(::Type{T}, a::ZZRingElem)  where T <: Integer
   iszero(a) && throw(ArgumentError("Argument must be non-zero"))
-  u = sign(a)
-  F = factor(ZZ(abs(a)))
+  u = T(sign(a))
+  F = factor(abs(a))
   res = Dict{T, Int}()  # factor-multiplicity pairs
   for (fac,exp) in F.fac
     res[T(fac)] = exp
