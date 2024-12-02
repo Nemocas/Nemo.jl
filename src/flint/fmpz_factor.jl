@@ -23,11 +23,11 @@ function factor(::Bool)
 end
 
 function factor(::Type{Bool}, ::Int)
-  throw(DomainError("Cannot factorize a boolean"))
+  throw(DomainError("Cannot have a factorization into booleans"))
 end
 
 function factor(::Type{Bool}, ::ZZRingElem)
-  throw(DomainError("Cannot factorize a boolean"))
+  throw(DomainError("Cannot have a factorization into booleans"))
 end
 
 
