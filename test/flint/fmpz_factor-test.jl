@@ -10,6 +10,8 @@
 
   @test_throws DomainError factor(true)
   @test_throws DomainError factor(false)
+  @test_throws DomainError factor(Bool, 1)
+  @test_throws DomainError factor(Bool, ZZ(1))
 
 
   # trivial case: input is 1
