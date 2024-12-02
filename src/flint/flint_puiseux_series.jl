@@ -464,7 +464,7 @@ function rand(rng::AbstractRNG, S::FlintPuiseuxSeriesRingOrField,
 end
 
 rand(S::FlintPuiseuxSeriesRingOrField, val_range, scale_range, v...) =
-rand(Random.GLOBAL_RNG, S, val_range, scale_range, v...)
+rand(Random.default_rng(), S, val_range, scale_range, v...)
 
 ###############################################################################
 #

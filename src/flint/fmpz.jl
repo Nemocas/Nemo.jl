@@ -2686,7 +2686,7 @@ sp[][1](rand(rng, sp[][2]))
 
 rand(rng::AbstractRNG, R::ZZRing, n::AbstractArray) = R(rand(rng, n))
 
-rand(R::ZZRing, n::AbstractArray) = rand(Random.GLOBAL_RNG, R, n)
+rand(R::ZZRing, n::AbstractArray) = rand(Random.default_rng(), R, n)
 
 @doc raw"""
     rand_bits(::ZZRing, b::Int)

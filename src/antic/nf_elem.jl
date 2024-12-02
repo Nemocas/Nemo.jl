@@ -1034,7 +1034,7 @@ end
 
 rand(rng::AbstractRNG, K::AbsSimpleNumField, r::AbstractUnitRange{Int}) = rand(rng, make(K, r))
 
-rand(K::AbsSimpleNumField, r) = rand(Random.GLOBAL_RNG, K, r)
+rand(K::AbsSimpleNumField, r) = rand(Random.default_rng(), K, r)
 
 ###############################################################################
 #
