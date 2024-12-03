@@ -645,9 +645,7 @@ div(x::Integer, y::ZZRingElem) = div(ZZRingElem(x), y)
 
 # Note Base.div is different to Nemo.div
 Base.div(x::Integer, y::ZZRingElem) = Base.div(ZZRingElem(x), y)
-Base.div(x::Integer, y::ZZRingElem, ::typeof(RoundToZero)) = Base.div(ZZ(x), y, RoundToZero)
-Base.div(x::Integer, y::ZZRingElem, ::typeof(RoundUp)) = Base.div(ZZ(x), y, RoundUp)
-Base.div(x::Integer, y::ZZRingElem, ::typeof(RoundDown)) = Base.div(ZZ(x), y, RoundDown)
+Base.div(x::Integer, y::ZZRingElem, r::RoundingMode) = Base.div(ZZ(x), y, r)
 
 div(x::ZZRingElem, y::Integer) = div(x, ZZRingElem(y))
 
