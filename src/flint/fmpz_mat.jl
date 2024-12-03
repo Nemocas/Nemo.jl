@@ -1554,7 +1554,11 @@ function _solve_dixon(a::ZZMatrix, b::ZZMatrix)
 end
 
 #XU = B. only the upper triangular part of U is used
-function _solve_triu_left(U::ZZMatrix, b::ZZMatrix)
+function AbstractAlgebra._solve_triu_left(U::ZZMatrix, b::ZZMatrix; side::Symbol = :left)
+  if side == :right
+    return AbstractAlgebra._solve_triu(U, b; side)
+  end
+  @assert side == :left
   n = ncols(U)
   m = nrows(b)
   R = base_ring(U)
@@ -1595,8 +1599,12 @@ function _solve_triu_left(U::ZZMatrix, b::ZZMatrix)
   return X
 end
 
-#UX = B
-function _solve_triu(U::ZZMatrix, b::ZZMatrix) 
+#UX = B, U has to be upper triangular
+function AbstractAlgebra._solve_triu(U::ZZMatrix, b::ZZMatrix; side::Symbol=:left) 
+  if side == :left
+    return AbstractAlgebra._solve_triu_left(U, b; side)
+  end
+  @assert side == :right
   n = nrows(U)
   m = ncols(b)
   X = zero(b)
@@ -1638,6 +1646,12 @@ function _solve_triu(U::ZZMatrix, b::ZZMatrix)
   return X
 end
 
+#solves Ax = B for A lower triagular. if f != 0 (f is true), the diagonal
+#is assumed to be 1 and not actually used.
+#the upper part of A is not used/ touched.
+#one cannot assert is_lower_triangular as this is used for the inplace
+#lu decomposition where the matrix is full, encoding an upper triangular
+#using the diagonal and a lower triangular with trivial diagonal
 function AbstractAlgebra._solve_tril!(A::ZZMatrix, B::ZZMatrix, C::ZZMatrix, f::Int = 0) 
 
   # a       x   u      ax = u
