@@ -136,7 +136,7 @@ export degree_fmpz
 export degrees
 export degrees_fit_int
 export degrees_fmpz
-#export denominator!  # not exported for now to avoid clash with Hecke
+export denominator!
 export derivative
 export det
 export det_divisor
@@ -464,7 +464,7 @@ export nullspace_right_rational
 export number_field
 export number_of_partitions
 export numpart
-#export numerator!  # not exported for now to avoid clash with Hecke
+export numerator!
 export oct
 export one
 export one!

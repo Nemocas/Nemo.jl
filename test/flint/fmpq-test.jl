@@ -193,6 +193,14 @@ end
 
   @test denominator(QQFieldElem(2, 3)) == 3
 
+  z = ZZRingElem()
+  @test numerator!(z, QQFieldElem(2, 3)) == 2
+  @test z == 2
+
+  z = ZZRingElem()
+  @test denominator!(z, QQFieldElem(2, 3)) == 3
+  @test z == 3
+
   @test characteristic(R) == 0
 
   @test nbits(QQFieldElem(12, 1)) == 5
