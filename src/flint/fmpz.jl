@@ -651,39 +651,17 @@ div(x::ZZRingElem, y::Integer) = div(x, ZZRingElem(y))
 
 # Note Base.div is different to Nemo.div
 Base.div(x::ZZRingElem, y::Integer) = Base.div(x, ZZRingElem(y))
-Base.div(x::ZZRingElem, y::Integer, ::typeof(RoundToZero)) = Base.div(x, ZZ(y), RoundToZero)
-Base.div(x::ZZRingElem, y::Integer, ::typeof(RoundUp)) = Base.div(x, ZZ(y), RoundUp)
-Base.div(x::ZZRingElem, y::Integer, ::typeof(RoundDown)) = Base.div(x, ZZ(y), RoundDown)
+Base.div(x::ZZRingElem, y::Integer, r::RoundingMode) = Base.div(x, ZZ(y), r)
 
 divrem(x::ZZRingElem, y::Integer) = divrem(x, ZZRingElem(y))
 
 divrem(x::Integer, y::ZZRingElem) = divrem(ZZRingElem(x), y)
 
 # Without the functions below, Julia defaults to `(div(x, y), rem(x, y))`
-Base.divrem(x::ZZRingElem, y::Integer) = (
-  Base.divrem(x, ZZ(y))
-)
-Base.divrem(x::ZZRingElem, y::Integer, ::typeof(RoundToZero)) = (
-  Base.divrem(x, ZZ(y), RoundToZero)
-)
-Base.divrem(x::ZZRingElem, y::Integer, ::typeof(RoundUp)) = (
-  Base.divrem(x, ZZ(y), RoundUp)
-)
-Base.divrem(x::ZZRingElem, y::Integer, ::typeof(RoundDown)) = (
-  Base.divrem(x, ZZ(y), RoundDown)
-)
-Base.divrem(x::Integer, y::ZZRingElem) = (
-  Base.divrem(ZZ(x), y)
-)
-Base.divrem(x::Integer, y::ZZRingElem, ::typeof(RoundToZero)) = (
-  Base.divrem(ZZ(x), y, RoundToZero)
-)
-Base.divrem(x::Integer, y::ZZRingElem, ::typeof(RoundUp)) = (
-  Base.divrem(ZZ(x), y, RoundUp)
-)
-Base.divrem(x::Integer, y::ZZRingElem, ::typeof(RoundDown)) = (
-  Base.divrem(ZZ(x), y, RoundDown)
-)
+Base.divrem(x::ZZRingElem, y::Integer) = Base.divrem(x, ZZ(y))
+Base.divrem(x::ZZRingElem, y::Integer, r::RoundingMode) = Base.divrem(x, ZZ(y), r)
+Base.divrem(x::Integer, y::ZZRingElem) = Base.divrem(ZZ(x), y)
+Base.divrem(x::Integer, y::ZZRingElem, r::RoundingMode) = Base.divrem(ZZ(x), y, r)
 
 ###############################################################################
 #
