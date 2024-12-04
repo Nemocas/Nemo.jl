@@ -56,7 +56,7 @@
   @test unit(F_minus1) == -1
   @test unit(F_minus1_ZZ) == -1
 
-  for T in [ Int8,  Int16,  Int32,  Int64,  UInt8,  UInt16,  UInt32,  UInt64 ]
+  for T in [ Int8,  Int16,  Int32,  Int64,  Int128,  UInt8,  UInt16,  UInt32,  UInt64,  UInt127,  BigInt,  ZZRingElem ]
     @test_throws ArgumentError factor(T(0))
     fac99 = factor(T(99))
     @test  unit(fac99) == 1
