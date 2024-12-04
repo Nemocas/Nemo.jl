@@ -10,8 +10,8 @@
 
   @test_throws DomainError factor(true)
   @test_throws DomainError factor(false)
-  @test_throws DomainError factor(Bool, 1)
-  @test_throws DomainError factor(Bool, ZZ(1))
+  @test_throws ArgumentError factor(Bool, 1)
+  @test_throws ArgumentError factor(Bool, ZZ(1))
 
 
   # trivial case: input is 1
@@ -57,5 +57,30 @@
   @test length(F_minus1_ZZ) == 0
   @test unit(F_minus1) == -1
   @test unit(F_minus1_ZZ) == -1
+
+for T in [ Int8,  Int16,  Int32,  Int64,  UInt8,  UInt16,  UInt32,  UInt64 ]
+  @test_throws ArgumentError factor(T(0))
+  fac99 = factor(T(99));
+  @test  unit(fac99) == 1
+  @test  typeof(unit(fac99)) == T
+  @test  length(fac99) == 2
+  @test  issetequal([a  for (a,_) in fac99], [3, 11])
+  @test  issetequal([e  for (_,e) in fac99], [2, 1])
+  for (a,_) in fac99
+    @test  typeof(a) == T
+  end
+end
+
+# Some tests for overflow
+@test_throws  InexactError  factor(Int8, 257)
+@test_throws  InexactError  factor(UInt8, 257)
+@test_throws  InexactError  factor(Int16, 65537)
+@test_throws  InexactError  factor(UInt16, 65537)
+@test_throws  InexactError  factor(Int32, ZZ(2)^32+15)
+@test_throws  InexactError  factor(UInt32, ZZ(2)^32+15)
+@test_throws  InexactError  factor(Int64, ZZ(2)^64+13)
+@test_throws  InexactError  factor(UInt64, ZZ(2)^64+13)
+@test_throws  InexactError  factor(Int128, ZZ(2)^128+51)
+@test_throws  InexactError  factor(UInt128, ZZ(2)^128+51)
 
 end

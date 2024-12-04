@@ -22,39 +22,41 @@ function factor(::Bool)
   throw(DomainError("Cannot factorize a boolean"))
 end
 
-function factor(::Type{Bool}, ::Int)
-  throw(DomainError("Cannot have a factorization into booleans"))
-end
-
-function factor(::Type{Bool}, ::ZZRingElem)
-  throw(DomainError("Cannot have a factorization into booleans"))
-end
-
 
 # The main dispatch function: flintify gives either Int or ZZRingElem,
 # then use Julia's dispatcher to select the worker function.
 function factor(a::T)  where T <: Integer
-  iszero(a) && throw(ArgumentError("Argument must be non-zero"))
+  @req  !iszero(a)  "Argument must be non-zero"
   return factor(typeof(a), Nemo.flintify(a))
 end
 
-# Two worker functions: one for Int, one for ZZRingElem
-function factor(::Type{T}, a::Int)  where T <: Int
-  iszero(a) && throw(ArgumentError("Argument must be non-zero"))
-  u = T(sign(a))
-  abs_a = reinterpret(UInt, a < 0 ? -a : a) # supposedly correct when a is most negative Int value
+
+# Three worker functions: one for Int, one for UInt, one for ZZRingElem
+function factor(::Type{T}, a::Int) where T <: Integer
+  abs_a = reinterpret(UInt, a < 0 ? -a : a) # like abs(a), but correct also when a == typemin(Int)
+  fac = factor(T, abs_a)
+  if a < 0
+    fac.unit = T(-1)  # OK since fac is mutable; gives error if T is Unsigned
+  end
+  return fac
+end
+
+function factor(::Type{T}, a::UInt)  where T <: Integer
+  @req  (T != Bool)  "Cannot have a factorization into booleans"
+  @req  !iszero(a)  "Argument must be non-zero"
   F = n_factor()
-  @ccall libflint.n_factor(F::Ref{n_factor}, abs_a::UInt)::Nothing
+  @ccall libflint.n_factor(F::Ref{n_factor}, a::UInt)::Nothing
   res = Dict{T, Int}()  # factor-multiplicity pairs
   for i in 1:F.num
     z = T(F.p[i])
     res[z] = F.exp[i]
   end
-  return Fac(u, res)
+  return Fac(T(1), res)
 end
 
 function factor(::Type{T}, a::ZZRingElem)  where T <: Integer
-  iszero(a) && throw(ArgumentError("Argument must be non-zero"))
+  @req  (T != Bool)  "Cannot have a factorization into booleans"
+  @req  !iszero(a)  "Argument must be non-zero"
   u = T(sign(a))
   F = factor(abs(a))
   res = Dict{T, Int}()  # factor-multiplicity pairs
