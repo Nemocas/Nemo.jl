@@ -1554,11 +1554,7 @@ function _solve_dixon(a::ZZMatrix, b::ZZMatrix)
 end
 
 #XU = B. only the upper triangular part of U is used
-function AbstractAlgebra._solve_triu_left(U::ZZMatrix, b::ZZMatrix; side::Symbol = :left)
-  if side == :right
-    return AbstractAlgebra._solve_triu(U, b; side)
-  end
-  @assert side == :left
+function AbstractAlgebra._solve_triu_left(U::ZZMatrix, b::ZZMatrix)
   n = ncols(U)
   m = nrows(b)
   R = base_ring(U)
@@ -1602,7 +1598,7 @@ end
 #UX = B, U has to be upper triangular
 function AbstractAlgebra._solve_triu(U::ZZMatrix, b::ZZMatrix; side::Symbol=:left) 
   if side == :left
-    return AbstractAlgebra._solve_triu_left(U, b; side)
+    return AbstractAlgebra._solve_triu_left(U, b)
   end
   @assert side == :right
   n = nrows(U)
