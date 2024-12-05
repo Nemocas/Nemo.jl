@@ -462,6 +462,16 @@ include("julia/Integer.jl")
 include("julia/Rational.jl")
 include("julia/Float.jl")
 
+################################################################################
+#
+#  Better error message for BoundsError of flint matrices
+#
+################################################################################
+
+function Base.summary(io::IO, A::T) where {T <: _MatTypes}
+  print(io, nrows(A), "x", ncols(A), " ", T)
+end
+
 ###############################################################################
 #
 #   satellite functionality
