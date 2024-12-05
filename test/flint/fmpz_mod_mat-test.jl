@@ -520,6 +520,13 @@ end
   R, = residue_ring(ZZ, 3^5)
   a = R[1;]
   @test @inferred isone(det(a))
+
+  for n in 2:12
+    R, = residue_ring(ZZ, ZZ(n))
+    a = matrix(R, [ 1 2 3 ; 4 5 6; 0 42 9])
+    @test det(a) == det(lift(a)) % modulus(R)
+    @test tr(a) == tr(lift(a)) % modulus(R)
+  end
 end
 
 @testset "ZZModMatrix.rank" begin
