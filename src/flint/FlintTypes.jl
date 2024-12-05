@@ -1845,8 +1845,8 @@ See [`FqPolyRepField`](@ref) for $p$ being a [`ZZRingElem`](@ref). See [`fqPolyR
   var :: Ptr{Nothing}
   # end of flint struct
 
-  overfields :: Dict{Int, Vector{FinFieldMorphism}}
-  subfields :: Dict{Int, Vector{FinFieldMorphism}}
+  overfields :: Dict{Int, Vector{FinFieldMorphism{fqPolyRepField, fqPolyRepField}}}
+  subfields :: Dict{Int, Vector{FinFieldMorphism{fqPolyRepField, fqPolyRepField}}}
 
   function fqPolyRepField(c::UInt, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true)
     check && !is_prime(c) &&
@@ -1973,8 +1973,8 @@ A finite field. The constructor automatically determines a fast implementation.
 
   var::String
 
-  overfields::Dict{Int, Vector{FinFieldMorphism}}
-  subfields::Dict{Int, Vector{FinFieldMorphism}}
+  overfields::Dict{Int, Vector{FinFieldMorphism{FqField, FqField}}}
+  subfields::Dict{Int, Vector{FinFieldMorphism{FqField, FqField}}}
 
   isstandard::Bool
   # isstandard means, that defining_polynomial(F) === modulus(F)
@@ -2148,8 +2148,8 @@ See [`fqPolyRepField`](@ref) for $p$ being an [`Int`](@ref). See [`FqPolyRepFiel
   var::Ptr{Nothing}
   # end of flint struct
 
-  overfields :: Dict{Int, Vector{FinFieldMorphism}}
-  subfields :: Dict{Int, Vector{FinFieldMorphism}}
+  overfields :: Dict{Int, Vector{FinFieldMorphism{FqPolyRepField, FqPolyRepField}}}
+  subfields :: Dict{Int, Vector{FinFieldMorphism{FqPolyRepField, FqPolyRepField}}}
 
   function FqPolyRepField(char::ZZRingElem, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true)
     check && !is_probable_prime(char) &&
