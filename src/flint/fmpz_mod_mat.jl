@@ -376,23 +376,12 @@ end
 #
 ################################################################################
 
-#= Not implemented in Flint yet
-
 function det(a::ZZModMatrix)
-!is_square(a) && error("Matrix must be a square matrix")
-if is_prime(a.n)
-r = @ccall libflint.fmpz_mod_mat_det(a::Ref{ZZModMatrix})::UInt
-return base_ring(a)(r)
-else
-try
-return AbstractAlgebra.det_fflu(a)
-catch
-return AbstractAlgebra.det_df(a)
+  !is_square(a) && error("Matrix must be a square matrix")
+  z = ZZRingElem()
+  r = @ccall libflint.fmpz_mod_mat_det(z::Ref{ZZRingElem}, a::Ref{ZZModMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return base_ring(a)(z)
 end
-end
-end
-
-=#
 
 ################################################################################
 #
@@ -400,14 +389,10 @@ end
 #
 ################################################################################
 
-#= Not implemented in Flint yet
-
 function rank(a::T) where T <: Zmod_fmpz_mat
-r = @ccall libflint.fmpz_mod_mat_rank(a::Ref{T})::Int
-return r
+  r = @ccall libflint.fmpz_mod_mat_rank(a::Ref{T}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Int
+  return r
 end
-
-=#
 
 ################################################################################
 #
@@ -434,17 +419,13 @@ function inv(a::ZZModMatrix)
   end
 end
 
-#= Not implemented in Flint yet
-
 function inv(a::T) where T <: Zmod_fmpz_mat
-!is_square(a) && error("Matrix must be a square matrix")
-z = similar(a)
-r = @ccall libflint.fmpz_mod_mat_inv(z::Ref{T}, a::Ref{T})::Int
-!Bool(r) && error("Matrix not invertible")
-return z
+  !is_square(a) && error("Matrix must be a square matrix")
+  z = similar(a)
+  r = @ccall libflint.fmpz_mod_mat_inv(z::Ref{T}, a::Ref{T}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Int
+  !Bool(r) && error("Matrix not invertible")
+  return z
 end
-
-=#
 
 ################################################################################
 #
@@ -599,26 +580,10 @@ end
 #
 ################################################################################
 
-#= Not implemented in Flint yet
-
-@doc raw"""
-    lift(a::T) where {T <: Zmod_fmpz_mat}
-
-Return a lift of the matrix $a$ to a matrix over $\mathbb{Z}$, i.e. where the
-entries of the returned matrix are those of $a$ lifted to $\mathbb{Z}$.
-"""
-function lift(a::T) where {T <: Zmod_fmpz_mat}
-z = ZZMatrix(nrows(a), ncols(a))
-@ccall libflint.fmpz_mat_set_fmpz_mod_mat(z::Ref{ZZMatrix}, a::Ref{T})::Nothing
-return z
-end
-
 function lift!(z::ZZMatrix, a::T) where T <: Zmod_fmpz_mat
-@ccall libflint.fmpz_mat_set_fmpz_mod_mat(z::Ref{ZZMatrix}, a::Ref{T})::Nothing
-return z
+  @ccall libflint.fmpz_mod_mat_get_fmpz_mat(z::Ref{ZZMatrix}, a::Ref{T})::Nothing
+  return z
 end
-
-=#
 
 @doc raw"""
     lift(a::T) where {T <: Zmod_fmpz_mat}
@@ -627,17 +592,8 @@ Return a lift of the matrix $a$ to a matrix over $\mathbb{Z}$, i.e. where the
 entries of the returned matrix are those of $a$ lifted to $\mathbb{Z}$.
 """
 function lift(a::Zmod_fmpz_mat)
-  z = zero_matrix(ZZ, nrows(a), ncols(a))
-  GC.@preserve a z begin
-    for i in 1:nrows(a)
-      for j in 1:ncols(a)
-        m = mat_entry_ptr(z, i, j)
-        n = mat_entry_ptr(a, i, j)
-        set!(m, n)
-      end
-    end
-  end
-  return z
+  z = ZZMatrix(nrows(a), ncols(a))
+  return lift!(z, a)
 end
 
 ################################################################################
@@ -646,16 +602,13 @@ end
 #
 ################################################################################
 
-#= Not implemented in Flint yet
-
 function charpoly(R::ZZModPolyRing, a::ZZModMatrix)
-m = deepcopy(a)
-p = R()
-@ccall libflint.fmpz_mod_mat_charpoly(p::Ref{ZZModPolyRingElem}, m::Ref{ZZModMatrix})::Nothing
-return p
+  @req base_ring(R) == base_ring(a) "base rings don't match'"
+  m = deepcopy(a)
+  p = R()
+  @ccall libflint.fmpz_mod_mat_charpoly(p::Ref{ZZModPolyRingElem}, m::Ref{ZZModMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return p
 end
-
-=#
 
 ################################################################################
 #
@@ -663,15 +616,11 @@ end
 #
 ################################################################################
 
-#= Not implemented in Flint yet
-
 function minpoly(R::ZZModPolyRing, a::ZZModMatrix)
-p = R()
-@ccall libflint.fmpz_mod_mat_minpoly(p::Ref{ZZModPolyRingElem}, a::Ref{ZZModMatrix})::Nothing
-return p
+  p = R()
+  @ccall libflint.fmpz_mod_mat_minpoly(p::Ref{ZZModPolyRingElem}, a::Ref{ZZModMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return p
 end
-
-=#
 
 ###############################################################################
 #
