@@ -11,6 +11,7 @@ const ring_to_mat = Dict(ZZ                         => ZZMatrix,
                         )
 
 include("flint/fmpz-test.jl")
+include("flint/fmpz_factor-test.jl")
 include("flint/fmpz_poly-test.jl")
 include("flint/fmpz_mod_poly-test.jl")
 include("flint/gfp_fmpz_poly-test.jl")

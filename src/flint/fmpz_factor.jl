@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   Flint factor(s) functiosn
+#   Flint factor(s) functions
 #
 ###############################################################################
 
@@ -17,19 +17,38 @@ function _factor(a::ZZRingElem)
   return res, canonical_unit(a)
 end
 
+# Just to give a helpful error message if someone tries to factor a boolean
+function factor(b::Bool)
+  throw(DomainError("Cannot factorize a boolean"));
+end
+
+# This function handles machine integer types (up to 64 bits)
 function factor(a::T) where T <: Union{Int, UInt}
   iszero(a) && throw(ArgumentError("Argument must be non-zero"))
   u = sign(a)
   a = u < 0 ? -a : a
   F = n_factor()
   @ccall libflint.n_factor(F::Ref{n_factor}, a::UInt)::Nothing
-  res = Dict{T, Int}()
+  res = Dict{T, Int}()  # factor-multiplicity pairs
   for i in 1:F.num
     z = F.p[i]
     res[z] = F.exp[i]
   end
   return Fac(u, res)
 end
+
+# This is supposed to be called only for T in [Int128, UInt128, BigInt]
+function factor(a::T) where T <: Integer
+  iszero(a) && throw(ArgumentError("Argument must be non-zero"))
+  u = sign(a)
+  F = factor(ZZ(abs(a)))
+  res = Dict{T, Int}()  # factor-multiplicity pairs
+  for (fac,exp) in F.fac
+    res[T(fac)] = exp
+  end
+  return Fac(u, res)
+end
+
 
 ################################################################################
 #

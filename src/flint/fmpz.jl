@@ -410,6 +410,10 @@ function Base.div(x::ZZRingElem, y::ZZRingElem)
   return z
 end
 
+Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundToZero)) = tdiv(x, y)
+Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundUp)) = cdiv(x, y)
+Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundDown)) = fdiv(x, y)
+
 function divexact(x::ZZRingElem, y::ZZRingElem; check::Bool=true)
   iszero(y) && throw(DivideError())
   if check
@@ -641,17 +645,23 @@ div(x::Integer, y::ZZRingElem) = div(ZZRingElem(x), y)
 
 # Note Base.div is different to Nemo.div
 Base.div(x::Integer, y::ZZRingElem) = Base.div(ZZRingElem(x), y)
+Base.div(x::Integer, y::ZZRingElem, r::RoundingMode) = Base.div(ZZ(x), y, r)
 
 div(x::ZZRingElem, y::Integer) = div(x, ZZRingElem(y))
 
 # Note Base.div is different to Nemo.div
 Base.div(x::ZZRingElem, y::Integer) = Base.div(x, ZZRingElem(y))
+Base.div(x::ZZRingElem, y::Integer, r::RoundingMode) = Base.div(x, ZZ(y), r)
 
 divrem(x::ZZRingElem, y::Integer) = divrem(x, ZZRingElem(y))
 
 divrem(x::Integer, y::ZZRingElem) = divrem(ZZRingElem(x), y)
 
-Base.divrem(x::ZZRingElem, y::Int) = (Base.div(x, y), Base.rem(x, y))
+# Without the functions below, Julia defaults to `(div(x, y), rem(x, y))`
+Base.divrem(x::ZZRingElem, y::Integer) = Base.divrem(x, ZZ(y))
+Base.divrem(x::ZZRingElem, y::Integer, r::RoundingMode) = Base.divrem(x, ZZ(y), r)
+Base.divrem(x::Integer, y::ZZRingElem) = Base.divrem(ZZ(x), y)
+Base.divrem(x::Integer, y::ZZRingElem, r::RoundingMode) = Base.divrem(ZZ(x), y, r)
 
 ###############################################################################
 #
@@ -664,9 +674,10 @@ function divrem(x::ZZRingElem, y::ZZRingElem)
 end
 
 # N.B. Base.divrem differs from Nemo.divrem
-function Base.divrem(x::ZZRingElem, y::ZZRingElem)
-  return tdivrem(x, y)
-end
+Base.divrem(x::ZZRingElem, y::ZZRingElem) = tdivrem(x, y)
+Base.divrem(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundToZero)) = tdivrem(x, y)
+Base.divrem(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundUp)) = cdivrem(x, y)
+Base.divrem(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundDown)) = fdivrem(x, y)
 
 function tdivrem(x::ZZRingElem, y::ZZRingElem)
   iszero(y) && throw(DivideError())
@@ -2894,6 +2905,7 @@ end
 (::Type{T})(a::ZZRingElem) where T <: Union{UInt8, UInt16, UInt32} = T(UInt(a))
 
 (::Type{Int128})(a::ZZRingElem) = Int128(BigInt(a))
+(::Type{UInt128})(a::ZZRingElem) = UInt128(BigInt(a))
 
 Integer(a::ZZRingElem) = BigInt(a)
 

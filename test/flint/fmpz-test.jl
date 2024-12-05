@@ -708,6 +708,26 @@ end
   @test Nemo.divrem(-ZZRingElem(2), 3) == (-ZZRingElem(1), ZZRingElem(1))
 end
 
+@testset "divrem and div with other rings" begin
+  for (x, y) in [(12, 5), (-12, 5)]
+    for r in [RoundToZero, RoundUp, RoundDown]
+      @test (
+        ZZ(Base.div(x, y, r))
+        == Base.div(ZZ(x), y, r)
+        == Base.div(x, ZZ(y), r)
+        == Base.div(ZZ(x), ZZ(y), r)
+      )
+      a, b = Base.divrem(x, y, r)
+      @test (
+        (ZZ(a), ZZ(b))
+        == Base.divrem(ZZ(x), y, r)
+        == Base.divrem(x, ZZ(y), r)
+        == Base.divrem(ZZ(x), ZZ(y), r)
+      )
+    end
+  end
+end
+
 @testset "ZZRingElem.roots" begin
   @test sqrt(ZZRingElem(16)) == 4
   @test sqrt(ZZRingElem()) == 0
