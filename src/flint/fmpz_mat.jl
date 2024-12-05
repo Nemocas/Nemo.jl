@@ -1596,6 +1596,8 @@ function AbstractAlgebra._solve_triu_left(U::ZZMatrix, b::ZZMatrix)
 end
 
 #UX = B, U has to be upper triangular
+#I think due to the Strassen calling path, where Strasse.solve(side = :left) 
+#call directly AA.solve_left, this has to be in AA and cannot be independent.
 function AbstractAlgebra._solve_triu(U::ZZMatrix, b::ZZMatrix; side::Symbol=:left) 
   if side == :left
     return AbstractAlgebra._solve_triu_left(U, b)
