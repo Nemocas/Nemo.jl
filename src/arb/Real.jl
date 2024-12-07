@@ -1425,6 +1425,7 @@ function hypot(x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
 end
 
 function root(x::RealFieldElem, n::UInt, prec::Int = precision(Balls))
+  is_zero(x) && return x
   z = RealFieldElem()
   @ccall libflint.arb_root(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, n::UInt, prec::Int)::Nothing
   return z

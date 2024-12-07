@@ -1423,6 +1423,7 @@ function hypot(x::ArbFieldElem, y::ArbFieldElem)
 end
 
 function root(x::ArbFieldElem, n::UInt)
+  is_zero(x) && return x
   z = parent(x)()
   @ccall libflint.arb_root(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, n::UInt, parent(x).prec::Int)::Nothing
   return z
