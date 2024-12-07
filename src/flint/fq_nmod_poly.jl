@@ -679,19 +679,6 @@ promote_rule(::Type{fqPolyRepPolyRingElem}, ::Type{ZZRingElem}) = fqPolyRepPolyR
 
 promote_rule(::Type{fqPolyRepPolyRingElem}, ::Type{fqPolyRepFieldElem}) = fqPolyRepPolyRingElem
 
-###############################################################################
-#
-#   Polynomial substitution
-#
-###############################################################################
-
-function (f::fqPolyRepPolyRingElem)(a::fqPolyRepFieldElem)
-  if parent(a) != base_ring(f)
-    return subst(f, a)
-  end
-  return evaluate(f, a)
-end
-
 ################################################################################
 #
 #   Parent object call overloads
