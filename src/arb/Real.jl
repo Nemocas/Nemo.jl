@@ -32,6 +32,9 @@ zero(R::RealField) = R(0)
 one(R::RealField) = R(1)
 
 # TODO: Add hash (and document under ArbFieldElem basic functionality)
+function hash(a::RealFieldElem, h::UInt)
+  return h
+end
 
 @doc raw"""
     accuracy_bits(x::RealFieldElem)
