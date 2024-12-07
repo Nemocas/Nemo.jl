@@ -1414,6 +1414,17 @@ function (::Type{Float64})(a::QQBarFieldElem)
   return Float64(x)
 end
 
+function (::Type{T})(a::QQBarFieldElem) where {T <: Integer}
+  return T(ZZRingElem(a))
+end
+
+function (::Type{T})(a::QQBarFieldElem) where {T <: Rational}
+  return T(QQFieldElem(a))
+end
+
+convert(::Type{QQBarFieldElem}, a::RationalUnion) = QQBarFieldElem(a)
+convert(::Type{T}, a::QQBarFieldElem) where {T <: RationalUnion} = T(a)
+
 ###############################################################################
 #
 #   Unsafe functions

@@ -418,4 +418,35 @@ end
   x = sqrt(R(-2))
   @test_throws InexactError Float64(x)
   @test isapprox(ComplexF64(x),sqrt(complex(-2)))
+
+
+  x = R(2)
+  for T in [Int16, UInt32, Int, BigInt, Rational{Int}, Rational{BigInt}, ZZRingElem, QQFieldElem]
+    y = convert(T, x)
+    @test y::T == 2
+
+    y = T(x)
+    @test y::T == 2
+
+    z = convert(QQBarFieldElem, y)
+    @test z::QQBarFieldElem == x
+
+    z = QQBarFieldElem(y)
+    @test z::QQBarFieldElem == x
+  end
+
+  x = R(2//3)
+  for T in [Rational{Int}, Rational{BigInt}, QQFieldElem]
+    y = convert(T, x)
+    @test y::T == 2//3
+
+    y = T(x)
+    @test y::T == 2//3
+
+    z = convert(QQBarFieldElem, y)
+    @test z::QQBarFieldElem == x
+
+    z = QQBarFieldElem(y)
+    @test z::QQBarFieldElem == x
+  end
 end
