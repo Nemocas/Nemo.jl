@@ -389,10 +389,17 @@ end
 #
 ################################################################################
 
+#= There are some doubts whether fmpz_mod_mat_rank is what we want: there are
+several non-equivalent ways to define the rank of a matrix over a ring with
+zero divisors. FLINT does not seem to document what exactly fmpz_mod_mat_rank
+computes...
+
 function rank(a::T) where T <: Zmod_fmpz_mat
   r = @ccall libflint.fmpz_mod_mat_rank(a::Ref{T}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Int
   return r
 end
+
+=#
 
 ################################################################################
 #
