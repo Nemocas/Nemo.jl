@@ -557,21 +557,6 @@ const _ecm_nC = Int[25, 90, 300, 700, 1800, 5100, 10600, 19300, 49000, 124000, 2
 const _ecm_B1s = Vector{Int}[_ecm_B1]
 const _ecm_nCs = Vector{Int}[_ecm_nC]
 
-###############################################################################
-#
-#   Set domain for ZZ, QQ to Flint
-#
-###############################################################################
-
-@doc zz_ring_doc
-const FlintZZ = ZZ
-
-@doc qq_field_doc
-const FlintQQ = QQ
-
-const FlintZZi = ZZi
-
-const FlintQQi = QQi
 
 ###############################################################################
 #
