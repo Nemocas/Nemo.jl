@@ -1,5 +1,26 @@
 RR = ArbField(64)
 
+function test_elem(R::ArbField)
+    randtype = rand((
+    :urandom,
+    :randtest,
+    :randtest_exact,
+    :randtest_precise,
+    :randtest_wide,
+    :randtest_special,
+    ))
+  return rand(R; randtype)
+end
+
+function equality(a::T, b::T) where T <: Union{ArbFieldElem,RealFieldElem,AcbFieldElem,ComplexFieldElem}
+   return isequal(a, b)
+end
+
+@testset "ArbFieldElem.conformance_tests" begin
+  test_Field_interface(RR)
+  #test_Field_interface_recursive(RR)
+end
+
 @testset "ArbFieldElem.constructors" begin
   @test isa(RR, ArbField)
   @test isa(RR(2), FieldElem)
