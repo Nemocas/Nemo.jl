@@ -401,6 +401,12 @@ end
 
   @test_throws DomainError root(-x, 3)
 
+  a = RR(0)
+  @testset "root(0, i)" for i in 1:10
+    @test is_zero(root(a, i))
+    @test is_zero(root(a, UInt(i)))
+  end
+
   @test overlaps(factorial(x), RR("0.886581428719259125080918 +/- 6.66e-25"))
   @test factorial(UInt(10), RR) == 3628800
   @test factorial(Int(10), RR) == 3628800
