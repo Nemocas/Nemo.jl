@@ -329,6 +329,11 @@ function isequal(x::AcbFieldElem, y::AcbFieldElem)
   return Bool(r)
 end
 
+function Base.hash(x::AcbFieldElem, h::UInt)
+  # TODO: improve me
+  return h
+end
+
 function ==(x::AcbFieldElem, y::AcbFieldElem)
   r = @ccall libflint.acb_eq(x::Ref{AcbFieldElem}, y::Ref{AcbFieldElem})::Cint
   return Bool(r)

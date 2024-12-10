@@ -204,11 +204,11 @@ end
 ################################################################################
 
 @doc raw"""
-    eigenvalues(M::MatElem{T}) where T <: FieldElem
+    eigenvalues(M::MatElem{T}) where T <: RingElem
 
-Return the eigenvalues of `M`.
+Return the eigenvalues of `M` which lie in `base_ring(M)`.
 """
-function eigenvalues(M::MatElem{T}) where T <: FieldElem
+function eigenvalues(M::MatElem{T}) where T <: RingElem
   @assert is_square(M)
   K = base_ring(M)
   f = charpoly(M)
@@ -218,10 +218,10 @@ end
 @doc raw"""
     eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
 
-Return the eigenvalues of `M` together with their algebraic multiplicities as a
-vector of tuples.
+Return the eigenvalues of `M` (which lie in `base_ring(M)`) together with their
+algebraic multiplicities as a vector of tuples of (root, multiplicity).
 """
-function eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
+function eigenvalues_with_multiplicities(M::MatElem{T}) where T <: RingElem
   @assert is_square(M)
   K = base_ring(M)
   Kx, x = polynomial_ring(K, "x", cached = false)

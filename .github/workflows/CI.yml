@@ -64,8 +64,9 @@ jobs:
             Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()
             using Documenter
-            using Nemo
+            import Nemo: Nemo, AbstractAlgebra
             DocMeta.setdocmeta!(Nemo, :DocTestSetup, :(using Nemo); recursive = true)
+            DocMeta.setdocmeta!(AbstractAlgebra, :DocTestSetup, AbstractAlgebra.doctestsetup(); recursive = true)
             doctest(Nemo)'
       - name: "Process code coverage"
         uses: julia-actions/julia-processcoverage@v1

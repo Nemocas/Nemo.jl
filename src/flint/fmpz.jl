@@ -143,17 +143,23 @@ end
 ################################################################################
 
 # Similar to hash for BigInt found in julia/base
-
-@inline function _fmpz_is_small(a::ZZRingElem)
-  return __fmpz_is_small(a.d)
+@inline function _fmpz_is_small(a::ZZRingElemOrPtr)
+  return __fmpz_is_small(data(a))
 end
 
-@inline function _fmpz_limbs(a::ZZRingElem)
-  return __fmpz_limbs(a.d)
+# "views" a non-small ZZRingElem as a readonly BigInt
+# the caller must ensure z is actually non-small, and
+# call GC.@preserve appropriately
+function _as_bigint(a::ZZRingElemOrPtr)
+  unsafe_load(Ptr{BigInt}(data(a) << 2))
+end
+
+@inline function _fmpz_size(a::ZZRingElemOrPtr)
+  return _fmpz_is_small(a) ? 1 : GC.@preserve a _as_bigint(a).size
 end
 
 function hash_integer(a::ZZRingElem, h::UInt)
-  return _hash_integer(a.d, h)
+  return GC.@preserve a _hash_integer(data(a), h)
 end
 
 function hash(a::ZZRingElem, h::UInt)
@@ -164,20 +170,12 @@ end
   return (unsigned(a) >> (Sys.WORD_SIZE - 2) != 1)
 end
 
-function __fmpz_limbs(a::Int)
-  if __fmpz_is_small(a)
-    return Cint(0)
-  end
-  b = unsafe_load(convert(Ptr{Cint}, unsigned(a)<<2), 2)
-  return b
-end
-
 function _hash_integer(a::Int, h::UInt)
-  s::Cint = __fmpz_limbs(a)
-  s == 0 && return Base.hash_integer(a, h)
-  # get the pointer after the first two Cint
-  d = convert(Ptr{Ptr{UInt}}, unsigned(a) << 2) + 2*sizeof(Cint)
-  p = unsafe_load(d)
+  __fmpz_is_small(a) && return Base.hash_integer(a, h)
+  # view it as a BigInt
+  z = unsafe_load(Ptr{BigInt}(unsigned(a) << 2))
+  s = z.size  # number of active limbs
+  p = z.d     # pointer to the limbs
   b = unsafe_load(p)
   h = xor(Base.hash_uint(xor(ifelse(s < 0, -b, b), h)), h)
   for k = 2:abs(s)
@@ -215,11 +213,11 @@ zero(::Type{ZZRingElem}) = ZZRingElem(0)
 
 Return the sign of $a$, i.e. $+1$, $0$ or $-1$.
 """
-sign(a::ZZRingElemOrPtr) = ZZRingElem(@ccall libflint.fmpz_sgn(a::Ref{ZZRingElem})::Cint)
+sign(a::ZZRingElemOrPtr) = ZZRingElem(sign(Int, a))
 
-sign(::Type{Int}, a::ZZRingElemOrPtr) = Int(@ccall libflint.fmpz_sgn(a::Ref{ZZRingElem})::Cint)
+sign(::Type{Int}, a::ZZRingElemOrPtr) = is_zero(a) ? 0 : (signbit(a) ? -1 : 1)
 
-Base.signbit(a::ZZRingElemOrPtr) = signbit(sign(Int, a))
+Base.signbit(a::ZZRingElemOrPtr) = _fmpz_is_small(a) ? signbit(data(a)) : signbit(_fmpz_size(a))
 
 is_negative(n::ZZRingElemOrPtr) = sign(Int, n) < 0
 is_positive(n::ZZRingElemOrPtr) = sign(Int, n) > 0
@@ -252,7 +250,7 @@ end
 
 Return the number of limbs required to store the absolute value of $a$.
 """
-size(a::ZZRingElem) = Int(@ccall libflint.fmpz_size(a::Ref{ZZRingElem})::Cint)
+size(a::ZZRingElem) = _fmpz_is_small(a) ? 1 : abs(_fmpz_size(a))
 
 is_unit(a::ZZRingElemOrPtr) = data(a) == 1 || data(a) == -1
 
@@ -284,8 +282,8 @@ function numerator(a::ZZRingElem)
   return a
 end
 
-isodd(a::ZZRingElemOrPtr)  = (@ccall libflint.fmpz_is_odd(a::Ref{ZZRingElem})::Cint) % Bool
-iseven(a::ZZRingElemOrPtr) = (@ccall libflint.fmpz_is_even(a::Ref{ZZRingElem})::Cint) % Bool
+isodd(a::ZZRingElemOrPtr) = isodd(a % UInt)
+iseven(a::ZZRingElemOrPtr) = !isodd(a)
 
 ###############################################################################
 #
@@ -412,6 +410,10 @@ function Base.div(x::ZZRingElem, y::ZZRingElem)
   return z
 end
 
+Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundToZero)) = tdiv(x, y)
+Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundUp)) = cdiv(x, y)
+Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundDown)) = fdiv(x, y)
+
 function divexact(x::ZZRingElem, y::ZZRingElem; check::Bool=true)
   iszero(y) && throw(DivideError())
   if check
@@ -473,6 +475,10 @@ end
 
 function is_divisible_by(x::Integer, y::ZZRingElem)
   return is_divisible_by(ZZRingElem(x), y)
+end
+
+function rem(x::ZZRingElemOrPtr, ::Type{UInt64})
+  return _fmpz_is_small(x) ? (data(x) % UInt) : GC.@preserve x (_as_bigint(x) % UInt)
 end
 
 function rem(x::ZZRingElem, c::ZZRingElem)
@@ -639,17 +645,23 @@ div(x::Integer, y::ZZRingElem) = div(ZZRingElem(x), y)
 
 # Note Base.div is different to Nemo.div
 Base.div(x::Integer, y::ZZRingElem) = Base.div(ZZRingElem(x), y)
+Base.div(x::Integer, y::ZZRingElem, r::RoundingMode) = Base.div(ZZ(x), y, r)
 
 div(x::ZZRingElem, y::Integer) = div(x, ZZRingElem(y))
 
 # Note Base.div is different to Nemo.div
 Base.div(x::ZZRingElem, y::Integer) = Base.div(x, ZZRingElem(y))
+Base.div(x::ZZRingElem, y::Integer, r::RoundingMode) = Base.div(x, ZZ(y), r)
 
 divrem(x::ZZRingElem, y::Integer) = divrem(x, ZZRingElem(y))
 
 divrem(x::Integer, y::ZZRingElem) = divrem(ZZRingElem(x), y)
 
-Base.divrem(x::ZZRingElem, y::Int) = (Base.div(x, y), Base.rem(x, y))
+# Without the functions below, Julia defaults to `(div(x, y), rem(x, y))`
+Base.divrem(x::ZZRingElem, y::Integer) = Base.divrem(x, ZZ(y))
+Base.divrem(x::ZZRingElem, y::Integer, r::RoundingMode) = Base.divrem(x, ZZ(y), r)
+Base.divrem(x::Integer, y::ZZRingElem) = Base.divrem(ZZ(x), y)
+Base.divrem(x::Integer, y::ZZRingElem, r::RoundingMode) = Base.divrem(ZZ(x), y, r)
 
 ###############################################################################
 #
@@ -662,9 +674,10 @@ function divrem(x::ZZRingElem, y::ZZRingElem)
 end
 
 # N.B. Base.divrem differs from Nemo.divrem
-function Base.divrem(x::ZZRingElem, y::ZZRingElem)
-  return tdivrem(x, y)
-end
+Base.divrem(x::ZZRingElem, y::ZZRingElem) = tdivrem(x, y)
+Base.divrem(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundToZero)) = tdivrem(x, y)
+Base.divrem(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundUp)) = cdivrem(x, y)
+Base.divrem(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundDown)) = fdivrem(x, y)
 
 function tdivrem(x::ZZRingElem, y::ZZRingElem)
   iszero(y) && throw(DivideError())
@@ -1527,7 +1540,7 @@ end
 Return `true` if $n$ is squarefree, `false` otherwise.
 """
 function is_squarefree(n::Union{Int, ZZRingElem})
-  iszero(n) && return false
+  is_divisible_by_four(n) && return false
   is_unit(n) && return true
   e, b = is_perfect_power_with_data(n)
   if e > 1
@@ -1535,6 +1548,9 @@ function is_squarefree(n::Union{Int, ZZRingElem})
   end
   return isone(maximum(values(factor(n).fac); init = 1))
 end
+
+is_divisible_by_four(n::Integer) = (n % 4) == 0
+is_divisible_by_four(n::ZZRingElem) = ((n % UInt) % 4) == 0
 
 ################################################################################
 #
@@ -2681,7 +2697,7 @@ sp[][1](rand(rng, sp[][2]))
 
 rand(rng::AbstractRNG, R::ZZRing, n::AbstractArray) = R(rand(rng, n))
 
-rand(R::ZZRing, n::AbstractArray) = rand(Random.GLOBAL_RNG, R, n)
+rand(R::ZZRing, n::AbstractArray) = rand(Random.default_rng(), R, n)
 
 @doc raw"""
     rand_bits(::ZZRing, b::Int)
@@ -2712,13 +2728,6 @@ end
 # this mirrors the implementation for BigInt in the Random module
 
 using Base.GMP: Limb, MPZ
-
-# "views" a non-small ZZRingElem as a readonly BigInt
-# the caller must call GC.@preserve appropriately
-function _as_bigint(z::ZZRingElem)
-  @assert !_fmpz_is_small(z)
-  unsafe_load(Ptr{BigInt}(z.d << 2))
-end
 
 
 Random.Sampler(::Type{<:AbstractRNG}, r::StepRange{ZZRingElem, ZZRingElem}, ::Random.Repetition) =
@@ -2752,11 +2761,7 @@ function SamplerFmpz(r::StepRange{ZZRingElem, ZZRingElem})
   nlimbs, highbits = divrem(nd, 8*sizeof(Limb))
   highbits > 0 && (nlimbs += 1)
   mask = highbits == 0 ? ~zero(Limb) : one(Limb)<<highbits - one(Limb)
-  GC.@preserve r1 r2 begin
-    a1 = _fmpz_is_small(r1) ? 1 : _as_bigint(r1).size
-    a2 = _fmpz_is_small(r2) ? 1 : _as_bigint(r2).size
-  end
-  nlimbsmax = max(nlimbs, abs(a1), abs(a2))
+  nlimbsmax = max(nlimbs, size(r1), size(r2))
   return SamplerFmpz(r1, m, nlimbs, nlimbsmax, mask, s)
 end
 
@@ -2900,6 +2905,7 @@ end
 (::Type{T})(a::ZZRingElem) where T <: Union{UInt8, UInt16, UInt32} = T(UInt(a))
 
 (::Type{Int128})(a::ZZRingElem) = Int128(BigInt(a))
+(::Type{UInt128})(a::ZZRingElem) = UInt128(BigInt(a))
 
 Integer(a::ZZRingElem) = BigInt(a)
 

@@ -763,7 +763,7 @@ Return the extension of the real sign function taking the value 1
 strictly in the right half plane, -1 strictly in the left half plane,
 and the sign of the imaginary part when on the imaginary axis.
 Equivalently, $\operatorname{csgn}(x) = x / \sqrt{x^2}$ except that the value is 0
-at zero. The value is returned as a Julia integer.
+at zero.
 """
 function csgn(a::QQBarFieldElem)
   return QQBarFieldElem(@ccall libflint.qqbar_csgn(a::Ref{QQBarFieldElem})::Cint)
@@ -772,7 +772,7 @@ end
 @doc raw"""
     sign_real(a::QQBarFieldElem)
 
-Return the sign of the real part of `a` as a Julia integer.
+Return the sign of the real part of `a`.
 """
 function sign_real(a::QQBarFieldElem)
   return QQBarFieldElem(@ccall libflint.qqbar_sgn_re(a::Ref{QQBarFieldElem})::Cint)
@@ -781,7 +781,7 @@ end
 @doc raw"""
     sign_imag(a::QQBarFieldElem)
 
-Return the sign of the imaginary part of `a` as a Julia integer.
+Return the sign of the imaginary part of `a`.
 """
 function sign_imag(a::QQBarFieldElem)
   return QQBarFieldElem(@ccall libflint.qqbar_sgn_im(a::Ref{QQBarFieldElem})::Cint)
@@ -1413,6 +1413,17 @@ function (::Type{Float64})(a::QQBarFieldElem)
   x = ArbField(53, cached = false)(a)
   return Float64(x)
 end
+
+function (::Type{T})(a::QQBarFieldElem) where {T <: Integer}
+  return T(ZZRingElem(a))
+end
+
+function (::Type{T})(a::QQBarFieldElem) where {T <: Rational}
+  return T(QQFieldElem(a))
+end
+
+convert(::Type{QQBarFieldElem}, a::RationalUnion) = QQBarFieldElem(a)
+convert(::Type{T}, a::QQBarFieldElem) where {T <: RationalUnion} = T(a)
 
 ###############################################################################
 #

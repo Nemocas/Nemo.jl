@@ -404,7 +404,7 @@ sp[][1](rand(rng, sp[][2]))
 
 rand(r::Random.AbstractRNG, R::FpField, b::AbstractArray) = rand(r, make(R, b))
 
-rand(R::FpField, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
+rand(R::FpField, b::AbstractArray) = rand(Random.default_rng(), R, b)
 
 ###############################################################################
 #

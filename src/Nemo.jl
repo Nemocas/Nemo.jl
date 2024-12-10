@@ -14,7 +14,7 @@ import Random: rand!
 
 using RandomExtensions: RandomExtensions, make, Make2, Make3
 
-import Pkg
+import TOML
 
 import SHA
 
@@ -333,6 +333,19 @@ end
 
 const __isthreaded = Ref(false)
 
+function show_banner()
+  PROJECT_TOML = TOML.parsefile(joinpath(@__DIR__, "..", "Project.toml"))
+  VERSION_NUMBER = PROJECT_TOML["version"]
+  if isdir(joinpath(@__DIR__, "..", ".git"))
+    VERSION_NUMBER *= "-dev"
+  end
+  println("")
+  println("Welcome to Nemo version $VERSION_NUMBER")
+  println("")
+  println("Nemo comes with absolutely no warranty whatsoever")
+end
+
+
 function __init__()
   # In case libgmp picks up the wrong libgmp later on, we "unset" the jl_*
   # functions from the julia :libgmp.
@@ -346,10 +359,7 @@ function __init__()
   @ccall libflint.flint_set_abort(@cfunction(flint_abort, Nothing, ())::Ptr{Nothing})::Nothing
 
   if AbstractAlgebra.should_show_banner() && get(ENV, "NEMO_PRINT_BANNER", "true") != "false"
-    println("")
-    println("Welcome to Nemo version $(version())")
-    println("")
-    println("Nemo comes with absolutely no warranty whatsoever")
+    show_banner()
   end
 
   # Initialize the thread local random state
@@ -377,41 +387,9 @@ end
 
 ###############################################################################
 #
-#  Version information
+#  Hack helper
 #
 ################################################################################
-
-const deps = Pkg.dependencies()
-if !haskey(deps, Base.UUID("2edaba10-b0f1-5616-af89-8c11ac63239a"))
-  version() = "building"
-else
-  ver = deps[Base.UUID("2edaba10-b0f1-5616-af89-8c11ac63239a")]
-  if occursin("/dev/", ver.source)
-    version() = VersionNumber("$(ver.version)-dev")
-  else
-    version() = VersionNumber("$(ver.version)")
-  end
-end
-
-function versioninfo()
-  print("Nemo version $(version())\n")
-  nemorepo = dirname(dirname(@__FILE__))
-
-  print("Nemo: ")
-  prepo = Base.LibGit2.GitRepo(nemorepo)
-  Base.LibGit2.with(Base.LibGit2.head(prepo)) do phead
-    print("commit: ")
-    print(string(Base.LibGit2.Oid(phead))[1:8])
-    print(" date: ")
-    commit = Base.LibGit2.get(Base.LibGit2.GitCommit, prepo, Base.LibGit2.Oid(phead))
-    print(Base.Dates.unix2datetime(Base.LibGit2.author(commit).time))
-    print(")\n")
-  end
-
-  finalize(prepo)
-
-  return nothing
-end
 
 macro new_struct(T, args...)
   return esc(Expr(:new, T, args...))
@@ -461,6 +439,16 @@ include("HeckeMoreStuff.jl")
 include("julia/Integer.jl")
 include("julia/Rational.jl")
 include("julia/Float.jl")
+
+################################################################################
+#
+#  Better error message for BoundsError of flint matrices
+#
+################################################################################
+
+function Base.summary(io::IO, A::T) where {T <: _MatTypes}
+  print(io, nrows(A), "x", ncols(A), " ", T)
+end
 
 ###############################################################################
 #

@@ -56,12 +56,14 @@ is_unit(a::zzModRingElem) = a.parent.n == 1 ? a.data == 0 : gcd(a.data, a.parent
 
 modulus(R::zzModRing) = R.n
 
+characteristic(R::zzModRing) = ZZRingElem(modulus(R))
+
+is_trivial(a::zzModRing) = is_unit(modulus(a))
+
 function deepcopy_internal(a::zzModRingElem, dict::IdDict)
   R = parent(a)
   return zzModRingElem(deepcopy(a.data), R)
 end
-
-characteristic(R::zzModRing) = ZZRingElem(modulus(R))
 
 ###############################################################################
 #
@@ -375,7 +377,7 @@ sp[][1](rand(rng, sp[][2]))
 
 rand(r::Random.AbstractRNG, R::zzModRing, b::AbstractArray) = rand(r, make(R, b))
 
-rand(R::zzModRing, b::AbstractArray) = rand(Random.GLOBAL_RNG, R, b)
+rand(R::zzModRing, b::AbstractArray) = rand(Random.default_rng(), R, b)
 
 ###############################################################################
 #

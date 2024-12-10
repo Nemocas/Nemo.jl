@@ -47,7 +47,7 @@ is_domain_type(::Type{QQFieldElem}) = true
 ###############################################################################
 
 function Base.hash(a::QQFieldElem, h::UInt)
-  return _hash_integer(a.num, _hash_integer(a.den, h))
+  return GC.@preserve a _hash_integer(a.num, _hash_integer(a.den, h))
 end
 
 ###############################################################################
@@ -1059,13 +1059,17 @@ function set!(c::QQFieldElemOrPtr, a::Union{Integer,ZZRingElemOrPtr})
   return c
 end
 
-function numerator!(z::ZZRingElem, y::QQFieldElem)
-  @ccall libflint.fmpq_numerator(z::Ref{ZZRingElem}, y::Ref{QQFieldElem})::Nothing
+function numerator!(z::ZZRingElemOrPtr, y::QQFieldElemOrPtr)
+  GC.@preserve y begin
+    set!(z, _num_ptr(y))
+  end
   return z
 end
 
 function denominator!(z::ZZRingElemOrPtr, y::QQFieldElemOrPtr)
-  @ccall libflint.fmpq_denominator(z::Ref{ZZRingElem}, y::Ref{QQFieldElem})::Nothing
+  GC.@preserve y begin
+    set!(z, _den_ptr(y))
+  end
   return z
 end
 

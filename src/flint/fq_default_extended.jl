@@ -616,7 +616,7 @@ function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::B
       p = characteristic(K)
       d = absolute_degree(K) * degree(f)
       # Construct a "standard" copy of F_p^d
-      L = FqField(p, d, s, cached)
+      L = FqField(p, d, s, false)
       L.isabsolute = absolute
       L.isstandard = false
       L.defining_poly = f

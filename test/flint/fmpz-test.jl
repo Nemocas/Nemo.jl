@@ -504,6 +504,12 @@ end
   @test rem(-12, ZZRingElem(3)) == 0
 
   @test_throws ArgumentError divexact(ZZ(2), 3)
+
+  b = ZZ(123)
+  @test b % UInt == 123 % UInt
+  @test -b % UInt == -123 % UInt
+  @test b^29 % UInt == big(123)^29 % UInt
+  @test -b^29 % UInt == -big(123)^29 % UInt
 end
 
 @testset "ZZRingElem.shift.." begin
@@ -700,6 +706,26 @@ end
   @test Nemo.divrem(-ZZRingElem(2), ZZRingElem(3)) == (-ZZRingElem(1), ZZRingElem(1))
   @test Nemo.divrem(-2, ZZRingElem(3)) == (-ZZRingElem(1), ZZRingElem(1))
   @test Nemo.divrem(-ZZRingElem(2), 3) == (-ZZRingElem(1), ZZRingElem(1))
+end
+
+@testset "divrem and div with other rings" begin
+  for (x, y) in [(12, 5), (-12, 5)]
+    for r in [RoundToZero, RoundUp, RoundDown]
+      @test (
+        ZZ(Base.div(x, y, r))
+        == Base.div(ZZ(x), y, r)
+        == Base.div(x, ZZ(y), r)
+        == Base.div(ZZ(x), ZZ(y), r)
+      )
+      a, b = Base.divrem(x, y, r)
+      @test (
+        (ZZ(a), ZZ(b))
+        == Base.divrem(ZZ(x), y, r)
+        == Base.divrem(x, ZZ(y), r)
+        == Base.divrem(ZZ(x), ZZ(y), r)
+      )
+    end
+  end
 end
 
 @testset "ZZRingElem.roots" begin

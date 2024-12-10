@@ -119,12 +119,6 @@ end
     t = similar(s, R, 2, 3)
     @test size(t) == (2, 3)
   end
-
-  # issue #651
-  m = one(Generic.MatSpaceElem{RealFieldElem}(RR, 2, 2))
-  for n = (m, -m, m*m, m+m, 2m)
-    @test n isa Generic.MatSpaceElem{RealFieldElem}
-  end
 end
 
 @testset "RealMatrix.printing" begin

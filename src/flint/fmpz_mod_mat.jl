@@ -130,45 +130,41 @@ end
 #
 ###############################################################################
 
-#= Not currently implemented in Flint
-
 function swap_rows!(x::T, i::Int, j::Int) where T <: Zmod_fmpz_mat
-@ccall libflint.fmpz_mod_mat_swap_rows(x::Ref{T}, C_NULL::Ptr{Nothing}, (i - 1)::Int, (j - 1)::Int)::Nothing
-return x
+  @ccall libflint.fmpz_mod_mat_swap_rows(x::Ref{T}, C_NULL::Ptr{Nothing}, (i - 1)::Int, (j - 1)::Int)::Nothing
+  return x
 end
 
 function swap_rows(x::T, i::Int, j::Int) where T <: Zmod_fmpz_mat
-(1 <= i <= nrows(x) && 1 <= j <= nrows(x)) || throw(BoundsError())
-y = deepcopy(x)
-return swap_rows!(y, i, j)
+  (1 <= i <= nrows(x) && 1 <= j <= nrows(x)) || throw(BoundsError())
+  y = deepcopy(x)
+  return swap_rows!(y, i, j)
 end
 
 function swap_cols!(x::T, i::Int, j::Int) where T <: Zmod_fmpz_mat
-@ccall libflint.fmpz_mod_mat_swap_cols(x::Ref{T}, C_NULL::Ptr{Nothing}, (i - 1)::Int, (j - 1)::Int)::Nothing
-return x
+  @ccall libflint.fmpz_mod_mat_swap_cols(x::Ref{T}, C_NULL::Ptr{Nothing}, (i - 1)::Int, (j - 1)::Int)::Nothing
+  return x
 end
 
 function swap_cols(x::T, i::Int, j::Int) where T <: Zmod_fmpz_mat
-(1 <= i <= ncols(x) && 1 <= j <= ncols(x)) || throw(BoundsError())
-y = deepcopy(x)
-return swap_cols!(y, i, j)
+  (1 <= i <= ncols(x) && 1 <= j <= ncols(x)) || throw(BoundsError())
+  y = deepcopy(x)
+  return swap_cols!(y, i, j)
 end
 
 function reverse_rows!(x::T) where T <: Zmod_fmpz_mat
-@ccall libflint.fmpz_mod_mat_invert_rows(x::Ref{T}, C_NULL::Ptr{Nothing})::Nothing
-return x
+  @ccall libflint.fmpz_mod_mat_invert_rows(x::Ref{T}, C_NULL::Ptr{Nothing})::Nothing
+  return x
 end
 
 reverse_rows(x::T) where T <: Zmod_fmpz_mat = reverse_rows!(deepcopy(x))
 
 function reverse_cols!(x::T) where T <: Zmod_fmpz_mat
-@ccall libflint.fmpz_mod_mat_invert_cols(x::Ref{T}, C_NULL::Ptr{Nothing})::Nothing
-return x
+  @ccall libflint.fmpz_mod_mat_invert_cols(x::Ref{T}, C_NULL::Ptr{Nothing})::Nothing
+  return x
 end
 
 reverse_cols(x::T) where T <: Zmod_fmpz_mat = reverse_cols!(deepcopy(x))
-
-=#
 
 ################################################################################
 #

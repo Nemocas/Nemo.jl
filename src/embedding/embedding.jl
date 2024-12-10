@@ -10,18 +10,18 @@
 #
 ################################################################################
 
-function overfields(k::FinField)
+function overfields(k::T) where T <: FinField
   if !isdefined(k, :overfields)
-    k.overfields = Dict{Int, Vector{FinFieldMorphism}}()
+    k.overfields = Dict{Int, Vector{FinFieldMorphism{T,T}}}()
   end
-  return k.overfields
+  return k.overfields::Dict{Int, Vector{FinFieldMorphism{T,T}}}
 end
 
-function subfields(k::FinField)
+function subfields(k::T) where T <: FinField
   if !isdefined(k, :subfields)
-    k.subfields = Dict{Int, Vector{FinFieldMorphism}}()
+    k.subfields = Dict{Int, Vector{FinFieldMorphism{T,T}}}()
   end
-  return k.subfields
+  return k.subfields::Dict{Int, Vector{FinFieldMorphism{T,T}}}
 end
 
 

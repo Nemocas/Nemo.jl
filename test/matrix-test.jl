@@ -59,3 +59,45 @@ end
   @test is_zero(reduce_mod(A, B))
   @test is_zero(reduce_mod(A, 2*B))
 end
+
+@testset "Eigenvalues of ZZMatrix" begin
+  A4 = matrix(ZZ,4,4, [6,-8,9,5,  5,-6,5,0,  0,6,5,4,  -6,8,-1,7])
+  E4 = eigenvalues(A4)
+  @test length(E4) == 2
+  @test issetequal(E4, [2,4])
+  E4m = eigenvalues_with_multiplicities(A4)
+  @test length(E4m) == 2
+  @test issetequal(E4m, [(ZZ(2),1), (ZZ(4),1)])
+
+
+  A5 = matrix(ZZ,5,5, [0,0,1,-1,-1,  -1,-1,1,1,-1,  0,0,1,-1,-1,  -1,1,1,-1,-1,  1,1,-1,-1,1])
+  E5 = eigenvalues(A5)
+  @test length(E5) == 3
+  @test issetequal(E5, [0,1,-2])
+
+  E5m = eigenvalues_with_multiplicities(A5)
+  @test length(E5m) == 3
+  @test issetequal(E5m, [(ZZ(0),2), (ZZ(1),2), (ZZ(-2),1)])
+
+
+  A6 = matrix(ZZ,6,6, [0,0,-1,0,1,0,  0,0,0,1,-1,0,  -1,0,0,0,1,0,  0,1,1,1,-1,0,  1,-1,1,1,-1,0,  1,-1,0,0,-1,-1])
+  E6 = eigenvalues(A6)
+  @test length(E6) == 2
+  @test issetequal(E6, [1,-1])
+
+  E6m = eigenvalues_with_multiplicities(A6)
+  @test length(E6m) == 2
+  @test issetequal(E6m, [(ZZ(-1),2), (ZZ(1),2)])
+
+
+  A6b = matrix(ZZ,6,6, [0,1,0,-1,1,0,  1,1,-2,0,-2,0,  -1,0,1,1,1,0,  1,-1,2,1,0,0,  1,1,-2,-2,-1,-2,  2,-2,0,2,-2,0])
+  E6b = eigenvalues(A6b)
+  @test length(E6b) == 2
+  @test issetequal(E6b, [1,-1])
+
+  E6bm = eigenvalues_with_multiplicities(A6b)
+  @test length(E6bm) == 2
+  @test issetequal(E6bm, [(ZZ(-1),1), (ZZ(1),2)])
+
+  # eigenvalues_simple not defined for integer matrices, so not tested.
+end

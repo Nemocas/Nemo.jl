@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   Flint factor(s) functiosn
+#   Flint factor(s) functions
 #
 ###############################################################################
 
@@ -17,19 +17,55 @@ function _factor(a::ZZRingElem)
   return res, canonical_unit(a)
 end
 
-function factor(a::T) where T <: Union{Int, UInt}
-  iszero(a) && throw(ArgumentError("Argument must be non-zero"))
-  u = sign(a)
-  a = u < 0 ? -a : a
+# Just to give a helpful error message if someone tries to factor a boolean
+function factor(::Bool)
+  throw(DomainError("Cannot factorize a boolean"))
+end
+
+
+# The main dispatch function: flintify gives either Int or ZZRingElem,
+# then use Julia's dispatcher to select the worker function.
+function factor(a::T)  where T <: Integer
+  @req  !iszero(a)  "Argument must be non-zero"
+  return _factor(typeof(a), Nemo.flintify(a))
+end
+
+
+# Three internal worker functions: one for Int, one for UInt, one for ZZRingElem
+function _factor(::Type{T}, a::Int) where T <: Integer
+  abs_a = reinterpret(UInt, a < 0 ? -a : a) # like abs(a), but correct also when a == typemin(Int)
+  fac = _factor(T, abs_a)
+  if a < 0
+    fac.unit = T(-1)  # OK since fac is mutable; gives error if T is Unsigned
+  end
+  return fac
+end
+
+function _factor(::Type{T}, a::UInt)  where T <: Integer
+  @req  (T != Bool)  "Cannot have a factorization into booleans"
+  @req  !iszero(a)  "Argument must be non-zero"
   F = n_factor()
   @ccall libflint.n_factor(F::Ref{n_factor}, a::UInt)::Nothing
-  res = Dict{T, Int}()
+  res = Dict{T, Int}()  # factor-multiplicity pairs
   for i in 1:F.num
-    z = F.p[i]
+    z = T(F.p[i])
     res[z] = F.exp[i]
+  end
+  return Fac(T(1), res)
+end
+
+function _factor(::Type{T}, a::ZZRingElem)  where T <: Integer
+  @req  (T != Bool)  "Cannot have a factorization into booleans"
+  @req  !iszero(a)  "Argument must be non-zero"
+  u = T(sign(a))
+  F = factor(abs(a))
+  res = Dict{T, Int}()  # factor-multiplicity pairs
+  for (fac,exp) in F.fac
+    res[T(fac)] = exp
   end
   return Fac(u, res)
 end
+
 
 ################################################################################
 #

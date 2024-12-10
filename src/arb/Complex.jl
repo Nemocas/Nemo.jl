@@ -318,6 +318,11 @@ function isequal(x::ComplexFieldElem, y::ComplexFieldElem)
   return Bool(r)
 end
 
+function Base.hash(x::ComplexFieldElem, h::UInt)
+  # TODO: improve me
+  return h
+end
+
 function ==(x::ComplexFieldElem, y::ComplexFieldElem)
   r = @ccall libflint.acb_eq(x::Ref{ComplexFieldElem}, y::Ref{ComplexFieldElem})::Cint
   return Bool(r)
