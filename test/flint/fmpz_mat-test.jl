@@ -710,9 +710,9 @@ end
   @test AbstractAlgebra.Solve.matrix_normal_form_type(A) === AbstractAlgebra.Solve.HermiteFormTrait()
 
   b = matrix(ZZ, 1, 2, [1, 6])
-  @test Nemo._solve_triu_left(A, b) == matrix(ZZ, 1, 2, [1, 1])
+  @test AbstractAlgebra._solve_triu_left(A, b) == matrix(ZZ, 1, 2, [1, 1])
   b = matrix(ZZ, 2, 1, [3, 4])
-  @test Nemo._solve_triu(A, b) == matrix(ZZ, 2, 1, [1, 1])
+  @test AbstractAlgebra._solve_triu(A, b; side = :right) == matrix(ZZ, 2, 1, [1, 1])
   b = matrix(ZZ, 2, 1, [1, 7])
   c = similar(b)
   AbstractAlgebra._solve_tril!(c, A, b)
