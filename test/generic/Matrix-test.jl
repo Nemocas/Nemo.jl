@@ -135,7 +135,7 @@ end
     M = randmat_triu(S, -100:100)
     b = rand(U, -100:100)
 
-    x = AbstractAlgebra._solve_triu(M, b, false)
+    x = AbstractAlgebra._solve_triu_right(M, b; unipotent = false)
 
     @test M*x == b
   end
