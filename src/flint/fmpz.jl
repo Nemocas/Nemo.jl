@@ -254,6 +254,8 @@ size(a::ZZRingElem) = _fmpz_is_small(a) ? 1 : abs(_fmpz_size(a))
 
 is_unit(a::ZZRingElemOrPtr) = data(a) == 1 || data(a) == -1
 
+is_nilpotent(a::ZZRingElemOrPtr) = iszero(data(a))
+
 is_zero(a::ZZRingElemOrPtr) = data(a) == 0
 
 is_one(a::ZZRingElemOrPtr) = data(a) == 1
