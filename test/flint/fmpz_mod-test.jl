@@ -132,8 +132,8 @@ end
   @test_throws Exception R2(R3(1))
   @test_throws Exception R3(R2(1))
 
-  ZZmod720,_ = residue_ring (ZZ,720)
-  ZZmodZZ720,_ = residue_ring (ZZ,ZZ(720))
+  ZZmod720,_ = residue_ring(ZZ,720)
+  ZZmodZZ720,_ = residue_ring(ZZ,ZZ(720))
   @test is_nilpotent(ZZmod720(30))
   @test is_nilpotent(ZZmodZZ720(30))
   nilp720 = filter((r -> is_nilpotent(ZZmod720(r))), 0:719);
