@@ -20,6 +20,8 @@ elem_type(::Type{zzModPolyRing}) = zzModPolyRingElem
 
 dense_poly_type(::Type{zzModRingElem}) = zzModPolyRingElem
 
+is_domain_type(::Type{zzModPolyRingElem}) = false
+
 ################################################################################
 #
 #   Basic helper
