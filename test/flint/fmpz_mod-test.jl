@@ -137,10 +137,9 @@ end
   @test is_nilpotent(ZZmod720(30))
   @test is_nilpotent(ZZmodZZ720(30))
   nilp720 = filter((r -> is_nilpotent(ZZmod720(r))), 0:719);
-  @test length(nilp) == 24  # 720/(2*3*5)
-  nilp = filter((r -> is_nilpotent(ZZmodZZ720(r))), 0:719);
-  @test length(nilp) == 24  # 720/(2*3*5)
-
+  @test length(nilp720) == 24  # 720/(2*3*5)
+  nilp720 = filter((r -> is_nilpotent(ZZmodZZ720(r))), 0:719);
+  @test length(nilp720) == 24  # 720/(2*3*5)
 end
 
 @testset "ZZModRingElem.unary_ops" begin
