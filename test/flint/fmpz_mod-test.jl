@@ -89,6 +89,8 @@ end
 
   @test !is_unit(R())
   @test is_unit(R(3))
+  @test is_nilpotent(R())
+  @test !is_nilpotent(R(3))
 
   @test deepcopy(R(3)) == R(3)
 
@@ -103,6 +105,7 @@ end
   @test modulus(S) == UInt(1)
 
   @test is_unit(S())
+  @test is_nilpotent(S())
 
   @test characteristic(R) == 13
 
@@ -128,6 +131,16 @@ end
   @test_throws Exception R6(R22(1))
   @test_throws Exception R2(R3(1))
   @test_throws Exception R3(R2(1))
+
+  ZZmod720,_ = residue_ring (ZZ,720)
+  ZZmodZZ720,_ = residue_ring (ZZ,ZZ(720))
+  @test is_nilpotent(ZZmod720(30))
+  @test is_nilpotent(ZZmodZZ720(30))
+  nilp720 = filter((r -> is_nilpotent(ZZmod720(r))), 0:719);
+  @test length(nilp) == 24  # 720/(2*3*5)
+  nilp = filter((r -> is_nilpotent(ZZmodZZ720(r))), 0:719);
+  @test length(nilp) == 24  # 720/(2*3*5)
+
 end
 
 @testset "ZZModRingElem.unary_ops" begin
