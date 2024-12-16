@@ -639,20 +639,6 @@ function matrix(R::FqPolyRepField, r::Int, c::Int, arr::AbstractVector{<: Union{
   return z
 end
 
-###############################################################################
-#
-#  Zero matrix
-#
-###############################################################################
-
-function zero_matrix(R::FqPolyRepField, r::Int, c::Int)
-  if r < 0 || c < 0
-    error("dimensions must not be negative")
-  end
-  z = FqPolyRepMatrix(r, c, R)
-  return z
-end
-
 ################################################################################
 #
 #  Kernel

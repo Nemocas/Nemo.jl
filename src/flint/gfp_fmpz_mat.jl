@@ -14,17 +14,6 @@ dense_matrix_type(::Type{FpFieldElem}) = FpMatrix
 
 is_zero_initialized(::Type{FpMatrix}) = true
 
-###############################################################################
-#
-#   Similar
-#
-###############################################################################
-
-function similar(::MatElem, R::FpField, r::Int, c::Int)
-  z = FpMatrix(R, undef, r, c)
-  return z
-end
-
 ################################################################################
 #
 #  Manipulation
@@ -298,20 +287,6 @@ function matrix(R::FpField, r::Int, c::Int, arr::AbstractVector{<: Union{FpField
   _check_dim(r, c, arr)
   z = FpMatrix(r, c, R.ninv, arr)
   z.base_ring = R
-  return z
-end
-
-###############################################################################
-#
-#  Zero matrix
-#
-###############################################################################
-
-function zero_matrix(R::FpField, r::Int, c::Int)
-  if r < 0 || c < 0
-    error("dimensions must not be negative")
-  end
-  z = FpMatrix(R, undef, r, c)
   return z
 end
 

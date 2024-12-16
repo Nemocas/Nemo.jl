@@ -6,19 +6,6 @@
 
 ###############################################################################
 #
-#   Similar & zero
-#
-###############################################################################
-
-function similar(::RealMatrix, R::RealField, r::Int, c::Int)
-  z = RealMatrix(r, c)
-  return z
-end
-
-zero(m::RealMatrix, R::RealField, r::Int, c::Int) = similar(m, R, r, c)
-
-###############################################################################
-#
 #   Basic manipulation
 #
 ###############################################################################
@@ -705,20 +692,6 @@ end
 function matrix(R::RealField, r::Int, c::Int, arr::AbstractVector{Rational{T}}) where {T <: Integer}
   arr_fmpz = map(QQFieldElem, arr)
   return matrix(R, r, c, arr_fmpz)
-end
-
-###############################################################################
-#
-#  Zero matrix
-#
-###############################################################################
-
-function zero_matrix(R::RealField, r::Int, c::Int)
-  if r < 0 || c < 0
-    error("dimensions must not be negative")
-  end
-  z = RealMatrix(r, c)
-  return z
 end
 
 ###############################################################################

@@ -6,19 +6,6 @@
 
 ###############################################################################
 #
-#   Similar & zero
-#
-###############################################################################
-
-function similar(::AcbMatrix, R::AcbField, r::Int, c::Int)
-  z = AcbMatrix(R, undef, r, c)
-  return z
-end
-
-zero(m::AcbMatrix, R::AcbField, r::Int, c::Int) = similar(m, R, r, c)
-
-###############################################################################
-#
 #   Basic manipulation
 #
 ###############################################################################
@@ -820,20 +807,6 @@ end
 function matrix(R::AcbField, r::Int, c::Int, arr::AbstractVector{Rational{T}}) where {T <: Integer}
   arr_fmpz = map(QQFieldElem, arr)
   return matrix(R, r, c, arr_fmpz)
-end
-
-###############################################################################
-#
-#  Zero matrix
-#
-###############################################################################
-
-function zero_matrix(R::AcbField, r::Int, c::Int)
-  if r < 0 || c < 0
-    error("dimensions must not be negative")
-  end
-  z = AcbMatrix(R, undef, r, c)
-  return z
 end
 
 ###############################################################################

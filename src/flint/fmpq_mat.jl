@@ -18,19 +18,6 @@ is_zero_initialized(::Type{QQMatrix}) = true
 
 ###############################################################################
 #
-#   Similar & zero
-#
-###############################################################################
-
-function similar(::QQMatrix, R::QQField, r::Int, c::Int)
-  z = QQMatrix(r, c)
-  return z
-end
-
-zero(m::QQMatrix, R::QQField, r::Int, c::Int) = similar(m, R, r, c)
-
-###############################################################################
-#
 #   Windows - handle with care!!!
 #
 ###############################################################################
@@ -866,33 +853,6 @@ function QQMatrix(x::ZZMatrix)
   z = QQMatrix(nrows(x), ncols(x))
   @ccall libflint.fmpq_mat_set_fmpz_mat(z::Ref{QQMatrix}, x::Ref{ZZMatrix})::Nothing
   return z
-end
-
-###############################################################################
-#
-#  Zero matrix
-#
-###############################################################################
-
-function zero_matrix(R::QQField, r::Int, c::Int)
-  if r < 0 || c < 0
-    error("dimensions must not be negative")
-  end
-  z = QQMatrix(r, c)
-  return z
-end
-
-###############################################################################
-#
-#  Identity matrix
-#
-###############################################################################
-
-function identity_matrix(R::QQField, n::Int)
-  if n < 0
-    error("dimension must not be negative")
-  end
-  return one!(QQMatrix(n, n))
 end
 
 ################################################################################

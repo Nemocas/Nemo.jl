@@ -790,19 +790,6 @@ function matrix(R::zzModRing, r::Int, c::Int, arr::AbstractVector{<: Union{zzMod
   return z
 end
 
-###############################################################################
-#
-#  Zero matrix
-#
-###############################################################################
-
-function zero_matrix(R::zzModRing, r::Int, c::Int)
-  if r < 0 || c < 0
-    error("dimensions must not be negative")
-  end
-  return zzModMatrix(R, undef, r, c)
-end
-
 ################################################################################
 #
 #  Kernel

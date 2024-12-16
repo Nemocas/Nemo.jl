@@ -655,20 +655,6 @@ function matrix(R::FqField, r::Int, c::Int, arr::AbstractVector{<: Union{FqField
   return z
 end
 
-###############################################################################
-#
-#  Zero matrix
-#
-###############################################################################
-
-function zero_matrix(R::FqField, r::Int, c::Int)
-  if r < 0 || c < 0
-    error("dimensions must not be negative")
-  end
-  z = FqMatrix(r, c, R)
-  return z
-end
-
 ################################################################################
 #
 #  Entry pointers

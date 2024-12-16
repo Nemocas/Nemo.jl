@@ -6,19 +6,6 @@
 
 ###############################################################################
 #
-#   Similar & zero
-#
-###############################################################################
-
-function similar(::ComplexMatrix, R::ComplexField, r::Int, c::Int)
-  z = ComplexMatrix(r, c)
-  return z
-end
-
-zero(m::ComplexMatrix, R::ComplexField, r::Int, c::Int) = similar(m, R, r, c)
-
-###############################################################################
-#
 #   Basic manipulation
 #
 ###############################################################################
@@ -811,20 +798,6 @@ end
 function matrix(R::ComplexField, r::Int, c::Int, arr::AbstractVector{Rational{T}}) where {T <: Integer}
   arr_fmpz = map(QQFieldElem, arr)
   return matrix(R, r, c, arr_fmpz)
-end
-
-###############################################################################
-#
-#  Zero matrix
-#
-###############################################################################
-
-function zero_matrix(R::ComplexField, r::Int, c::Int)
-  if r < 0 || c < 0
-    error("dimensions must not be negative")
-  end
-  z = ComplexMatrix(r, c)
-  return z
 end
 
 ###############################################################################

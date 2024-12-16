@@ -14,17 +14,6 @@ dense_matrix_type(::Type{ZZModRingElem}) = ZZModMatrix
 
 is_zero_initialized(::Type{ZZModMatrix}) = true
 
-###############################################################################
-#
-#   Similar
-#
-###############################################################################
-
-function similar(::MatElem, R::ZZModRing, r::Int, c::Int)
-  z = ZZModMatrix(R, undef, r, c)
-  return z
-end
-
 ################################################################################
 #
 #  Manipulation
@@ -719,20 +708,6 @@ function matrix(R::ZZModRing, r::Int, c::Int, arr::AbstractVector{<: Union{ZZMod
   _check_dim(r, c, arr)
   z = ZZModMatrix(r, c, R.ninv, arr)
   z.base_ring = R
-  return z
-end
-
-###############################################################################
-#
-#  Zero matrix
-#
-###############################################################################
-
-function zero_matrix(R::ZZModRing, r::Int, c::Int)
-  if r < 0 || c < 0
-    error("dimensions must not be negative")
-  end
-  z = ZZModMatrix(R, undef, r, c)
   return z
 end
 
