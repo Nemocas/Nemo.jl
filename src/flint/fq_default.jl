@@ -60,7 +60,7 @@ isone(a::FqFieldElem) = @ccall libflint.fq_default_is_one(a::Ref{FqFieldElem}, a
 
 _is_gen(a::FqFieldElem) = a == _gen(parent(a))
 
-is_unit(a::FqFieldElem) = @ccall libflint.fq_default_is_invertible(a::Ref{FqFieldElem}, a.parent::Ref{FqField})::Bool
+is_unit(a::FqFieldElem) = !iszero(a)
 
 function characteristic(a::FqField)
   d = ZZRingElem()

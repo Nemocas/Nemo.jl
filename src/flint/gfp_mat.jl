@@ -64,9 +64,7 @@ end
 
 function one(a::fpMatrixSpace)
   (nrows(a) != ncols(a)) && error("Matrices must be square")
-  z = a()
-  @ccall libflint.nmod_mat_one(z::Ref{fpMatrix})::Nothing
-  return z
+  return one!(a())
 end
 
 ################################################################################

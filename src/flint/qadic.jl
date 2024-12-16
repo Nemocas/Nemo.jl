@@ -189,7 +189,7 @@ iszero(a::QadicFieldElem) = Bool(@ccall libflint.qadic_is_zero(a::Ref{QadicField
 
 isone(a::QadicFieldElem) = Bool(@ccall libflint.qadic_is_one(a::Ref{QadicFieldElem})::Cint)
 
-is_unit(a::QadicFieldElem) = !Bool(@ccall libflint.qadic_is_zero(a::Ref{QadicFieldElem})::Cint)
+is_unit(a::QadicFieldElem) = !iszero(a)
 
 characteristic(R::QadicField) = 0
 
