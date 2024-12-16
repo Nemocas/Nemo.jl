@@ -396,13 +396,13 @@ function is_nilpotent(res::ResElem{T}) where {T<:IntegerUnion}
   #    m=modulus(res);
   #    return powermod(lift(res),nbits(m),m)==0
   m = modulus(res)
-  r = lift(res)
+  r = data(res) # the least non-negative class representative as a value of type "unsigned" T; !!note that "lift" casts the value to BigInt!!
   while true
     g = gcd(r, m)
     (g == m) && return true
     (g == 1) && return false
-    m /= g
-    r = g^2
+    m = divexact(m, g)  #  equiv to:  m /= g
+    mod!(g, m);  r = g^2  # g^2 cannot overflow thanks to mod!
   end
 end
 
