@@ -145,7 +145,7 @@ end
   rr = 4*3^20
   mm = 3*rr
   R_overflow, = residue_ring(ZZ, mm)
-  @test is_nilpotent(R(rr))
+  @test is_nilpotent(R_overflow(rr))
 end
 
 @testset "ZZModRingElem.unary_ops" begin
