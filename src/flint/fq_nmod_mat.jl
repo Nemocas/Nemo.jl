@@ -12,6 +12,8 @@
 
 dense_matrix_type(::Type{fqPolyRepFieldElem}) = fqPolyRepMatrix
 
+is_zero_initialized(::Type{fqPolyRepMatrix}) = true
+
 ###############################################################################
 #
 #   Similar & zero

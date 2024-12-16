@@ -14,6 +14,8 @@ base_ring(a::ZZMatrix) = ZZ
 
 dense_matrix_type(::Type{ZZRingElem}) = ZZMatrix
 
+is_zero_initialized(::Type{ZZMatrix}) = true
+
 ###############################################################################
 #
 #   similar & zero

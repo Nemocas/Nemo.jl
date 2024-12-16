@@ -12,6 +12,8 @@
 
 dense_matrix_type(::Type{fpFieldElem}) = fpMatrix
 
+is_zero_initialized(::Type{fpMatrix}) = true
+
 ###############################################################################
 #
 #   Similar & zero

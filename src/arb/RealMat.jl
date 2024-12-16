@@ -27,6 +27,8 @@ base_ring(a::RealMatrix) = RealField()
 
 dense_matrix_type(::Type{RealFieldElem}) = RealMatrix
 
+is_zero_initialized(::Type{RealMatrix}) = true
+
 function getindex!(z::ArbFieldElem, x::RealMatrix, r::Int, c::Int)
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)

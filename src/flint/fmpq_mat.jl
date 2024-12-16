@@ -14,6 +14,8 @@ base_ring(a::QQMatrix) = QQ
 
 dense_matrix_type(::Type{QQFieldElem}) = QQMatrix
 
+is_zero_initialized(::Type{QQMatrix}) = true
+
 ###############################################################################
 #
 #   Similar & zero

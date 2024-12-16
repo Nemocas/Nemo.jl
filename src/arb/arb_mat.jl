@@ -27,6 +27,8 @@ base_ring(a::ArbMatrix) = a.base_ring
 
 dense_matrix_type(::Type{ArbFieldElem}) = ArbMatrix
 
+is_zero_initialized(::Type{ArbMatrix}) = true
+
 precision(x::ArbMatrixSpace) = precision(x.base_ring)
 
 function getindex!(z::ArbFieldElem, x::ArbMatrix, r::Int, c::Int)

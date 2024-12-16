@@ -27,6 +27,8 @@ base_ring(a::AcbMatrix) = a.base_ring
 
 dense_matrix_type(::Type{AcbFieldElem}) = AcbMatrix
 
+is_zero_initialized(::Type{AcbMatrix}) = true
+
 precision(x::AcbMatrixSpace) = precision(base_ring(x))
 
 function getindex!(z::AcbFieldElem, x::AcbMatrix, r::Int, c::Int)

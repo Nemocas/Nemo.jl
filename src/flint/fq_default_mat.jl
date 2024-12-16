@@ -12,6 +12,8 @@
 
 dense_matrix_type(::Type{FqFieldElem}) = FqMatrix
 
+is_zero_initialized(::Type{FqMatrix}) = true
+
 ###############################################################################
 #
 #   Similar & zero

@@ -27,6 +27,8 @@ base_ring(a::ComplexMatrix) = ComplexField()
 
 dense_matrix_type(::Type{ComplexFieldElem}) = ComplexMatrix
 
+is_zero_initialized(::Type{ComplexMatrix}) = true
+
 function getindex!(z::ComplexFieldElem, x::ComplexMatrix, r::Int, c::Int)
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)

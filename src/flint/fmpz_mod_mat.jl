@@ -12,6 +12,8 @@
 
 dense_matrix_type(::Type{ZZModRingElem}) = ZZModMatrix
 
+is_zero_initialized(::Type{ZZModMatrix}) = true
+
 ###############################################################################
 #
 #   Similar
