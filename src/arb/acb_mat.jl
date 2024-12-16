@@ -617,14 +617,6 @@ end
 #
 ################################################################################
 
-function swap_rows(x::AcbMatrix, i::Int, j::Int)
-  _checkbounds(nrows(x), i) || throw(BoundsError())
-  _checkbounds(nrows(x), j) || throw(BoundsError())
-  z = deepcopy(x)
-  swap_rows!(z, i, j)
-  return z
-end
-
 function swap_rows!(x::AcbMatrix, i::Int, j::Int)
   @ccall libflint.acb_mat_swap_rows(x::Ref{AcbMatrix}, C_NULL::Ptr{Nothing}, (i - 1)::Int, (j - 1)::Int)::Nothing
 end

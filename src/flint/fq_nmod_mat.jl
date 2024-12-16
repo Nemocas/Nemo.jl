@@ -143,21 +143,9 @@ function swap_rows!(x::fqPolyRepMatrix, i::Int, j::Int)
   return x
 end
 
-function swap_rows(x::fqPolyRepMatrix, i::Int, j::Int)
-  (1 <= i <= nrows(x) && 1 <= j <= nrows(x)) || throw(BoundsError())
-  y = deepcopy(x)
-  return swap_rows!(y, i, j)
-end
-
 function swap_cols!(x::fqPolyRepMatrix, i::Int, j::Int)
   @ccall libflint.fq_nmod_mat_swap_cols(x::Ref{fqPolyRepMatrix}, C_NULL::Ptr{Nothing}, (i - 1)::Int, (j - 1)::Int, base_ring(x)::Ref{fqPolyRepField})::Nothing
   return x
-end
-
-function swap_cols(x::fqPolyRepMatrix, i::Int, j::Int)
-  (1 <= i <= ncols(x) && 1 <= j <= ncols(x)) || throw(BoundsError())
-  y = deepcopy(x)
-  return swap_cols!(y, i, j)
 end
 
 function reverse_rows!(x::fqPolyRepMatrix)
@@ -165,14 +153,10 @@ function reverse_rows!(x::fqPolyRepMatrix)
   return x
 end
 
-reverse_rows(x::fqPolyRepMatrix) = reverse_rows!(deepcopy(x))
-
 function reverse_cols!(x::fqPolyRepMatrix)
   @ccall libflint.fq_nmod_mat_invert_cols(x::Ref{fqPolyRepMatrix}, C_NULL::Ptr{Nothing}, base_ring(x)::Ref{fqPolyRepField})::Nothing
   return x
 end
-
-reverse_cols(x::fqPolyRepMatrix) = reverse_cols!(deepcopy(x))
 
 ################################################################################
 #
