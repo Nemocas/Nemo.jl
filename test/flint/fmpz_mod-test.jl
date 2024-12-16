@@ -140,6 +140,12 @@ end
   @test length(nilp720) == 24  # 720/(2*3*5)
   nilp720 = filter((r -> is_nilpotent(ZZmodZZ720(r))), 0:719);
   @test length(nilp720) == 24  # 720/(2*3*5)
+
+  # 64-bit overflow test:  **ASSUMES** Int is 64 bits
+  rr = 4*3^20
+  mm = 3*rr
+  R_overflow, = residue_ring(ZZ, mm)
+  @test is_nilpotent(R(rr))
 end
 
 @testset "ZZModRingElem.unary_ops" begin
