@@ -20,8 +20,6 @@ base_ring(a::ZZModRing) = ZZ
 
 parent(a::ZZModRingElem) = a.parent
 
-is_domain_type(::Type{ZZModRingElem}) = false
-
 ###############################################################################
 #
 #   Basic manipulation
