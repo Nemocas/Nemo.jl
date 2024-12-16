@@ -18,8 +18,6 @@ elem_type(::Type{ZZModPolyRing}) = ZZModPolyRingElem
 
 parent_type(::Type{ZZModPolyRingElem}) = ZZModPolyRing
 
-is_domain_type(::Type{ZZModPolyRingElem}) = false
-
 dense_poly_type(::Type{ZZModRingElem}) = ZZModPolyRingElem
 
 function _is_one_or_throw(f, y)
