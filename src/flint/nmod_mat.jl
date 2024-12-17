@@ -704,57 +704,14 @@ function (a::zzModMatrixSpace)()
   return z
 end
 
-function (a::zzModMatrixSpace)(arr::AbstractMatrix{BigInt})
+function (a::zzModMatrixSpace)(arr::AbstractVecOrMat{T}) where {T <: IntegerUnion}
   _check_dim(nrows(a), ncols(a), arr)
   z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::zzModMatrixSpace)(arr::AbstractVector{BigInt})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::zzModMatrixSpace)(arr::AbstractMatrix{ZZRingElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::zzModMatrixSpace)(arr::AbstractVector{ZZRingElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::zzModMatrixSpace)(arr::AbstractMatrix{Int})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::zzModMatrixSpace)(arr::AbstractVector{Int})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::zzModMatrixSpace)(arr::AbstractMatrix{zzModRingElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::zzModMatrixSpace)(arr::AbstractVector{zzModRingElem})
+function (a::zzModMatrixSpace)(arr::AbstractVecOrMat{zzModRingElem})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
   z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)

@@ -641,13 +641,7 @@ function (x::RealMatrixSpace)(y::ZZMatrix)
   return z
 end
 
-function (x::RealMatrixSpace)(y::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, AbstractString}}
-  _check_dim(nrows(x), ncols(x), y)
-  z = RealMatrix(nrows(x), ncols(x), y, precision(Balls))
-  return z
-end
-
-function (x::RealMatrixSpace)(y::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, AbstractString}}
+function (x::RealMatrixSpace)(y::AbstractVecOrMat{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, AbstractString}}
   _check_dim(nrows(x), ncols(x), y)
   z = RealMatrix(nrows(x), ncols(x), y, precision(Balls))
   return z

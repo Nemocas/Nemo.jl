@@ -222,57 +222,14 @@ function (a::FpMatrixSpace)(b::FpFieldElem)
   return M
 end
 
-function (a::FpMatrixSpace)(arr::AbstractMatrix{BigInt})
+function (a::FpMatrixSpace)(arr::AbstractVecOrMat{T}) where {T <: IntegerUnion}
   _check_dim(nrows(a), ncols(a), arr)
   z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::FpMatrixSpace)(arr::AbstractVector{BigInt})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::FpMatrixSpace)(arr::AbstractMatrix{ZZRingElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::FpMatrixSpace)(arr::AbstractVector{ZZRingElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::FpMatrixSpace)(arr::AbstractMatrix{Int})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::FpMatrixSpace)(arr::AbstractVector{Int})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::FpMatrixSpace)(arr::AbstractMatrix{FpFieldElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::FpMatrixSpace)(arr::AbstractVector{FpFieldElem})
+function (a::FpMatrixSpace)(arr::AbstractVecOrMat{FpFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
   z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)

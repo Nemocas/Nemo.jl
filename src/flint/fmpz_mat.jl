@@ -1906,13 +1906,7 @@ function (a::ZZMatrixSpace)()
   return z
 end
 
-function (a::ZZMatrixSpace)(arr::AbstractMatrix{T}) where {T <: IntegerUnion}
-  _check_dim(nrows(a), ncols(a), arr)
-  z = ZZMatrix(nrows(a), ncols(a), arr)
-  return z
-end
-
-function (a::ZZMatrixSpace)(arr::AbstractVector{T}) where {T <: IntegerUnion}
+function (a::ZZMatrixSpace)(arr::AbstractVecOrMat{T}) where {T <: IntegerUnion}
   _check_dim(nrows(a), ncols(a), arr)
   z = ZZMatrix(nrows(a), ncols(a), arr)
   return z

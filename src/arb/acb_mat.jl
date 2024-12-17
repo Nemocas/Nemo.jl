@@ -707,14 +707,7 @@ end
 
 for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, ArbFieldElem, AcbFieldElem, String]
   @eval begin
-    function (x::AcbMatrixSpace)(y::AbstractMatrix{$T})
-      _check_dim(nrows(x), ncols(x), y)
-      z = AcbMatrix(nrows(x), ncols(x), y, precision(x))
-      z.base_ring = x.base_ring
-      return z
-    end
-
-    function (x::AcbMatrixSpace)(y::AbstractVector{$T})
+    function (x::AcbMatrixSpace)(y::AbstractVecOrMat{$T})
       _check_dim(nrows(x), ncols(x), y)
       z = AcbMatrix(nrows(x), ncols(x), y, precision(x))
       z.base_ring = x.base_ring
@@ -723,24 +716,13 @@ for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, ArbFieldElem, AcbFieldElem
   end
 end
 
-(x::AcbMatrixSpace)(y::AbstractMatrix{T}) where {T <: Integer} = x(map(ZZRingElem, y))
+(x::AcbMatrixSpace)(y::AbstractVecOrMat{T}) where {T <: Integer} = x(map(ZZRingElem, y))
 
-(x::AcbMatrixSpace)(y::AbstractVector{T}) where {T <: Integer} = x(map(ZZRingElem, y))
-
-(x::AcbMatrixSpace)(y::AbstractMatrix{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
-
-(x::AcbMatrixSpace)(y::AbstractVector{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
+(x::AcbMatrixSpace)(y::AbstractVecOrMat{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
 
 for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, ArbFieldElem, String]
   @eval begin
-    function (x::AcbMatrixSpace)(y::AbstractMatrix{Tuple{$T, $T}})
-      _check_dim(nrows(x), ncols(x), y)
-      z = AcbMatrix(nrows(x), ncols(x), y, precision(x))
-      z.base_ring = x.base_ring
-      return z
-    end
-
-    function (x::AcbMatrixSpace)(y::AbstractVector{Tuple{$T, $T}})
+    function (x::AcbMatrixSpace)(y::AbstractVecOrMat{Tuple{$T, $T}})
       _check_dim(nrows(x), ncols(x), y)
       z = AcbMatrix(nrows(x), ncols(x), y, precision(x))
       z.base_ring = x.base_ring
@@ -749,16 +731,10 @@ for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, ArbFieldElem, String]
   end
 end
 
-(x::AcbMatrixSpace)(y::AbstractMatrix{Tuple{T, T}}) where {T <: Integer} =
+(x::AcbMatrixSpace)(y::AbstractVecOrMat{Tuple{T, T}}) where {T <: Integer} =
 x(map(z -> (ZZRingElem(z[1]), ZZRingElem(z[2])), y))
 
-(x::AcbMatrixSpace)(y::AbstractVector{Tuple{T, T}}) where {T <: Integer} =
-x(map(z -> (ZZRingElem(z[1]), ZZRingElem(z[2])), y))
-
-(x::AcbMatrixSpace)(y::AbstractMatrix{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
-x(map(z -> (QQFieldElem(z[1]), QQFieldElem(z[2])), y))
-
-(x::AcbMatrixSpace)(y::AbstractVector{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
+(x::AcbMatrixSpace)(y::AbstractVecOrMat{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
 x(map(z -> (QQFieldElem(z[1]), QQFieldElem(z[2])), y))
 
 for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AcbFieldElem, String]

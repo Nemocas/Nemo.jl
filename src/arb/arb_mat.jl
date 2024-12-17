@@ -665,14 +665,7 @@ function (x::ArbMatrixSpace)(y::ZZMatrix)
   return z
 end
 
-function (x::ArbMatrixSpace)(y::AbstractMatrix{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AbstractString}}
-  _check_dim(nrows(x), ncols(x), y)
-  z = ArbMatrix(nrows(x), ncols(x), y, precision(x))
-  z.base_ring = x.base_ring
-  return z
-end
-
-function (x::ArbMatrixSpace)(y::AbstractVector{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AbstractString}}
+function (x::ArbMatrixSpace)(y::AbstractVecOrMat{T}) where {T <: Union{Int, UInt, ZZRingElem, QQFieldElem, Float64, BigFloat, ArbFieldElem, AbstractString}}
   _check_dim(nrows(x), ncols(x), y)
   z = ArbMatrix(nrows(x), ncols(x), y, precision(x))
   z.base_ring = x.base_ring
