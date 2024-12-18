@@ -14,6 +14,8 @@ base_ring(a::ZZMatrix) = ZZ
 
 dense_matrix_type(::Type{ZZRingElem}) = ZZMatrix
 
+is_zero_initialized(::Type{ZZMatrix}) = true
+
 ###############################################################################
 #
 #   similar & zero
@@ -230,21 +232,9 @@ function swap_rows!(x::ZZMatrix, i::Int, j::Int)
   return x
 end
 
-function swap_rows(x::ZZMatrix, i::Int, j::Int)
-  (1 <= i <= nrows(x) && 1 <= j <= nrows(x)) || throw(BoundsError())
-  y = deepcopy(x)
-  return swap_rows!(y, i, j)
-end
-
 function swap_cols!(x::ZZMatrix, i::Int, j::Int)
   @ccall libflint.fmpz_mat_swap_cols(x::Ref{ZZMatrix}, C_NULL::Ptr{Nothing}, (i - 1)::Int, (j - 1)::Int)::Nothing
   return x
-end
-
-function swap_cols(x::ZZMatrix, i::Int, j::Int)
-  (1 <= i <= ncols(x) && 1 <= j <= ncols(x)) || throw(BoundsError())
-  y = deepcopy(x)
-  return swap_cols!(y, i, j)
 end
 
 function reverse_rows!(x::ZZMatrix)
@@ -252,14 +242,10 @@ function reverse_rows!(x::ZZMatrix)
   return x
 end
 
-reverse_rows(x::ZZMatrix) = reverse_rows!(deepcopy(x))
-
 function reverse_cols!(x::ZZMatrix)
   @ccall libflint.fmpz_mat_invert_cols(x::Ref{ZZMatrix}, C_NULL::Ptr{Nothing})::Nothing
   return x
 end
-
-reverse_cols(x::ZZMatrix) = reverse_cols!(deepcopy(x))
 
 ###############################################################################
 #

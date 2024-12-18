@@ -81,7 +81,7 @@ finite field, otherwise return `false`.
 """
 is_gen(a::FqPolyRepFieldElem) = a == gen(parent(a))
 
-is_unit(a::FqPolyRepFieldElem) = @ccall libflint.fq_is_invertible(a::Ref{FqPolyRepFieldElem}, a.parent::Ref{FqPolyRepField})::Bool
+is_unit(a::FqPolyRepFieldElem) = !is_zero(a)
 
 function characteristic(a::FqPolyRepField)
   d = ZZRingElem()

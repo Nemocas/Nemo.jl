@@ -185,7 +185,7 @@ iszero(a::PadicFieldElem) = Bool(@ccall libflint.padic_is_zero(a::Ref{PadicField
 
 isone(a::PadicFieldElem) = Bool(@ccall libflint.padic_is_one(a::Ref{PadicFieldElem})::Cint)
 
-is_unit(a::PadicFieldElem) = !Bool(@ccall libflint.padic_is_zero(a::Ref{PadicFieldElem})::Cint)
+is_unit(a::PadicFieldElem) = !iszero(a)
 
 characteristic(R::PadicField) = 0
 
