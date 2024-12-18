@@ -14,16 +14,6 @@ dense_matrix_type(::Type{zzModRingElem}) = zzModMatrix
 
 is_zero_initialized(::Type{zzModMatrix}) = true
 
-###############################################################################
-#
-#   Similar & zero
-#
-###############################################################################
-
-similar(::zzModMatrix, R::zzModRing, r::Int, c::Int) = zzModMatrix(R, undef, r, c)
-
-zero(m::zzModMatrix, R::zzModRing, r::Int, c::Int) = similar(m, R, r, c)
-
 ################################################################################
 #
 #  Manipulation

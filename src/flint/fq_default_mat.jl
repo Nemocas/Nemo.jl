@@ -14,15 +14,6 @@ dense_matrix_type(::Type{FqFieldElem}) = FqMatrix
 
 is_zero_initialized(::Type{FqMatrix}) = true
 
-###############################################################################
-#
-#   Similar & zero
-#
-###############################################################################
-
-similar(::FqMatrix, R::FqField, r::Int, c::Int) = FqMatrix(r, c, R)
-zero(m::FqMatrix, R::FqField, r::Int, c::Int) = FqMatrix(r, c, R)
-
 ################################################################################
 #
 #  Manipulation
