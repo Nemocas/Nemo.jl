@@ -73,8 +73,8 @@ end
 base_ring(a::FqMatrix) = a.base_ring
 
 function one(a::FqMatrixSpace)
-  (nrows(a) != ncols(a)) && error("Matrices must be square")
-  return a(one(base_ring(a)))
+  check_square(a)
+  return one!(a())
 end
 
 function iszero(a::FqMatrix)

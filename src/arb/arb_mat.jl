@@ -59,6 +59,7 @@ Base.@propagate_inbounds setindex!(x::ArbMatrix, y::Rational{T},
 setindex!(x, ZZRingElem(y), r, c)
 
 function one(x::ArbMatrixSpace)
+  check_square(x)
   return one!(x())
 end
 
