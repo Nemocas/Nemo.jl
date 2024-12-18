@@ -85,15 +85,8 @@ number_of_columns(a::FpMatrix) = a.c
 base_ring(a::FpMatrix) = a.base_ring
 
 function one(a::FpMatrixSpace)
-  (nrows(a) != ncols(a)) && error("Matrices must be square")
-  z = a()
-  @ccall libflint.fmpz_mod_mat_one(z::Ref{FpMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
-end
-
-function iszero(a::FpMatrix)
-  r = @ccall libflint.fmpz_mod_mat_is_zero(a::Ref{FpMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Cint
-  return Bool(r)
+  check_square(a)
+  return one!(a())
 end
 
 @inline function is_zero_entry(A::FpMatrix, i::Int, j::Int)

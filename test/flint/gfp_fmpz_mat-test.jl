@@ -228,7 +228,7 @@ end
 
   @test iszero(e)
 
-  @test_throws ErrorException one(matrix_space(Native.GF(ZZ(2)), 1, 2))
+  @test_throws DomainError one(matrix_space(Native.GF(ZZ(2)), 1, 2))
 
   @test is_square(a)
 

@@ -52,7 +52,7 @@ function deepcopy_internal(a::fpMatrix, dict::IdDict)
 end
 
 function one(a::fpMatrixSpace)
-  (nrows(a) != ncols(a)) && error("Matrices must be square")
+  check_square(a)
   return one!(a())
 end
 

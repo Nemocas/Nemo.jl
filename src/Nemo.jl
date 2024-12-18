@@ -167,6 +167,7 @@ import AbstractAlgebra: @attributes
 import AbstractAlgebra: @show_name
 import AbstractAlgebra: @show_special
 import AbstractAlgebra: @show_special_elem
+import AbstractAlgebra: check_square
 import AbstractAlgebra: Dedent
 import AbstractAlgebra: div
 import AbstractAlgebra: divrem

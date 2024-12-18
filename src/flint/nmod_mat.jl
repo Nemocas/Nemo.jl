@@ -86,7 +86,7 @@ number_of_columns(a::T) where T <: Zmodn_mat = a.c
 base_ring(a::T) where T <: Zmodn_mat = a.base_ring
 
 function one(a::zzModMatrixSpace)
-  (nrows(a) != ncols(a)) && error("Matrices must be square")
+  check_square(a)
   return one!(a())
 end
 

@@ -71,6 +71,7 @@ setindex!(x::AcbMatrix, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) wher
 setindex!(x, map(QQFieldElem, y), r, c)
 
 function one(x::AcbMatrixSpace)
+  check_square(x)
   return one!(x())
 end
 
