@@ -193,12 +193,16 @@ end
 #
 ################################################################################
 
+function rem!(z::fpPolyRingElem, x::fpPolyRingElem, y::fpPolyRingElem)
+  @ccall libflint.nmod_poly_rem(z::Ref{fpPolyRingElem}, x::Ref{fpPolyRingElem}, y::Ref{fpPolyRingElem})::Nothing
+  return z
+end
+
 function rem(x::fpPolyRingElem, y::fpPolyRingElem)
   check_parent(x,y)
   iszero(y) && throw(DivideError())
   z = parent(x)()
-  @ccall libflint.nmod_poly_rem(z::Ref{fpPolyRingElem}, x::Ref{fpPolyRingElem}, y::Ref{fpPolyRingElem})::Nothing
-  return z
+  return rem!(z, x, y)
 end
 
 ################################################################################

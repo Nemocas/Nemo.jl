@@ -296,6 +296,30 @@ end
 
 ###############################################################################
 #
+#   Division with remainder
+#
+###############################################################################
+
+function Base.divrem(a::ZZModRingElem, b::ZZModRingElem)
+  R = parent(a)
+  r = rem(a, b)
+  return divexact(a - r, b), r
+end
+
+function Base.div(a::ZZModRingElem, b::ZZModRingElem)
+  R = parent(a)
+  r = rem(a, b)
+  return divexact(a - r, b)
+end
+
+function Base.rem(a::ZZModRingElem, b::ZZModRingElem)
+  R = parent(a)
+  r = R(rem(lift(a), gcd(modulus(R), lift(b))))
+  return r
+end
+
+###############################################################################
+#
 #   GCD
 #
 ###############################################################################
