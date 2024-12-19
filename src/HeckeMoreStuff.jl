@@ -291,11 +291,6 @@ function mod(f::ZZPolyRingElem, p::ZZRingElem)
   return g
 end
 
-function is_irreducible(a::QQMPolyRingElem)
-  af = factor(a)
-  return !(length(af.fac) > 1 || any(x -> x > 1, values(af.fac)))
-end
-
 #Assuming that the denominator of a is one, reduces all the coefficients modulo p
 # non-symmetric (positive) residue system
 function mod!(a::AbsSimpleNumFieldElem, b::ZZRingElem)
