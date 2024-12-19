@@ -502,8 +502,27 @@ end
 
 @doc raw"""
     reduce_mod(x::ZZMatrix, y::ZZRingElem)
+    reduce_mod(x::ZZMatrix, y::Integer)
 
 Reduce the entries of $x$ modulo $y$ and return the result.
+
+# Examples
+```jldoctest
+julia> A = ZZ[2 3 5; 1 4 7; 9 2 2]
+[2   3   5]
+[1   4   7]
+[9   2   2]
+
+julia> reduce_mod(A, ZZ(5))
+[2   3   0]
+[1   4   2]
+[4   2   2]
+
+julia> reduce_mod(A, 2)
+[0   1   1]
+[1   0   1]
+[1   0   0]
+```
 """
 function reduce_mod(x::ZZMatrix, y::ZZRingElem)
   z = similar(x)
@@ -511,29 +530,19 @@ function reduce_mod(x::ZZMatrix, y::ZZRingElem)
   return z
 end
 
-@doc raw"""
-    reduce_mod(x::ZZMatrix, y::Integer)
-
-Reduce the entries of $x$ modulo $y$ and return the result.
-"""
 reduce_mod(x::ZZMatrix, y::Integer) = reduce_mod(x, ZZRingElem(y))
 
-@doc raw"""
-    mod!(M::ZZMatrix, p::ZZRingElem)
-
-Reduces every entry modulo $p$ in-place, i.e. applies the mod function to every entry.
-Positive residue system.
-"""
-function mod!(M::ZZMatrix, p::ZZRingElem)
-  GC.@preserve M begin
+function mod!(A::ZZMatrix, M::ZZMatrix, p::ZZRingElem)
+  GC.@preserve A M begin
     for i = 1:nrows(M)
       for j = 1:ncols(M)
-        z = mat_entry_ptr(M, i, j)
-        @ccall libflint.fmpz_mod(z::Ptr{ZZRingElem}, z::Ptr{ZZRingElem}, p::Ref{ZZRingElem})::Nothing
+        x = mat_entry_ptr(M, i, j)
+        z = mat_entry_ptr(A, i, j)
+        mod!(z, x, p)
       end
     end
   end
-  return nothing
+  return A
 end
 
 @doc raw"""
@@ -541,22 +550,22 @@ end
 
 Reduces every entry modulo $p$, i.e. applies the mod function to every entry.
 """
-function mod(M::ZZMatrix, p::ZZRingElem)
-  N = deepcopy(M)
-  mod!(N, p)
-  return N
-end
+mod(M::ZZMatrix, p::ZZRingElem) = mod!(similar(M), M, p)
 
 @doc raw"""
+    mod_sym!(N::ZZMatrix, M::ZZMatrix, p::ZZRingElem)
     mod_sym!(M::ZZMatrix, p::ZZRingElem)
 
 Reduces every entry modulo $p$ in-place, into the symmetric residue system.
 """
-function mod_sym!(M::ZZMatrix, B::ZZRingElem)
+function mod_sym!(N::ZZMatrix, M::ZZMatrix, B::ZZRingElem)
+println("foo")
   @assert !iszero(B)
-  @ccall libflint.fmpz_mat_scalar_smod(M::Ref{ZZMatrix}, M::Ref{ZZMatrix}, B::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_mat_scalar_smod(N::Ref{ZZMatrix}, M::Ref{ZZMatrix}, B::Ref{ZZRingElem})::Nothing
+  return N
 end
-mod_sym!(M::ZZMatrix, B::Integer) = mod_sym!(M, ZZRingElem(B))
+mod_sym!(N::ZZMatrix, M::ZZMatrix, B::Integer) = mod_sym!(M, ZZRingElem(B))
+mod_sym!(M::ZZMatrix, B::IntegerUnion) = mod_sym!(M, M, B)
 
 @doc raw"""
     mod_sym(M::ZZMatrix, p::ZZRingElem) -> ZZMatrix

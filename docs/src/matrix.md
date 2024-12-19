@@ -169,25 +169,6 @@ reduce_mod(::ZZMatrix, ::Integer)
 reduce_mod(::ZZMatrix, ::ZZRingElem)
 ```
 
-**Examples**
-
-```jldoctest
-julia> A = ZZ[2 3 5; 1 4 7; 9 2 2]
-[2   3   5]
-[1   4   7]
-[9   2   2]
-
-julia> reduce_mod(A, ZZ(5))
-[2   3   0]
-[1   4   2]
-[4   2   2]
-
-julia> reduce_mod(A, 2)
-[0   1   1]
-[1   0   1]
-[1   0   0]
-```
-
 ### Lifting
 
 ```@docs
