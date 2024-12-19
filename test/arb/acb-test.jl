@@ -1,6 +1,23 @@
 RR = ArbField(64)
 CC = AcbField(64)
 
+function test_elem(R::AcbField)
+    randtype = rand((
+    :urandom,
+    :randtest,
+    :randtest_exact,
+    :randtest_precise,
+    :randtest_wide,
+    :randtest_special,
+    ))
+  return rand(R; randtype)
+end
+
+@testset "AcbFieldElem.conformance_tests" begin
+  test_Field_interface(CC)
+  #test_Field_interface_recursive(CC)
+end
+
 @testset "AcbFieldElem.constructors" begin
   @test isa(CC, AcbField)
   @test isa(CC(2), FieldElem)
