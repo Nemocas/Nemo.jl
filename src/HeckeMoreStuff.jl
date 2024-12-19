@@ -386,11 +386,19 @@ end
 
 Tests if $a$ is nilpotent.
 """
-function is_nilpotent(a::ResElem{T}) where {T<:IntegerUnion}
-  #a is nilpontent if it is divisible by all primes divising the modulus
-  # the largest exponent a prime can divide is nbits(m)
-  l = nbits(modulus(a))
-  return iszero(a^l)
+function is_nilpotent(res::ResElem{T}) where {T<:IntegerUnion}
+  # Code below is faster than
+  #    m=modulus(res);
+  #    return powermod(lift(res),nbits(m),m)==0
+  m = modulus(res)
+  r = data(res) # the least non-negative class representative as a value of type "unsigned" T; !!note that "lift" casts the value to BigInt!!
+  while true
+    g = gcd(r, m)
+    (g == m) && return true
+    (g == 1) && return false
+    m = divexact(m, g)  #  equiv to:  m /= g
+    mod!(g, m);  r = g^2  # g^2 cannot overflow thanks to mod!
+  end
 end
 
 function inv(f::T) where {T<:Union{ZZModPolyRingElem,zzModPolyRingElem}}

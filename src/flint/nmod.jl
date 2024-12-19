@@ -20,6 +20,7 @@ base_ring(a::zzModRing) = ZZ
 
 parent(a::zzModRingElem) = a.parent
 
+
 ###############################################################################
 #
 #   Basic manipulation
