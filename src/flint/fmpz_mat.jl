@@ -1254,7 +1254,11 @@ end
 
 Compute the Smith normal form of $x$.
 """
-function snf(x::ZZMatrix)
+@inline snf(x::ZZMatrix) = _snf(x)
+
+@inline _snf(x) = __snf(x)
+
+function __snf(x::ZZMatrix)
   z = similar(x)
   @ccall libflint.fmpz_mat_snf(z::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
   return z
@@ -1622,7 +1626,7 @@ function _solve_dixon(a::ZZMatrix, b::ZZMatrix)
 end
 
 #XU = B. only the upper triangular part of U is used
-function AbstractAlgebra._solve_triu_left(U::ZZMatrix, b::ZZMatrix)
+function AbstractAlgebra._solve_triu_left(U::ZZMatrix, b::ZZMatrix; unipotent::Bool = false)
   n = ncols(U)
   m = nrows(b)
   R = base_ring(U)
@@ -1649,7 +1653,11 @@ function AbstractAlgebra._solve_triu_left(U::ZZMatrix, b::ZZMatrix)
           tmp_p += sizeof(ZZRingElem)
         end
         sub!(s, mat_entry_ptr(b, i, j), s)
-        divexact!(mat_entry_ptr(tmp, 1, j), s, mat_entry_ptr(U, j, j))
+        if unipotent
+          set!(mat_entry_ptr(tmp, 1, j), s)
+        else
+          divexact!(mat_entry_ptr(tmp, 1, j), s, mat_entry_ptr(U, j, j))
+        end
       end
       tmp_p = mat_entry_ptr(tmp, 1, 1)
       X_p = mat_entry_ptr(X, i, 1)
@@ -1666,9 +1674,9 @@ end
 #UX = B, U has to be upper triangular
 #I think due to the Strassen calling path, where Strasse.solve(side = :left) 
 #call directly AA.solve_left, this has to be in AA and cannot be independent.
-function AbstractAlgebra._solve_triu(U::ZZMatrix, b::ZZMatrix; side::Symbol=:left) 
+function AbstractAlgebra._solve_triu(U::ZZMatrix, b::ZZMatrix; side::Symbol=:left, unipotent::Bool = false) 
   if side == :left
-    return AbstractAlgebra._solve_triu_left(U, b)
+    return AbstractAlgebra._solve_triu_left(U, b; unipotent)
   end
   @assert side == :right
   n = nrows(U)
@@ -1698,7 +1706,11 @@ function AbstractAlgebra._solve_triu(U::ZZMatrix, b::ZZMatrix; side::Symbol=:lef
         #         s = b[j, i] - s
         tmp_ptr = mat_entry_ptr(tmp, 1, j)
         U_ptr = mat_entry_ptr(U, j, j)
-        divexact!(tmp_ptr, s, U_ptr)
+        if unipotent
+          set!(tmp_ptr, s)
+        else
+          divexact!(tmp_ptr, s, U_ptr)
+        end
         #           tmp[j] = divexact(s, U[j,j])
       end
       tmp_ptr = mat_entry_ptr(tmp, 1, 1)
@@ -1825,6 +1837,11 @@ end
 
 function mul!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::ZZMatrixOrPtr)
   @ccall libflint.fmpz_mat_mul(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Ref{ZZMatrix})::Nothing
+  return z
+end
+
+function mul_classical!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::ZZMatrixOrPtr)
+  @ccall libflint.fmpz_mat_mul_classical(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Ref{ZZMatrix})::Nothing
   return z
 end
 
