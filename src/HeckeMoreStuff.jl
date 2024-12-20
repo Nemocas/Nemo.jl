@@ -365,18 +365,6 @@ function is_unit(f::T) where {T<:Union{ZZModPolyRingElem,zzModPolyRingElem}}
   return true
 end
 
-@doc raw"""
-    is_nilpotent(a::ResElem{ZZRingElem}) -> Bool
-    is_nilpotent(a::ResElem{Integer}) -> Bool
-
-Tests if $a$ is nilpotent.
-"""
-function is_nilpotent(a::ResElem{T}) where {T<:IntegerUnion}
-  #a is nilpontent if it is divisible by all primes divising the modulus
-  # the largest exponent a prime can divide is nbits(m)
-  l = nbits(modulus(a))
-  return iszero(a^l)
-end
 
 function inv(f::T) where {T<:Union{ZZModPolyRingElem,zzModPolyRingElem}}
   if !is_unit(f)
