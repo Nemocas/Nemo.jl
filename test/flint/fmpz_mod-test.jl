@@ -144,7 +144,7 @@ end
   # 64-bit overflow test:  **ASSUMES** Int is 64 bits
   rr = 4*3^20
   mm = 3*rr
-  R_overflow, = residue_ring(ZZ, mm)
+  R_overflow,_ = residue_ring(ZZ, mm)
   @test is_nilpotent(R_overflow(rr))
 end
 
