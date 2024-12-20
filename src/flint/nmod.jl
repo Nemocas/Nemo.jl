@@ -51,9 +51,7 @@ end
 
 iszero(a::zzModRingElem) = a.data == 0
 
-isone(a::zzModRingElem) = a.parent.n == 1 ? a.data == 0 : a.data == 1
-
-is_unit(a::zzModRingElem) = a.parent.n == 1 ? a.data == 0 : gcd(a.data, a.parent.n) == 1
+isone(a::zzModRingElem) = (a.parent.n == 1) || (a.data == 1)
 
 modulus(R::zzModRing) = R.n
 
