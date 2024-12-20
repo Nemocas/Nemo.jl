@@ -343,6 +343,12 @@ end
   @test powermod(f, -10, g) == 78305338116088931412*x+91239060941924718463
 
   @test powermod(f, -ZZRingElem(10), g) == 78305338116088931412*x+91239060941924718463
+
+  R, = residue_ring(ZZ, ZZ(2809))
+  Rx, x = R[:x]
+  f = 32*x^9 + 28*x^8 + 2497*x^7 + 2443*x^6 + 708*x^5 + 996*x^4 + 2557*x^3 + 2104*x^2 + 2517*x + 2752
+  g = x^10 + 2798*x^8 + 2806*x^7 + 37*x^6 + 14*x^5 + 2761*x^4 + 2787*x^3 + 20*x^2 + 12*x + 1
+  @test_throws ErrorException invmod(f, g)
 end
 
 @testset "ZZModPolyRingElem.euclidean_division" begin
