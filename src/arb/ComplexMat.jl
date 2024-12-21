@@ -6,19 +6,6 @@
 
 ###############################################################################
 #
-#   Similar & zero
-#
-###############################################################################
-
-function similar(::ComplexMatrix, R::ComplexField, r::Int, c::Int)
-  z = ComplexMatrix(r, c)
-  return z
-end
-
-zero(m::ComplexMatrix, R::ComplexField, r::Int, c::Int) = similar(m, R, r, c)
-
-###############################################################################
-#
 #   Basic manipulation
 #
 ###############################################################################
@@ -706,13 +693,7 @@ end
 
 for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, RealFieldElem, ComplexFieldElem, String]
   @eval begin
-    function (x::ComplexMatrixSpace)(y::AbstractMatrix{$T})
-      _check_dim(nrows(x), ncols(x), y)
-      z = ComplexMatrix(nrows(x), ncols(x), y, precision(Balls))
-      return z
-    end
-
-    function (x::ComplexMatrixSpace)(y::AbstractVector{$T})
+    function (x::ComplexMatrixSpace)(y::AbstractVecOrMat{$T})
       _check_dim(nrows(x), ncols(x), y)
       z = ComplexMatrix(nrows(x), ncols(x), y, precision(Balls))
       return z
@@ -720,23 +701,13 @@ for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, RealFieldElem, ComplexFiel
   end
 end
 
-(x::ComplexMatrixSpace)(y::AbstractMatrix{T}) where {T <: Integer} = x(map(ZZRingElem, y))
+(x::ComplexMatrixSpace)(y::AbstractVecOrMat{T}) where {T <: Integer} = x(map(ZZRingElem, y))
 
-(x::ComplexMatrixSpace)(y::AbstractVector{T}) where {T <: Integer} = x(map(ZZRingElem, y))
-
-(x::ComplexMatrixSpace)(y::AbstractMatrix{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
-
-(x::ComplexMatrixSpace)(y::AbstractVector{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
+(x::ComplexMatrixSpace)(y::AbstractVecOrMat{Rational{T}}) where {T <: Integer} = x(map(QQFieldElem, y))
 
 for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, RealFieldElem, String]
   @eval begin
-    function (x::ComplexMatrixSpace)(y::AbstractMatrix{Tuple{$T, $T}})
-      _check_dim(nrows(x), ncols(x), y)
-      z = ComplexMatrix(nrows(x), ncols(x), y, precision(Balls))
-      return z
-    end
-
-    function (x::ComplexMatrixSpace)(y::AbstractVector{Tuple{$T, $T}})
+    function (x::ComplexMatrixSpace)(y::AbstractVecOrMat{Tuple{$T, $T}})
       _check_dim(nrows(x), ncols(x), y)
       z = ComplexMatrix(nrows(x), ncols(x), y, precision(Balls))
       return z
@@ -744,16 +715,10 @@ for T in [Float64, ZZRingElem, QQFieldElem, BigFloat, RealFieldElem, String]
   end
 end
 
-(x::ComplexMatrixSpace)(y::AbstractMatrix{Tuple{T, T}}) where {T <: Integer} =
+(x::ComplexMatrixSpace)(y::AbstractVecOrMat{Tuple{T, T}}) where {T <: Integer} =
 x(map(z -> (ZZRingElem(z[1]), ZZRingElem(z[2])), y))
 
-(x::ComplexMatrixSpace)(y::AbstractVector{Tuple{T, T}}) where {T <: Integer} =
-x(map(z -> (ZZRingElem(z[1]), ZZRingElem(z[2])), y))
-
-(x::ComplexMatrixSpace)(y::AbstractMatrix{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
-x(map(z -> (QQFieldElem(z[1]), QQFieldElem(z[2])), y))
-
-(x::ComplexMatrixSpace)(y::AbstractVector{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
+(x::ComplexMatrixSpace)(y::AbstractVecOrMat{Tuple{Rational{T}, Rational{T}}}) where {T <: Integer} =
 x(map(z -> (QQFieldElem(z[1]), QQFieldElem(z[2])), y))
 
 for T in [Integer, ZZRingElem, QQFieldElem, Float64, BigFloat, RealFieldElem, ComplexFieldElem, String]
@@ -811,20 +776,6 @@ end
 function matrix(R::ComplexField, r::Int, c::Int, arr::AbstractVector{Rational{T}}) where {T <: Integer}
   arr_fmpz = map(QQFieldElem, arr)
   return matrix(R, r, c, arr_fmpz)
-end
-
-###############################################################################
-#
-#  Zero matrix
-#
-###############################################################################
-
-function zero_matrix(R::ComplexField, r::Int, c::Int)
-  if r < 0 || c < 0
-    error("dimensions must not be negative")
-  end
-  z = ComplexMatrix(r, c)
-  return z
 end
 
 ###############################################################################

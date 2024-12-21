@@ -14,17 +14,6 @@ dense_matrix_type(::Type{FpFieldElem}) = FpMatrix
 
 is_zero_initialized(::Type{FpMatrix}) = true
 
-###############################################################################
-#
-#   Similar
-#
-###############################################################################
-
-function similar(::MatElem, R::FpField, r::Int, c::Int)
-  z = FpMatrix(R, undef, r, c)
-  return z
-end
-
 ################################################################################
 #
 #  Manipulation
@@ -224,57 +213,14 @@ function (a::FpMatrixSpace)(b::FpFieldElem)
   return M
 end
 
-function (a::FpMatrixSpace)(arr::AbstractMatrix{BigInt})
+function (a::FpMatrixSpace)(arr::AbstractVecOrMat{T}) where {T <: IntegerUnion}
   _check_dim(nrows(a), ncols(a), arr)
   z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::FpMatrixSpace)(arr::AbstractVector{BigInt})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::FpMatrixSpace)(arr::AbstractMatrix{ZZRingElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::FpMatrixSpace)(arr::AbstractVector{ZZRingElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::FpMatrixSpace)(arr::AbstractMatrix{Int})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::FpMatrixSpace)(arr::AbstractVector{Int})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::FpMatrixSpace)(arr::AbstractMatrix{FpFieldElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::FpMatrixSpace)(arr::AbstractVector{FpFieldElem})
+function (a::FpMatrixSpace)(arr::AbstractVecOrMat{FpFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
   z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
@@ -298,20 +244,6 @@ function matrix(R::FpField, r::Int, c::Int, arr::AbstractVector{<: Union{FpField
   _check_dim(r, c, arr)
   z = FpMatrix(r, c, R.ninv, arr)
   z.base_ring = R
-  return z
-end
-
-###############################################################################
-#
-#  Zero matrix
-#
-###############################################################################
-
-function zero_matrix(R::FpField, r::Int, c::Int)
-  if r < 0 || c < 0
-    error("dimensions must not be negative")
-  end
-  z = FpMatrix(R, undef, r, c)
   return z
 end
 

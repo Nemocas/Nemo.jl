@@ -484,6 +484,7 @@ function rem(x::ZZRingElemOrPtr, ::Type{UInt64})
 end
 
 function rem(x::ZZRingElem, c::ZZRingElem)
+  # FIXME: it seems `rem` and `rem!` for `ZZRingElem` do different things?
   q, r = Base.divrem(x, c)
   return r
 end
@@ -2608,6 +2609,14 @@ function divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::UInt)
 end
 
 divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer) = divexact!(z, a, flintify(b))
+
+#
+
+function rem!(a::ZZRingElem, b::ZZRingElem, c::ZZRingElem)
+  # FIXME: it seems `rem` and `rem!` for `ZZRingElem` do different things?
+  @ccall libflint.fmpz_mod(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ref{ZZRingElem})::Nothing
+  return a
+end
 
 #
 

@@ -14,15 +14,6 @@ dense_matrix_type(::Type{FqFieldElem}) = FqMatrix
 
 is_zero_initialized(::Type{FqMatrix}) = true
 
-###############################################################################
-#
-#   Similar & zero
-#
-###############################################################################
-
-similar(::FqMatrix, R::FqField, r::Int, c::Int) = FqMatrix(r, c, R)
-zero(m::FqMatrix, R::FqField, r::Int, c::Int) = FqMatrix(r, c, R)
-
 ################################################################################
 #
 #  Manipulation
@@ -652,20 +643,6 @@ end
 function matrix(R::FqField, r::Int, c::Int, arr::AbstractVector{<: Union{FqFieldElem, ZZRingElem, Integer}})
   _check_dim(r, c, arr)
   z = FqMatrix(r, c, arr, R)
-  return z
-end
-
-###############################################################################
-#
-#  Zero matrix
-#
-###############################################################################
-
-function zero_matrix(R::FqField, r::Int, c::Int)
-  if r < 0 || c < 0
-    error("dimensions must not be negative")
-  end
-  z = FqMatrix(r, c, R)
   return z
 end
 

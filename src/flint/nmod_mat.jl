@@ -14,16 +14,6 @@ dense_matrix_type(::Type{zzModRingElem}) = zzModMatrix
 
 is_zero_initialized(::Type{zzModMatrix}) = true
 
-###############################################################################
-#
-#   Similar & zero
-#
-###############################################################################
-
-similar(::zzModMatrix, R::zzModRing, r::Int, c::Int) = zzModMatrix(R, undef, r, c)
-
-zero(m::zzModMatrix, R::zzModRing, r::Int, c::Int) = similar(m, R, r, c)
-
 ################################################################################
 #
 #  Manipulation
@@ -180,26 +170,20 @@ end
 
 function +(x::T, y::T) where T <: Zmodn_mat
   check_parent(x,y)
-  z = similar(x)
-  @ccall libflint.nmod_mat_add(z::Ref{T}, x::Ref{T}, y::Ref{T})::Nothing
-  return z
+  return add!(similar(x), x, y)
 end
 
 function -(x::T, y::T) where T <: Zmodn_mat
   check_parent(x,y)
-  z = similar(x)
-  @ccall libflint.nmod_mat_sub(z::Ref{T}, x::Ref{T}, y::Ref{T})::Nothing
-  return z
+  return sub!(similar(x), x, y)
 end
 
 function *(x::T, y::T) where T <: Zmodn_mat
   (base_ring(x) != base_ring(y)) && error("Base ring must be equal")
   (ncols(x) != nrows(y)) && error("Dimensions are wrong")
   z = similar(x, nrows(x), ncols(y))
-  @ccall libflint.nmod_mat_mul(z::Ref{T}, x::Ref{T}, y::Ref{T})::Nothing
-  return z
+  return mul!(z, x, y)
 end
-
 
 ################################################################################
 #
@@ -249,18 +233,29 @@ function mul!(z::Vector{UInt}, a::Vector{UInt}, b::T) where T <: Zmodn_mat
   return z
 end
 
-function mul!(a::zzModMatrix, b::zzModMatrix, c::zzModRingElem)
-  @ccall libflint.nmod_mat_scalar_mul(a::Ref{zzModMatrix}, b::Ref{zzModMatrix}, c.data::UInt)::Nothing
+function mul!(a::T, b::T, c::UInt) where T <: Zmodn_mat
+  @ccall libflint.nmod_mat_scalar_mul(a::Ref{T}, b::Ref{T}, c::UInt)::Nothing
   return a
+end
+
+function mul!(a::T, b::UInt, c::T) where T <: Zmodn_mat
+  return mul!(a, c, b)
+end
+
+function mul!(a::zzModMatrix, b::zzModMatrix, c::zzModRingElem)
+  return mul!(a, b, c.data)
 end
 
 function mul!(a::zzModMatrix, b::zzModRingElem, c::zzModMatrix)
   return mul!(a, c, b)
 end
 
-function mul!(A::fpMatrix, B::fpFieldElem, D::fpMatrix)
-  @ccall libflint.nmod_mat_scalar_mul(A::Ref{fpMatrix}, D::Ref{fpMatrix}, B.data::UInt)::Nothing
-  return A
+function mul!(a::fpMatrix, b::fpMatrix, c::fpFieldElem)
+  return mul!(a, b, c.data)
+end
+
+function mul!(a::fpMatrix, b::fpFieldElem, c::fpMatrix)
+  return mul!(a, c, b)
 end
 
 function addmul!(A::fpMatrix, B::fpMatrix, C::fpFieldElem, D::fpMatrix)
@@ -279,10 +274,6 @@ function Generic.add_one!(a::T, i::Int, j::Int) where T <: Zmodn_mat
   return a
 end
 
-function mul!(a::fpMatrix, b::fpMatrix, c::fpFieldElem)
-  return mul!(a, c, b)
-end
-
 ################################################################################
 #
 #  Ad hoc binary operators
@@ -290,9 +281,7 @@ end
 ################################################################################
 
 function *(x::T, y::UInt) where T <: Zmodn_mat
-  z = similar(x)
-  @ccall libflint.nmod_mat_scalar_mul(z::Ref{T}, x::Ref{T}, y::UInt)::Nothing
-  return z
+  return mul!(similar(x), x, y)
 end
 
 *(x::UInt, y::T) where T <: Zmodn_mat = y*x
@@ -706,57 +695,14 @@ function (a::zzModMatrixSpace)()
   return z
 end
 
-function (a::zzModMatrixSpace)(arr::AbstractMatrix{BigInt})
+function (a::zzModMatrixSpace)(arr::AbstractVecOrMat{T}) where {T <: IntegerUnion}
   _check_dim(nrows(a), ncols(a), arr)
   z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
   z.base_ring = a.base_ring
   return z
 end
 
-function (a::zzModMatrixSpace)(arr::AbstractVector{BigInt})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::zzModMatrixSpace)(arr::AbstractMatrix{ZZRingElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::zzModMatrixSpace)(arr::AbstractVector{ZZRingElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::zzModMatrixSpace)(arr::AbstractMatrix{Int})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::zzModMatrixSpace)(arr::AbstractVector{Int})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::zzModMatrixSpace)(arr::AbstractMatrix{zzModRingElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
-  z.base_ring = a.base_ring
-  return z
-end
-
-function (a::zzModMatrixSpace)(arr::AbstractVector{zzModRingElem})
+function (a::zzModMatrixSpace)(arr::AbstractVecOrMat{zzModRingElem})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
   z = zzModMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
@@ -788,19 +734,6 @@ function matrix(R::zzModRing, r::Int, c::Int, arr::AbstractVector{<: Union{zzMod
   z = zzModMatrix(r, c, R.n, arr)
   z.base_ring = R
   return z
-end
-
-###############################################################################
-#
-#  Zero matrix
-#
-###############################################################################
-
-function zero_matrix(R::zzModRing, r::Int, c::Int)
-  if r < 0 || c < 0
-    error("dimensions must not be negative")
-  end
-  return zzModMatrix(R, undef, r, c)
 end
 
 ################################################################################
