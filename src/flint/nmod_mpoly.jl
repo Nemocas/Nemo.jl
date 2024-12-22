@@ -100,10 +100,6 @@ for (etype, rtype, ftype, ctype, utype) in (
       return length(a) == 1
     end
 
-    # function is_unit(a::($etype))
-    #   return length(a) == 1 && total_degree(a) == 0 && is_unit(coeff(a, 1))
-    # end
-
     function is_constant(a::($etype))
       return Bool(@ccall libflint.nmod_mpoly_is_ui(a::Ref{($etype)}, parent(a)::Ref{($rtype)})::Cint)
     end
