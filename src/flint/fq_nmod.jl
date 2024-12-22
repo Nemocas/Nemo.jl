@@ -81,8 +81,6 @@ isone(a::fqPolyRepFieldElem) = @ccall libflint.fq_nmod_is_one(a::Ref{fqPolyRepFi
 
 is_gen(a::fqPolyRepFieldElem) = a == gen(parent(a)) # there is no is_gen in flint
 
-is_unit(a::fqPolyRepFieldElem) = @ccall libflint.fq_nmod_is_invertible(a::Ref{fqPolyRepFieldElem}, a.parent::Ref{fqPolyRepField})::Bool
-
 function characteristic(a::fqPolyRepField)
   return ZZ(a.n)
 end

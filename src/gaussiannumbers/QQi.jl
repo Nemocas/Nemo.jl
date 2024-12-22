@@ -384,10 +384,6 @@ end
 #
 ###############################################################################
 
-function is_unit(a::QQiFieldElem)
-  return !iszero(a)
-end
-
 function inv!(z::QQiFieldElem, a::QQiFieldElem)
   d = abs2(a.num)
   mul!(z.num.x, a.num.x, a.den)

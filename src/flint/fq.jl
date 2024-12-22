@@ -81,8 +81,6 @@ finite field, otherwise return `false`.
 """
 is_gen(a::FqPolyRepFieldElem) = a == gen(parent(a))
 
-is_unit(a::FqPolyRepFieldElem) = !is_zero(a)
-
 function characteristic(a::FqPolyRepField)
   d = ZZRingElem()
   @ccall libflint.__fq_ctx_prime(d::Ref{ZZRingElem}, a::Ref{FqPolyRepField})::Nothing

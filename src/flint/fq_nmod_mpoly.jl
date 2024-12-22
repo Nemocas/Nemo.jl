@@ -91,10 +91,6 @@ function is_term(a::fqPolyRepMPolyRingElem)
   return length(a) == 1
 end
 
-function is_unit(a::fqPolyRepMPolyRingElem)
-  return is_constant(a)
-end
-
 function is_constant(a::fqPolyRepMPolyRingElem)
   b = @ccall libflint.fq_nmod_mpoly_is_fq_nmod(a::Ref{fqPolyRepMPolyRingElem}, parent(a)::Ref{fqPolyRepMPolyRing})::Cint
   return Bool(b)

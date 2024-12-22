@@ -351,7 +351,6 @@ export is_less_real
 export is_less_root_order
 export is_lower_triangular
 export is_negative
-export is_nilpotent
 export is_nonnegative
 export is_nonpositive
 export is_nonzero
