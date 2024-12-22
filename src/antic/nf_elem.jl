@@ -131,14 +131,6 @@ function iszero(a::AbsSimpleNumFieldElem)
 end
 
 @doc raw"""
-    is_unit(a::AbsSimpleNumFieldElem)
-
-Return `true` if the given number field element is invertible, i.e. nonzero,
-otherwise return `false`. Note, this does not take the maximal order into account.
-"""
-is_unit(a::AbsSimpleNumFieldElem) = !iszero(a)
-
-@doc raw"""
     isinteger(a::AbsSimpleNumFieldElem)
 
 Return `true` if the given number field element is an integer, i.e., in ZZ, otherwise

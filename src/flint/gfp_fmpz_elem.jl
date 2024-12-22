@@ -60,8 +60,6 @@ function one(R::FpField)
   end
 end
 
-is_unit(a::FpFieldElem) = a.data != 0
-
 modulus(R::FpField) = R.n
 
 characteristic(F::FpField) = modulus(F)

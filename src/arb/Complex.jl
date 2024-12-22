@@ -447,10 +447,6 @@ end
 #
 ################################################################################
 
-function is_unit(x::ComplexFieldElem)
-  !iszero(x)
-end
-
 @doc raw"""
     iszero(x::ComplexFieldElem)
 

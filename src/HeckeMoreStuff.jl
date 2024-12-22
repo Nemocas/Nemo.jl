@@ -346,26 +346,6 @@ function gcdx(a::ResElem{T}, b::ResElem{T}) where {T<:IntegerUnion}
   return R(G), R(U) * R(u), R(U) * R(v)
 end
 
-@doc raw"""
-    is_unit(f::Union{ZZModPolyRingElem,zzModPolyRingElem}) -> Bool
-
-Tests if $f$ is a unit in the polynomial ring, i.e. if
-$f = u + n$ where $u$ is a unit in the coeff. ring
-and $n$ is nilpotent.
-"""
-function is_unit(f::T) where {T<:Union{ZZModPolyRingElem,zzModPolyRingElem}}
-  if !is_unit(constant_coefficient(f))
-    return false
-  end
-  for i = 1:degree(f)
-    if !is_nilpotent(coeff(f, i))
-      return false
-    end
-  end
-  return true
-end
-
-
 function inv(f::T) where {T<:Union{ZZModPolyRingElem,zzModPolyRingElem}}
   if !is_unit(f)
     error("impossible inverse")

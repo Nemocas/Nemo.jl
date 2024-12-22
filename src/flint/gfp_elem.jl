@@ -57,8 +57,6 @@ iszero(a::fpFieldElem) = a.data == 0
 
 isone(a::fpFieldElem) = a.data == 1
 
-is_unit(a::fpFieldElem) = a.data != 0
-
 modulus(R::fpField) = R.n
 
 function deepcopy_internal(a::fpFieldElem, dict::IdDict)
