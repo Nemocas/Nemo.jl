@@ -364,10 +364,13 @@ end
 
 function mul!(z::FpFieldElem, x::FpFieldElem, y::ZZRingElem)
   R = parent(x)
-  @ccall libflint.fmpz_mod(z.data::Ref{ZZRingElem}, y::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
-
-  @ccall libflint.fmpz_mod_mul(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, z.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
+  if z !== x
+    @ccall libflint.fmpz_mod(z.data::Ref{ZZRingElem}, y::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
+    @ccall libflint.fmpz_mod_mul(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, z.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+    return z
+  else
+    return mul!(z, x, R(y))
+  end
 end
 
 function add!(z::FpFieldElem, x::FpFieldElem, y::FpFieldElem)
