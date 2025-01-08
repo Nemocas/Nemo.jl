@@ -368,7 +368,8 @@ end
 function invmod(f::ZZModPolyRingElem, M::ZZModPolyRingElem)
   if !is_unit(f)
     r = parent(f)()
-    i = @ccall libflint.fmpz_mod_poly_invmod(r::Ref{ZZModPolyRingElem}, f::Ref{ZZModPolyRingElem}, M::Ref{ZZModPolyRingElem}, f.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Int
+    ff = ZZ()
+    i = @ccall libflint.fmpz_mod_poly_invmod_f(ff::Ref{ZZRingElem}, r::Ref{ZZModPolyRingElem}, f::Ref{ZZModPolyRingElem}, M::Ref{ZZModPolyRingElem}, f.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Int
     if iszero(i)
       error("not yet implemented")
     else
