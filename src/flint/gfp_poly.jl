@@ -302,6 +302,7 @@ end
 ################################################################################
 
 function is_irreducible(x::fpPolyRingElem)
+  is_constant(x) && return false
   return Bool(@ccall libflint.nmod_poly_is_irreducible(x::Ref{fpPolyRingElem})::Int32)
 end
 

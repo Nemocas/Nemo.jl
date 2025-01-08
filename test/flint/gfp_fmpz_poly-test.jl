@@ -497,6 +497,9 @@ end
   f = x^2 + 2x + 1
 
   @test is_irreducible(f) == false
+
+  @test !is_irreducible(x^0)
+  @test !is_irreducible(0*x^0)
 end
 
 @testset "FpPolyRingElem.is_squarefree" begin

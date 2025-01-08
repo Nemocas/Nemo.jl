@@ -502,6 +502,9 @@ end
   @test is_irreducible(x)
 
   @test is_irreducible(x^16+2*x^9+x^8+x^2+x+1)
+
+  @test !is_irreducible(x^0)
+  @test !is_irreducible(0*x^0)
 end
 
 @testset "FqPolyRepPolyRingElem.is_squarefree" begin

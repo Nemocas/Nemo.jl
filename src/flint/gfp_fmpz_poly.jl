@@ -242,6 +242,7 @@ end
 ################################################################################
 
 function is_irreducible(x::FpPolyRingElem)
+  is_constant(x) && return false
   return Bool(@ccall libflint.fmpz_mod_poly_is_irreducible(x::Ref{FpPolyRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Cint)
 end
 

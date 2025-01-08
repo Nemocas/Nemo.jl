@@ -641,6 +641,7 @@ end
 
 function is_irreducible(x::zzModPolyRingElem)
   !is_prime(modulus(x)) && error("Modulus not prime in is_irreducible")
+  is_constant(x) && return false
   return Bool(@ccall libflint.nmod_poly_is_irreducible(x::Ref{zzModPolyRingElem})::Int32)
 end
 

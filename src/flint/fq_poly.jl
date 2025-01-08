@@ -519,6 +519,7 @@ end
 ################################################################################
 
 function is_irreducible(x::FqPolyRepPolyRingElem)
+  is_constant(x) && return false
   return Bool(@ccall libflint.fq_poly_is_irreducible(x::Ref{FqPolyRepPolyRingElem}, base_ring(parent(x))::Ref{FqPolyRepField})::Int32)
 end
 
