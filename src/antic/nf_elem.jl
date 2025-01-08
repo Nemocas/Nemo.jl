@@ -131,14 +131,6 @@ function iszero(a::AbsSimpleNumFieldElem)
 end
 
 @doc raw"""
-    is_unit(a::AbsSimpleNumFieldElem)
-
-Return `true` if the given number field element is invertible, i.e. nonzero,
-otherwise return `false`. Note, this does not take the maximal order into account.
-"""
-is_unit(a::AbsSimpleNumFieldElem) = !iszero(a)
-
-@doc raw"""
     isinteger(a::AbsSimpleNumFieldElem)
 
 Return `true` if the given number field element is an integer, i.e., in ZZ, otherwise
@@ -262,24 +254,21 @@ function +(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem)
   parent(a) == parent(b) || return force_op(+, a, b)::AbsSimpleNumFieldElem
   check_parent(a, b)
   r = a.parent()
-  @ccall libflint.nf_elem_add(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
-  return r
+  return add!(r, a, b)
 end
 
 function -(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem)
   parent(a) == parent(b) || return force_op(-, a, b)::AbsSimpleNumFieldElem
   check_parent(a, b)
   r = a.parent()
-  @ccall libflint.nf_elem_sub(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
-  return r
+  return sub!(r, a, b)
 end
 
 function *(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem)
   parent(a) == parent(b) || return force_op(*, a, b)::AbsSimpleNumFieldElem
   check_parent(a, b)
   r = a.parent()
-  @ccall libflint.nf_elem_mul(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
-  return r
+  return mul!(r, a, b)
 end
 
 ###############################################################################
@@ -724,6 +713,11 @@ end
 
 add!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Integer) = add!(c, a, flintify(b))
 
+function sub!(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem, c::AbsSimpleNumFieldElem)
+  @ccall libflint.nf_elem_sub(a::Ref{AbsSimpleNumFieldElem}, b::Ref{AbsSimpleNumFieldElem}, c::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  return a
+end
+
 function sub!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::QQFieldElem)
   @ccall libflint.nf_elem_sub_fmpq(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{QQFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
   return c
@@ -774,6 +768,23 @@ function mul!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Int)
 end
 
 mul!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Integer) = mul!(c, a, flintify(b))
+
+function divexact!(z::AbsSimpleNumFieldElem, x::AbsSimpleNumFieldElem, y::Int)
+  @ccall libflint.nf_elem_scalar_div_si(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Int, parent(x)::Ref{AbsSimpleNumField})::Nothing
+  return z
+end
+
+function divexact!(z::AbsSimpleNumFieldElem, x::AbsSimpleNumFieldElem, y::ZZRingElem)
+  @ccall libflint.nf_elem_scalar_div_fmpz(z::Ref{AbsSimpleNumFieldElem}, x::Ref{AbsSimpleNumFieldElem}, y::Ref{ZZRingElem}, parent(x)::Ref{AbsSimpleNumField})::Nothing
+  return z
+end
+
+function divexact!(z::AbsSimpleNumFieldElem, x::AbsSimpleNumFieldElem, y::QQFieldElem)
+  @ccall libflint.nf_elem_scalar_div_fmpq(z::Ref{AbsSimpleNumFieldElem}, x::Ref{AbsSimpleNumFieldElem}, y::Ref{QQFieldElem}, parent(x)::Ref{AbsSimpleNumField})::Nothing
+  return z
+end
+
+divexact!(z::AbsSimpleNumFieldElem, x::AbsSimpleNumFieldElem, y::RationalUnion) = divexact!(z, x, flintify(y))
 
 ###############################################################################
 #
@@ -1015,6 +1026,10 @@ function (a::QQPolyRing)(b::AbsSimpleNumFieldElem)
   @ccall libflint.nf_elem_get_fmpq_poly(r::Ref{QQPolyRingElem}, b::Ref{AbsSimpleNumFieldElem}, parent(b)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
+
+(::QQField)(a::AbsSimpleNumFieldElem) = (is_rational(a) && return coeff(a, 0)) || error("not a rational")
+
+(::ZZRing)(a::AbsSimpleNumFieldElem) = (is_integer(a) && return numerator(coeff(a, 0))) || error("not an integer")
 
 ###############################################################################
 #

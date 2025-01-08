@@ -450,10 +450,6 @@ end
 #
 ################################################################################
 
-function is_unit(x::ArbFieldElem)
-  !iszero(x)
-end
-
 @doc raw"""
     iszero(x::ArbFieldElem)
 

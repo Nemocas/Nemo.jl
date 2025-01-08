@@ -104,10 +104,6 @@ function is_term(a::QQMPolyRingElem)
   return length(a) == 1
 end
 
-function is_unit(a::QQMPolyRingElem)
-  return length(a) == 1 && total_degree(a) == 0 && is_unit(coeff(a, 1))
-end
-
 function is_constant(a::QQMPolyRingElem)
   b = @ccall libflint.fmpq_mpoly_is_fmpq(a::Ref{QQMPolyRingElem}, parent(a)::Ref{QQMPolyRing})::Cint
   return Bool(b)

@@ -532,3 +532,10 @@ end
   R = Native.GF(ZZ(19))
   @test R([5]) == R(5)
 end
+
+@testset "gfp_fmpz.bug" begin
+  R = Native.GF(ZZRingElem(123456789012345678949))
+  z = R(1)
+  mul!(z, z, ZZ(10))
+  @test z == 10
+end

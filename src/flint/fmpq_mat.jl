@@ -18,19 +18,6 @@ is_zero_initialized(::Type{QQMatrix}) = true
 
 ###############################################################################
 #
-#   Similar & zero
-#
-###############################################################################
-
-function similar(::QQMatrix, R::QQField, r::Int, c::Int)
-  z = QQMatrix(r, c)
-  return z
-end
-
-zero(m::QQMatrix, R::QQField, r::Int, c::Int) = similar(m, R, r, c)
-
-###############################################################################
-#
 #   Windows - handle with care!!!
 #
 ###############################################################################
@@ -727,50 +714,19 @@ function (a::QQMatrixSpace)()
   return z
 end
 
-function (a::QQMatrixSpace)(arr::AbstractMatrix{QQFieldElem})
+function (a::QQMatrixSpace)(arr::AbstractVecOrMat{QQFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
   z = QQMatrix(nrows(a), ncols(a), arr)
   return z
 end
 
-function (a::QQMatrixSpace)(arr::AbstractMatrix{ZZRingElem})
+function (a::QQMatrixSpace)(arr::AbstractVecOrMat{T}) where {T <: IntegerUnion}
   _check_dim(nrows(a), ncols(a), arr)
   z = QQMatrix(nrows(a), ncols(a), arr)
   return z
 end
 
-
-function (a::QQMatrixSpace)(arr::AbstractMatrix{T}) where {T <: Integer}
-  _check_dim(nrows(a), ncols(a), arr)
-  z = QQMatrix(nrows(a), ncols(a), arr)
-  return z
-end
-
-function (a::QQMatrixSpace)(arr::AbstractMatrix{Rational{T}}) where {T <: Integer}
-  _check_dim(nrows(a), ncols(a), arr)
-  z = QQMatrix(nrows(a), ncols(a), map(QQFieldElem, arr))
-  return z
-end
-
-function (a::QQMatrixSpace)(arr::AbstractVector{QQFieldElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = QQMatrix(nrows(a), ncols(a), arr)
-  return z
-end
-
-function (a::QQMatrixSpace)(arr::AbstractVector{ZZRingElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  z = QQMatrix(nrows(a), ncols(a), arr)
-  return z
-end
-
-function (a::QQMatrixSpace)(arr::AbstractVector{T}) where {T <: Integer}
-  _check_dim(nrows(a), ncols(a), arr)
-  z = QQMatrix(nrows(a), ncols(a), arr)
-  return z
-end
-
-function (a::QQMatrixSpace)(arr::AbstractVector{Rational{T}}) where {T <: Integer}
+function (a::QQMatrixSpace)(arr::AbstractVecOrMat{<:Rational})
   _check_dim(nrows(a), ncols(a), arr)
   z = QQMatrix(nrows(a), ncols(a), map(QQFieldElem, arr))
   return z
@@ -781,17 +737,7 @@ function (a::QQMatrixSpace)(d::QQFieldElem)
   return z
 end
 
-function (a::QQMatrixSpace)(d::ZZRingElem)
-  z = QQMatrix(nrows(a), ncols(a), QQFieldElem(d))
-  return z
-end
-
-function (a::QQMatrixSpace)(d::Integer)
-  z = QQMatrix(nrows(a), ncols(a), QQFieldElem(d))
-  return z
-end
-
-(a::QQMatrixSpace)(d::Rational) = a(QQFieldElem(d))
+(a::QQMatrixSpace)(d::RationalUnion) = a(QQFieldElem(d))
 
 function (a::QQMatrixSpace)(M::ZZMatrix)
   (ncols(a) == ncols(M) && nrows(a) == nrows(M)) || error("wrong matrix dimension")
@@ -866,33 +812,6 @@ function QQMatrix(x::ZZMatrix)
   z = QQMatrix(nrows(x), ncols(x))
   @ccall libflint.fmpq_mat_set_fmpz_mat(z::Ref{QQMatrix}, x::Ref{ZZMatrix})::Nothing
   return z
-end
-
-###############################################################################
-#
-#  Zero matrix
-#
-###############################################################################
-
-function zero_matrix(R::QQField, r::Int, c::Int)
-  if r < 0 || c < 0
-    error("dimensions must not be negative")
-  end
-  z = QQMatrix(r, c)
-  return z
-end
-
-###############################################################################
-#
-#  Identity matrix
-#
-###############################################################################
-
-function identity_matrix(R::QQField, n::Int)
-  if n < 0
-    error("dimension must not be negative")
-  end
-  return one!(QQMatrix(n, n))
 end
 
 ################################################################################

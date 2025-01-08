@@ -113,10 +113,6 @@ is_one(a::QQFieldElemOrPtr) = isinteger(a) && is_one(_num_ptr(a))
 
 is_zero(a::QQFieldElemOrPtr) = is_zero(_num_ptr(a))
 
-is_unit(a::QQFieldElem) = !iszero(a)
-
-is_nilpotent(a::QQFieldElem) = iszero(a)
-
 isinteger(a::QQFieldElemOrPtr) = is_one(_den_ptr(a))
 
 isfinite(::QQFieldElem) = true

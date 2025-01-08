@@ -18,19 +18,6 @@ is_zero_initialized(::Type{ZZMatrix}) = true
 
 ###############################################################################
 #
-#   similar & zero
-#
-###############################################################################
-
-function similar(::ZZMatrix, R::ZZRing, r::Int, c::Int)
-  z = ZZMatrix(r, c)
-  return z
-end
-
-zero(m::ZZMatrix, R::ZZRing, r::Int, c::Int) = similar(m, R, r, c)
-
-###############################################################################
-#
 #   View and sub
 #
 ###############################################################################
@@ -1908,13 +1895,7 @@ function (a::ZZMatrixSpace)()
   return z
 end
 
-function (a::ZZMatrixSpace)(arr::AbstractMatrix{T}) where {T <: IntegerUnion}
-  _check_dim(nrows(a), ncols(a), arr)
-  z = ZZMatrix(nrows(a), ncols(a), arr)
-  return z
-end
-
-function (a::ZZMatrixSpace)(arr::AbstractVector{T}) where {T <: IntegerUnion}
+function (a::ZZMatrixSpace)(arr::AbstractVecOrMat{T}) where {T <: IntegerUnion}
   _check_dim(nrows(a), ncols(a), arr)
   z = ZZMatrix(nrows(a), ncols(a), arr)
   return z
@@ -2030,20 +2011,6 @@ function ZZMatrix(r::Int, c::Int, d::IntegerUnion)
     el = mat_entry_ptr(z, i, i)
     set!(el, d)
   end
-  return z
-end
-
-###############################################################################
-#
-#  Zero matrix
-#
-###############################################################################
-
-function zero_matrix(R::ZZRing, r::Int, c::Int)
-  if r < 0 || c < 0
-    error("dimensions must not be negative")
-  end
-  z = ZZMatrix(r, c)
   return z
 end
 

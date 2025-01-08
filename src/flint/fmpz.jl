@@ -254,8 +254,6 @@ size(a::ZZRingElem) = _fmpz_is_small(a) ? 1 : abs(_fmpz_size(a))
 
 is_unit(a::ZZRingElemOrPtr) = data(a) == 1 || data(a) == -1
 
-is_nilpotent(a::ZZRingElemOrPtr) = (data(a) == 0)
-
 is_zero(a::ZZRingElemOrPtr) = data(a) == 0
 
 is_one(a::ZZRingElemOrPtr) = data(a) == 1
@@ -484,6 +482,7 @@ function rem(x::ZZRingElemOrPtr, ::Type{UInt64})
 end
 
 function rem(x::ZZRingElem, c::ZZRingElem)
+  # FIXME: it seems `rem` and `rem!` for `ZZRingElem` do different things?
   q, r = Base.divrem(x, c)
   return r
 end
@@ -2608,6 +2607,14 @@ function divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::UInt)
 end
 
 divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer) = divexact!(z, a, flintify(b))
+
+#
+
+function rem!(a::ZZRingElem, b::ZZRingElem, c::ZZRingElem)
+  # FIXME: it seems `rem` and `rem!` for `ZZRingElem` do different things?
+  @ccall libflint.fmpz_mod(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ref{ZZRingElem})::Nothing
+  return a
+end
 
 #
 

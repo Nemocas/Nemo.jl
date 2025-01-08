@@ -14,15 +14,6 @@ dense_matrix_type(::Type{fqPolyRepFieldElem}) = fqPolyRepMatrix
 
 is_zero_initialized(::Type{fqPolyRepMatrix}) = true
 
-###############################################################################
-#
-#   Similar & zero
-#
-###############################################################################
-
-similar(::fqPolyRepMatrix, R::fqPolyRepField, r::Int, c::Int) = fqPolyRepMatrix(r, c, R)
-zero(::fqPolyRepMatrix, R::fqPolyRepField, r::Int, c::Int) = fqPolyRepMatrix(r, c, R)
-
 ################################################################################
 #
 #  Manipulation
@@ -625,20 +616,6 @@ end
 function matrix(R::fqPolyRepField, r::Int, c::Int, arr::AbstractVector{<: Union{fqPolyRepFieldElem, ZZRingElem, Integer}})
   _check_dim(r, c, arr)
   z = fqPolyRepMatrix(r, c, arr, R)
-  return z
-end
-
-###############################################################################
-#
-#  Zero matrix
-#
-###############################################################################
-
-function zero_matrix(R::fqPolyRepField, r::Int, c::Int)
-  if c < 0 || r < 0
-    error("dimensions must not be negative")
-  end
-  z = fqPolyRepMatrix(r, c, R)
   return z
 end
 

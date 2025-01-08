@@ -225,11 +225,6 @@ function is_squarefree(x::Generic.Poly{AbsSimpleNumFieldElem})
   return isone(gcd(x, derivative(x), true))
 end
 
-###
-
-(::QQField)(a::AbsSimpleNumFieldElem) = (is_rational(a) && return coeff(a, 0)) || error("not a rational")
-(::ZZRing)(a::AbsSimpleNumFieldElem) = (is_integer(a) && return numerator(coeff(a, 0))) || error("not an integer")
-
 ################################################################################
 #
 #  Base case for dot products
@@ -291,11 +286,6 @@ function mod(f::ZZPolyRingElem, p::ZZRingElem)
   return g
 end
 
-function is_irreducible(a::QQMPolyRingElem)
-  af = factor(a)
-  return !(length(af.fac) > 1 || any(x -> x > 1, values(af.fac)))
-end
-
 #Assuming that the denominator of a is one, reduces all the coefficients modulo p
 # non-symmetric (positive) residue system
 function mod!(a::AbsSimpleNumFieldElem, b::ZZRingElem)
@@ -315,16 +305,6 @@ function numerator(a::AbsSimpleNumFieldElem)
   z = deepcopy(a)
   @ccall libflint.nf_elem_set_den(z::Ref{AbsSimpleNumFieldElem}, _one::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
   return z
-end
-
-function divexact!(z::AbsSimpleNumFieldElem, x::AbsSimpleNumFieldElem, y::ZZRingElem)
-  @ccall libflint.nf_elem_scalar_div_fmpz(z::Ref{AbsSimpleNumFieldElem}, x::Ref{AbsSimpleNumFieldElem}, y::Ref{ZZRingElem}, parent(x)::Ref{AbsSimpleNumField})::Nothing
-  return z
-end
-
-function sub!(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem, c::AbsSimpleNumFieldElem)
-  @ccall libflint.nf_elem_sub(a::Ref{AbsSimpleNumFieldElem}, b::Ref{AbsSimpleNumFieldElem}, c::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
-  return a
 end
 
 function lift(R::ZZAbsPowerSeriesRing, f::ZZModAbsPowerSeriesRingElem)
@@ -366,26 +346,6 @@ function gcdx(a::ResElem{T}, b::ResElem{T}) where {T<:IntegerUnion}
   return R(G), R(U) * R(u), R(U) * R(v)
 end
 
-@doc raw"""
-    is_unit(f::Union{ZZModPolyRingElem,zzModPolyRingElem}) -> Bool
-
-Tests if $f$ is a unit in the polynomial ring, i.e. if
-$f = u + n$ where $u$ is a unit in the coeff. ring
-and $n$ is nilpotent.
-"""
-function is_unit(f::T) where {T<:Union{ZZModPolyRingElem,zzModPolyRingElem}}
-  if !is_unit(constant_coefficient(f))
-    return false
-  end
-  for i = 1:degree(f)
-    if !is_nilpotent(coeff(f, i))
-      return false
-    end
-  end
-  return true
-end
-
-
 function inv(f::T) where {T<:Union{ZZModPolyRingElem,zzModPolyRingElem}}
   if !is_unit(f)
     error("impossible inverse")
@@ -408,7 +368,8 @@ end
 function invmod(f::ZZModPolyRingElem, M::ZZModPolyRingElem)
   if !is_unit(f)
     r = parent(f)()
-    i = @ccall libflint.fmpz_mod_poly_invmod(r::Ref{ZZModPolyRingElem}, f::Ref{ZZModPolyRingElem}, M::Ref{ZZModPolyRingElem}, f.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Int
+    ff = ZZ()
+    i = @ccall libflint.fmpz_mod_poly_invmod_f(ff::Ref{ZZRingElem}, r::Ref{ZZModPolyRingElem}, f::Ref{ZZModPolyRingElem}, M::Ref{ZZModPolyRingElem}, f.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Int
     if iszero(i)
       error("not yet implemented")
     else
@@ -695,11 +656,6 @@ function evaluate(f::QQPolyRingElem, a::AbsSimpleNumFieldElem)
   return s
 end
 
-function rem!(z::fpPolyRingElem, a::fpPolyRingElem, b::fpPolyRingElem)
-  @ccall libflint.nmod_poly_rem(z::Ref{fpPolyRingElem}, a::Ref{fpPolyRingElem}, b::Ref{fpPolyRingElem}, (pointer_from_objref(base_ring(z)) + sizeof(ZZRingElem))::Ptr{Nothing})::Nothing
-  return z
-end
-
 function preimage(M::Map{D,C}, a) where {D,C}
   if isdefined(M.header, :preimage)
     p = M.header.preimage(a)::elem_type(D)
@@ -823,24 +779,6 @@ numerator(a::QQFieldElem, ::ZZRing) = numerator(a)
 function (R::QQPolyRing)(a::Generic.RationalFunctionFieldElem{QQFieldElem})
   @assert isone(denominator(a))
   return R(numerator(a))
-end
-
-function Base.divrem(a::ZZModRingElem, b::ZZModRingElem)
-  R = parent(a)
-  r = rem(a, b)
-  return divexact(a - r, b), r
-end
-
-function Base.div(a::ZZModRingElem, b::ZZModRingElem)
-  R = parent(a)
-  r = rem(a, b)
-  return divexact(a - r, b)
-end
-
-function Base.rem(a::ZZModRingElem, b::ZZModRingElem)
-  R = parent(a)
-  r = R(rem(lift(a), gcd(modulus(R), lift(b))))
-  return r
 end
 
 @doc raw"""
@@ -1072,11 +1010,6 @@ function (R::FqPolyRepField)(x::FpPolyRingElem)
   @ccall libflint.fq_set_fmpz_mod_poly(z::Ref{FqPolyRepFieldElem}, x::Ref{FpPolyRingElem}, R::Ref{FqPolyRepField})::Nothing
   @ccall libflint.fq_reduce(z::Ref{FqPolyRepFieldElem}, R::Ref{FqPolyRepField})::Nothing
   return z
-end
-
-@inline function rem!(a::ZZRingElem, b::ZZRingElem, c::ZZRingElem)
-  @ccall libflint.fmpz_mod(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ref{ZZRingElem})::Nothing
-  return a
 end
 
 function rem!(a::ZZModPolyRingElem, b::ZZModPolyRingElem, c::ZZModPolyRingElem)

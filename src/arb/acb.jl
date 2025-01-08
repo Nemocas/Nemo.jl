@@ -458,10 +458,6 @@ end
 #
 ################################################################################
 
-function is_unit(x::AcbFieldElem)
-  !iszero(x)
-end
-
 @doc raw"""
     iszero(x::AcbFieldElem)
 

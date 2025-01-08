@@ -95,10 +95,6 @@ function is_term(a::ZZMPolyRingElem)
   return length(a) == 1
 end
 
-function is_unit(a::ZZMPolyRingElem)
-  return length(a) == 1 && total_degree(a) == 0 && is_unit(coeff(a, 1))
-end
-
 function is_constant(a::ZZMPolyRingElem)
   b = @ccall libflint.fmpz_mpoly_is_fmpz(a::Ref{ZZMPolyRingElem}, parent(a)::Ref{ZZMPolyRing})::Cint
   return Bool(b)
