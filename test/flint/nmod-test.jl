@@ -130,7 +130,7 @@ end
   @test_throws Exception R2(R3(1))
   @test_throws Exception R3(R2(1))
 
-  ZZmod720,_ = residue_ring(ZZ,720)
+  ZZmod720,_ = residue_ring(ZZ, 720)
   @test is_nilpotent(ZZmod720(30))
   @test count(is_nilpotent, ZZmod720) == 24  # 720/(2*3*5)
 
