@@ -20,7 +20,6 @@ elem_type(::Type{zzModPolyRing}) = zzModPolyRingElem
 
 dense_poly_type(::Type{zzModRingElem}) = zzModPolyRingElem
 
-
 ################################################################################
 #
 #   Basic helper
