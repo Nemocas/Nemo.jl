@@ -116,6 +116,13 @@ end
 
   @test shift_right(a, 2) == R(7)^-2 + 2*R(7)^-1 + 4*7^0 + O(R, 7^3)
   @test shift_left(a, 2) == 7^2 + 2*7^3 + 4*7^4 + O(R, 7^5)
+
+  #
+  R, _ = QadicField(19, 1, 10)
+  x = 2*19^1 + 17*19^3 + 5*19^4 + 10*19^5 + O(R, 19^6)
+  y = 9*19^0 + 9*19^1 + 14*19^2 + 4*19^3 + 11*19^4 + O(R, 19^5)
+  @test isequal(add!(deepcopy(x), x, y), x + y)
+  @test hash(add!(deepcopy(x), x, y)) == hash(x + y)
 end
 
 @testset "QadicFieldElem.unary_ops" begin

@@ -618,9 +618,9 @@ function mul!(z::QadicFieldElem, x::QadicFieldElem, y::QadicFieldElem)
 end
 
 function add!(z::QadicFieldElem, x::QadicFieldElem, y::QadicFieldElem)
-  z.N = min(x.N, y.N)
   ctx = parent(x)
   @ccall libflint.qadic_add(z::Ref{QadicFieldElem}, x::Ref{QadicFieldElem}, y::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
+  setprecision!(z, min(x.N, y.N))
   return z
 end
 
