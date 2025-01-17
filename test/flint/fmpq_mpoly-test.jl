@@ -813,3 +813,50 @@ end
   @test abc - a - b == c
   @test abc - ab == c
 end
+
+@testset "QQMPolyRingElem.convert_to_ZZMPolyRingElem" begin
+  Qxy, (x,y) = QQ[:x,:y]
+  f = 11*(x^2/2 + ZZ(3)^50*x*y^5/7 + y^6/12)
+
+  R = ZZ
+  Rxy, (u,v) = polynomial_ring(R, [:u,:v])
+  g = 462*u^2 + 94762534375324541717672868*u*v^5 + 77*v^6
+
+  @test g == @inferred mul!(zero(Rxy), f, 84)
+  @test g == change_base_ring(R, f*84; parent = Rxy)
+  @test g == map_coefficients(R, f*84; parent = Rxy)
+
+  # test error handling
+  @test_throws ArgumentError change_base_ring(R, f/5; parent = Rxy)
+  @test_throws ArgumentError map_coefficients(R, f/5; parent = Rxy)
+
+  # test ordering mismatch
+  Rxy, (u,v) = polynomial_ring(R, [:u,:v]; internal_ordering = :deglex)
+  g = 462*u^2 + 94762534375324541717672868*u*v^5 + 77*v^6
+
+  @test g == change_base_ring(R, f*84; parent = Rxy)
+  @test g == map_coefficients(R, f*84; parent = Rxy)
+end
+
+@testset "QQMPolyRingElem.convert_to_fpMPolyRing" begin
+  Qxy, (x,y) = QQ[:x,:y]
+  f = 11*(x^2/2 + ZZ(3)^50*x*y^5/7 + y^6/12)
+
+  R = Native.GF(5)
+  Rxy, (u,v) = polynomial_ring(R, [:u,:v])
+  g = 462*u^2 + 94762534375324541717672868*u*v^5 + 77*v^6
+
+  @test g == change_base_ring(R, f*84; parent = Rxy)
+  @test g == map_coefficients(R, f*84; parent = Rxy)
+
+  # test error handling
+  @test_throws ArgumentError change_base_ring(R, f/5; parent = Rxy)
+  @test_throws ArgumentError map_coefficients(R, f/5; parent = Rxy)
+
+  # test ordering mismatch
+  Rxy, (u,v) = polynomial_ring(R, [:u,:v]; internal_ordering = :deglex)
+  g = 462*u^2 + 94762534375324541717672868*u*v^5 + 77*v^6
+
+  @test g == change_base_ring(R, f*84; parent = Rxy)
+  @test g == map_coefficients(R, f*84; parent = Rxy)
+end

@@ -645,6 +645,11 @@ end
 #
 ###############################################################################
 
+_content_ptr(c::QQMPolyRingElem) = Ptr{QQFieldElem}(pointer_from_objref(c))
+_content_ptr(c::Ptr{QQMPolyRingElem}) = Ptr{QQFieldElem}(c)
+_content_ptr(c::Ref{QQMPolyRingElem}) = _content_ptr(c[])
+_zpoly_ptr(c::QQMPolyRingElemOrPtr) = Ptr{ZZMPolyRingElem}(_content_ptr(c) + sizeof(QQFieldElem))
+
 function zero!(a::QQMPolyRingElem)
   @ccall libflint.fmpq_mpoly_zero(a::Ref{QQMPolyRingElem}, a.parent::Ref{QQMPolyRing})::Nothing
   return a
@@ -747,6 +752,20 @@ sub!(a::QQMPolyRingElem, b::RationalUnion, c::QQMPolyRingElem) = neg!(sub!(a, c,
 
 mul!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::RationalUnion) = mul!(a, b, flintify(c))
 mul!(a::QQMPolyRingElem, b::RationalUnion, c::QQMPolyRingElem) = mul!(a, c, b)
+
+# special: multiply a QQMPolyRingElem by an integer and store the result as a ZZMPolyRingElem.
+# obviously this only works if the integers is a multiple of the denominator of the polynomial
+function mul!(a::ZZMPolyRingElem, b::QQMPolyRingElem, c::IntegerUnion)
+  x = QQFieldElem()
+  GC.@preserve b x begin
+    x = mul!(x, _content_ptr(b), c)
+    bp = _zpoly_ptr(b)
+    xp = _num_ptr(x)
+    @ccall libflint.fmpz_mpoly_scalar_mul_fmpz(a::Ref{ZZMPolyRingElem}, bp::Ref{ZZMPolyRingElem}, xp::Ref{ZZRingElem}, parent(a)::Ref{ZZMPolyRing})::Nothing
+  end
+  return a
+end
+
 
 divexact!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::RationalUnion) = divexact!(a, b, flintify(c))
 
@@ -1046,4 +1065,55 @@ function (R::QQMPolyRing)(a::Vector{Any}, b::Vector{Vector{T}}) where T
   end
 
   return R(newaa, newbb)
+end
+
+###############################################################################
+#
+#   Changing base ring, mapping coefficients
+#
+###############################################################################
+
+function map_coefficients(R::ZZRing, f::QQMPolyRingElem;
+                          cached::Bool = true,
+                          parent::ZZMPolyRing = AbstractAlgebra._change_mpoly_ring(R, parent(f), cached))
+  @req isinteger(_content_ptr(f)) "input polynomial must have integral coefficients"
+  @req ngens(parent) == ngens(Nemo.parent(f)) "parents must have matching numbers of generators"
+  if internal_ordering(parent) == internal_ordering(Nemo.parent(f))
+    return mul!(zero(parent), f, 1)
+  end
+
+  ctx = MPolyBuildCtx(parent)
+  for (c, ev) in zip(coefficients(f), exponent_vectors(f))
+    push_term!(ctx, ZZ(c), ev)
+  end
+  return finish(ctx)
+end
+
+function map_coefficients(F::fpField, f::QQMPolyRingElem;
+                          cached::Bool = true,
+                          parent::MPolyRing = AbstractAlgebra._change_mpoly_ring(F, parent(f), cached))
+  dF = denominator(f)
+  d = F(dF)
+  @req !iszero(d) "Denominator divisible by p!"
+  m = inv(d)
+  ctx = MPolyBuildCtx(parent)
+  # TODO: rewrite this code using `_zpoly_ptr(f)`: convert that into the desired
+  # element, then multiply the result once by m at the end
+  for (c, ev) in zip(coefficients(f), exponent_vectors(f))
+    el = numerator(c * dF)
+    push_term!(ctx, F(el) * m, ev)
+  end
+  return finish(ctx)
+end
+
+function change_base_ring(R::ZZRing, f::QQMPolyRingElem;
+                          cached::Bool = true,
+                          parent::ZZMPolyRing = AbstractAlgebra._change_mpoly_ring(R, parent(f), cached))
+  return map_coefficients(R, f; cached, parent)
+end
+
+function change_base_ring(F::fpField, f::QQMPolyRingElem;
+                          cached::Bool = true,
+                          parent::fpMPolyRing = AbstractAlgebra._change_mpoly_ring(F, parent(f), cached))
+  return map_coefficients(F, f; cached, parent)
 end
