@@ -65,8 +65,7 @@ end
 
 function deepcopy_internal(a::QQMPolyRingElem, dict::IdDict)
   z = parent(a)()
-  @ccall libflint.fmpq_mpoly_set(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, a.parent::Ref{QQMPolyRing})::Nothing
-  return z
+  return set!(z, a)
 end
 
 function length(a::QQMPolyRingElem)
@@ -672,6 +671,37 @@ function neg!(a::QQMPolyRingElem, b::QQMPolyRingElem)
   @ccall libflint.fmpq_mpoly_neg(a::Ref{QQMPolyRingElem}, b::Ref{QQMPolyRingElem}, parent(a)::Ref{QQMPolyRing})::Nothing
   return a
 end
+
+#
+
+function set!(z::QQMPolyRingElem, a::QQMPolyRingElem)
+  @ccall libflint.fmpq_mpoly_set(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, parent(z)::Ref{QQMPolyRing})::Nothing
+  return z
+end
+
+function set!(z::QQMPolyRingElem, a::QQFieldElemOrPtr)
+  @ccall libflint.fmpq_mpoly_set_fmpq(z::Ref{QQMPolyRingElem}, a::Ref{QQFieldElem}, parent(z)::Ref{QQMPolyRing})::Nothing
+  return z
+end
+
+function set!(z::QQMPolyRingElem, a::ZZRingElemOrPtr)
+  @ccall libflint.fmpq_mpoly_set_fmpz(z::Ref{QQMPolyRingElem}, a::Ref{ZZRingElem}, parent(z)::Ref{QQMPolyRing})::Nothing
+  return z
+end
+
+function set!(z::QQMPolyRingElem, a::Int)
+  @ccall libflint.fmpq_mpoly_set_si(z::Ref{QQMPolyRingElem}, a::Int, parent(z)::Ref{QQMPolyRing})::Nothing
+  return z
+end
+
+function set!(z::QQMPolyRingElem, a::UInt)
+  @ccall libflint.fmpq_mpoly_set_ui(z::Ref{QQMPolyRingElem}, a::UInt, parent(z)::Ref{QQMPolyRing})::Nothing
+  return z
+end
+
+set!(z::QQMPolyRingElem, a::Union{Integer, Rational}) = set!(z, flintify(a))
+
+#
 
 function add!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::QQMPolyRingElem)
   @ccall libflint.fmpq_mpoly_add(a::Ref{QQMPolyRingElem}, b::Ref{QQMPolyRingElem}, c::Ref{QQMPolyRingElem}, a.parent::Ref{QQMPolyRing})::Nothing

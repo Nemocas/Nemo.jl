@@ -64,8 +64,7 @@ end
 
 function deepcopy_internal(a::ZZMPolyRingElem, dict::IdDict)
   z = parent(a)()
-  @ccall libflint.fmpz_mpoly_set(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
-  return z
+  return set!(z, a)
 end
 
 function length(a::ZZMPolyRingElem)
@@ -635,6 +634,33 @@ function neg!(z::ZZMPolyRingElem, a::ZZMPolyRingElem)
   @ccall libflint.fmpz_mpoly_neg(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return z
 end
+
+#
+
+function set!(z::ZZMPolyRingElem, a::ZZMPolyRingElem)
+  @ccall libflint.fmpz_mpoly_set(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, parent(z)::Ref{ZZMPolyRing})::Nothing
+  return z
+end
+
+function set!(z::ZZMPolyRingElem, a::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_mpoly_set_fmpz(z::Ref{ZZMPolyRingElem}, a::Ref{ZZRingElem}, parent(z)::Ref{ZZMPolyRing})::Nothing
+  return z
+end
+
+function set!(z::ZZMPolyRingElem, a::Int)
+  @ccall libflint.fmpz_mpoly_set_si(z::Ref{ZZMPolyRingElem}, a::Int, parent(z)::Ref{ZZMPolyRing})::Nothing
+  return z
+end
+
+function set!(z::ZZMPolyRingElem, a::UInt)
+  @ccall libflint.fmpz_mpoly_set_ui(z::Ref{ZZMPolyRingElem}, a::UInt, parent(z)::Ref{ZZMPolyRing})::Nothing
+  return z
+end
+
+set!(z::ZZMPolyRingElem, a::Union{Integer, Rational}) = set!(z, flintify(a))
+
+#
+
 
 function add!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::ZZMPolyRingElem)
   @ccall libflint.fmpz_mpoly_add(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, b::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing

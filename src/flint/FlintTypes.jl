@@ -1158,25 +1158,8 @@ mutable struct ZZMPolyRingElem <: MPolyRingElem{ZZRingElem}
     return z
   end
 
-  function ZZMPolyRingElem(ctx::ZZMPolyRing, a::ZZRingElem)
-    z = ZZMPolyRingElem(ctx)
-    @ccall libflint.fmpz_mpoly_set_fmpz(z::Ref{ZZMPolyRingElem}, a::Ref{ZZRingElem}, ctx::Ref{ZZMPolyRing})::Nothing
-    return z
-  end
-
-  function ZZMPolyRingElem(ctx::ZZMPolyRing, a::Int)
-    z = ZZMPolyRingElem(ctx)
-    @ccall libflint.fmpz_mpoly_set_si(z::Ref{ZZMPolyRingElem}, a::Int, ctx::Ref{ZZMPolyRing})::Nothing
-    return z
-  end
-
-  function ZZMPolyRingElem(ctx::ZZMPolyRing, a::UInt)
-    z = ZZMPolyRingElem(ctx)
-    @ccall libflint.fmpz_mpoly_set_ui(z::Ref{ZZMPolyRingElem}, a::UInt, ctx::Ref{ZZMPolyRing})::Nothing
-    return z
-  end
-
-  ZZMPolyRingElem(ctx::ZZMPolyRing, a::Integer) = ZZMPolyRingElem(ctx, flintify(a))
+  ZZMPolyRingElem(ctx::ZZMPolyRing, a::ZZRingElem) = set!(ZZMPolyRingElem(ctx), a)
+  ZZMPolyRingElem(ctx::ZZMPolyRing, a::Integer) = set!(ZZMPolyRingElem(ctx), a)
 end
 
 function _fmpz_mpoly_clear_fn(a::ZZMPolyRingElem)
@@ -1316,29 +1299,11 @@ mutable struct QQMPolyRingElem <: MPolyRingElem{QQFieldElem}
     return z
   end
 
-  function QQMPolyRingElem(ctx::QQMPolyRing, a::ZZRingElem)
-    z = QQMPolyRingElem(ctx)
-    @ccall libflint.fmpq_mpoly_set_fmpz(z::Ref{QQMPolyRingElem}, a::Ref{ZZRingElem}, ctx::Ref{QQMPolyRing})::Nothing
-    return z
-  end
+  QQMPolyRingElem(ctx::QQMPolyRing, a::ZZRingElem) = set!(QQMPolyRingElem(ctx), a)
+  QQMPolyRingElem(ctx::QQMPolyRing, a::QQFieldElem) = set!(QQMPolyRingElem(ctx), a)
+  QQMPolyRingElem(ctx::QQMPolyRing, a::Integer) = set!(QQMPolyRingElem(ctx), a)
+  QQMPolyRingElem(ctx::QQMPolyRing, a::Rational) = set!(QQMPolyRingElem(ctx), a)
 
-  function QQMPolyRingElem(ctx::QQMPolyRing, a::QQFieldElem)
-    z = QQMPolyRingElem(ctx)
-    @ccall libflint.fmpq_mpoly_set_fmpq(z::Ref{QQMPolyRingElem}, a::Ref{QQFieldElem}, ctx::Ref{QQMPolyRing})::Nothing
-    return z
-  end
-
-  function QQMPolyRingElem(ctx::QQMPolyRing, a::Int)
-    z = QQMPolyRingElem(ctx)
-    @ccall libflint.fmpq_mpoly_set_si(z::Ref{QQMPolyRingElem}, a::Int, ctx::Ref{QQMPolyRing})::Nothing
-    return z
-  end
-
-  function QQMPolyRingElem(ctx::QQMPolyRing, a::UInt)
-    z = QQMPolyRingElem(ctx)
-    @ccall libflint.fmpq_mpoly_set_ui(z::Ref{QQMPolyRingElem}, a::UInt, ctx::Ref{QQMPolyRing})::Nothing
-    return z
-  end
 end
 
 function _fmpq_mpoly_clear_fn(a::QQMPolyRingElem)
