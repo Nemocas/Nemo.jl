@@ -750,4 +750,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::Zmodn_mat, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(UInt)
+mat_entry_ptr(A::Zmodn_mat, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(UInt)
