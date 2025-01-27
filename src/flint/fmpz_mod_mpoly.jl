@@ -102,10 +102,6 @@ for (etype, rtype, ftype, ctype) in (
       return length(a) == 1 && isone(coeff(a, 1))
     end
 
-    function is_term(a::($etype))
-      return length(a) == 1
-    end
-
     function is_constant(a::($etype))
       return Bool(@ccall libflint.fmpz_mod_mpoly_is_fmpz(a::Ref{($etype)}, parent(a)::Ref{($rtype)})::Cint)
     end

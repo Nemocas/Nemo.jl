@@ -78,17 +78,8 @@ function isone(a::fqPolyRepMPolyRingElem)
   return Bool(b)
 end
 
-function iszero(a::fqPolyRepMPolyRingElem)
-  b = @ccall libflint.fq_nmod_mpoly_is_zero(a::Ref{fqPolyRepMPolyRingElem}, a.parent::Ref{fqPolyRepMPolyRing})::Cint
-  return Bool(b)
-end
-
 function is_monomial(a::fqPolyRepMPolyRingElem)
   return length(a) == 1 && isone(coeff(a, 1))
-end
-
-function is_term(a::fqPolyRepMPolyRingElem)
-  return length(a) == 1
 end
 
 function is_constant(a::fqPolyRepMPolyRingElem)

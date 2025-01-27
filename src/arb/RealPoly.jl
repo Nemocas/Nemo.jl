@@ -23,8 +23,6 @@ function set_length!(x::RealPolyRingElem, n::Int)
   return x
 end
 
-degree(x::RealPolyRingElem) = length(x) - 1
-
 function coeff(a::RealPolyRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   t = base_ring(parent(a))()
@@ -47,10 +45,6 @@ end
 function is_gen(a::RealPolyRingElem)
   return isequal(a, gen(parent(a)))
 end
-
-#function iszero(a::RealPolyRingElem)
-#   return length(a) == 0
-#end
 
 #function isone(a::RealPolyRingElem)
 #   return strongequal(a, one(parent(a)))

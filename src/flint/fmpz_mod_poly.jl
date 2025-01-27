@@ -59,10 +59,6 @@ gen(R::ZmodNFmpzPolyRing) = R([ZZRingElem(0), ZZRingElem(1)])
 is_gen(a::Zmodn_fmpz_poly) = (degree(a) == 1 &&
                               iszero(coeff(a,0)) && isone(coeff(a,1)))
 
-function iszero(a::T) where {T <: Zmodn_fmpz_poly}
-  return a.length == 0
-end
-
 var(R::ZmodNFmpzPolyRing) = R.S
 
 modulus(a::Zmodn_fmpz_poly) = a.parent.n

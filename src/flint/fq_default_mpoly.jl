@@ -58,20 +58,8 @@ function isone(a::FqMPolyRingElem)
   return isone(a.data)
 end
 
-function iszero(a::FqMPolyRingElem)
-  return iszero(a.data)
-end
-
 function is_monomial(a::FqMPolyRingElem)
   return is_monomial(a.data)
-end
-
-function is_term(a::FqMPolyRingElem)
-  return is_term(a.data)
-end
-
-function is_unit(a::FqMPolyRingElem)
-  return is_unit(a.data)
 end
 
 function is_constant(a::FqMPolyRingElem)

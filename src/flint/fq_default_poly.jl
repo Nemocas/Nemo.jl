@@ -56,11 +56,7 @@ gen(a::FqPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
 is_gen(x::FqPolyRingElem) = @ccall libflint.fq_default_poly_is_gen(x::Ref{FqPolyRingElem}, base_ring(x.parent)::Ref{FqField})::Bool
 
-iszero(x::FqPolyRingElem) = @ccall libflint.fq_default_poly_is_zero(x::Ref{FqPolyRingElem}, base_ring(x.parent)::Ref{FqField})::Bool
-
 isone(x::FqPolyRingElem) = @ccall libflint.fq_default_poly_is_one(x::Ref{FqPolyRingElem}, base_ring(x.parent)::Ref{FqField})::Bool
-
-degree(f::FqPolyRingElem) = length(f) - 1
 
 function deepcopy_internal(a::FqPolyRingElem, dict::IdDict)
   z = FqPolyRingElem(a, base_ring(a))

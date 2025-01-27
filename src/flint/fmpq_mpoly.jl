@@ -90,17 +90,8 @@ function isone(a::QQMPolyRingElem)
   return Bool(b)
 end
 
-function iszero(a::QQMPolyRingElem)
-  b = @ccall libflint.fmpq_mpoly_is_zero(a::Ref{QQMPolyRingElem}, a.parent::Ref{QQMPolyRing})::Cint
-  return Bool(b)
-end
-
 function is_monomial(a::QQMPolyRingElem)
   return length(a) == 1 && coeff(a, 1) == 1
-end
-
-function is_term(a::QQMPolyRingElem)
-  return length(a) == 1
 end
 
 function is_constant(a::QQMPolyRingElem)

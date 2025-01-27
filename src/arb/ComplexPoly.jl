@@ -23,8 +23,6 @@ function set_length!(x::ComplexPolyRingElem, n::Int)
   return x
 end
 
-degree(x::ComplexPolyRingElem) = length(x) - 1
-
 function coeff(a::ComplexPolyRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   t = ComplexFieldElem()
@@ -47,10 +45,6 @@ end
 function is_gen(a::ComplexPolyRingElem)
   return isequal(a, gen(parent(a)))
 end
-
-#function iszero(a::ComplexPolyRingElem)
-#   return length(a) == 0
-#end
 
 #function isone(a::ComplexPolyRingElem)
 #   return isequal(a, one(parent(a)))

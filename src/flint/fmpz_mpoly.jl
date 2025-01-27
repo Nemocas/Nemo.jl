@@ -81,17 +81,8 @@ function isone(a::ZZMPolyRingElem)
   return Bool(b)
 end
 
-function iszero(a::ZZMPolyRingElem)
-  b = @ccall libflint.fmpz_mpoly_is_zero(a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Cint
-  return Bool(b)
-end
-
 function is_monomial(a::ZZMPolyRingElem)
   return length(a) == 1 && coeff(a, 1) == 1
-end
-
-function is_term(a::ZZMPolyRingElem)
-  return length(a) == 1
 end
 
 function is_constant(a::ZZMPolyRingElem)

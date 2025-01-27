@@ -23,8 +23,6 @@ function set_length!(x::AcbPolyRingElem, n::Int)
   return x
 end
 
-degree(x::AcbPolyRingElem) = length(x) - 1
-
 function coeff(a::AcbPolyRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   t = parent(a).base_ring()
@@ -47,10 +45,6 @@ end
 function is_gen(a::AcbPolyRingElem)
   return isequal(a, gen(parent(a)))
 end
-
-#function iszero(a::AcbPolyRingElem)
-#   return length(a) == 0
-#end
 
 #function isone(a::AcbPolyRingElem)
 #   return isequal(a, one(parent(a)))
