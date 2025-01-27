@@ -605,10 +605,11 @@ function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::B
       # K is F_p
       # f is either nmod_poly or fmpz_mod_poly
       # we can define K[t]/(f) directly on the C side with the right modulus
-      if _fq_default_ctx_type(K) == _FQ_DEFAULT_NMOD
+      _fq_ctx_type = _fq_default_ctx_type(K)
+      if _fq_ctx_type == _FQ_DEFAULT_NMOD
         z = _fq_field_from_nmod_poly_in_disguise(f, s)
       else
-        @assert _fq_default_ctx_type(K) == _FQ_DEFAULT_FMPZ_NMOD
+        @assert _fq_ctx_type == _FQ_DEFAULT_FMPZ_NMOD
         z = _fq_field_from_fmpz_mod_poly_in_disguise(f, s)
       end
     else
@@ -774,12 +775,13 @@ function (F::FqField)(p::FqPolyRingElem)
     @assert is_absolute(F)
     K = base_field(F)
     characteristic(base_ring(p)) != characteristic(F) && error("Polynomial has wrong coefficient ring")
-    if _fq_default_ctx_type(K) == _FQ_DEFAULT_NMOD
+    _fq_ctx_type = _fq_default_ctx_type(K)
+    if _fq_ctx_type == _FQ_DEFAULT_NMOD
       y = FqFieldElem(F)
       @ccall libflint.fq_default_set_nmod_poly(y::Ref{FqFieldElem}, p::Ref{FqPolyRingElem}, F::Ref{FqField})::Nothing
       return y
     else
-      @assert _fq_default_ctx_type(K) == _FQ_DEFAULT_FMPZ_NMOD
+      @assert _fq_ctx_type == _FQ_DEFAULT_FMPZ_NMOD
       y = FqFieldElem(F)
       @ccall libflint.fq_default_set_fmpz_mod_poly(y::Ref{FqFieldElem}, p::Ref{FqPolyRingElem}, F::Ref{FqField})::Nothing
       return y
@@ -798,11 +800,12 @@ function _lift_standard(R::FqPolyRing, a::FqFieldElem)
   F = base_ring(R)
   p = R()
   @assert F === base_field(parent(a))
-  if _fq_default_ctx_type(F) == _FQ_DEFAULT_NMOD
+  _fq_ctx_type = _fq_default_ctx_type(F)
+  if _fq_ctx_type == _FQ_DEFAULT_NMOD
     @ccall libflint.fq_default_get_nmod_poly(p::Ref{FqPolyRingElem}, a::Ref{FqFieldElem}, K::Ref{FqField})::Nothing
     return p
   else
-    @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_NMOD
+    @assert _fq_ctx_type == _FQ_DEFAULT_FMPZ_NMOD
     @ccall libflint.fq_default_get_fmpz_mod_poly(p::Ref{FqPolyRingElem}, a::Ref{FqFieldElem}, K::Ref{FqField})::Nothing
     return p
   end
