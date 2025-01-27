@@ -67,10 +67,7 @@ function deepcopy_internal(a::ZZMPolyRingElem, dict::IdDict)
   return set!(z, a)
 end
 
-function length(a::ZZMPolyRingElem)
-  n = @ccall libflint.fmpz_mpoly_length(a::Ref{ZZMPolyRingElem})::Int
-  return n
-end
+length(a::ZZMPolyRingElem) = a.length
 
 one(R::ZZMPolyRing) = one!(R())
 

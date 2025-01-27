@@ -28,7 +28,7 @@ var(a::ZZPolyRing) = a.S
 #
 ###############################################################################
 
-length(x::ZZPolyRingElem) = @ccall libflint.fmpz_poly_length(x::Ref{ZZPolyRingElem})::Int
+length(x::ZZPolyRingElem) = x.length
 
 function coeff(x::ZZPolyRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))

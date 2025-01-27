@@ -54,9 +54,7 @@ function normalise(a::ZZAbsPowerSeriesRingElem, len::Int)
   return len
 end
 
-function length(x::ZZAbsPowerSeriesRingElem)
-  return @ccall libflint.fmpz_poly_length(x::Ref{ZZAbsPowerSeriesRingElem})::Int
-end
+length(x::ZZAbsPowerSeriesRingElem) = x.length
 
 precision(x::ZZAbsPowerSeriesRingElem) = x.prec
 

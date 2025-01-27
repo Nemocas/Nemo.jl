@@ -68,10 +68,7 @@ function deepcopy_internal(a::QQMPolyRingElem, dict::IdDict)
   return set!(z, a)
 end
 
-function length(a::QQMPolyRingElem)
-  n = @ccall libflint.fmpq_mpoly_length(a::Ref{QQMPolyRingElem})::Int
-  return n
-end
+length(a::QQMPolyRingElem) = a.length
 
 function one(R::QQMPolyRing)
   z = R()

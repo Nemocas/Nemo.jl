@@ -56,9 +56,7 @@ for (etype, rtype, mtype, brtype) in (
       return len
     end
 
-    function pol_length(x::($etype))
-      return @ccall libflint.nmod_poly_length(x::Ref{($etype)})::Int
-    end
+    pol_length(x::($etype)) = x.length
 
     precision(x::($etype)) = x.prec
 

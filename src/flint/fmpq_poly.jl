@@ -40,7 +40,7 @@ function denominator(a::QQPolyRingElem)
   return z
 end
 
-length(x::QQPolyRingElem) = @ccall libflint.fmpq_poly_length(x::Ref{QQPolyRingElem})::Int
+length(x::QQPolyRingElem) = x.length
 
 function set_length!(x::QQPolyRingElem, n::Int)
   @ccall libflint._fmpq_poly_set_length(x::Ref{QQPolyRingElem}, n::Int)::Nothing

@@ -64,9 +64,7 @@ function coeff(x::QQAbsPowerSeriesRingElem, n::Int)
   return z
 end
 
-function length(x::QQAbsPowerSeriesRingElem)
-  return @ccall libflint.fmpq_poly_length(x::Ref{QQAbsPowerSeriesRingElem})::Int
-end
+length(x::QQAbsPowerSeriesRingElem) = x.length
 
 precision(x::QQAbsPowerSeriesRingElem) = x.prec
 

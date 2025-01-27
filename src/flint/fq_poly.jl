@@ -28,7 +28,7 @@ var(a::FqPolyRepPolyRing) = a.S
 #
 ################################################################################
 
-length(x::FqPolyRepPolyRingElem) = @ccall libflint.fq_poly_length(x::Ref{FqPolyRepPolyRingElem})::Int
+length(x::FqPolyRepPolyRingElem) = x.length
 
 function coeff(x::FqPolyRepPolyRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))

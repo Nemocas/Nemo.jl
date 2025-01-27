@@ -33,10 +33,7 @@ end
 #
 ################################################################################
 
-function length(x::T) where {T <: Zmodn_fmpz_poly}
-  return x.length
-  #   return @ccall libflint.fmpz_mod_poly_length(x::Ref{T}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Int
-end
+length(x::T) where {T <: Zmodn_fmpz_poly} = x.length
 
 function degree(x::T) where {T <: Zmodn_fmpz_poly}
   return x.length - 1

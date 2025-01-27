@@ -16,7 +16,7 @@ elem_type(::Type{ComplexPolyRing}) = ComplexPolyRingElem
 
 dense_poly_type(::Type{ComplexFieldElem}) = ComplexPolyRingElem
 
-length(x::ComplexPolyRingElem) = @ccall libflint.acb_poly_length(x::Ref{ComplexPolyRingElem})::Int
+length(x::ComplexPolyRingElem) = x.length
 
 function set_length!(x::ComplexPolyRingElem, n::Int)
   @ccall libflint._acb_poly_set_length(x::Ref{ComplexPolyRingElem}, n::Int)::Nothing

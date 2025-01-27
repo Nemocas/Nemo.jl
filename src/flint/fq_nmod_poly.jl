@@ -28,7 +28,7 @@ var(a::fqPolyRepPolyRing) = a.S
 #
 ################################################################################
 
-length(x::fqPolyRepPolyRingElem) = @ccall libflint.fq_nmod_poly_length(x::Ref{fqPolyRepPolyRingElem})::Int
+length(x::fqPolyRepPolyRingElem) = x.length
 
 function set_length!(x::fqPolyRepPolyRingElem, n::Int)
   @ccall libflint._fq_nmod_poly_set_length(x::Ref{fqPolyRepPolyRingElem}, n::Int)::Nothing

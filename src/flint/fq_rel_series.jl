@@ -51,9 +51,7 @@ function normalise(a::FqPolyRepRelPowerSeriesRingElem, len::Int)
   return len
 end
 
-function pol_length(x::FqPolyRepRelPowerSeriesRingElem)
-  return @ccall libflint.fq_poly_length(x::Ref{FqPolyRepRelPowerSeriesRingElem}, base_ring(x)::Ref{FqPolyRepField})::Int
-end
+pol_length(x::FqPolyRepRelPowerSeriesRingElem) = x.length
 
 precision(x::FqPolyRepRelPowerSeriesRingElem) = x.prec
 

@@ -52,7 +52,7 @@ end
 #
 ################################################################################
 
-length(x::T) where T <: Zmodn_poly = @ccall libflint.nmod_poly_length(x::Ref{T})::Int
+length(x::T) where T <: Zmodn_poly = x.length
 
 degree(x::T) where T <: Zmodn_poly = @ccall libflint.nmod_poly_degree(x::Ref{T})::Int
 

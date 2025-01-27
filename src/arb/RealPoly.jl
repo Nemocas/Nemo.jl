@@ -16,7 +16,7 @@ elem_type(::Type{RealPolyRing}) = RealPolyRingElem
 
 dense_poly_type(::Type{RealFieldElem}) = RealPolyRingElem
 
-length(x::RealPolyRingElem) = @ccall libflint.arb_poly_length(x::Ref{RealPolyRingElem})::Int
+length(x::RealPolyRingElem) = x.length
 
 function set_length!(x::RealPolyRingElem, n::Int)
   @ccall libflint._arb_poly_set_length(x::Ref{RealPolyRingElem}, n::Int)::Nothing

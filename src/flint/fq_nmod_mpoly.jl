@@ -64,10 +64,7 @@ function deepcopy_internal(a::fqPolyRepMPolyRingElem, dict::IdDict)
   return z
 end
 
-function length(a::fqPolyRepMPolyRingElem)
-  n = @ccall libflint.fq_nmod_mpoly_length(a::Ref{fqPolyRepMPolyRingElem}, a.parent::Ref{fqPolyRepMPolyRing})::Int
-  return n
-end
+length(a::fqPolyRepMPolyRingElem) = a.length
 
 one(R::fqPolyRepMPolyRing) = one!(R())
 
