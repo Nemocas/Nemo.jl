@@ -16,3 +16,6 @@ ba3e1355fe8b2612b1f48d26ab68f6902efde691
 
 # Changed ccall to @ccall
 3286337121c441ded472c3fecbd9279b916cd0d2
+
+# Changed Flint -> FLINT
+0644dccf59a3f0a529d51575aae3a798f8331b5b
