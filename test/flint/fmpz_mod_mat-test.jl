@@ -744,37 +744,32 @@ end
   @test nrows(K) == 2
 end
 
-#= Not implemented in FLINT yet
-
 @testset "ZZModMatrix.lu" begin
+  Z17, = residue_ring(ZZ, ZZ(17))
+  R = matrix_space(Z17, 3, 3)
+  S = matrix_space(Z17, 3, 4)
 
-Z17, = residue_ring(ZZ, ZZ(17))
-R = matrix_space(Z17, 3, 3)
-S = matrix_space(Z17, 3, 4)
+  a = R([1 2 3; 3 2 1; 0 0 2])
 
-a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
+  b = S([2 1 0 1; 0 0 0 0; 0 1 2 0])
 
-b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+  r, P, l, u = lu(a)
 
-r, P, l, u = lu(a)
+  @test l * u == P * a
 
-@test l*u == P*a
+  r, P, l, u = lu(b)
 
-r, P, l, u = lu(b)
+  @test l * u == S([2 1 0 1; 0 1 2 0; 0 0 0 0])
 
-@test l*u == S([ 2 1 0 1; 0 1 2 0; 0 0 0 0])
+  @test l * u == P * b
 
-@test l*u == P*b
+  c = matrix(Z17, 6, 3, [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1])
 
-c = matrix(Z17, 6, 3, [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1])
+  r, P, l, u = lu(c)
 
-r, P, l, u = lu(c)
-
-@test r == 3
-@test l*u == P*c
+  @test r == 3
+  @test l * u == P * c
 end
-
-=#
 
 @testset "ZZModMatrix.swap_rows" begin
   Z17, = residue_ring(ZZ, ZZ(17))
