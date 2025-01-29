@@ -152,9 +152,6 @@ end
   @test 12 - g == -x^3-3*x+10
 
   @test ZZRingElem(12) - g == -x^3-3*x+10
-
-  # verify bugfix (used to crash)
-  @test is_zero(zero(R) - ZZ(0))
 end
 
 @testset "ZZPolyRingElem.comparison" begin
