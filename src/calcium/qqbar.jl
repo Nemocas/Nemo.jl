@@ -247,7 +247,7 @@ function minpoly(R::ZZPolyRing, x::QQBarFieldElem)
 end
 
 @doc raw"""
-    minpoly(R::ZZPolyRing, x::QQBarFieldElem)
+    minpoly(R::QQPolyRing, x::QQBarFieldElem)
 
 Return the minimal polynomial of `x` as an element of the polynomial ring `R`.
 """
