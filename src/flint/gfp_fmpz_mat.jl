@@ -302,13 +302,10 @@ end
 
 function lu!(P::Perm, x::FpMatrix)
   P.d .-= 1
-
   rank = @ccall libflint.fmpz_mod_mat_lu(P.d::Ptr{Int}, x::Ref{FpMatrix}, Cint(false)::Cint, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Int
-
   P.d .+= 1
 
-  # flint does x == PLU instead of Px == LU (docs are wrong)
-  inv!(P)
+  inv!(P) # FLINT does PLU = x instead of Px = LU
 
   return rank
 end
