@@ -87,10 +87,6 @@ mutable struct ZZRingElem <: RingElem
   ZZRingElem(x::ZZRingElem) = x
 end
 
-function _fmpz_clear_fn(a::ZZRingElem)
-  @ccall libflint.fmpz_clear(a::Ref{ZZRingElem})::Nothing
-end
-
 mutable struct fmpz_factor
   sign::Cint
   p::Ptr{Nothing} # Array of fmpz_struct's
@@ -104,10 +100,6 @@ mutable struct fmpz_factor
     finalizer(_fmpz_factor_clear_fn, z)
     return z
   end
-end
-
-function _fmpz_factor_clear_fn(a::fmpz_factor)
-  @ccall libflint.fmpz_factor_clear(a::Ref{fmpz_factor})::Nothing
 end
 
 struct ZZRingElemUnitRange <: AbstractUnitRange{ZZRingElem}
@@ -219,8 +211,6 @@ mutable struct QQFieldElem <: FracElem{ZZRingElem}
   QQFieldElem(a::QQFieldElem) = a
 end
 
-_fmpq_clear_fn(a::QQFieldElem) = @ccall libflint.fmpq_clear(a::Ref{QQFieldElem})::Nothing
-
 ###############################################################################
 #
 #   ZZPolyRing / ZZPolyRingElem
@@ -267,10 +257,6 @@ mutable struct ZZPolyRingElem <: PolyRingElem{ZZRingElem}
   ZZPolyRingElem(a::ZZPolyRingElem) = set!(ZZPolyRingElem(), a)
 end
 
-function _fmpz_poly_clear_fn(a::ZZPolyRingElem)
-  @ccall libflint.fmpz_poly_clear(a::Ref{ZZPolyRingElem})::Nothing
-end
-
 mutable struct fmpz_poly_factor
   d::Int # ZZRingElem
   p::Ptr{ZZPolyRingElem} # array of flint fmpz_poly_struct's
@@ -284,11 +270,6 @@ mutable struct fmpz_poly_factor
     finalizer(_fmpz_poly_factor_clear_fn, z)
     return z
   end
-end
-
-function _fmpz_poly_factor_clear_fn(f::fmpz_poly_factor)
-  @ccall libflint.fmpz_poly_factor_clear(f::Ref{fmpz_poly_factor})::Nothing
-  nothing
 end
 
 ###############################################################################
@@ -343,10 +324,6 @@ mutable struct QQPolyRingElem <: PolyRingElem{QQFieldElem}
 
   QQPolyRingElem(a::ZZPolyRingElem) = set!(QQPolyRingElem(), a)
   QQPolyRingElem(a::QQPolyRingElem) = set!(QQPolyRingElem(), a)
-end
-
-function _fmpq_poly_clear_fn(a::QQPolyRingElem)
-  @ccall libflint.fmpq_poly_clear(a::Ref{QQPolyRingElem})::Nothing
 end
 
 ###############################################################################
@@ -445,10 +422,6 @@ mutable struct fmpz_mod_ctx_struct
     finalizer(_fmpz_mod_ctx_clear_fn, z)
     return z
   end
-end
-
-function _fmpz_mod_ctx_clear_fn(a::fmpz_mod_ctx_struct)
-  @ccall libflint.fmpz_mod_ctx_clear(a::Ref{fmpz_mod_ctx_struct})::Nothing
 end
 
 @doc raw"""
@@ -618,10 +591,6 @@ mutable struct zzModPolyRingElem <: PolyRingElem{zzModRingElem}
   end
 end
 
-function _nmod_poly_clear_fn(x::zzModPolyRingElem)
-  @ccall libflint.nmod_poly_clear(x::Ref{zzModPolyRingElem})::Nothing
-end
-
 mutable struct nmod_poly_factor
   poly::Ptr{zzModPolyRingElem}  # array of flint nmod_poly_struct's
   exp::Ptr{Int}
@@ -636,10 +605,6 @@ mutable struct nmod_poly_factor
     finalizer(_nmod_poly_factor_clear_fn, z)
     return z
   end
-end
-
-function _nmod_poly_factor_clear_fn(a::nmod_poly_factor)
-  @ccall libflint.nmod_poly_factor_clear(a::Ref{nmod_poly_factor})::Nothing
 end
 
 ################################################################################
@@ -736,10 +701,6 @@ mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
   end
 end
 
-function _gfp_poly_clear_fn(x::fpPolyRingElem)
-  @ccall libflint.nmod_poly_clear(x::Ref{fpPolyRingElem})::Nothing
-end
-
 mutable struct gfp_poly_factor
   poly::Ptr{fpPolyRingElem}  # array of flint nmod_poly_struct's
   exp::Ptr{Int}
@@ -754,10 +715,6 @@ mutable struct gfp_poly_factor
     finalizer(_gfp_poly_factor_clear_fn, z)
     return z
   end
-end
-
-function _gfp_poly_factor_clear_fn(a::gfp_poly_factor)
-  @ccall libflint.nmod_poly_factor_clear(a::Ref{gfp_poly_factor})::Nothing
 end
 
 ###############################################################################
@@ -874,10 +831,6 @@ mutable struct ZZModPolyRingElem <: PolyRingElem{ZZModRingElem}
   end
 end
 
-function _fmpz_mod_poly_clear_fn(x::ZZModPolyRingElem)
-  @ccall libflint.fmpz_mod_poly_clear(x::Ref{ZZModPolyRingElem}, base_ring(parent(x)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-end
-
 mutable struct fmpz_mod_poly_factor
   poly::Ptr{ZZModPolyRingElem}
   exp::Ptr{Int}
@@ -898,10 +851,6 @@ mutable struct fmpz_mod_poly_factor
   function fmpz_mod_poly_factor(R::ZZModRing)
     return fmpz_mod_poly_factor(R.ninv)
   end
-end
-
-function _fmpz_mod_poly_factor_clear_fn(a::fmpz_mod_poly_factor)
-  @ccall libflint.fmpz_mod_poly_factor_clear(a::Ref{fmpz_mod_poly_factor}, a.n::Ref{fmpz_mod_ctx_struct})::Nothing
 end
 
 ###############################################################################
@@ -1018,10 +967,6 @@ mutable struct FpPolyRingElem <: PolyRingElem{FpFieldElem}
   end
 end
 
-function _fmpz_mod_poly_clear_fn(x::FpPolyRingElem)
-  @ccall libflint.fmpz_mod_poly_clear(x::Ref{FpPolyRingElem}, base_ring(parent(x)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-end
-
 mutable struct gfp_fmpz_poly_factor
   poly::Ptr{FpPolyRingElem}
   exp::Ptr{Int}
@@ -1042,10 +987,6 @@ mutable struct gfp_fmpz_poly_factor
   function gfp_fmpz_poly_factor(R::FpField)
     return gfp_fmpz_poly_factor(R.ninv)
   end
-end
-
-function _gfp_fmpz_poly_factor_clear_fn(a::gfp_fmpz_poly_factor)
-  @ccall libflint.fmpz_mod_poly_factor_clear(a::Ref{gfp_fmpz_poly_factor}, a.n::Ref{fmpz_mod_ctx_struct})::Nothing
 end
 
 ###############################################################################
@@ -1088,10 +1029,6 @@ const flint_orderings = [:lex, :deglex, :degrevlex]
   end
 end
 ZZMPolyRing(::ZZRing, s::Vector{Symbol}, S::Symbol, cached::Bool=true) = ZZMPolyRing(s, S, cached)
-
-function _fmpz_mpoly_ctx_clear_fn(a::ZZMPolyRing)
-  @ccall libflint.fmpz_mpoly_ctx_clear(a::Ref{ZZMPolyRing})::Nothing
-end
 
 const FmpzMPolyID = CacheDictType{Tuple{Vector{Symbol}, Symbol}, ZZMPolyRing}()
 
@@ -1162,10 +1099,6 @@ mutable struct ZZMPolyRingElem <: MPolyRingElem{ZZRingElem}
   ZZMPolyRingElem(ctx::ZZMPolyRing, a::Integer) = set!(ZZMPolyRingElem(ctx), a)
 end
 
-function _fmpz_mpoly_clear_fn(a::ZZMPolyRingElem)
-  @ccall libflint.fmpz_mpoly_clear(a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
-end
-
 mutable struct fmpz_mpoly_factor
   constant::Int
   constant_den::Int
@@ -1184,10 +1117,6 @@ mutable struct fmpz_mpoly_factor
     finalizer(_fmpz_mpoly_factor_clear_fn, z)
     return z
   end
-end
-
-function _fmpz_mpoly_factor_clear_fn(f::fmpz_mpoly_factor)
-  @ccall libflint.fmpz_mpoly_factor_clear(f::Ref{fmpz_mpoly_factor}, f.parent::Ref{ZZMPolyRing})::Nothing
 end
 
 ###############################################################################
@@ -1228,10 +1157,6 @@ end
   end
 end
 QQMPolyRing(::QQField, s::Vector{Symbol}, S::Symbol, cached::Bool=true) = QQMPolyRing(s, S, cached)
-
-function _fmpq_mpoly_ctx_clear_fn(a::QQMPolyRing)
-  @ccall libflint.fmpq_mpoly_ctx_clear(a::Ref{QQMPolyRing})::Nothing
-end
 
 const FmpqMPolyID = CacheDictType{Tuple{Vector{Symbol}, Symbol}, QQMPolyRing}()
 
@@ -1306,10 +1231,6 @@ mutable struct QQMPolyRingElem <: MPolyRingElem{QQFieldElem}
 
 end
 
-function _fmpq_mpoly_clear_fn(a::QQMPolyRingElem)
-  @ccall libflint.fmpq_mpoly_clear(a::Ref{QQMPolyRingElem}, a.parent::Ref{QQMPolyRing})::Nothing
-end
-
 mutable struct fmpq_mpoly_factor
   constant_num::Int
   constant_den::Int
@@ -1328,10 +1249,6 @@ mutable struct fmpq_mpoly_factor
     finalizer(_fmpq_mpoly_factor_clear_fn, z)
     return z
   end
-end
-
-function _fmpq_mpoly_factor_clear_fn(f::fmpq_mpoly_factor)
-  @ccall libflint.fmpq_mpoly_factor_clear(f::Ref{fmpq_mpoly_factor}, f.parent::Ref{QQMPolyRing})::Nothing
 end
 
 ###############################################################################
@@ -1377,10 +1294,6 @@ end
       return z
     end
   end
-end
-
-function _nmod_mpoly_ctx_clear_fn(a::zzModMPolyRing)
-  @ccall libflint.nmod_mpoly_ctx_clear(a::Ref{zzModMPolyRing})::Nothing
 end
 
 const NmodMPolyID = CacheDictType{Tuple{zzModRing, Vector{Symbol}, Symbol}, zzModMPolyRing}()
@@ -1462,10 +1375,6 @@ mutable struct zzModMPolyRingElem <: MPolyRingElem{zzModRingElem}
   end
 end
 
-function _nmod_mpoly_clear_fn(a::zzModMPolyRingElem)
-  @ccall libflint.nmod_mpoly_clear(a::Ref{zzModMPolyRingElem}, a.parent::Ref{zzModMPolyRing})::Nothing
-end
-
 mutable struct nmod_mpoly_factor
   constant::UInt
   poly::Ptr{Nothing}
@@ -1483,10 +1392,6 @@ mutable struct nmod_mpoly_factor
     finalizer(_nmod_mpoly_factor_clear_fn, z)
     return z
   end
-end
-
-function _nmod_mpoly_factor_clear_fn(f::nmod_mpoly_factor)
-  @ccall libflint.nmod_mpoly_factor_clear(f::Ref{nmod_mpoly_factor}, f.parent::Ref{zzModMPolyRing})::Nothing
 end
 
 ################################################################################
@@ -1532,10 +1437,6 @@ end
       return z
     end
   end
-end
-
-function _gfp_mpoly_ctx_clear_fn(a::fpMPolyRing)
-  @ccall libflint.nmod_mpoly_ctx_clear(a::Ref{fpMPolyRing})::Nothing
 end
 
 const GFPMPolyID = CacheDictType{Tuple{fpField, Vector{Symbol}, Symbol}, fpMPolyRing}()
@@ -1617,10 +1518,6 @@ mutable struct fpMPolyRingElem <: MPolyRingElem{fpFieldElem}
   end
 end
 
-function _gfp_mpoly_clear_fn(a::fpMPolyRingElem)
-  @ccall libflint.nmod_mpoly_clear(a::Ref{fpMPolyRingElem}, a.parent::Ref{fpMPolyRing})::Nothing
-end
-
 mutable struct gfp_mpoly_factor
   constant::UInt
   poly::Ptr{Nothing}
@@ -1638,10 +1535,6 @@ mutable struct gfp_mpoly_factor
     finalizer(_gfp_mpoly_factor_clear_fn, z)
     return z
   end
-end
-
-function _gfp_mpoly_factor_clear_fn(f::gfp_mpoly_factor)
-  @ccall libflint.nmod_mpoly_factor_clear(f::Ref{gfp_mpoly_factor}, f.parent::Ref{fpMPolyRing})::Nothing
 end
 
 ################################################################################
@@ -1696,10 +1589,6 @@ end
   end
 end
 
-function _gfp_fmpz_mpoly_ctx_clear_fn(a::FpMPolyRing)
-  @ccall libflint.fmpz_mod_mpoly_ctx_clear(a::Ref{FpMPolyRing})::Nothing
-end
-
 const GFPFmpzMPolyID = CacheDictType{Tuple{FpField, Vector{Symbol}, Symbol}, FpMPolyRing}()
 
 mutable struct FpMPolyRingElem <: MPolyRingElem{FpFieldElem}
@@ -1747,10 +1636,6 @@ mutable struct FpMPolyRingElem <: MPolyRingElem{FpFieldElem}
   end
 end
 
-function _gfp_fmpz_mpoly_clear_fn(a::FpMPolyRingElem)
-  @ccall libflint.fmpz_mod_mpoly_clear(a::Ref{FpMPolyRingElem}, a.parent::Ref{FpMPolyRing})::Nothing
-end
-
 mutable struct gfp_fmpz_mpoly_factor
   constant::Int
   poly::Ptr{Nothing}
@@ -1768,10 +1653,6 @@ mutable struct gfp_fmpz_mpoly_factor
     finalizer(_gfp_fmpz_mpoly_factor_clear_fn, z)
     return z
   end
-end
-
-function _gfp_fmpz_mpoly_factor_clear_fn(f::gfp_fmpz_mpoly_factor)
-  @ccall libflint.fmpz_mod_mpoly_factor_clear(f::Ref{gfp_fmpz_mpoly_factor}, f.parent::Ref{FpMPolyRing})::Nothing
 end
 
 ###############################################################################
@@ -1860,10 +1741,6 @@ const FqNmodFiniteFieldIDGFPPol = CacheDictType{Tuple{fpPolyRing, fpPolyRingElem
                                                 fqPolyRepField}()
 
 
-function _FqNmodFiniteField_clear_fn(a :: fqPolyRepField)
-  @ccall libflint.fq_nmod_ctx_clear(a::Ref{fqPolyRepField})::Nothing
-end
-
 @doc raw"""
     fqPolyRepFieldElem <: FinFieldElem
 
@@ -1910,10 +1787,6 @@ mutable struct fqPolyRepFieldElem <: FinFieldElem
     set!(d, x)
     return d
   end
-end
-
-function _fq_nmod_clear_fn(a::fqPolyRepFieldElem)
-  @ccall libflint.fq_nmod_clear(a::Ref{fqPolyRepFieldElem}, a.parent::Ref{fqPolyRepField})::Nothing
 end
 
 ###############################################################################
@@ -2030,10 +1903,6 @@ const FqDefaultFiniteFieldIDNmodPol = CacheDictType{Tuple{zzModPolyRingElem, Sym
 
 const FqDefaultFiniteFieldIDGFPNmodPol = CacheDictType{Tuple{fpPolyRingElem, Symbol}, FqField}()
 
-function _FqDefaultFiniteField_clear_fn(a :: FqField)
-  @ccall libflint.fq_default_ctx_clear(a::Ref{FqField})::Nothing
-end
-
 @doc raw"""
     FqFieldElem <: FinFieldElem
 
@@ -2069,10 +1938,6 @@ mutable struct FqFieldElem <: FinFieldElem
     set!(d, x)
     return d
   end
-end
-
-function _fq_default_clear_fn(a::FqFieldElem)
-  @ccall libflint.fq_default_clear(a::Ref{FqFieldElem}, a.parent::Ref{FqField})::Nothing
 end
 
 ###############################################################################
@@ -2156,10 +2021,6 @@ const FqFiniteFieldIDFmpzPol = CacheDictType{Tuple{ZZModPolyRingElem, Symbol}, F
 
 const FqFiniteFieldIDGFPPol = CacheDictType{Tuple{FpPolyRingElem, Symbol}, FqPolyRepField}()
 
-function _FqFiniteField_clear_fn(a :: FqPolyRepField)
-  @ccall libflint.fq_ctx_clear(a::Ref{FqPolyRepField})::Nothing
-end
-
 @doc raw"""
     FqPolyRepFieldElem <: FinFieldElem
 
@@ -2193,10 +2054,6 @@ mutable struct FqPolyRepFieldElem <: FinFieldElem
     set!(d, x)
     return d
   end
-end
-
-function _fq_clear_fn(a::FqPolyRepFieldElem)
-  @ccall libflint.fq_clear(a::Ref{FqPolyRepFieldElem}, a.parent::Ref{FqPolyRepField})::Nothing
 end
 
 
@@ -2262,10 +2119,6 @@ end
       return z
     end
   end
-end
-
-function _fq_nmod_mpoly_ctx_clear_fn(a::fqPolyRepMPolyRing)
-  @ccall libflint.fq_nmod_mpoly_ctx_clear(a::Ref{fqPolyRepMPolyRing})::Nothing
 end
 
 const FqNmodMPolyID = CacheDictType{Tuple{fqPolyRepField, Vector{Symbol}, Symbol}, fqPolyRepMPolyRing}()
@@ -2351,10 +2204,6 @@ mutable struct fqPolyRepMPolyRingElem <: MPolyRingElem{fqPolyRepFieldElem}
   end
 end
 
-function _fq_nmod_mpoly_clear_fn(a::fqPolyRepMPolyRingElem)
-  @ccall libflint.fq_nmod_mpoly_clear(a::Ref{fqPolyRepMPolyRingElem}, a.parent::Ref{fqPolyRepMPolyRing})::Nothing
-end
-
 mutable struct fq_nmod_mpoly_factor
   constant_coeffs::Ptr{Nothing}
   constant_alloc::Int
@@ -2378,10 +2227,6 @@ mutable struct fq_nmod_mpoly_factor
     finalizer(_fq_nmod_mpoly_factor_clear_fn, z)
     return z
   end
-end
-
-function _fq_nmod_mpoly_factor_clear_fn(f::fq_nmod_mpoly_factor)
-  @ccall libflint.fq_nmod_mpoly_factor_clear(f::Ref{fq_nmod_mpoly_factor}, f.parent::Ref{fqPolyRepMPolyRing})::Nothing
 end
 
 ###############################################################################
@@ -2441,10 +2286,6 @@ end
 
 const PadicBase = CacheDictType{ZZRingElem, PadicField}()
 
-function _padic_ctx_clear_fn(a::PadicField)
-  @ccall libflint.padic_ctx_clear(a::Ref{PadicField})::Nothing
-end
-
 @doc raw"""
     PadicFieldElem <: FlintLocalFieldElem <: NonArchLocalFieldElem <: FieldElem
 
@@ -2462,10 +2303,6 @@ mutable struct PadicFieldElem <: FlintLocalFieldElem
     finalizer(_padic_clear_fn, d)
     return d
   end
-end
-
-function _padic_clear_fn(a::PadicFieldElem)
-  @ccall libflint.padic_clear(a::Ref{PadicFieldElem})::Nothing
 end
 
 ###############################################################################
@@ -2512,10 +2349,6 @@ end
 
 const QadicBase = CacheDictType{Tuple{PadicField, Int}, QadicField}()
 
-function _qadic_ctx_clear_fn(a::QadicField)
-  @ccall libflint.qadic_ctx_clear(a::Ref{QadicField})::Nothing
-end
-
 @doc raw"""
     QadicFieldElem <: FlintLocalFieldElem <: NonArchLocalFieldElem <: FieldElem
 
@@ -2535,10 +2368,6 @@ mutable struct QadicFieldElem <: FlintLocalFieldElem
     finalizer(_qadic_clear_fn, z)
     return z
   end
-end
-
-function _qadic_clear_fn(a::QadicFieldElem)
-  @ccall libflint.qadic_clear(a::Ref{QadicFieldElem})::Nothing
 end
 
 ###############################################################################
@@ -2596,10 +2425,6 @@ mutable struct ZZRelPowerSeriesRingElem <: RelPowerSeriesRingElem{ZZRingElem}
   end
 end
 
-function _fmpz_rel_series_clear_fn(a::ZZRelPowerSeriesRingElem)
-  @ccall libflint.fmpz_poly_clear(a::Ref{ZZRelPowerSeriesRingElem})::Nothing
-end
-
 ###############################################################################
 #
 #   ZZAbsPowerSeriesRing / ZZAbsPowerSeriesRingElem
@@ -2649,10 +2474,6 @@ mutable struct ZZAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{ZZRingElem}
     @ccall libflint.fmpz_poly_set(z::Ref{ZZAbsPowerSeriesRingElem}, a::Ref{ZZAbsPowerSeriesRingElem})::Nothing
     return z
   end
-end
-
-function _fmpz_abs_series_clear_fn(a::ZZAbsPowerSeriesRingElem)
-  @ccall libflint.fmpz_poly_clear(a::Ref{ZZAbsPowerSeriesRingElem})::Nothing
 end
 
 ###############################################################################
@@ -2764,10 +2585,6 @@ mutable struct ZZLaurentSeriesRingElem <: RingElem
   end
 end
 
-function _fmpz_laurent_series_clear_fn(a::ZZLaurentSeriesRingElem)
-  @ccall libflint.fmpz_poly_clear(a::Ref{ZZLaurentSeriesRingElem})::Nothing
-end
-
 ###############################################################################
 #
 #   QQRelPowerSeriesRing / QQRelPowerSeriesRingElem
@@ -2824,10 +2641,6 @@ mutable struct QQRelPowerSeriesRingElem <: RelPowerSeriesRingElem{QQFieldElem}
   end
 end
 
-function _fmpq_rel_series_clear_fn(a::QQRelPowerSeriesRingElem)
-  @ccall libflint.fmpq_poly_clear(a::Ref{QQRelPowerSeriesRingElem})::Nothing
-end
-
 ###############################################################################
 #
 #   QQAbsPowerSeriesRing / QQAbsPowerSeriesRingElem
@@ -2880,10 +2693,6 @@ mutable struct QQAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{QQFieldElem}
     @ccall libflint.fmpq_poly_set(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem})::Nothing
     return z
   end
-end
-
-function _fmpq_abs_series_clear_fn(a::QQAbsPowerSeriesRingElem)
-  @ccall libflint.fmpq_poly_clear(a::Ref{QQAbsPowerSeriesRingElem})::Nothing
 end
 
 ###############################################################################
@@ -2974,10 +2783,6 @@ mutable struct fpRelPowerSeriesRingElem <: RelPowerSeriesRingElem{fpFieldElem}
   end
 end
 
-function _gfp_rel_series_clear_fn(a::fpRelPowerSeriesRingElem)
-  @ccall libflint.nmod_poly_clear(a::Ref{fpRelPowerSeriesRingElem})::Nothing
-end
-
 ###############################################################################
 #
 #   zzModRelPowerSeriesRing / zzModRelPowerSeriesRingElem
@@ -3064,10 +2869,6 @@ mutable struct zzModRelPowerSeriesRingElem <: RelPowerSeriesRingElem{zzModRingEl
     end
     return z
   end
-end
-
-function _nmod_rel_series_clear_fn(a::zzModRelPowerSeriesRingElem)
-  @ccall libflint.nmod_poly_clear(a::Ref{zzModRelPowerSeriesRingElem})::Nothing
 end
 
 ###############################################################################
@@ -3162,10 +2963,6 @@ mutable struct FpRelPowerSeriesRingElem <: RelPowerSeriesRingElem{FpFieldElem}
   end
 end
 
-function _gfp_fmpz_rel_series_clear_fn(a::FpRelPowerSeriesRingElem)
-  @ccall libflint.fmpz_mod_poly_clear(a::Ref{FpRelPowerSeriesRingElem}, base_ring(parent(a)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-end
-
 ###############################################################################
 #
 #   ZZModRelPowerSeriesRing / ZZModRelPowerSeriesRingElem
@@ -3258,10 +3055,6 @@ mutable struct ZZModRelPowerSeriesRingElem <: RelPowerSeriesRingElem{ZZModRingEl
   end
 end
 
-function _fmpz_mod_rel_series_clear_fn(a::ZZModRelPowerSeriesRingElem)
-  @ccall libflint.fmpz_mod_poly_clear(a::Ref{ZZModRelPowerSeriesRingElem}, base_ring(parent(a)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-end
-
 ###############################################################################
 #
 #   FpAbsPowerSeriesRing / FpAbsPowerSeriesRingElem
@@ -3346,10 +3139,6 @@ mutable struct FpAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{FpFieldElem}
     end
     return z
   end
-end
-
-function _gfp_fmpz_abs_series_clear_fn(a::FpAbsPowerSeriesRingElem)
-  @ccall libflint.fmpz_mod_poly_clear(a::Ref{FpAbsPowerSeriesRingElem}, base_ring(parent(a)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
 end
 
 ###############################################################################
@@ -3440,10 +3229,6 @@ mutable struct zzModAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{zzModRingEl
   end
 end
 
-function _nmod_abs_series_clear_fn(x::zzModAbsPowerSeriesRingElem)
-  @ccall libflint.nmod_poly_clear(x::Ref{zzModAbsPowerSeriesRingElem})::Nothing
-end
-
 ###############################################################################
 #
 #   fpAbsPowerSeriesRing / fpAbsPowerSeriesRingElem
@@ -3530,10 +3315,6 @@ mutable struct fpAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{fpFieldElem}
     finalizer(_gfp_abs_series_clear_fn, z)
     return z
   end
-end
-
-function _gfp_abs_series_clear_fn(x::fpAbsPowerSeriesRingElem)
-  @ccall libflint.nmod_poly_clear(x::Ref{fpAbsPowerSeriesRingElem})::Nothing
 end
 
 ###############################################################################
@@ -3623,11 +3404,6 @@ mutable struct ZZModAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{ZZModRingEl
   end
 end
 
-function _fmpz_mod_abs_series_clear_fn(a::ZZModAbsPowerSeriesRingElem)
-  @ccall libflint.fmpz_mod_poly_clear(a::Ref{ZZModAbsPowerSeriesRingElem}, base_ring(parent(a)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-end
-
-
 ###############################################################################
 #
 #   FqRelPowerSeriesRing / FqRelPowerSeriesRingElem
@@ -3684,11 +3460,6 @@ mutable struct FqRelPowerSeriesRingElem <: RelPowerSeriesRingElem{FqFieldElem}
     finalizer(_fq_default_rel_series_clear_fn, z)
     return z
   end
-end
-
-function _fq_default_rel_series_clear_fn(a::FqRelPowerSeriesRingElem)
-  ctx = base_ring(a)
-  @ccall libflint.fq_default_poly_clear(a::Ref{FqRelPowerSeriesRingElem}, ctx::Ref{FqField})::Nothing
 end
 
 ###############################################################################
@@ -3748,11 +3519,6 @@ mutable struct FqPolyRepRelPowerSeriesRingElem <: RelPowerSeriesRingElem{FqPolyR
   end
 end
 
-function _fq_rel_series_clear_fn(a::FqPolyRepRelPowerSeriesRingElem)
-  ctx = base_ring(a)
-  @ccall libflint.fq_poly_clear(a::Ref{FqPolyRepRelPowerSeriesRingElem}, ctx::Ref{FqPolyRepField})::Nothing
-end
-
 ###############################################################################
 #
 #   FqAbsPowerSeriesRing / FqAbsPowerSeriesRingElem
@@ -3809,11 +3575,6 @@ mutable struct FqAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{FqFieldElem}
   end
 end
 
-function _fq_default_abs_series_clear_fn(a::FqAbsPowerSeriesRingElem)
-  ctx = base_ring(a)
-  @ccall libflint.fq_default_poly_clear(a::Ref{FqAbsPowerSeriesRingElem}, ctx::Ref{FqField})::Nothing
-end
-
 ###############################################################################
 #
 #   FqPolyRepAbsPowerSeriesRing / FqPolyRepAbsPowerSeriesRingElem
@@ -3867,11 +3628,6 @@ mutable struct FqPolyRepAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{FqPolyR
     finalizer(_fq_abs_series_clear_fn, z)
     return z
   end
-end
-
-function _fq_abs_series_clear_fn(a::FqPolyRepAbsPowerSeriesRingElem)
-  ctx = base_ring(a)
-  @ccall libflint.fq_poly_clear(a::Ref{FqPolyRepAbsPowerSeriesRingElem}, ctx::Ref{FqPolyRepField})::Nothing
 end
 
 ###############################################################################
@@ -3932,11 +3688,6 @@ mutable struct fqPolyRepRelPowerSeriesRingElem <: RelPowerSeriesRingElem{fqPolyR
   end
 end
 
-function _fq_nmod_rel_series_clear_fn(a::fqPolyRepRelPowerSeriesRingElem)
-  ctx = base_ring(a)
-  @ccall libflint.fq_nmod_poly_clear(a::Ref{fqPolyRepRelPowerSeriesRingElem}, ctx::Ref{fqPolyRepField})::Nothing
-end
-
 ###############################################################################
 #
 #   fqPolyRepAbsPowerSeriesRing / fqPolyRepAbsPowerSeriesRingElem
@@ -3993,11 +3744,6 @@ mutable struct fqPolyRepAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{fqPolyR
   end
 end
 
-function _fq_nmod_abs_series_clear_fn(a::fqPolyRepAbsPowerSeriesRingElem)
-  ctx = base_ring(a)
-  @ccall libflint.fq_nmod_poly_clear(a::Ref{fqPolyRepAbsPowerSeriesRingElem}, ctx::Ref{fqPolyRepField})::Nothing
-end
-
 ###############################################################################
 #
 #   QQMatrixSpace / QQMatrix
@@ -4038,10 +3784,6 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
   end
 end
 
-function _fmpq_mat_clear_fn(a::QQMatrix)
-  @ccall libflint.fmpq_mat_clear(a::Ref{QQMatrix})::Nothing
-end
-
 ###############################################################################
 #
 #   ZZMatrixSpace / ZZMatrix
@@ -4080,10 +3822,6 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
     finalizer(_fmpz_mat_clear_fn, z)
     return z
   end
-end
-
-function _fmpz_mat_clear_fn(a::ZZMatrix)
-  @ccall libflint.fmpz_mat_clear(a::Ref{ZZMatrix})::Nothing
 end
 
 ###############################################################################
@@ -4217,10 +3955,6 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
     error("Modulus must be smaller than ", ZZRingElem(typemax(UInt)))
     return zzModMatrix(UInt(n), b)
   end
-end
-
-function _nmod_mat_clear_fn(mat::zzModMatrix)
-  @ccall libflint.nmod_mat_clear(mat::Ref{zzModMatrix})::Nothing
 end
 
 ###############################################################################
@@ -4369,11 +4103,6 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
   end
 end
 
-
-function _fmpz_mod_mat_clear_fn(mat::ZZModMatrix)
-  @ccall libflint.fmpz_mod_mat_clear(mat::Ref{ZZModMatrix}, C_NULL::Ref{Nothing})::Nothing # Hack
-end
-
 ###############################################################################
 #
 #   FpMatrixSpace / FpMatrix
@@ -4472,10 +4201,6 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
     end
     return z
   end
-end
-
-function _gfp_fmpz_mat_clear_fn(mat::FpMatrix)
-  @ccall libflint.fmpz_mod_mat_clear(mat::Ref{FpMatrix}, C_NULL::Ref{Nothing})::Nothing # Hack
 end
 
 ################################################################################
@@ -4609,10 +4334,6 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
   end
 end
 
-function _gfp_mat_clear_fn(mat::fpMatrix)
-  @ccall libflint.nmod_mat_clear(mat::Ref{fpMatrix})::Nothing
-end
-
 ###############################################################################
 #
 #   FqPolyRing / FqPolyRingElem
@@ -4725,10 +4446,6 @@ mutable struct FqPolyRingElem <: PolyRingElem{FqFieldElem}
   end
 end
 
-function _fq_default_poly_clear_fn(a::FqPolyRingElem)
-  @ccall libflint.fq_default_poly_clear(a::Ref{FqPolyRingElem}, base_ring(a)::Ref{FqField})::Nothing
-end
-
 mutable struct fq_default_poly_factor
   # fq_default_ctx_struct is 32 bytes on 64 bit machine
   opaque::NTuple{32, Int8}
@@ -4742,11 +4459,6 @@ mutable struct fq_default_poly_factor
     finalizer(_fq_default_poly_factor_clear_fn, z)
     return z
   end
-end
-
-function _fq_default_poly_factor_clear_fn(a::fq_default_poly_factor)
-  K = a.base_field
-  @ccall libflint.fq_default_poly_factor_clear(a::Ref{fq_default_poly_factor}, K::Ref{FqField})::Nothing
 end
 
 ###############################################################################
@@ -4834,10 +4546,6 @@ mutable struct FqPolyRepPolyRingElem <: PolyRingElem{FqPolyRepFieldElem}
   end
 end
 
-function _fq_poly_clear_fn(a::FqPolyRepPolyRingElem)
-  @ccall libflint.fq_poly_clear(a::Ref{FqPolyRepPolyRingElem})::Nothing
-end
-
 mutable struct fq_poly_factor
   poly::Ptr{FqPolyRepPolyRingElem}
   exp::Ptr{Int}
@@ -4852,10 +4560,6 @@ mutable struct fq_poly_factor
     finalizer(_fq_poly_factor_clear_fn, z)
     return z
   end
-end
-
-function _fq_poly_factor_clear_fn(a::fq_poly_factor)
-  @ccall libflint.fq_poly_factor_clear(a::Ref{fq_poly_factor}, a.base_field::Ref{FqPolyRepField})::Nothing
 end
 
 ###############################################################################
@@ -4943,10 +4647,6 @@ mutable struct fqPolyRepPolyRingElem <: PolyRingElem{fqPolyRepFieldElem}
   end
 end
 
-function _fq_nmod_poly_clear_fn(a::fqPolyRepPolyRingElem)
-  @ccall libflint.fq_nmod_poly_clear(a::Ref{fqPolyRepPolyRingElem})::Nothing
-end
-
 mutable struct fq_nmod_poly_factor
   poly::Ptr{fqPolyRepPolyRingElem}
   exp::Ptr{Int}
@@ -4961,10 +4661,6 @@ mutable struct fq_nmod_poly_factor
     finalizer(_fq_nmod_poly_factor_clear_fn, z)
     return z
   end
-end
-
-function _fq_nmod_poly_factor_clear_fn(a::fq_nmod_poly_factor)
-  @ccall libflint.fq_nmod_poly_factor_clear(a::Ref{fq_nmod_poly_factor}, a.base_field::Ref{fqPolyRepField})::Nothing
 end
 
 ###############################################################################
@@ -5061,10 +4757,6 @@ mutable struct FqMatrix <: MatElem{FqFieldElem}
   end
 end
 
-function _fq_default_mat_clear_fn(a::FqMatrix)
-  @ccall libflint.fq_default_mat_clear(a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
-end
-
 ###############################################################################
 #
 #   FqPolyRepMatrixSpace/FqPolyRepMatrix
@@ -5140,10 +4832,6 @@ mutable struct FqPolyRepMatrix <: MatElem{FqPolyRepFieldElem}
     end
     return z
   end
-end
-
-function _fq_mat_clear_fn(a::FqPolyRepMatrix)
-  @ccall libflint.fq_mat_clear(a::Ref{FqPolyRepMatrix}, base_ring(a)::Ref{FqPolyRepField})::Nothing
 end
 
 ###############################################################################
@@ -5223,10 +4911,6 @@ mutable struct fqPolyRepMatrix <: MatElem{fqPolyRepFieldElem}
   end
 end
 
-function _fq_nmod_mat_clear_fn(a::fqPolyRepMatrix)
-  @ccall libflint.fq_nmod_mat_clear(a::Ref{fqPolyRepMatrix}, base_ring(a)::Ref{fqPolyRepField})::Nothing
-end
-
 ################################################################################
 #
 #   Rand state
@@ -5246,11 +4930,6 @@ if NEW_FLINT
       return a
     end
   end
-
-  function _rand_ctx_clear_fn(a::rand_ctx)
-    @ccall libflint.flint_rand_clear(a::Ref{rand_ctx})::Cvoid
-    nothing
-  end
 else
   mutable struct rand_ctx
     data::NTuple{56, Int8}
@@ -5261,11 +4940,6 @@ else
       finalizer(_rand_ctx_clear_fn, a)
       return a
     end
-  end
-
-  function _rand_ctx_clear_fn(a::rand_ctx)
-    @ccall libflint.flint_randclear(a::Ref{rand_ctx})::Cvoid
-    nothing
   end
 end
 
@@ -5346,6 +5020,339 @@ macro fq_default_mpoly_do_op(f, R, a...)
     end
   end
   return res
+end
+
+################################################################################
+#
+#   Finalizer
+#
+################################################################################
+
+function _fmpz_clear_fn(a::ZZRingElem)
+  @ccall libflint.fmpz_clear(a::Ref{ZZRingElem})::Nothing
+end
+
+function _fmpz_factor_clear_fn(a::fmpz_factor)
+  @ccall libflint.fmpz_factor_clear(a::Ref{fmpz_factor})::Nothing
+end
+
+_fmpq_clear_fn(a::QQFieldElem) = @ccall libflint.fmpq_clear(a::Ref{QQFieldElem})::Nothing
+
+
+function _fmpz_poly_clear_fn(a::ZZPolyRingElem)
+  @ccall libflint.fmpz_poly_clear(a::Ref{ZZPolyRingElem})::Nothing
+end
+
+function _fmpz_poly_factor_clear_fn(f::fmpz_poly_factor)
+  @ccall libflint.fmpz_poly_factor_clear(f::Ref{fmpz_poly_factor})::Nothing
+  nothing
+end
+
+function _fmpq_poly_clear_fn(a::QQPolyRingElem)
+  @ccall libflint.fmpq_poly_clear(a::Ref{QQPolyRingElem})::Nothing
+end
+
+function _fmpz_mod_ctx_clear_fn(a::fmpz_mod_ctx_struct)
+  @ccall libflint.fmpz_mod_ctx_clear(a::Ref{fmpz_mod_ctx_struct})::Nothing
+end
+
+function _nmod_poly_clear_fn(x::zzModPolyRingElem)
+  @ccall libflint.nmod_poly_clear(x::Ref{zzModPolyRingElem})::Nothing
+end
+
+function _nmod_poly_factor_clear_fn(a::nmod_poly_factor)
+  @ccall libflint.nmod_poly_factor_clear(a::Ref{nmod_poly_factor})::Nothing
+end
+
+function _gfp_poly_clear_fn(x::fpPolyRingElem)
+  @ccall libflint.nmod_poly_clear(x::Ref{fpPolyRingElem})::Nothing
+end
+
+function _gfp_poly_factor_clear_fn(a::gfp_poly_factor)
+  @ccall libflint.nmod_poly_factor_clear(a::Ref{gfp_poly_factor})::Nothing
+end
+
+function _fmpz_mod_poly_clear_fn(x::ZZModPolyRingElem)
+  @ccall libflint.fmpz_mod_poly_clear(x::Ref{ZZModPolyRingElem}, base_ring(parent(x)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+end
+
+function _fmpz_mod_poly_factor_clear_fn(a::fmpz_mod_poly_factor)
+  @ccall libflint.fmpz_mod_poly_factor_clear(a::Ref{fmpz_mod_poly_factor}, a.n::Ref{fmpz_mod_ctx_struct})::Nothing
+end
+
+function _fmpz_mod_poly_clear_fn(x::FpPolyRingElem)
+  @ccall libflint.fmpz_mod_poly_clear(x::Ref{FpPolyRingElem}, base_ring(parent(x)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+end
+
+function _gfp_fmpz_poly_factor_clear_fn(a::gfp_fmpz_poly_factor)
+  @ccall libflint.fmpz_mod_poly_factor_clear(a::Ref{gfp_fmpz_poly_factor}, a.n::Ref{fmpz_mod_ctx_struct})::Nothing
+end
+
+function _fmpz_mpoly_ctx_clear_fn(a::ZZMPolyRing)
+  @ccall libflint.fmpz_mpoly_ctx_clear(a::Ref{ZZMPolyRing})::Nothing
+end
+
+function _fmpz_mpoly_clear_fn(a::ZZMPolyRingElem)
+  @ccall libflint.fmpz_mpoly_clear(a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
+end
+
+function _fmpz_mpoly_factor_clear_fn(f::fmpz_mpoly_factor)
+  @ccall libflint.fmpz_mpoly_factor_clear(f::Ref{fmpz_mpoly_factor}, f.parent::Ref{ZZMPolyRing})::Nothing
+end
+
+function _fmpq_mpoly_ctx_clear_fn(a::QQMPolyRing)
+  @ccall libflint.fmpq_mpoly_ctx_clear(a::Ref{QQMPolyRing})::Nothing
+end
+
+function _fmpq_mpoly_clear_fn(a::QQMPolyRingElem)
+  @ccall libflint.fmpq_mpoly_clear(a::Ref{QQMPolyRingElem}, a.parent::Ref{QQMPolyRing})::Nothing
+end
+
+function _fmpq_mpoly_factor_clear_fn(f::fmpq_mpoly_factor)
+  @ccall libflint.fmpq_mpoly_factor_clear(f::Ref{fmpq_mpoly_factor}, f.parent::Ref{QQMPolyRing})::Nothing
+end
+
+function _nmod_mpoly_ctx_clear_fn(a::zzModMPolyRing)
+  @ccall libflint.nmod_mpoly_ctx_clear(a::Ref{zzModMPolyRing})::Nothing
+end
+
+function _nmod_mpoly_clear_fn(a::zzModMPolyRingElem)
+  @ccall libflint.nmod_mpoly_clear(a::Ref{zzModMPolyRingElem}, a.parent::Ref{zzModMPolyRing})::Nothing
+end
+
+function _nmod_mpoly_factor_clear_fn(f::nmod_mpoly_factor)
+  @ccall libflint.nmod_mpoly_factor_clear(f::Ref{nmod_mpoly_factor}, f.parent::Ref{zzModMPolyRing})::Nothing
+end
+
+function _gfp_mpoly_ctx_clear_fn(a::fpMPolyRing)
+  @ccall libflint.nmod_mpoly_ctx_clear(a::Ref{fpMPolyRing})::Nothing
+end
+
+function _gfp_mpoly_clear_fn(a::fpMPolyRingElem)
+  @ccall libflint.nmod_mpoly_clear(a::Ref{fpMPolyRingElem}, a.parent::Ref{fpMPolyRing})::Nothing
+end
+
+function _gfp_mpoly_factor_clear_fn(f::gfp_mpoly_factor)
+  @ccall libflint.nmod_mpoly_factor_clear(f::Ref{gfp_mpoly_factor}, f.parent::Ref{fpMPolyRing})::Nothing
+end
+
+function _gfp_fmpz_mpoly_ctx_clear_fn(a::FpMPolyRing)
+  @ccall libflint.fmpz_mod_mpoly_ctx_clear(a::Ref{FpMPolyRing})::Nothing
+end
+
+function _gfp_fmpz_mpoly_clear_fn(a::FpMPolyRingElem)
+  @ccall libflint.fmpz_mod_mpoly_clear(a::Ref{FpMPolyRingElem}, a.parent::Ref{FpMPolyRing})::Nothing
+end
+
+function _gfp_fmpz_mpoly_factor_clear_fn(f::gfp_fmpz_mpoly_factor)
+  @ccall libflint.fmpz_mod_mpoly_factor_clear(f::Ref{gfp_fmpz_mpoly_factor}, f.parent::Ref{FpMPolyRing})::Nothing
+end
+
+function _FqNmodFiniteField_clear_fn(a :: fqPolyRepField)
+  @ccall libflint.fq_nmod_ctx_clear(a::Ref{fqPolyRepField})::Nothing
+end
+
+function _fq_nmod_clear_fn(a::fqPolyRepFieldElem)
+  @ccall libflint.fq_nmod_clear(a::Ref{fqPolyRepFieldElem}, a.parent::Ref{fqPolyRepField})::Nothing
+end
+
+function _FqDefaultFiniteField_clear_fn(a :: FqField)
+  @ccall libflint.fq_default_ctx_clear(a::Ref{FqField})::Nothing
+end
+
+function _fq_default_clear_fn(a::FqFieldElem)
+  @ccall libflint.fq_default_clear(a::Ref{FqFieldElem}, a.parent::Ref{FqField})::Nothing
+end
+
+function _FqFiniteField_clear_fn(a :: FqPolyRepField)
+  @ccall libflint.fq_ctx_clear(a::Ref{FqPolyRepField})::Nothing
+end
+
+function _fq_clear_fn(a::FqPolyRepFieldElem)
+  @ccall libflint.fq_clear(a::Ref{FqPolyRepFieldElem}, a.parent::Ref{FqPolyRepField})::Nothing
+end
+
+function _fq_nmod_mpoly_ctx_clear_fn(a::fqPolyRepMPolyRing)
+  @ccall libflint.fq_nmod_mpoly_ctx_clear(a::Ref{fqPolyRepMPolyRing})::Nothing
+end
+
+function _fq_nmod_mpoly_clear_fn(a::fqPolyRepMPolyRingElem)
+  @ccall libflint.fq_nmod_mpoly_clear(a::Ref{fqPolyRepMPolyRingElem}, a.parent::Ref{fqPolyRepMPolyRing})::Nothing
+end
+
+function _fq_nmod_mpoly_factor_clear_fn(f::fq_nmod_mpoly_factor)
+  @ccall libflint.fq_nmod_mpoly_factor_clear(f::Ref{fq_nmod_mpoly_factor}, f.parent::Ref{fqPolyRepMPolyRing})::Nothing
+end
+
+function _padic_ctx_clear_fn(a::PadicField)
+  @ccall libflint.padic_ctx_clear(a::Ref{PadicField})::Nothing
+end
+
+function _padic_clear_fn(a::PadicFieldElem)
+  @ccall libflint.padic_clear(a::Ref{PadicFieldElem})::Nothing
+end
+
+function _qadic_ctx_clear_fn(a::QadicField)
+  @ccall libflint.qadic_ctx_clear(a::Ref{QadicField})::Nothing
+end
+
+function _qadic_clear_fn(a::QadicFieldElem)
+  @ccall libflint.qadic_clear(a::Ref{QadicFieldElem})::Nothing
+end
+
+function _fmpz_rel_series_clear_fn(a::ZZRelPowerSeriesRingElem)
+  @ccall libflint.fmpz_poly_clear(a::Ref{ZZRelPowerSeriesRingElem})::Nothing
+end
+
+function _fmpz_abs_series_clear_fn(a::ZZAbsPowerSeriesRingElem)
+  @ccall libflint.fmpz_poly_clear(a::Ref{ZZAbsPowerSeriesRingElem})::Nothing
+end
+
+function _fmpz_laurent_series_clear_fn(a::ZZLaurentSeriesRingElem)
+  @ccall libflint.fmpz_poly_clear(a::Ref{ZZLaurentSeriesRingElem})::Nothing
+end
+
+function _fmpq_rel_series_clear_fn(a::QQRelPowerSeriesRingElem)
+  @ccall libflint.fmpq_poly_clear(a::Ref{QQRelPowerSeriesRingElem})::Nothing
+end
+
+function _fmpq_abs_series_clear_fn(a::QQAbsPowerSeriesRingElem)
+  @ccall libflint.fmpq_poly_clear(a::Ref{QQAbsPowerSeriesRingElem})::Nothing
+end
+
+function _gfp_rel_series_clear_fn(a::fpRelPowerSeriesRingElem)
+  @ccall libflint.nmod_poly_clear(a::Ref{fpRelPowerSeriesRingElem})::Nothing
+end
+
+function _nmod_rel_series_clear_fn(a::zzModRelPowerSeriesRingElem)
+  @ccall libflint.nmod_poly_clear(a::Ref{zzModRelPowerSeriesRingElem})::Nothing
+end
+
+function _gfp_fmpz_rel_series_clear_fn(a::FpRelPowerSeriesRingElem)
+  @ccall libflint.fmpz_mod_poly_clear(a::Ref{FpRelPowerSeriesRingElem}, base_ring(parent(a)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+end
+
+function _fmpz_mod_rel_series_clear_fn(a::ZZModRelPowerSeriesRingElem)
+  @ccall libflint.fmpz_mod_poly_clear(a::Ref{ZZModRelPowerSeriesRingElem}, base_ring(parent(a)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+end
+
+function _gfp_fmpz_abs_series_clear_fn(a::FpAbsPowerSeriesRingElem)
+  @ccall libflint.fmpz_mod_poly_clear(a::Ref{FpAbsPowerSeriesRingElem}, base_ring(parent(a)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+end
+
+function _nmod_abs_series_clear_fn(x::zzModAbsPowerSeriesRingElem)
+  @ccall libflint.nmod_poly_clear(x::Ref{zzModAbsPowerSeriesRingElem})::Nothing
+end
+
+function _gfp_abs_series_clear_fn(x::fpAbsPowerSeriesRingElem)
+  @ccall libflint.nmod_poly_clear(x::Ref{fpAbsPowerSeriesRingElem})::Nothing
+end
+
+function _fmpz_mod_abs_series_clear_fn(a::ZZModAbsPowerSeriesRingElem)
+  @ccall libflint.fmpz_mod_poly_clear(a::Ref{ZZModAbsPowerSeriesRingElem}, base_ring(parent(a)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+end
+
+function _fq_default_rel_series_clear_fn(a::FqRelPowerSeriesRingElem)
+  ctx = base_ring(a)
+  @ccall libflint.fq_default_poly_clear(a::Ref{FqRelPowerSeriesRingElem}, ctx::Ref{FqField})::Nothing
+end
+
+function _fq_rel_series_clear_fn(a::FqPolyRepRelPowerSeriesRingElem)
+  ctx = base_ring(a)
+  @ccall libflint.fq_poly_clear(a::Ref{FqPolyRepRelPowerSeriesRingElem}, ctx::Ref{FqPolyRepField})::Nothing
+end
+
+function _fq_default_abs_series_clear_fn(a::FqAbsPowerSeriesRingElem)
+  ctx = base_ring(a)
+  @ccall libflint.fq_default_poly_clear(a::Ref{FqAbsPowerSeriesRingElem}, ctx::Ref{FqField})::Nothing
+end
+
+function _fq_abs_series_clear_fn(a::FqPolyRepAbsPowerSeriesRingElem)
+  ctx = base_ring(a)
+  @ccall libflint.fq_poly_clear(a::Ref{FqPolyRepAbsPowerSeriesRingElem}, ctx::Ref{FqPolyRepField})::Nothing
+end
+
+function _fq_nmod_rel_series_clear_fn(a::fqPolyRepRelPowerSeriesRingElem)
+  ctx = base_ring(a)
+  @ccall libflint.fq_nmod_poly_clear(a::Ref{fqPolyRepRelPowerSeriesRingElem}, ctx::Ref{fqPolyRepField})::Nothing
+end
+
+function _fq_nmod_abs_series_clear_fn(a::fqPolyRepAbsPowerSeriesRingElem)
+  ctx = base_ring(a)
+  @ccall libflint.fq_nmod_poly_clear(a::Ref{fqPolyRepAbsPowerSeriesRingElem}, ctx::Ref{fqPolyRepField})::Nothing
+end
+
+function _fmpq_mat_clear_fn(a::QQMatrix)
+  @ccall libflint.fmpq_mat_clear(a::Ref{QQMatrix})::Nothing
+end
+
+function _fmpz_mat_clear_fn(a::ZZMatrix)
+  @ccall libflint.fmpz_mat_clear(a::Ref{ZZMatrix})::Nothing
+end
+
+function _nmod_mat_clear_fn(mat::zzModMatrix)
+  @ccall libflint.nmod_mat_clear(mat::Ref{zzModMatrix})::Nothing
+end
+
+function _fmpz_mod_mat_clear_fn(mat::ZZModMatrix)
+  @ccall libflint.fmpz_mod_mat_clear(mat::Ref{ZZModMatrix}, C_NULL::Ref{Nothing})::Nothing # Hack
+end
+
+function _gfp_fmpz_mat_clear_fn(mat::FpMatrix)
+  @ccall libflint.fmpz_mod_mat_clear(mat::Ref{FpMatrix}, C_NULL::Ref{Nothing})::Nothing # Hack
+end
+
+function _gfp_mat_clear_fn(mat::fpMatrix)
+  @ccall libflint.nmod_mat_clear(mat::Ref{fpMatrix})::Nothing
+end
+
+function _fq_default_poly_clear_fn(a::FqPolyRingElem)
+  @ccall libflint.fq_default_poly_clear(a::Ref{FqPolyRingElem}, base_ring(a)::Ref{FqField})::Nothing
+end
+
+function _fq_default_poly_factor_clear_fn(a::fq_default_poly_factor)
+  K = a.base_field
+  @ccall libflint.fq_default_poly_factor_clear(a::Ref{fq_default_poly_factor}, K::Ref{FqField})::Nothing
+end
+
+function _fq_poly_clear_fn(a::FqPolyRepPolyRingElem)
+  @ccall libflint.fq_poly_clear(a::Ref{FqPolyRepPolyRingElem})::Nothing
+end
+
+function _fq_poly_factor_clear_fn(a::fq_poly_factor)
+  @ccall libflint.fq_poly_factor_clear(a::Ref{fq_poly_factor}, a.base_field::Ref{FqPolyRepField})::Nothing
+end
+
+function _fq_nmod_poly_clear_fn(a::fqPolyRepPolyRingElem)
+  @ccall libflint.fq_nmod_poly_clear(a::Ref{fqPolyRepPolyRingElem})::Nothing
+end
+
+function _fq_nmod_poly_factor_clear_fn(a::fq_nmod_poly_factor)
+  @ccall libflint.fq_nmod_poly_factor_clear(a::Ref{fq_nmod_poly_factor}, a.base_field::Ref{fqPolyRepField})::Nothing
+end
+
+function _fq_default_mat_clear_fn(a::FqMatrix)
+  @ccall libflint.fq_default_mat_clear(a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
+end
+
+function _fq_mat_clear_fn(a::FqPolyRepMatrix)
+  @ccall libflint.fq_mat_clear(a::Ref{FqPolyRepMatrix}, base_ring(a)::Ref{FqPolyRepField})::Nothing
+end
+
+function _fq_nmod_mat_clear_fn(a::fqPolyRepMatrix)
+  @ccall libflint.fq_nmod_mat_clear(a::Ref{fqPolyRepMatrix}, base_ring(a)::Ref{fqPolyRepField})::Nothing
+end
+
+if NEW_FLINT
+  function _rand_ctx_clear_fn(a::rand_ctx)
+    @ccall libflint.flint_rand_clear(a::Ref{rand_ctx})::Cvoid
+    nothing
+  end
+else
+  function _rand_ctx_clear_fn(a::rand_ctx)
+    @ccall libflint.flint_randclear(a::Ref{rand_ctx})::Cvoid
+    nothing
+  end
 end
 
 ################################################################################
