@@ -5036,8 +5036,9 @@ function _fmpz_factor_clear_fn(a::fmpz_factor)
   @ccall libflint.fmpz_factor_clear(a::Ref{fmpz_factor})::Nothing
 end
 
-_fmpq_clear_fn(a::QQFieldElem) = @ccall libflint.fmpq_clear(a::Ref{QQFieldElem})::Nothing
-
+function _fmpq_clear_fn(a::QQFieldElem)
+  @ccall libflint.fmpq_clear(a::Ref{QQFieldElem})::Nothing
+end
 
 function _fmpz_poly_clear_fn(a::ZZPolyRingElem)
   @ccall libflint.fmpz_poly_clear(a::Ref{ZZPolyRingElem})::Nothing
@@ -5045,7 +5046,6 @@ end
 
 function _fmpz_poly_factor_clear_fn(f::fmpz_poly_factor)
   @ccall libflint.fmpz_poly_factor_clear(f::Ref{fmpz_poly_factor})::Nothing
-  nothing
 end
 
 function _fmpq_poly_clear_fn(a::QQPolyRingElem)
@@ -5148,7 +5148,7 @@ function _gfp_fmpz_mpoly_factor_clear_fn(f::gfp_fmpz_mpoly_factor)
   @ccall libflint.fmpz_mod_mpoly_factor_clear(f::Ref{gfp_fmpz_mpoly_factor}, f.parent::Ref{FpMPolyRing})::Nothing
 end
 
-function _FqNmodFiniteField_clear_fn(a :: fqPolyRepField)
+function _FqNmodFiniteField_clear_fn(a::fqPolyRepField)
   @ccall libflint.fq_nmod_ctx_clear(a::Ref{fqPolyRepField})::Nothing
 end
 
@@ -5156,7 +5156,7 @@ function _fq_nmod_clear_fn(a::fqPolyRepFieldElem)
   @ccall libflint.fq_nmod_clear(a::Ref{fqPolyRepFieldElem}, a.parent::Ref{fqPolyRepField})::Nothing
 end
 
-function _FqDefaultFiniteField_clear_fn(a :: FqField)
+function _FqDefaultFiniteField_clear_fn(a::FqField)
   @ccall libflint.fq_default_ctx_clear(a::Ref{FqField})::Nothing
 end
 
@@ -5164,7 +5164,7 @@ function _fq_default_clear_fn(a::FqFieldElem)
   @ccall libflint.fq_default_clear(a::Ref{FqFieldElem}, a.parent::Ref{FqField})::Nothing
 end
 
-function _FqFiniteField_clear_fn(a :: FqPolyRepField)
+function _FqFiniteField_clear_fn(a::FqPolyRepField)
   @ccall libflint.fq_ctx_clear(a::Ref{FqPolyRepField})::Nothing
 end
 
@@ -5345,13 +5345,11 @@ end
 
 if NEW_FLINT
   function _rand_ctx_clear_fn(a::rand_ctx)
-    @ccall libflint.flint_rand_clear(a::Ref{rand_ctx})::Cvoid
-    nothing
+    @ccall libflint.flint_rand_clear(a::Ref{rand_ctx})::Nothing
   end
 else
   function _rand_ctx_clear_fn(a::rand_ctx)
-    @ccall libflint.flint_randclear(a::Ref{rand_ctx})::Cvoid
-    nothing
+    @ccall libflint.flint_randclear(a::Ref{rand_ctx})::Nothing
   end
 end
 
