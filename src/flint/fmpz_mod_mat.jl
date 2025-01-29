@@ -267,18 +267,16 @@ end
 #
 ################################################################################
 
-#= Not implemented in FLINT yet
+function ^(x::T, y::Int) where {T<:Zmod_fmpz_mat}
+  if y < 0
+    x = inv(x)
+    y = -y
+  end
+  z = similar(x)
+  @ccall libflint.fmpz_mod_mat_pow_ui(z::Ref{T}, x::Ref{T}, y::Int)::Nothing
+  return z
+end
 
-function ^(x::T, y::Int) where T <: Zmod_fmpz_mat
-if y < 0
-x = inv(x)
-y = -y
-end
-z = similar(x)
-@ccall libflint.fmpz_mod_mat_pow(z::Ref{T}, x::Ref{T}, y::Int)::Nothing
-return z
-end
-=#
 
 function ^(x::T, y::ZZRingElem) where T <: Zmod_fmpz_mat
   (y > ZZRingElem(typemax(Int))) &&
