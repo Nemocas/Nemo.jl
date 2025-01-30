@@ -40,6 +40,10 @@ const __FLINT_VERSION_MINOR = 2
 
 const __FLINT_VERSION_PATCHLEVEL = 0
 
+struct struct___FLINT_FILE end
+
+const FLINT_FILE = struct___FLINT_FILE
+
 const flint_bitcnt_t = ulong
 
 const nn_ptr = Ptr{ulong}
@@ -578,6 +582,112 @@ end
 const fq_poly_factor_t = Ptr{fq_poly_factor_struct}
 
 # end fq_types.h
+###############################################################################
+
+
+###############################################################################
+# begin gr_types.h
+
+const GR_SUCCESS = 0
+
+const GR_DOMAIN = 1
+
+const GR_UNABLE = 2
+
+const GR_TEST_FAIL = 4
+
+@enum truth_t begin
+  T_TRUE
+  T_FALSE
+  T_UNKNOWN
+end
+
+struct gr_stream_struct
+  fp::Ptr{FLINT_FILE}
+  s::Ptr{char}
+  len::slong
+  alloc::slong
+end
+
+const gr_stream_t = Ptr{gr_stream_struct}
+
+struct gr_ctx_struct
+  data::NTuple{GR_CTX_STRUCT_DATA_BYTES, char}
+  which_ring::ulong
+  sizeof_elem::slong
+  methods::Ptr{gr_funcptr}
+  size_limit::ulong
+end
+
+const gr_ctx_t = Ptr{gr_ctx_struct}
+
+const gr_ptr = Ptr{void}
+
+const gr_srcptr = Ptr{void}
+
+const gr_ctx_ptr = Ptr{void}
+
+struct gr_vec_struct
+  entries::gr_ptr
+  alloc::slong
+  length::slong
+end
+
+const gr_vec_t = Ptr{gr_vec_struct}
+
+struct gr_mat_struct
+  entries::gr_ptr
+  r::slong
+  c::slong
+  rows::Ptr{gr_ptr}
+end
+
+const gr_mat_t = Ptr{gr_mat_struct}
+
+struct gr_poly_struct
+  coeffs::gr_ptr
+  alloc::slong
+  length::slong
+end
+
+const gr_poly_t = Ptr{gr_poly_struct}
+
+# end gr_types.h
+###############################################################################
+
+
+###############################################################################
+# begin fq_default.h
+
+struct fq_default_struct
+  uniondata::NTuple{maximum(sizeof, (
+    fq_t,
+    fq_nmod_t,
+    fq_zech_t,
+    ulong,
+    fmpz_t,
+  )), UInt8}
+end
+const union_fq_default_struct = fq_default_struct
+
+const fq_default_t = Ptr{fq_default_struct}
+
+const fq_default_ctx_struct = gr_ctx_struct
+
+const fq_default_ctx_t = Ptr{fq_default_ctx_struct}
+
+struct _gr_fmpz_mod_ctx_struct
+  ctx::Ptr{fmpz_mod_ctx_struct}
+  is_prime::truth_t
+  a::fmpz    #= when used as finite field with defining polynomial x - a =#
+end
+
+struct _gr_nmod_ctx_struct
+  nmod::nmod_t
+  a::ulong   #= when used as finite field with defining polynomial x - a =#
+end
+
+# end fq_default.h
 ###############################################################################
 
 

@@ -35,36 +35,42 @@ function expand_templates(input, flintdir)
   return replace(input, substitutions...)
 end
 
-const regex_typedef_struct_fields_name = r"^typedef struct\s*\{([^{}]+)\}\s*([a-z_]+);"m
-const regex_typedef_struct_fields_ptrname = r"^typedef struct\s*\{([^{}]+)\}\s*([a-z_]+)\[1\];"m
-const regex_struct_structname_fields = r"^struct *([a-z_]+)\s*\{([^{}]+)\}\s*;"m
-const regex_typedef_struct_structname_fields_name = r"^typedef struct *([a-z_]+)\s*\{([^{}]+)\}\s*([a-z_]+);"m
+const regex_typedef_struct_fields_name = r"^typedef struct\s*\{([^{}]+)\}\s*([A-Za-z0-9_]+);"m
+const regex_typedef_struct_fields_ptrname = r"^typedef struct\s*\{([^{}]+)\}\s*([A-Za-z0-9_]+)\[1\];"m
+const regex_struct_structname_fields = r"^struct *([A-Za-z0-9_]+)\s*\{([^{}]+)\}\s*;"m
+const regex_struct_structname = r"^struct *([A-Za-z0-9_]+);"m
+const regex_typedef_struct_structname_fields_name = r"^typedef struct *([A-Za-z0-9_]+)\s*\{([^{}]+)\}\s*([A-Za-z0-9_]+);"m
 
-const regex_typedef_enum_values_name = r"^typedef enum\s*\{([^{}]+)\}\s*([a-z_]+);"m
-const regex_enum_enumname_values = r"^enum *([a-z_]+)\s*\{([^{}]+)\}\s*;"m
-const regex_typedef_enum_enumname_values_name = r"^typedef enum *([a-z_]+)\s*\{([^{}]+)\}\s*([a-z_]+);"m
+const regex_typedef_enum_values_name = r"^typedef enum\s*\{([^{}]+)\}\s*([A-Za-z0-9_]+);"m
+const regex_enum_enumname_values = r"^enum *([A-Za-z0-9_]+)\s*\{([^{}]+)\}\s*;"m
+const regex_typedef_enum_enumname_values_name = r"^typedef enum *([A-Za-z0-9_]+)\s*\{([^{}]+)\}\s*([A-Za-z0-9_]+);"m
 
-function convert_struct(str)
+const regex_typedef_union_values_name = r"^typedef union\s*\{([^{}]+)\}\s*([A-Za-z0-9_]+);"m
+const regex_union_unionname_values = r"^union *([A-Za-z0-9_]+)\s*\{([^{}]+)\}\s*;"m
+const regex_typedef_union_unionname_values_name = r"^typedef union *([A-Za-z0-9_]+)\s*\{([^{}]+)\}\s*([A-Za-z0-9_]+);"m
+
+function convert_struct(str::AbstractString)
   substitutions = Pair{Regex,Union{SubstitutionString,Function}}[
     regex_typedef_struct_fields_name => s"struct \2\1end",                                  # whole typedef struct construct
     regex_struct_structname_fields => s"struct struct_\1\2end",                             # whole struct construct
+    regex_struct_structname => s"struct struct_\1 end",                                     # whole struct construct without fields
     regex_typedef_struct_fields_ptrname => s"struct struct_\2\1end\nconst \2 = Ptr{struct_\2}", # whole typedef struct construct with [1]
     regex_typedef_struct_structname_fields_name => s"struct \3\2end\nconst struct_\1 = \3", # whole typedef struct construct with two names
-    r"^ +([a-z_]+) +([A-Za-z0-9_]+);"m => s"  \2::\1",                                      # simple fields (one to five declared on one line)
-    r"^ +([a-z_]+) +([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+);"m => s"  \2::\1\n  \3::\1",
-    r"^ +([a-z_]+) +([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+);"m => s"  \2::\1\n  \3::\1\n  \4::\1",
-    r"^ +([a-z_]+) +([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+);"m => s"  \2::\1\n  \3::\1\n  \4::\1\n  \5::\1",
-    r"^ +([a-z_]+) +([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+);"m => s"  \2::\1\n  \3::\1\n  \4::\1\n  \5::\1\n  \6::\1",
-    r"^ +([a-z_]+) *\* *([A-Za-z0-9_]+);"m => s"  \2::Ptr{\1}",                             # pointer field (one to five declared on one line)
-    r"^ +([a-z_]+) *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+);"m => s"  \2::Ptr{\1}\n  \3::Ptr{\1}",
-    r"^ +([a-z_]+) *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+);"m => s"  \2::Ptr{\1}\n  \3::Ptr{\1}\n  \4::Ptr{\1}",
-    r"^ +([a-z_]+) *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+);"m => s"  \2::Ptr{\1}\n  \3::Ptr{\1}\n  \4::Ptr{\1}\n  \5::Ptr{\1}",
-    r"^ +([a-z_]+) *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+);"m => s"  \2::Ptr{\1}\n  \3::Ptr{\1}\n  \4::Ptr{\1}\n  \5::Ptr{\1}\n  \6::Ptr{\1}",
-    r"^ +([a-z_]+) *\* *\* *([A-Za-z0-9_]+);"m => s"  \2::Ptr{Ptr{\1}}",                   # double pointer field
-    r"^ +([a-z_]+) +([A-Za-z0-9_]+)\[([A-Za-z0-9_]+)\];"m => s"  \2::NTuple{\3, \1}",       # fixed len array field
-    r"^ +[a-z_]+ *\( *\* *([A-Za-z0-9_]+) *\) *\([a-z_, *]+\);"m => s"  \1::Ptr{Nothing}",  # function pointer field
-    r"^ +struct *([a-z_]+) +([A-Za-z0-9_]+);"m => s"  \2::struct_\1",                       # struct field (without typedef)
-    r"^ +enum *([a-z_]+) +([A-Za-z0-9_]+);"m => s"  \2::enum_\1",                           # enum field (without typedef)
+    r"^ +([A-Za-z0-9_]+) +([A-Za-z0-9_]+);"m => s"  \2::\1",                                      # simple fields (one to five declared on one line)
+    r"^ +([A-Za-z0-9_]+) +([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+);"m => s"  \2::\1\n  \3::\1",
+    r"^ +([A-Za-z0-9_]+) +([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+);"m => s"  \2::\1\n  \3::\1\n  \4::\1",
+    r"^ +([A-Za-z0-9_]+) +([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+);"m => s"  \2::\1\n  \3::\1\n  \4::\1\n  \5::\1",
+    r"^ +([A-Za-z0-9_]+) +([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+);"m => s"  \2::\1\n  \3::\1\n  \4::\1\n  \5::\1\n  \6::\1",
+    r"^ +([A-Za-z0-9_]+) *\* *([A-Za-z0-9_]+);"m => s"  \2::Ptr{\1}",                             # pointer field (one to five declared on one line)
+    r"^ +([A-Za-z0-9_]+) *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+);"m => s"  \2::Ptr{\1}\n  \3::Ptr{\1}",
+    r"^ +([A-Za-z0-9_]+) *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+);"m => s"  \2::Ptr{\1}\n  \3::Ptr{\1}\n  \4::Ptr{\1}",
+    r"^ +([A-Za-z0-9_]+) *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+);"m => s"  \2::Ptr{\1}\n  \3::Ptr{\1}\n  \4::Ptr{\1}\n  \5::Ptr{\1}",
+    r"^ +([A-Za-z0-9_]+) *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+);"m => s"  \2::Ptr{\1}\n  \3::Ptr{\1}\n  \4::Ptr{\1}\n  \5::Ptr{\1}\n  \6::Ptr{\1}",
+    r"^ +([A-Za-z0-9_]+) *\* *\* *([A-Za-z0-9_]+);"m => s"  \2::Ptr{Ptr{\1}}",                    # double pointer field
+    r"^ +([A-Za-z0-9_]+) +([A-Za-z0-9_]+)\[([A-Za-z0-9_]+)\];"m => s"  \2::NTuple{\3, \1}",       # fixed len array field
+    r"^ +[A-Za-z0-9_]+ *\( *\* *([A-Za-z0-9_]+) *\) *\([a-z_, *]+\);"m => s"  \1::Ptr{Nothing}",  # function pointer field
+    r"^ +struct *([A-Za-z0-9_]+) +([A-Za-z0-9_]+);"m => s"  \2::struct_\1",                       # struct field (without typedef)
+    r"^ +enum *([A-Za-z0-9_]+) +([A-Za-z0-9_]+);"m => s"  \2::enum_\1",                           # enum field (without typedef)
   ]
   for substitution in substitutions
     str = replace(str, substitution)
@@ -72,12 +78,25 @@ function convert_struct(str)
   return str
 end
 
-function convert_enum(str)
+function convert_enum(str::AbstractString)
   substitutions = Pair{Regex,Union{SubstitutionString,Function}}[
     regex_typedef_enum_values_name => s"@enum \2 begin\1end",                               # whole typedef enum construct
     regex_enum_enumname_values => s"@enum enum_\1 begin\2end",                              # whole enum construct
     regex_typedef_enum_enumname_values_name => s"@enum \3 begin\2end\nconst enum_\1 = \3",  # whole typedef enum construct with two names
     r"^ +([A-Za-z0-9_]+),?"m => s"  \1",                                                    # simple enum values
+  ]
+  for substitution in substitutions
+    str = replace(str, substitution)
+  end
+  return str
+end
+
+function convert_union(str::AbstractString)
+  substitutions = Pair{Regex,Union{SubstitutionString,Function}}[
+    regex_typedef_union_values_name => s"struct \2\n  uniondata::NTuple{maximum(sizeof, (\1  )), UInt8}\nend",                                 # whole typedef union construct
+    regex_union_unionname_values => s"struct union_\1\n  uniondata::NTuple{maximum(sizeof, (\2  )), UInt8}\nend",                             # whole union construct
+    regex_typedef_union_unionname_values_name => s"struct \3\n  uniondata::NTuple{maximum(sizeof, (\2  )), UInt8}\nend\nconst union_\1 = \3", # whole typedef union construct with two names
+    r"^ +([a-z_]+) +([A-Za-z0-9_]+);"m => s"    \1,",
   ]
   for substitution in substitutions
     str = replace(str, substitution)
@@ -100,13 +119,20 @@ function c2julia(str::String)
     regex_typedef_struct_fields_name => convert_struct,                       # whole typedef struct construct
     regex_typedef_struct_fields_ptrname => convert_struct,                    # whole typedef struct construct with [1]
     regex_struct_structname_fields => convert_struct,                         # whole struct construct
+    regex_struct_structname => convert_struct,                                # whole struct construct without fields
     regex_typedef_struct_structname_fields_name => convert_struct,            # whole typedef struct construct with two names
     regex_typedef_enum_values_name => convert_enum,                           # whole typedef enum construct
     regex_enum_enumname_values => convert_enum,                               # whole enum construct
     regex_typedef_enum_enumname_values_name => convert_enum,                  # whole typedef enum construct with two names
+    regex_typedef_union_values_name => convert_union,                         # whole typedef union construct
+    regex_union_unionname_values => convert_union,                            # whole union construct
+    regex_typedef_union_unionname_values_name => convert_union,               # whole typedef union construct with two names
     r"^typedef +([A-Za-z_]+) +([A-Za-z_]+);"m => s"const \2 = \1",            # simple typedef
     r"^typedef +([A-Za-z_]+) *\* *([A-Za-z_]+);"m => s"const \2 = Ptr{\1}",   # pointer typedef
     r"^typedef +([A-Za-z_]+) +([A-Za-z_]+)\[1\];"m => s"const \2 = Ptr{\1}",  # pointer typedef
+    r"^typedef +struct +([A-Za-z_]+) +([A-Za-z_]+);"m => s"const \2 = struct_\1", # struct typedef
+    r"^typedef +enum +([A-Za-z_]+) +([A-Za-z_]+);"m => s"const \2 = enum_\1",   # enum typedef
+    r"^typedef +union +([A-Za-z_]+) +([A-Za-z_]+);"m => s"const \2 = union_\1", # union typedef
     r"^#define +([A-Za-z_]+) +(\d+) *$"m => s"const \1 = \2",                 # defines of integer constants
   ]
   combined_regex = Regex(join(map(re -> re.pattern, first.(substitutions)), "|"), "m")

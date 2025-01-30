@@ -44,6 +44,10 @@ const FLINT_BITS = UInt == UInt64 ? 64 : 32
 
 @include_c_header("fq_types.h")
 
+@include_c_header("gr_types.h")
+
+@include_c_header("fq_default.h")
+
 @include_c_header("padic_types.h")
 
 @include_c_header("n_poly_types.h")
