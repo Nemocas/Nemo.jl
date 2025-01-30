@@ -957,10 +957,7 @@ input.
 """
 function lll_with_transform(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51))
   z = deepcopy(x)
-  u = similar(x, nrows(x), nrows(x))
-  for i in 1:nrows(u)
-    u[i, i] = 1
-  end
+  u = identity_matrix(ZZ, nrows(x))
   @ccall libflint.fmpz_lll(z::Ref{ZZMatrix}, u::Ref{ZZMatrix}, ctx::Ref{LLLContext})::Nothing
   return z, u
 end
@@ -1003,6 +1000,30 @@ function lll!(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51))
   return x
 end
 
+# for lll_gram, we use the following helpers to deal with the degenerate case.
+
+function _is_definitely_full_rank(x::ZZMatrix)
+  if Int == Int64
+    p = 1099511627791 % Int64
+  else
+    p = 1048583 % Int32
+  end
+  F = Nemo.Native.GF(p; cached = false)
+  xmodp = F.(x)
+  return rank(xmodp) == nrows(x)
+end
+
+function _complete_to_basis(x::ZZMatrix)
+  @assert nrows(x) <= ncols(x)
+  # compute column HNF and take the inverse
+  h, t = hnf_with_transform(transpose(x))
+  for i in 1:nrows(x)
+    @assert is_one(h[i, i])
+  end
+  transpose!(t)
+  return inv!(t)
+end
+
 @doc raw"""
     lll_gram_with_transform(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
 
@@ -1015,13 +1036,54 @@ See [`lll_gram`](@ref) for the used default parameters which can be overridden b
 supplying an optional context object.
 """
 function lll_gram_with_transform(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
-  z = deepcopy(x)
-  u = similar(x, nrows(x), nrows(x))
-  for i in 1:nrows(u)
-    u[i, i] = 1
+  @req is_square(x) && is_symmetric(x) "The matrix must be a symmetric square matrix"
+  # try to recognize the definite case
+  if nrows(x) == 0
+    return x, x
   end
-  @ccall libflint.fmpz_lll(z::Ref{ZZMatrix}, u::Ref{ZZMatrix}, ctx::Ref{LLLContext})::Nothing
-  return z, u
+  if _is_definitely_full_rank(x)
+    u = identity_matrix(ZZ, nrows(x))
+    if x[1, 1] < 0
+      y = neg(x)
+      _lll_gram_with_transform!(y, u, ctx)
+      return neg!(y), u
+    else
+      y = deepcopy(x)
+      _lll_gram_with_transform!(y, u, ctx)
+      return y, u
+    end
+  end
+  # remove the radical using a unimodular transformation
+  L = kernel(x; side = :left)
+  n = nrows(L)
+  r = nrows(x) - n
+  C = _complete_to_basis(L)
+  # move kernel to bottom, so that
+  # C * x * transpose(C) = [ * | 0 ]
+  #                        [-------]
+  #                        [ 0 | 0 ]
+  uu = deepcopy(reverse_rows!(C))
+  mul!(C, C, x * transpose(C))
+  u = identity_matrix(ZZ, nrows(x))
+  if C[1, 1] < 0
+    _lll_gram_with_transform!(neg!(@view(C[1:r, 1:r])), @view(u[1:r, 1:r]), ctx)
+    neg!(C)
+  else
+    _lll_gram_with_transform!(@view(C[1:r, 1:r]), @view(u[1:r, 1:r]), ctx)
+  end
+  return C, u * uu
+end
+
+function _lll_gram_with_transform!(x::ZZMatrix, u::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
+  # modifies x and u
+  @ccall libflint.fmpz_lll(x::Ref{ZZMatrix}, u::Ref{ZZMatrix}, ctx::Ref{LLLContext})::Nothing
+  return x, u
+end
+
+function _lll_gram_with_transform!(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
+  u = identity_matrix(ZZ, nrows(x))
+  @ccall libflint.fmpz_lll(x::Ref{ZZMatrix}, u::Ref{ZZMatrix}, ctx::Ref{LLLContext})::Nothing
+  return x, u
 end
 
 @doc raw"""
@@ -1029,29 +1091,62 @@ end
 
 Return the Gram matrix $L$ of an LLL-reduced basis of the lattice given by the
 Gram matrix $x$.
-The matrix $x$ must be symmetric and non-singular.
+The matrix $x$ must be symmetric and semidefinite. If an indefinite matrix is
+provided, the output is undefined.
 
 By default, the LLL is performed with reduction parameters $\delta = 0.99$ and
 $\eta = 0.51$. These defaults can be overridden by specifying an optional context
 object.
 """
 function lll_gram(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
+  @req is_square(x) && is_symmetric(x) "The matrix must be a symmetric square matrix"
   z = deepcopy(x)
   return lll_gram!(z)
 end
-
 @doc raw"""
     lll_gram!(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
 
 Compute the Gram matrix of an LLL-reduced basis of the lattice given by the
 Gram matrix $x$ inplace.
-The matrix $x$ must be symmetric and non-singular.
+The matrix $x$ must be symmetric and semidefinite.
 
 By default, the LLL is performed with reduction parameters $\delta = 0.99$ and
 $\eta = 0.51$. These defaults can be overridden by specifying an optional context
 object.
 """
 function lll_gram!(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
+  if nrows(x) == 0
+    return x
+  end
+  # try to recognize the definite case
+  if _is_definitely_full_rank(x)
+    if x[1, 1] < 0
+      return neg!(_lll_gram!(!neg(x), ctx))
+    else
+      return _lll_gram!(x, ctx)
+    end
+  end
+  # remove the radical using a unimodular transformation
+  L = kernel(x; side = :left)
+  n = nrows(L)
+  r = nrows(x) - n
+  C = _complete_to_basis(L)
+  # move kernel to bottom, so that
+  # C * x * transpose(C) = [ * | 0 ]
+  #                        [-------]
+  #                        [ 0 | 0 ]
+  reverse_rows!(C)
+  mul!(x, x, transpose(C))
+  C = mul!(x, C, x)
+  if C[1, 1] < 0
+    neg!(_lll_gram!(neg!(@view(x[1:r, 1:r])), ctx))
+  else
+    _lll_gram!(@view(x[1:r, 1:r]), ctx)
+  end
+  return x
+end
+
+function _lll_gram!(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
   @ccall libflint.fmpz_lll(x::Ref{ZZMatrix}, C_NULL::Ptr{Nothing}, ctx::Ref{LLLContext})::Nothing
   return x
 end
