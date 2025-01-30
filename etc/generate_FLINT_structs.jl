@@ -1,8 +1,5 @@
 VERSION >= v"1.9" || error("This script requires Julia 1.7 or later")
 
-const headerfile_begin_regex = r"#ifdef __cplusplus\s*extern \"C\"\s*\{\s*#endif"
-const headerfile_end_regex = r"#ifdef __cplusplus\s*\}\s*#endif"
-
 function expand_templates(input, flintdir)
   matches = eachmatch(r"^@include_c_header\(\"([A-Za-z_.]+)\"\)$"m, input)
   substitutions = Pair{String,String}[]
@@ -15,14 +12,8 @@ function expand_templates(input, flintdir)
     content = open(joinpath(flintdir, filename)) do headerfile
       read(headerfile, String)
     end
-    # Restrict to the relevant part (ignore include guards etc.)
-    begin_match = match(headerfile_begin_regex, content)
-    @assert !isnothing(begin_match)
-    end_match = match(headerfile_end_regex, content)
-    @assert !isnothing(end_match)
-    relevant_content = content[(begin_match.offset + length(begin_match.match)):(end_match.offset - 1)]
     # Convert to julia
-    translated_content = c2julia(relevant_content)
+    translated_content = c2julia(content)
     # Build the substitution value
     template_val =
       "###############################################################################\n" *

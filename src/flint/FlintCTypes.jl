@@ -665,6 +665,16 @@ const gr_poly_t = Ptr{gr_poly_struct}
 ###############################################################################
 # begin fq_default.h
 
+const FQ_DEFAULT_FQ_ZECH = 1
+
+const FQ_DEFAULT_FQ_NMOD = 2
+
+const FQ_DEFAULT_FQ = 3
+
+const FQ_DEFAULT_NMOD = 4
+
+const FQ_DEFAULT_FMPZ_MOD = 5
+
 struct fq_default_struct
   uniondata::NTuple{maximum(sizeof, (
     fq_t,
