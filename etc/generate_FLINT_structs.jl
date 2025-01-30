@@ -132,6 +132,7 @@ function c2julia(str::String)
   output = join(
     map(m -> replace(m.match, substitutions...), eachmatch(combined_regex, str)), "\n\n"
   )
+  output = replace(output, r"\h*\n" => "\n") # remove trailing whitespace
   return output
 end
 
