@@ -1,5 +1,5 @@
 # Most of this file is generated from FLINT's header files.
-# Do not edit manually, only the corresponding `*_template.jl` should be edited.
+# Do not edit manually, only the corresponding `etc/*_template.jl` file should be edited.
 
 # This file was generated using FLINT_jll v300.100.301+0.
 

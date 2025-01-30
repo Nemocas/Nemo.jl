@@ -111,7 +111,7 @@ end
 
 file_header_notice(FLINT_jll_version) = """
 # Most of this file is generated from FLINT's header files.
-# Do not edit manually, only the corresponding `*_template.jl` should be edited.
+# Do not edit manually, only the corresponding `etc/*_template.jl` file should be edited.
 
 # This file was generated using FLINT_jll v$(FLINT_jll_version).
 
@@ -136,7 +136,7 @@ function main()
   flintversion = pkgversion(FLINT_jll)
   @info "Found FLINT" flintpath flintversion
 
-  infile = joinpath(nemopath, "src", "flint", "FlintCTypes_template.jl")
+  infile = joinpath(nemopath, "etc", "FlintCTypes_template.jl")
   outfile = joinpath(nemopath, "src", "flint", "FlintCTypes.jl")
   expand_template_file(infile, outfile, flintpath, file_header_notice(flintversion))
 end
