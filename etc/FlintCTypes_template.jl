@@ -15,26 +15,18 @@ const unsigned_int = Cuint
 const char = Cchar
 const unsigned_char = Cuchar
 const double = Cdouble
+const ulong = UInt
+const slong = Int
 
-#
-# from gmp.h
-#
-
-const mp_limb_t = Base.GMP.Limb
-const mp_limb_signed_t = signed(Base.GMP.Limb)
-const mp_bitcnt_t = Base.GMP.MPZ.bitcnt_t
-
-const mp_ptr = Ptr{mp_limb_t}
-const mp_srcptr = Ptr{mp_limb_t}
 
 #
 # from flint.h
 #
 
-const ulong = mp_limb_t
-const slong = mp_limb_signed_t
 const flint_bitcnt_t = ulong
-const FLINT_BITS = Base.GMP.BITS_PER_LIMB
+const nn_ptr = Ptr{ulong}
+const nn_srcptr = Ptr{ulong}
+const FLINT_BITS = UInt == UInt64 ? 64 : 32
 
 struct nmod_t
   n::mp_limb_t

@@ -20,26 +20,18 @@ const unsigned_int = Cuint
 const char = Cchar
 const unsigned_char = Cuchar
 const double = Cdouble
+const ulong = UInt
+const slong = Int
 
-#
-# from gmp.h
-#
-
-const mp_limb_t = Base.GMP.Limb
-const mp_limb_signed_t = signed(Base.GMP.Limb)
-const mp_bitcnt_t = Base.GMP.MPZ.bitcnt_t
-
-const mp_ptr = Ptr{mp_limb_t}
-const mp_srcptr = Ptr{mp_limb_t}
 
 #
 # from flint.h
 #
 
-const ulong = mp_limb_t
-const slong = mp_limb_signed_t
 const flint_bitcnt_t = ulong
-const FLINT_BITS = Base.GMP.BITS_PER_LIMB
+const nn_ptr = Ptr{ulong}
+const nn_srcptr = Ptr{ulong}
+const FLINT_BITS = UInt == UInt64 ? 64 : 32
 
 struct nmod_t
   n::mp_limb_t
@@ -91,17 +83,17 @@ const n_primes_t = Ptr{n_primes_struct}
 # begin nmod_types.h
 
 struct nmod_mat_struct
-  entries::Ptr{mp_limb_t}
+  entries::Ptr{ulong}
   r::slong
   c::slong
-  rows::Ptr{Ptr{mp_limb_t}}
+  rows::Ptr{Ptr{ulong}}
   mod::nmod_t
 end
 
 const nmod_mat_t = Ptr{nmod_mat_struct}
 
 struct nmod_poly_struct
-  coeffs::mp_ptr
+  coeffs::nn_ptr
   alloc::slong
   length::slong
   mod::nmod_t
@@ -123,24 +115,24 @@ struct nmod_poly_mat_struct
   r::slong
   c::slong
   rows::Ptr{Ptr{nmod_poly_struct}}
-  modulus::mp_limb_t
+  modulus::ulong
 end
 
 const nmod_poly_mat_t = Ptr{nmod_poly_mat_struct}
 
 struct nmod_mpoly_struct
-  coeffs::Ptr{mp_limb_t}
+  coeffs::Ptr{ulong}
   exps::Ptr{ulong}
   length::slong
   bits::flint_bitcnt_t    #= number of bits per exponent =#
-  coeffs_alloc::slong     #= abs size in mp_limb_t units =#
+  coeffs_alloc::slong     #= abs size in ulong units =#
   exps_alloc::slong       #= abs size in ulong units =#
 end
 
 const nmod_mpoly_t = Ptr{nmod_mpoly_struct}
 
 struct nmod_mpoly_factor_struct
-  constant::mp_limb_t
+  constant::ulong
   poly::Ptr{nmod_mpoly_struct}
   exp::Ptr{fmpz}
   num::slong
@@ -156,6 +148,16 @@ const nmod_mpoly_factor_t = Ptr{nmod_mpoly_factor_struct}
 ###############################################################################
 # begin fmpz_types.h
 
+struct zz_struct
+  alloc::int
+  size::int
+  ptr::nn_ptr
+end
+
+typedef zz_struct * zz_ptr;
+typedef const zz_struct * zz_srcptr;
+#define FMPZ_TO_ZZ(x) ((zz_ptr) ((ulong) (x) << 2))
+
 struct fmpz_factor_struct
   sign::int
   p::Ptr{fmpz}
@@ -167,7 +169,7 @@ end
 const fmpz_factor_t = Ptr{fmpz_factor_struct}
 
 struct fmpz_preinvn_struct
-  dinv::mp_ptr
+  dinv::nn_ptr
   n::slong
   norm::flint_bitcnt_t
 end
@@ -349,7 +351,7 @@ struct fmpz_mod_mpoly_struct
   exps::Ptr{ulong}
   length::slong
   bits::flint_bitcnt_t    #= number of bits per exponent =#
-  coeffs_alloc::slong     #= abs size in mp_limb_t units =#
+  coeffs_alloc::slong     #= abs size in ulong units =#
   exps_alloc::slong       #= abs size in ulong units =#
 end
 
@@ -381,7 +383,7 @@ struct fq_nmod_ctx_struct
   sparse_modulus::int
   is_conway::int #= whether field was generated using Flint Conway table (assures primitivity =#
 
-  a::Ptr{mp_limb_t}
+  a::Ptr{ulong}
   j::Ptr{slong}
   len::slong
 
@@ -420,11 +422,11 @@ end
 const fq_nmod_poly_factor_t = Ptr{fq_nmod_poly_factor_struct}
 
 struct fq_nmod_mpoly_struct
-  coeffs::Ptr{mp_limb_t}
+  coeffs::Ptr{ulong}
   exps::Ptr{ulong}
   length::slong
   bits::flint_bitcnt_t    #= number of bits per exponent =#
-  coeffs_alloc::slong     #= abs size in mp_limb_t units =#
+  coeffs_alloc::slong     #= abs size in ulong units =#
   exps_alloc::slong       #= abs size in ulong units =#
 end
 
@@ -438,7 +440,7 @@ const fq_nmod_mpoly_t = Ptr{fq_nmod_mpoly_struct}
 # begin fq_zech_types.h
 
 struct fq_zech_struct
-  value::mp_limb_t
+  value::ulong
 end
 
 const fq_zech_t = Ptr{fq_zech_struct}
@@ -607,7 +609,7 @@ const padic_poly_t = Ptr{padic_poly_struct}
 
 #= arrays of ulong =#
 struct n_poly_struct
-  coeffs::Ptr{mp_limb_t}
+  coeffs::Ptr{ulong}
   alloc::slong
   length::slong
 end
@@ -641,7 +643,7 @@ const n_fq_tpoly_t = n_tpoly_t
 #= sparse arrays of ulong =#
 struct n_polyu_struct
   exps::Ptr{ulong}
-  coeffs::Ptr{mp_limb_t}
+  coeffs::Ptr{ulong}
   length::slong
   alloc::slong
 end
@@ -693,14 +695,14 @@ end
 const n_poly_bpoly_stack_t = Ptr{n_poly_bpoly_stack_struct}
 
 struct nmod_eval_interp_struct
-  M::Ptr{mp_limb_t}
-  T::Ptr{mp_limb_t}
-  Q::Ptr{mp_limb_t}
-  array::Ptr{mp_limb_t}
+  M::Ptr{ulong}
+  T::Ptr{ulong}
+  Q::Ptr{ulong}
+  array::Ptr{ulong}
   alloc::slong
   d::slong
   radix::slong
-  w::mp_limb_t
+  w::ulong
 end
 
 const nmod_eval_interp_t = Ptr{nmod_eval_interp_struct}

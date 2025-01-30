@@ -1,3 +1,5 @@
+# Note to self: Remember to remove the Overrides.toml once FLINT 3.2.0 is released.
+
 @doc raw"""
   Nemo is a computer algebra package for the Julia programming language, maintained by William Hart, Tommy Hofmann, Claus Fieker and Fredrik Johansson with additional code by Oleksandr Motsak and other contributors.
 

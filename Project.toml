@@ -14,7 +14,7 @@ TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 
 [compat]
 AbstractAlgebra = "0.44.2"
-FLINT_jll = "~300.100.300"
+FLINT_jll = "~300.100.301" # should be "~300.200.0"
 Libdl = "1.6"
 LinearAlgebra = "1.6"
 Random = "1.6"
