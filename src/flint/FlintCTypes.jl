@@ -63,14 +63,14 @@ end
 const flint_rand_t = Ptr{flint_rand_struct}
 
 @enum flint_err_t begin
-  FLINT_ERROR     #= general error =#
-  FLINT_OVERFLOW  #= overflow =#
-  FLINT_IMPINV    #= impossible inverse =#
-  FLINT_DOMERR    #= domain error =#
-  FLINT_DIVZERO   #= divide by zero =#
-  FLINT_EXPOF     #= exponent overflow =#
-  FLINT_INEXACT   #= inexact error =#
-  FLINT_TEST_FAIL  #= test fail =#
+  FLINT_ERROR     
+  FLINT_OVERFLOW  
+  FLINT_IMPINV    
+  FLINT_DOMERR    
+  FLINT_DIVZERO   
+  FLINT_EXPOF     
+  FLINT_INEXACT   
+  FLINT_TEST_FAIL  
 end
 
 struct nmod_t
@@ -170,9 +170,9 @@ struct nmod_mpoly_struct
   coeffs::Ptr{ulong}
   exps::Ptr{ulong}
   length::slong
-  bits::flint_bitcnt_t    #= number of bits per exponent =#
-  coeffs_alloc::slong     #= abs size in ulong units =#
-  exps_alloc::slong       #= abs size in ulong units =#
+  bits::flint_bitcnt_t    
+  coeffs_alloc::slong     
+  exps_alloc::slong       
 end
 
 const nmod_mpoly_t = Ptr{nmod_mpoly_struct}
@@ -259,18 +259,18 @@ end
 const fmpz_poly_mat_t = Ptr{fmpz_poly_mat_struct}
 
 struct fmpz_mpoly_struct
-  coeffs::Ptr{fmpz} #= alloc fmpzs =#
+  coeffs::Ptr{fmpz} 
   exps::Ptr{ulong}
   alloc::slong
   length::slong
-  bits::flint_bitcnt_t     #= number of bits per exponent =#
+  bits::flint_bitcnt_t     
 end
 
 const fmpz_mpoly_t = Ptr{fmpz_mpoly_struct}
 
 struct fmpz_mpoly_factor_struct
   constant::fmpz_t
-  constant_den::fmpz_t        #= should be one after normal operations =#
+  constant_den::fmpz_t        
   poly::Ptr{fmpz_mpoly_struct}
   exp::Ptr{fmpz}
   num::slong
@@ -325,9 +325,9 @@ end
 
 const fmpq_poly_t = Ptr{fmpq_poly_struct}
 
-struct fmpq_mpoly_struct                       #= non zero case:                   |  zero case: =#
-  content::fmpq_t     #= positive or negative content     |  zero       =#
-  zpoly::fmpz_mpoly_t #= contentless poly, lc is positive |  zero       =#
+struct fmpq_mpoly_struct                       
+  content::fmpq_t     
+  zpoly::fmpz_mpoly_t 
 end
 
 const fmpq_mpoly_t = Ptr{fmpq_mpoly_struct}
@@ -388,9 +388,9 @@ struct fmpz_mod_mpoly_struct
   coeffs::Ptr{fmpz}
   exps::Ptr{ulong}
   length::slong
-  bits::flint_bitcnt_t    #= number of bits per exponent =#
-  coeffs_alloc::slong     #= abs size in ulong units =#
-  exps_alloc::slong       #= abs size in ulong units =#
+  bits::flint_bitcnt_t    
+  coeffs_alloc::slong     
+  exps_alloc::slong       
 end
 
 const fmpz_mod_mpoly_t = Ptr{fmpz_mod_mpoly_struct}
@@ -420,7 +420,7 @@ struct fq_nmod_ctx_struct
   mod::nmod_t
 
   sparse_modulus::int
-  is_conway::int #= whether field was generated using Flint Conway table (assures primitivity =#
+  is_conway::int 
 
   a::Ptr{ulong}
   j::Ptr{slong}
@@ -464,9 +464,9 @@ struct fq_nmod_mpoly_struct
   coeffs::Ptr{ulong}
   exps::Ptr{ulong}
   length::slong
-  bits::flint_bitcnt_t    #= number of bits per exponent =#
-  coeffs_alloc::slong     #= abs size in ulong units =#
-  exps_alloc::slong       #= abs size in ulong units =#
+  bits::flint_bitcnt_t    
+  coeffs_alloc::slong     
+  exps_alloc::slong       
 end
 
 const fq_nmod_mpoly_t = Ptr{fq_nmod_mpoly_struct}
@@ -485,19 +485,19 @@ end
 const fq_zech_t = Ptr{fq_zech_struct}
 
 struct fq_zech_ctx_struct
-  qm1::ulong     #= q - 1 =#
-  qm1o2::ulong   #= (q - 1) / 2 or 1 when p == 2 =#
-  qm1opm1::ulong #= (q - 1) / (p - 1) =#
+  qm1::ulong     
+  qm1o2::ulong   
+  qm1opm1::ulong 
   p::ulong
   ppre::double
-  prime_root::ulong       #= primitive root for prime subfield =#
+  prime_root::ulong       
   zech_log_table::Ptr{ulong}
   prime_field_table::Ptr{ulong}
   eval_table::Ptr{ulong}
 
   fq_nmod_ctx::Ptr{fq_nmod_ctx_struct}
   owns_fq_nmod_ctx::int
-  is_conway::int #= whether field was generated using Flint Conway tables (assures primitivity) =#
+  is_conway::int 
 end
 
 const fq_zech_ctx_t = Ptr{fq_zech_ctx_struct}
@@ -543,7 +543,7 @@ struct fq_ctx_struct
   ctxp::fmpz_mod_ctx_t
 
   sparse_modulus::int
-  is_conway::int #= whether field was initialized with the Flint Conway tables  (assures primitivity) =#
+  is_conway::int 
 
   a::Ptr{fmpz}
   j::Ptr{slong}
@@ -695,12 +695,12 @@ const fq_default_ctx_t = Ptr{fq_default_ctx_struct}
 struct _gr_fmpz_mod_ctx_struct
   ctx::Ptr{fmpz_mod_ctx_struct}
   is_prime::truth_t
-  a::fmpz    #= when used as finite field with defining polynomial x - a =#
+  a::fmpz    
 end
 
 struct _gr_nmod_ctx_struct
   nmod::nmod_t
-  a::ulong   #= when used as finite field with defining polynomial x - a =#
+  a::ulong   
 end
 
 # end fq_default.h
@@ -872,6 +872,8 @@ const nmod_eval_interp_t = Ptr{nmod_eval_interp_struct}
 ###############################################################################
 # begin mpoly_types.h
 
+const MPOLY_MIN_BITS = UWORD(8)
+
 @enum ordering_t begin
   ORD_LEX
   ORD_DEGLEX
@@ -881,13 +883,13 @@ end
 const MPOLY_NUM_ORDERINGS = 3
 
 struct mpoly_ctx_struct
-  nvars::slong    #= number of variables =#
-  nfields::slong  #= number of fields in exponent vector =#
-  ord::ordering_t #= monomial ordering =#
-  deg::int        #= is ord a degree ordering? =#
-  rev::int        #= is ord a reversed ordering? =#
+  nvars::slong    
+  nfields::slong  
+  ord::ordering_t 
+  deg::int        
+  rev::int        
   lut_words_per_exp::NTuple{FLINT_BITS, slong}
-  lut_fix_bits::NTuple{FLINT_BITS, unsigned_char} #= FLINT_BITS < 256 =#
+  lut_fix_bits::NTuple{FLINT_BITS, unsigned_char} 
 end
 
 const mpoly_ctx_t = Ptr{mpoly_ctx_struct}
@@ -990,7 +992,7 @@ struct mpoly_gcd_info_struct
   zippel_perm::Ptr{slong}
   zippel2_perm::Ptr{slong}
   can_use::unsigned_int
-  Gdeflate_deg_bounds_are_nice::int #= all of Gdeflate_deg_bound came from real gcd computations =#
+  Gdeflate_deg_bounds_are_nice::int 
 
   data::Ptr{char}
 end
@@ -1029,7 +1031,7 @@ struct nmod_mpolyun_struct
   exps::Ptr{ulong}
   alloc::slong
   length::slong
-  bits::flint_bitcnt_t   #= default bits to construct coeffs =#
+  bits::flint_bitcnt_t   
 end
 
 const nmod_mpolyun_t = Ptr{nmod_mpolyun_struct}

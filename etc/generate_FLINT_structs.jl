@@ -100,8 +100,8 @@ function c2julia(str::String)
     r"unsigned int" => s"unsigned_int",                                       # convert `unsigned int` to a single token
     r"unsigned char" => s"unsigned_char",                                     # convert `unsigned char` to a single token
     r" const " => s" ",                                                       # remove all `const`
-    r"^//(.*)$"m => s"#\1",                                                   # line comment
-    r"/\*(.*?)\*/"s => s"#=\1=#",                                             # block comment
+    r"^//(.*)$"m => s"",                                                      # remove line comment
+    r"/\*(.*?)\*/"s => s"",                                                   # remove block comment
   ]
   for substitution in preprocessing
     str = replace(str, substitution)
