@@ -50,6 +50,8 @@ const nn_ptr = Ptr{ulong}
 
 const nn_srcptr = Ptr{ulong}
 
+const flint_cleanup_function_t = Ptr{Nothing}
+
 const thread_pool_handle = int
 
 struct flint_rand_struct
@@ -610,6 +612,10 @@ struct gr_stream_struct
 end
 
 const gr_stream_t = Ptr{gr_stream_struct}
+
+const gr_funcptr = Ptr{Nothing}
+
+const GR_CTX_STRUCT_DATA_BYTES = 6 * sizeof(ulong)
 
 struct gr_ctx_struct
   data::NTuple{GR_CTX_STRUCT_DATA_BYTES, char}

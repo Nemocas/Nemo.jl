@@ -133,7 +133,9 @@ function c2julia(str::String)
     r"^typedef +struct +([A-Za-z_]+) +([A-Za-z_]+);"m => s"const \2 = struct_\1", # struct typedef
     r"^typedef +enum +([A-Za-z_]+) +([A-Za-z_]+);"m => s"const \2 = enum_\1",   # enum typedef
     r"^typedef +union +([A-Za-z_]+) +([A-Za-z_]+);"m => s"const \2 = union_\1", # union typedef
+    r"^typedef +[A-Za-z0-9_]+ *\( *\* *([A-Za-z0-9_]+) *\) *\([a-z_, *]+\);"m => s"const \1 = Ptr{Nothing}", # function pointer typedef
     r"^#define +([A-Za-z_]+) +(\d+) *$"m => s"const \1 = \2",                 # defines of integer constants
+    r"^#define +([A-Za-z_]+) +\(([A-Za-z0-9+*() ]+)\) *$"m => s"const \1 = \2",   # defines of more complex constants
   ]
   combined_regex = Regex(join(map(re -> re.pattern, first.(substitutions)), "|"), "m")
   output = join(
