@@ -439,6 +439,8 @@ include("Infinity.jl")
 include("HeckeMiscFiniteField.jl")
 include("HeckeMoreStuff.jl")
 
+include("UnivPoly.jl")
+
 # More functionality for Julia types
 include("julia/Integer.jl")
 include("julia/Rational.jl")
