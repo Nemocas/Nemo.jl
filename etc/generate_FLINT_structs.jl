@@ -35,22 +35,21 @@ function expand_templates(input, flintdir)
   return replace(input, substitutions...)
 end
 
-const regex_typedef_struct_fields_name = r"typedef struct\s*\{([^{}]+)\}\s*([a-z_]+);"
-const regex_typedef_struct_fields_ptrname = r"typedef struct\s*\{([^{}]+)\}\s*([a-z_]+)\[1\];"
-const regex_struct_structname_fields = r"struct *([a-z_]+)\s*\{([^{}]+)\}\s*;"
-const regex_typedef_struct_structname_fields_name = r"typedef struct *([a-z_]+)\s*\{([^{}]+)\}\s*([a-z_]+);"
+const regex_typedef_struct_fields_name = r"^typedef struct\s*\{([^{}]+)\}\s*([a-z_]+);"m
+const regex_typedef_struct_fields_ptrname = r"^typedef struct\s*\{([^{}]+)\}\s*([a-z_]+)\[1\];"m
+const regex_struct_structname_fields = r"^struct *([a-z_]+)\s*\{([^{}]+)\}\s*;"m
+const regex_typedef_struct_structname_fields_name = r"^typedef struct *([a-z_]+)\s*\{([^{}]+)\}\s*([a-z_]+);"m
 
-const regex_typedef_enum_values_name = r"typedef enum\s*\{([^{}]+)\}\s*([a-z_]+);"
-const regex_enum_enumname_values = r"enum *([a-z_]+)\s*\{([^{}]+)\}\s*;"
-const regex_typedef_enum_enumname_values_name = r"typedef enum *([a-z_]+)\s*\{([^{}]+)\}\s*([a-z_]+);"
+const regex_typedef_enum_values_name = r"^typedef enum\s*\{([^{}]+)\}\s*([a-z_]+);"m
+const regex_enum_enumname_values = r"^enum *([a-z_]+)\s*\{([^{}]+)\}\s*;"m
+const regex_typedef_enum_enumname_values_name = r"^typedef enum *([a-z_]+)\s*\{([^{}]+)\}\s*([a-z_]+);"m
 
 function convert_struct(str)
-  substitutions = Pair{Regex,Union{SubstitutionString, Function}}[
+  substitutions = Pair{Regex,Union{SubstitutionString,Function}}[
     regex_typedef_struct_fields_name => s"struct \2\1end",                                  # whole typedef struct construct
     regex_struct_structname_fields => s"struct struct_\1\2end",                             # whole struct construct
     regex_typedef_struct_fields_ptrname => s"struct struct_\2\1end\nconst \2 = Ptr{struct_\2}", # whole typedef struct construct with [1]
     regex_typedef_struct_structname_fields_name => s"struct \3\2end\nconst struct_\1 = \3", # whole typedef struct construct with two names
-    r"^( +)const "m => s"\1",                                                               # remove `const` from fields
     r"^ +([a-z_]+) +([A-Za-z0-9_]+);"m => s"  \2::\1",                                      # simple fields (one to five declared on one line)
     r"^ +([a-z_]+) +([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+);"m => s"  \2::\1\n  \3::\1",
     r"^ +([a-z_]+) +([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+);"m => s"  \2::\1\n  \3::\1\n  \4::\1",
@@ -74,7 +73,7 @@ function convert_struct(str)
 end
 
 function convert_enum(str)
-  substitutions = Pair{Regex,Union{SubstitutionString, Function}}[
+  substitutions = Pair{Regex,Union{SubstitutionString,Function}}[
     regex_typedef_enum_values_name => s"@enum \2 begin\1end",                               # whole typedef enum construct
     regex_enum_enumname_values => s"@enum enum_\1 begin\2end",                              # whole enum construct
     regex_typedef_enum_enumname_values_name => s"@enum \3 begin\2end\nconst enum_\1 = \3",  # whole typedef enum construct with two names
@@ -87,9 +86,17 @@ function convert_enum(str)
 end
 
 function c2julia(str::String)
-  substitutions = Pair{Regex,Union{SubstitutionString, Function}}[
+  preprocessing = Pair{Regex,Union{SubstitutionString,Function}}[
     r"unsigned int" => s"unsigned_int",                                       # convert `unsigned int` to a single token
     r"unsigned char" => s"unsigned_char",                                     # convert `unsigned char` to a single token
+    r" const " => s" ",                                                       # remove all `const`
+    r"^//(.*)$"m => s"#\1",                                                   # line comment
+    r"/\*(.*?)\*/"s => s"#=\1=#",                                             # block comment
+  ]
+  for substitution in preprocessing
+    str = replace(str, substitution)
+  end
+  substitutions = Pair{Regex,Union{SubstitutionString,Function}}[
     regex_typedef_struct_fields_name => convert_struct,                       # whole typedef struct construct
     regex_typedef_struct_fields_ptrname => convert_struct,                    # whole typedef struct construct with [1]
     regex_struct_structname_fields => convert_struct,                         # whole struct construct
@@ -97,16 +104,16 @@ function c2julia(str::String)
     regex_typedef_enum_values_name => convert_enum,                           # whole typedef enum construct
     regex_enum_enumname_values => convert_enum,                               # whole enum construct
     regex_typedef_enum_enumname_values_name => convert_enum,                  # whole typedef enum construct with two names
-    r"^typedef ([A-Za-z_]+) ([A-Za-z_]+);"m => s"const \2 = \1",              # simple typedef
-    r"^typedef ([A-Za-z_]+) ([A-Za-z_]+)\[1\];"m => s"const \2 = Ptr{\1}",    # pointer typedef
-    r"^#define ([A-Za-z_]+) ([A-Za-z0-9_]+)"m => s"const \1 = \2",            # defines used as typedef
-    r"^//(.*)$"m => s"#\1",                                                   # line comment
-    r"/\*(.*?)\*/"s => s"#=\1=#",                                             # block comment
+    r"^typedef +([A-Za-z_]+) +([A-Za-z_]+);"m => s"const \2 = \1",            # simple typedef
+    r"^typedef +([A-Za-z_]+) *\* *([A-Za-z_]+);"m => s"const \2 = Ptr{\1}",   # pointer typedef
+    r"^typedef +([A-Za-z_]+) +([A-Za-z_]+)\[1\];"m => s"const \2 = Ptr{\1}",  # pointer typedef
+    r"^#define +([A-Za-z_]+) +(\d+) *$"m => s"const \1 = \2",                 # defines of integer constants
   ]
-  for substitution in substitutions
-    str = replace(str, substitution)
-  end
-  return str
+  combined_regex = Regex(join(map(re -> re.pattern, first.(substitutions)), "|"), "m")
+  output = join(
+    map(m -> replace(m.match, substitutions...), eachmatch(combined_regex, str)), "\n\n"
+  )
+  return output
 end
 
 file_header_notice(FLINT_jll_version) = """
@@ -123,11 +130,15 @@ file_header_notice(FLINT_jll_version) = """
 #
 ################################################################################
 
-function expand_template_file(infile::String, outfile::String, flintpath::String, file_header::String)
+function expand_template_file(
+  infile::String, outfile::String, flintpath::String, file_header::String
+)
   @info "Expanding file" infile outfile
   open(outfile, "w") do io
     write(io, file_header)
-    write(io, expand_templates(read(infile, String), joinpath(flintpath, "include", "flint")))
+    write(
+      io, expand_templates(read(infile, String), joinpath(flintpath, "include", "flint"))
+    )
   end
 end
 

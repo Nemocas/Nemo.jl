@@ -20,30 +20,13 @@ const slong = Int
 
 
 #
-# from flint.h
+# from `./configure`
 #
 
-const flint_bitcnt_t = ulong
-const nn_ptr = Ptr{ulong}
-const nn_srcptr = Ptr{ulong}
 const FLINT_BITS = UInt == UInt64 ? 64 : 32
 
-struct nmod_t
-  n::mp_limb_t
-  ninv::mp_limb_t
-  norm::flint_bitcnt_t
-end
 
-const fmpz = slong
-const fmpz_t = Ptr{fmpz}
-
-struct fmpq
-  num::fmpz
-  den::fmpz
-end
-
-const fmpq_t = Ptr{fmpq}
-
+@include_c_header("flint.h")
 
 @include_c_header("limb_types.h")
 

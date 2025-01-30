@@ -25,21 +25,56 @@ const slong = Int
 
 
 #
-# from flint.h
+# from `./configure`
 #
 
-const flint_bitcnt_t = ulong
-const nn_ptr = Ptr{ulong}
-const nn_srcptr = Ptr{ulong}
 const FLINT_BITS = UInt == UInt64 ? 64 : 32
 
+
+###############################################################################
+# begin flint.h
+
+const __FLINT_VERSION = 3
+
+const __FLINT_VERSION_MINOR = 2
+
+const __FLINT_VERSION_PATCHLEVEL = 0
+
+const flint_bitcnt_t = ulong
+
+const nn_ptr = Ptr{ulong}
+
+const nn_srcptr = Ptr{ulong}
+
+const thread_pool_handle = int
+
+struct flint_rand_struct
+  __gmp_state::Ptr{void}
+  __randval::ulong
+  __randval2::ulong
+end
+
+const flint_rand_t = Ptr{flint_rand_struct}
+
+@enum flint_err_t begin
+  FLINT_ERROR     #= general error =#
+  FLINT_OVERFLOW  #= overflow =#
+  FLINT_IMPINV    #= impossible inverse =#
+  FLINT_DOMERR    #= domain error =#
+  FLINT_DIVZERO   #= divide by zero =#
+  FLINT_EXPOF     #= exponent overflow =#
+  FLINT_INEXACT   #= inexact error =#
+  FLINT_TEST_FAIL  #= test fail =#
+end
+
 struct nmod_t
-  n::mp_limb_t
-  ninv::mp_limb_t
+  n::ulong
+  ninv::ulong
   norm::flint_bitcnt_t
 end
 
 const fmpz = slong
+
 const fmpz_t = Ptr{fmpz}
 
 struct fmpq
@@ -48,6 +83,11 @@ struct fmpq
 end
 
 const fmpq_t = Ptr{fmpq}
+
+const MPZ_MIN_ALLOC = 2
+
+# end flint.h
+###############################################################################
 
 
 ###############################################################################
@@ -154,9 +194,9 @@ struct zz_struct
   ptr::nn_ptr
 end
 
-typedef zz_struct * zz_ptr;
-typedef const zz_struct * zz_srcptr;
-#define FMPZ_TO_ZZ(x) ((zz_ptr) ((ulong) (x) << 2))
+const zz_ptr = Ptr{zz_struct}
+
+const zz_srcptr = Ptr{zz_struct}
 
 struct fmpz_factor_struct
   sign::int
@@ -279,14 +319,6 @@ end
 
 const fmpq_poly_t = Ptr{fmpq_poly_struct}
 
-#=
-    A polynomial f is represented as
-        content * zpoly,
-    where zpoly should have positive leading coefficient and trivial content.
-    If f is zero, then the representation should have
-        content = 0 and zpoly = 0
-=#
-
 struct fmpq_mpoly_struct                       #= non zero case:                   |  zero case: =#
   content::fmpq_t     #= positive or negative content     |  zero       =#
   zpoly::fmpz_mpoly_t #= contentless poly, lc is positive |  zero       =#
@@ -375,6 +407,7 @@ const fmpz_mod_mpoly_factor_t = Ptr{fmpz_mod_mpoly_factor_struct}
 # begin fq_nmod_types.h
 
 const fq_nmod_t = nmod_poly_t
+
 const fq_nmod_struct = nmod_poly_struct
 
 struct fq_nmod_ctx_struct
@@ -497,6 +530,7 @@ const fq_zech_poly_factor_t = Ptr{fq_zech_poly_factor_struct}
 # begin fq_types.h
 
 const fq_t = fmpz_poly_t
+
 const fq_struct = fmpz_poly_struct
 
 struct fq_ctx_struct
@@ -607,7 +641,6 @@ const padic_poly_t = Ptr{padic_poly_struct}
 ###############################################################################
 # begin n_poly_types.h
 
-#= arrays of ulong =#
 struct n_poly_struct
   coeffs::Ptr{ulong}
   alloc::slong
@@ -615,10 +648,11 @@ struct n_poly_struct
 end
 
 const n_poly_t = Ptr{n_poly_struct}
+
 const n_fq_poly_struct = n_poly_struct
+
 const n_fq_poly_t = n_poly_t
 
-#= arrays of arrays of ulong =#
 struct n_bpoly_struct
   coeffs::Ptr{n_poly_struct}
   alloc::slong
@@ -626,10 +660,11 @@ struct n_bpoly_struct
 end
 
 const n_bpoly_t = Ptr{n_bpoly_struct}
+
 const n_fq_bpoly_struct = n_bpoly_struct
+
 const n_fq_bpoly_t = n_bpoly_t
 
-#= arrays of arrays of arrays of ulong =#
 struct n_tpoly_struct
   coeffs::Ptr{n_bpoly_struct}
   alloc::slong
@@ -637,10 +672,11 @@ struct n_tpoly_struct
 end
 
 const n_tpoly_t = Ptr{n_tpoly_struct}
+
 const n_fq_tpoly_struct = n_tpoly_struct
+
 const n_fq_tpoly_t = n_tpoly_t
 
-#= sparse arrays of ulong =#
 struct n_polyu_struct
   exps::Ptr{ulong}
   coeffs::Ptr{ulong}
@@ -649,15 +685,11 @@ struct n_polyu_struct
 end
 
 const n_polyu_t = Ptr{n_polyu_struct}
+
 const n_fq_polyu_struct = n_polyu_struct
+
 const n_fq_polyu_t = n_polyu_t
 
-#=
-    sparse arrays of arrays of ulong
-    n_polyu1n => one exponent is in the exps[i]
-    n_polyu2n => two exponents are packed into the exps[i]
-    ...
-=#
 struct n_polyun_struct
   coeffs::Ptr{n_poly_struct}
   exps::Ptr{ulong}
@@ -666,10 +698,11 @@ struct n_polyun_struct
 end
 
 const n_polyun_t = Ptr{n_polyun_struct}
+
 const n_fq_polyun_struct = n_polyun_struct
+
 const n_fq_polyun_t = n_polyun_t
 
-#= n_poly stack =#
 struct n_poly_stack_struct
   array::Ptr{Ptr{n_poly_struct}}
   alloc::slong
@@ -678,7 +711,6 @@ end
 
 const n_poly_stack_t = Ptr{n_poly_stack_struct}
 
-#= n_bpoly stack =#
 struct n_bpoly_stack_struct
   array::Ptr{Ptr{n_bpoly_struct}}
   alloc::slong
@@ -713,8 +745,6 @@ const nmod_eval_interp_t = Ptr{nmod_eval_interp_struct}
 
 ###############################################################################
 # begin mpoly_types.h
-
-#define MPOLY_MIN_BITS (UWORD(8))    #= minimum number of bits to pack into =#
 
 @enum ordering_t begin
   ORD_LEX
@@ -768,7 +798,6 @@ struct fq_nmod_mpoly_ctx_struct
 end
 
 const fq_nmod_mpoly_ctx_t = Ptr{fq_nmod_mpoly_ctx_struct}
-
 
 struct struct_mpoly_void_ring_t
   elem_size::slong
@@ -859,10 +888,6 @@ end
 
 const mpoly_compression_t = Ptr{mpoly_compression_struct}
 
-#=
-    nmod_mpolyn_t
-    multivariates with n_poly_t coefficients
-=#
 struct nmod_mpolyn_struct
   coeffs::Ptr{n_poly_struct}
   exps::Ptr{ulong}
@@ -870,13 +895,9 @@ struct nmod_mpolyn_struct
   length::slong
   bits::slong
 end
+
 const nmod_mpolyn_t = Ptr{nmod_mpolyn_struct}
 
-#=
-    nmod_mpolyun_t
-    sparse univariates with nmod_mpolyn_t coefficients
-        with uniform bits and LEX ordering
-=#
 struct nmod_mpolyun_struct
   coeffs::Ptr{nmod_mpolyn_struct}
   exps::Ptr{ulong}
@@ -884,6 +905,7 @@ struct nmod_mpolyun_struct
   length::slong
   bits::flint_bitcnt_t   #= default bits to construct coeffs =#
 end
+
 const nmod_mpolyun_t = Ptr{nmod_mpolyun_struct}
 
 @enum nmod_gcds_ret_t begin
