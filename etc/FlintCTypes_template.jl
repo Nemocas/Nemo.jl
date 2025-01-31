@@ -7,23 +7,14 @@
 module FlintC
 
 #
-# C types (names provided to ease automatic conversion of struct definitions)
+# FLINT configuration and global definitions
 #
-const void = Cvoid
-const int = Cint
-const unsigned_int = Cuint
-const char = Cchar
-const unsigned_char = Cuchar
-const double = Cdouble
+
 const ulong = UInt
 const slong = Int
 
 WORD(n) = Int(n)
 UWORD(n) = UInt(n)
-
-#
-# from `./configure`
-#
 
 const FLINT_BITS = UInt == UInt64 ? 64 : 32
 

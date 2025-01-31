@@ -59,7 +59,7 @@ function convert_struct(str::AbstractString)
     r"^ +([A-Za-z0-9_]+) *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+);"m => s"  \2::Ptr{\1}\n  \3::Ptr{\1}\n  \4::Ptr{\1}\n  \5::Ptr{\1}\n  \6::Ptr{\1}",
     r"^ +([A-Za-z0-9_]+) *\* *\* *([A-Za-z0-9_]+);"m => s"  \2::Ptr{Ptr{\1}}",                    # double pointer field
     r"^ +([A-Za-z0-9_]+) +([A-Za-z0-9_]+)\[([A-Za-z0-9_]+)\];"m => s"  \2::NTuple{\3, \1}",       # fixed len array field
-    r"^ +[A-Za-z0-9_]+ *\( *\* *([A-Za-z0-9_]+) *\) *\([a-z_, *]+\);"m => s"  \1::Ptr{Nothing}",  # function pointer field
+    r"^ +[A-Za-z0-9_]+ *\( *\* *([A-Za-z0-9_]+) *\) *\([A-Za-z0-9_, *]+\);"m => s"  \1::Ptr{Nothing}",  # function pointer field
     r"^ +struct *([A-Za-z0-9_]+) +([A-Za-z0-9_]+);"m => s"  \2::struct_\1",                       # struct field (without typedef)
     r"^ +enum *([A-Za-z0-9_]+) +([A-Za-z0-9_]+);"m => s"  \2::enum_\1",                           # enum field (without typedef)
   ]
@@ -96,12 +96,16 @@ function convert_union(str::AbstractString)
 end
 
 function c2julia(str::String)
-  preprocessing = Pair{Regex,Union{SubstitutionString,Function}}[
-    r"unsigned int" => s"unsigned_int",                                       # convert `unsigned int` to a single token
-    r"unsigned char" => s"unsigned_char",                                     # convert `unsigned char` to a single token
-    r" const " => s" ",                                                       # remove all `const`
-    r"^//(.*)$"m => s"",                                                      # remove line comment
-    r"/\*(.*?)\*/"s => s"",                                                   # remove block comment
+  preprocessing = Pair{Regex,String}[
+    r"^//(.*)$"m => "",                     # remove line comment
+    r"/\*(.*?)\*/"s => "",                  # remove block comment
+    r" const " => " ",                      # remove all `const`
+    r"\bvoid\b" => "Cvoid",                 # replace `void` C type
+    r"\bunsigned int\b" => "Cuint",         # replace `unsigned int` C type
+    r"\bint\b" => "Cint",                    # replace `int` C type
+    r"\bunsigned char\b" => "Cuchar",       # replace `unsigned char` C type
+    r"\bchar\b" => "Cchar",                 # replace `char` C type
+    r"\bdouble\b" => "Cdouble",             # replace `double` C type
   ]
   for substitution in preprocessing
     str = replace(str, substitution)
@@ -124,7 +128,7 @@ function c2julia(str::String)
     r"^typedef +struct +([A-Za-z_]+) +([A-Za-z_]+);"m => s"const \2 = struct_\1", # struct typedef
     r"^typedef +enum +([A-Za-z_]+) +([A-Za-z_]+);"m => s"const \2 = enum_\1",   # enum typedef
     r"^typedef +union +([A-Za-z_]+) +([A-Za-z_]+);"m => s"const \2 = union_\1", # union typedef
-    r"^typedef +[A-Za-z0-9_]+ *\( *\* *([A-Za-z0-9_]+) *\) *\([a-z_, *]+\);"m => s"const \1 = Ptr{Nothing}", # function pointer typedef
+    r"^typedef +[A-Za-z0-9_]+ *\( *\* *([A-Za-z0-9_]+) *\) *\([A-Za-z0-9_, *]+\);"m => s"const \1 = Ptr{Nothing}", # function pointer typedef
     r"^#define +([A-Za-z_]+) +(\d+) *$"m => s"const \1 = \2",                 # defines of integer constants
     r"^#define +([A-Za-z_]+) +\(([A-Za-z0-9+*() ]+)\) *$"m => s"const \1 = \2",   # defines of more complex constants
   ]

@@ -12,23 +12,14 @@
 module FlintC
 
 #
-# C types (names provided to ease automatic conversion of struct definitions)
+# FLINT configuration and global definitions
 #
-const void = Cvoid
-const int = Cint
-const unsigned_int = Cuint
-const char = Cchar
-const unsigned_char = Cuchar
-const double = Cdouble
+
 const ulong = UInt
 const slong = Int
 
 WORD(n) = Int(n)
 UWORD(n) = UInt(n)
-
-#
-# from `./configure`
-#
 
 const FLINT_BITS = UInt == UInt64 ? 64 : 32
 
@@ -54,10 +45,10 @@ const nn_srcptr = Ptr{ulong}
 
 const flint_cleanup_function_t = Ptr{Nothing}
 
-const thread_pool_handle = int
+const thread_pool_handle = Cint
 
 struct flint_rand_struct
-  __gmp_state::Ptr{void}
+  __gmp_state::Ptr{Cvoid}
   __randval::ulong
   __randval2::ulong
 end
@@ -104,21 +95,21 @@ const MPZ_MIN_ALLOC = 2
 const FLINT_MAX_FACTORS_IN_LIMB = 15
 
 struct n_factor_t
-  num::int
-  exp::NTuple{FLINT_MAX_FACTORS_IN_LIMB, int}
+  num::Cint
+  exp::NTuple{FLINT_MAX_FACTORS_IN_LIMB, Cint}
   p::NTuple{FLINT_MAX_FACTORS_IN_LIMB, ulong}
 end
 
 struct n_primes_struct
   small_i::slong
   small_num::slong
-  small_primes::Ptr{unsigned_int}
+  small_primes::Ptr{Cuint}
 
   sieve_a::ulong
   sieve_b::ulong
   sieve_i::slong
   sieve_num::slong
-  sieve::Ptr{char}
+  sieve::Ptr{Cchar}
 end
 
 const n_primes_t = Ptr{n_primes_struct}
@@ -197,8 +188,8 @@ const nmod_mpoly_factor_t = Ptr{nmod_mpoly_factor_struct}
 # begin fmpz_types.h
 
 struct zz_struct
-  alloc::int
-  size::int
+  alloc::Cint
+  size::Cint
   ptr::nn_ptr
 end
 
@@ -207,7 +198,7 @@ const zz_ptr = Ptr{zz_struct}
 const zz_srcptr = Ptr{zz_struct}
 
 struct fmpz_factor_struct
-  sign::int
+  sign::Cint
   p::Ptr{fmpz}
   exp::Ptr{ulong}
   alloc::slong
@@ -421,8 +412,8 @@ const fq_nmod_struct = nmod_poly_struct
 struct fq_nmod_ctx_struct
   mod::nmod_t
 
-  sparse_modulus::int
-  is_conway::int
+  sparse_modulus::Cint
+  is_conway::Cint
 
   a::Ptr{ulong}
   j::Ptr{slong}
@@ -431,7 +422,7 @@ struct fq_nmod_ctx_struct
   modulus::nmod_poly_t
   inv::nmod_poly_t
 
-  var::Ptr{char}
+  var::Ptr{Cchar}
 end
 
 const fq_nmod_ctx_t = Ptr{fq_nmod_ctx_struct}
@@ -491,15 +482,15 @@ struct fq_zech_ctx_struct
   qm1o2::ulong
   qm1opm1::ulong
   p::ulong
-  ppre::double
+  ppre::Cdouble
   prime_root::ulong
   zech_log_table::Ptr{ulong}
   prime_field_table::Ptr{ulong}
   eval_table::Ptr{ulong}
 
   fq_nmod_ctx::Ptr{fq_nmod_ctx_struct}
-  owns_fq_nmod_ctx::int
-  is_conway::int
+  owns_fq_nmod_ctx::Cint
+  is_conway::Cint
 end
 
 const fq_zech_ctx_t = Ptr{fq_zech_ctx_struct}
@@ -544,8 +535,8 @@ const fq_struct = fmpz_poly_struct
 struct fq_ctx_struct
   ctxp::fmpz_mod_ctx_t
 
-  sparse_modulus::int
-  is_conway::int
+  sparse_modulus::Cint
+  is_conway::Cint
 
   a::Ptr{fmpz}
   j::Ptr{slong}
@@ -554,7 +545,7 @@ struct fq_ctx_struct
   modulus::fmpz_mod_poly_t
   inv::fmpz_mod_poly_t
 
-  var::Ptr{char}
+  var::Ptr{Cchar}
 end
 
 const fq_ctx_t = Ptr{fq_ctx_struct}
@@ -608,7 +599,7 @@ end
 
 struct gr_stream_struct
   fp::Ptr{FLINT_FILE}
-  s::Ptr{char}
+  s::Ptr{Cchar}
   len::slong
   alloc::slong
 end
@@ -620,7 +611,7 @@ const gr_funcptr = Ptr{Nothing}
 const GR_CTX_STRUCT_DATA_BYTES = 6 * sizeof(ulong)
 
 struct gr_ctx_struct
-  data::NTuple{GR_CTX_STRUCT_DATA_BYTES, char}
+  data::NTuple{GR_CTX_STRUCT_DATA_BYTES, Cchar}
   which_ring::ulong
   sizeof_elem::slong
   methods::Ptr{gr_funcptr}
@@ -629,11 +620,11 @@ end
 
 const gr_ctx_t = Ptr{gr_ctx_struct}
 
-const gr_ptr = Ptr{void}
+const gr_ptr = Ptr{Cvoid}
 
-const gr_srcptr = Ptr{void}
+const gr_srcptr = Ptr{Cvoid}
 
-const gr_ctx_ptr = Ptr{void}
+const gr_ctx_ptr = Ptr{Cvoid}
 
 struct gr_vec_struct
   entries::gr_ptr
@@ -728,7 +719,7 @@ end
 
 struct padic_ctx_struct
   p::fmpz_t
-  pinv::double
+  pinv::Cdouble
   pow::Ptr{fmpz}
   min::slong
   max::slong
@@ -888,10 +879,10 @@ struct mpoly_ctx_struct
   nvars::slong
   nfields::slong
   ord::ordering_t
-  deg::int
-  rev::int
+  deg::Cint
+  rev::Cint
   lut_words_per_exp::NTuple{FLINT_BITS, slong}
-  lut_fix_bits::NTuple{FLINT_BITS, unsigned_char}
+  lut_fix_bits::NTuple{FLINT_BITS, Cuchar}
 end
 
 const mpoly_ctx_t = Ptr{mpoly_ctx_struct}
@@ -931,7 +922,7 @@ const fq_nmod_mpoly_ctx_t = Ptr{fq_nmod_mpoly_ctx_struct}
 
 struct struct_mpoly_void_ring_t
   elem_size::slong
-  ctx::Ptr{void}
+  ctx::Ptr{Cvoid}
   init::Ptr{Nothing}
   clear::Ptr{Nothing}
   is_zero::Ptr{Nothing}
@@ -982,21 +973,21 @@ struct mpoly_gcd_info_struct
   Adeflate_tdeg::slong
   Bdeflate_tdeg::slong
 
-  Adensity::double
-  Bdensity::double
+  Adensity::Cdouble
+  Bdensity::Cdouble
 
-  hensel_time::double
-  brown_time::double
-  zippel_time::double
-  zippel2_time::double
+  hensel_time::Cdouble
+  brown_time::Cdouble
+  zippel_time::Cdouble
+  zippel2_time::Cdouble
   hensel_perm::Ptr{slong}
   brown_perm::Ptr{slong}
   zippel_perm::Ptr{slong}
   zippel2_perm::Ptr{slong}
-  can_use::unsigned_int
-  Gdeflate_deg_bounds_are_nice::int
+  can_use::Cuint
+  Gdeflate_deg_bounds_are_nice::Cint
 
-  data::Ptr{char}
+  data::Ptr{Cchar}
 end
 
 const mpoly_gcd_info_t = Ptr{mpoly_gcd_info_struct}
@@ -1011,9 +1002,9 @@ struct mpoly_compression_struct
   umat::Ptr{slong}
   deltas::Ptr{slong}
   degs::Ptr{slong}
-  is_trivial::int
-  is_perm::int
-  is_irred::int
+  is_trivial::Cint
+  is_perm::Cint
+  is_irred::Cint
 end
 
 const mpoly_compression_t = Ptr{mpoly_compression_struct}
