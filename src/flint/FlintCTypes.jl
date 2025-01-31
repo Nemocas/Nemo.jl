@@ -701,6 +701,66 @@ end
 
 
 ###############################################################################
+# begin fq_default_mat.h
+
+struct fq_default_mat_struct
+  uniondata::NTuple{maximum(sizeof, (
+    fq_mat_t,
+    fq_nmod_mat_t,
+    fq_zech_mat_t,
+    nmod_mat_t,
+    fmpz_mod_mat_t,
+  )), UInt8}
+end
+const union_fq_default_mat_struct = fq_default_mat_struct
+
+const fq_default_mat_t = Tuple{fq_default_mat_struct}
+
+# end fq_default_mat.h
+###############################################################################
+
+
+###############################################################################
+# begin fq_default_poly.h
+
+struct fq_default_poly_struct
+  uniondata::NTuple{maximum(sizeof, (
+    fq_poly_t,
+    fq_nmod_poly_t,
+    fq_zech_poly_t,
+    nmod_poly_t,
+    fmpz_mod_poly_t,
+  )), UInt8}
+end
+const union_fq_default_poly_struct = fq_default_poly_struct
+
+const fq_default_poly_t = Tuple{fq_default_poly_struct}
+
+# end fq_default_poly.h
+###############################################################################
+
+
+###############################################################################
+# begin fq_default_poly_factor.h
+
+struct fq_default_poly_factor_struct
+  uniondata::NTuple{maximum(sizeof, (
+    fq_poly_factor_t,
+    fq_nmod_poly_factor_t,
+    fq_zech_poly_factor_t,
+    nmod_poly_factor_t,
+    fmpz_mod_poly_factor_t,
+  )), UInt8}
+end
+const union_fq_default_poly_factor_struct = fq_default_poly_factor_struct
+
+const fq_default_poly_factor_t = Tuple{fq_default_poly_factor_struct}
+
+# end fq_default_poly_factor.h
+###############################################################################
+
+
+###############################################################################
 # begin padic_types.h
 
 struct padic_struct
