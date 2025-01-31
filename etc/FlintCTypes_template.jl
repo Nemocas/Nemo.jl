@@ -18,6 +18,8 @@ const double = Cdouble
 const ulong = UInt
 const slong = Int
 
+WORD(n) = Int(n)
+UWORD(n) = UInt(n)
 
 #
 # from `./configure`
