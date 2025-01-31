@@ -45,7 +45,7 @@ function convert_struct(str::AbstractString)
     regex_typedef_struct_fields_name => s"struct \2\1end",                                        # whole typedef struct construct
     regex_struct_structname_fields => s"struct struct_\1\2end",                                   # whole struct construct
     regex_struct_structname => s"struct struct_\1 end",                                           # whole struct construct without fields
-    regex_typedef_struct_fields_refname => s"struct struct_\2\1end\nconst \2 = Ref{struct_\2}",   # whole typedef struct singleton array construct
+    regex_typedef_struct_fields_refname => s"struct struct_\2\1end\nconst \2 = Tuple{struct_\2}", # whole typedef struct singleton array construct
     regex_typedef_struct_structname_fields_name => s"struct \3\2end\nconst struct_\1 = \3",       # whole typedef struct construct with two names
     r"^ +([A-Za-z0-9_]+) +([A-Za-z0-9_]+);"m => s"  \2::\1",                                      # simple fields (one to five declared on one line)
     r"^ +([A-Za-z0-9_]+) +([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+);"m => s"  \2::\1\n  \3::\1",
@@ -124,7 +124,7 @@ function c2julia(str::String)
     regex_typedef_union_unionname_values_name => convert_union,               # whole typedef union construct with two names
     r"^typedef +([A-Za-z_]+) +([A-Za-z_]+);"m => s"const \2 = \1",            # simple typedef
     r"^typedef +([A-Za-z_]+) *\* *([A-Za-z_]+);"m => s"const \2 = Ptr{\1}",   # pointer typedef
-    r"^typedef +([A-Za-z_]+) +([A-Za-z_]+)\[1\];"m => s"const \2 = Ref{\1}",  # singleton array typedef
+    r"^typedef +([A-Za-z_]+) +([A-Za-z_]+)\[1\];"m => s"const \2 = Tuple{\1}",  # singleton array typedef
     r"^typedef +struct +([A-Za-z_]+) +([A-Za-z_]+);"m => s"const \2 = struct_\1", # struct typedef
     r"^typedef +enum +([A-Za-z_]+) +([A-Za-z_]+);"m => s"const \2 = enum_\1",   # enum typedef
     r"^typedef +union +([A-Za-z_]+) +([A-Za-z_]+);"m => s"const \2 = union_\1", # union typedef

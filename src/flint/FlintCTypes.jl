@@ -53,7 +53,7 @@ struct flint_rand_struct
   __randval2::ulong
 end
 
-const flint_rand_t = Ref{flint_rand_struct}
+const flint_rand_t = Tuple{flint_rand_struct}
 
 @enum flint_err_t begin
   FLINT_ERROR
@@ -74,14 +74,14 @@ end
 
 const fmpz = slong
 
-const fmpz_t = Ref{fmpz}
+const fmpz_t = Tuple{fmpz}
 
 struct fmpq
   num::fmpz
   den::fmpz
 end
 
-const fmpq_t = Ref{fmpq}
+const fmpq_t = Tuple{fmpq}
 
 const MPZ_MIN_ALLOC = 2
 
@@ -112,7 +112,7 @@ struct n_primes_struct
   sieve::Ptr{Cchar}
 end
 
-const n_primes_t = Ref{n_primes_struct}
+const n_primes_t = Tuple{n_primes_struct}
 
 # end limb_types.h
 ###############################################################################
@@ -129,7 +129,7 @@ struct nmod_mat_struct
   mod::nmod_t
 end
 
-const nmod_mat_t = Ref{nmod_mat_struct}
+const nmod_mat_t = Tuple{nmod_mat_struct}
 
 struct nmod_poly_struct
   coeffs::nn_ptr
@@ -138,7 +138,7 @@ struct nmod_poly_struct
   mod::nmod_t
 end
 
-const nmod_poly_t = Ref{nmod_poly_struct}
+const nmod_poly_t = Tuple{nmod_poly_struct}
 
 struct nmod_poly_factor_struct
   p::Ptr{nmod_poly_struct}
@@ -147,7 +147,7 @@ struct nmod_poly_factor_struct
   alloc::slong
 end
 
-const nmod_poly_factor_t = Ref{nmod_poly_factor_struct}
+const nmod_poly_factor_t = Tuple{nmod_poly_factor_struct}
 
 struct nmod_poly_mat_struct
   entries::Ptr{nmod_poly_struct}
@@ -157,7 +157,7 @@ struct nmod_poly_mat_struct
   modulus::ulong
 end
 
-const nmod_poly_mat_t = Ref{nmod_poly_mat_struct}
+const nmod_poly_mat_t = Tuple{nmod_poly_mat_struct}
 
 struct nmod_mpoly_struct
   coeffs::Ptr{ulong}
@@ -168,7 +168,7 @@ struct nmod_mpoly_struct
   exps_alloc::slong
 end
 
-const nmod_mpoly_t = Ref{nmod_mpoly_struct}
+const nmod_mpoly_t = Tuple{nmod_mpoly_struct}
 
 struct nmod_mpoly_factor_struct
   constant::ulong
@@ -178,7 +178,7 @@ struct nmod_mpoly_factor_struct
   alloc::slong
 end
 
-const nmod_mpoly_factor_t = Ref{nmod_mpoly_factor_struct}
+const nmod_mpoly_factor_t = Tuple{nmod_mpoly_factor_struct}
 
 # end nmod_types.h
 ###############################################################################
@@ -205,7 +205,7 @@ struct fmpz_factor_struct
   num::slong
 end
 
-const fmpz_factor_t = Ref{fmpz_factor_struct}
+const fmpz_factor_t = Tuple{fmpz_factor_struct}
 
 struct fmpz_preinvn_struct
   dinv::nn_ptr
@@ -213,7 +213,7 @@ struct fmpz_preinvn_struct
   norm::flint_bitcnt_t
 end
 
-const fmpz_preinvn_t = Ref{fmpz_preinvn_struct}
+const fmpz_preinvn_t = Tuple{fmpz_preinvn_struct}
 
 struct fmpz_poly_struct
   coeffs::Ptr{fmpz}
@@ -221,7 +221,7 @@ struct fmpz_poly_struct
   length::slong
 end
 
-const fmpz_poly_t = Ref{fmpz_poly_struct}
+const fmpz_poly_t = Tuple{fmpz_poly_struct}
 
 struct fmpz_poly_factor_struct
   c::fmpz
@@ -231,7 +231,7 @@ struct fmpz_poly_factor_struct
   alloc::slong
 end
 
-const fmpz_poly_factor_t = Ref{fmpz_poly_factor_struct}
+const fmpz_poly_factor_t = Tuple{fmpz_poly_factor_struct}
 
 struct fmpz_mat_struct
   entries::Ptr{fmpz}
@@ -240,7 +240,7 @@ struct fmpz_mat_struct
   rows::Ptr{Ptr{fmpz}}
 end
 
-const fmpz_mat_t = Ref{fmpz_mat_struct}
+const fmpz_mat_t = Tuple{fmpz_mat_struct}
 
 struct fmpz_poly_mat_struct
   entries::Ptr{fmpz_poly_struct}
@@ -249,7 +249,7 @@ struct fmpz_poly_mat_struct
   rows::Ptr{Ptr{fmpz_poly_struct}}
 end
 
-const fmpz_poly_mat_t = Ref{fmpz_poly_mat_struct}
+const fmpz_poly_mat_t = Tuple{fmpz_poly_mat_struct}
 
 struct fmpz_mpoly_struct
   coeffs::Ptr{fmpz}
@@ -259,7 +259,7 @@ struct fmpz_mpoly_struct
   bits::flint_bitcnt_t
 end
 
-const fmpz_mpoly_t = Ref{fmpz_mpoly_struct}
+const fmpz_mpoly_t = Tuple{fmpz_mpoly_struct}
 
 struct fmpz_mpoly_factor_struct
   constant::fmpz_t
@@ -270,28 +270,28 @@ struct fmpz_mpoly_factor_struct
   alloc::slong
 end
 
-const fmpz_mpoly_factor_t = Ref{fmpz_mpoly_factor_struct}
+const fmpz_mpoly_factor_t = Tuple{fmpz_mpoly_factor_struct}
 
 struct fmpz_poly_q_struct
   num::Ptr{fmpz_poly_struct}
   den::Ptr{fmpz_poly_struct}
 end
 
-const fmpz_poly_q_t = Ref{fmpz_poly_q_struct}
+const fmpz_poly_q_t = Tuple{fmpz_poly_q_struct}
 
 struct fmpz_mpoly_q_struct
   num::fmpz_mpoly_struct
   den::fmpz_mpoly_struct
 end
 
-const fmpz_mpoly_q_t = Ref{fmpz_mpoly_q_struct}
+const fmpz_mpoly_q_t = Tuple{fmpz_mpoly_q_struct}
 
 struct fmpzi_struct
   a::fmpz
   b::fmpz
 end
 
-const fmpzi_t = Ref{fmpzi_struct}
+const fmpzi_t = Tuple{fmpzi_struct}
 
 # end fmpz_types.h
 ###############################################################################
@@ -307,7 +307,7 @@ struct fmpq_mat_struct
   rows::Ptr{Ptr{fmpq}}
 end
 
-const fmpq_mat_t = Ref{fmpq_mat_struct}
+const fmpq_mat_t = Tuple{fmpq_mat_struct}
 
 struct fmpq_poly_struct
   coeffs::Ptr{fmpz}
@@ -316,14 +316,14 @@ struct fmpq_poly_struct
   den::fmpz_t
 end
 
-const fmpq_poly_t = Ref{fmpq_poly_struct}
+const fmpq_poly_t = Tuple{fmpq_poly_struct}
 
 struct fmpq_mpoly_struct
   content::fmpq_t
   zpoly::fmpz_mpoly_t
 end
 
-const fmpq_mpoly_t = Ref{fmpq_mpoly_struct}
+const fmpq_mpoly_t = Tuple{fmpq_mpoly_struct}
 
 struct fmpq_mpoly_factor_struct
   constant::fmpq_t
@@ -333,7 +333,7 @@ struct fmpq_mpoly_factor_struct
   alloc::slong
 end
 
-const fmpq_mpoly_factor_t = Ref{fmpq_mpoly_factor_struct}
+const fmpq_mpoly_factor_t = Tuple{fmpq_mpoly_factor_struct}
 
 # end fmpq_types.h
 ###############################################################################
@@ -354,11 +354,11 @@ struct fmpz_mod_ctx_struct
 end
 const struct_fmpz_mod_ctx = fmpz_mod_ctx_struct
 
-const fmpz_mod_ctx_t = Ref{fmpz_mod_ctx_struct}
+const fmpz_mod_ctx_t = Tuple{fmpz_mod_ctx_struct}
 
 const fmpz_mod_mat_struct = fmpz_mat_struct
 
-const fmpz_mod_mat_t = Ref{fmpz_mod_mat_struct}
+const fmpz_mod_mat_t = Tuple{fmpz_mod_mat_struct}
 
 struct fmpz_mod_poly_struct
   coeffs::Ptr{fmpz}
@@ -366,7 +366,7 @@ struct fmpz_mod_poly_struct
   length::slong
 end
 
-const fmpz_mod_poly_t = Ref{fmpz_mod_poly_struct}
+const fmpz_mod_poly_t = Tuple{fmpz_mod_poly_struct}
 
 struct fmpz_mod_poly_factor_struct
   poly::Ptr{fmpz_mod_poly_struct}
@@ -375,7 +375,7 @@ struct fmpz_mod_poly_factor_struct
   alloc::slong
 end
 
-const fmpz_mod_poly_factor_t = Ref{fmpz_mod_poly_factor_struct}
+const fmpz_mod_poly_factor_t = Tuple{fmpz_mod_poly_factor_struct}
 
 struct fmpz_mod_mpoly_struct
   coeffs::Ptr{fmpz}
@@ -386,7 +386,7 @@ struct fmpz_mod_mpoly_struct
   exps_alloc::slong
 end
 
-const fmpz_mod_mpoly_t = Ref{fmpz_mod_mpoly_struct}
+const fmpz_mod_mpoly_t = Tuple{fmpz_mod_mpoly_struct}
 
 struct fmpz_mod_mpoly_factor_struct
   constant::fmpz_t
@@ -396,7 +396,7 @@ struct fmpz_mod_mpoly_factor_struct
   alloc::slong
 end
 
-const fmpz_mod_mpoly_factor_t = Ref{fmpz_mod_mpoly_factor_struct}
+const fmpz_mod_mpoly_factor_t = Tuple{fmpz_mod_mpoly_factor_struct}
 
 # end fmpz_mod_types.h
 ###############################################################################
@@ -425,7 +425,7 @@ struct fq_nmod_ctx_struct
   var::Ptr{Cchar}
 end
 
-const fq_nmod_ctx_t = Ref{fq_nmod_ctx_struct}
+const fq_nmod_ctx_t = Tuple{fq_nmod_ctx_struct}
 
 struct fq_nmod_mat_struct
   entries::Ptr{fq_nmod_struct}
@@ -434,7 +434,7 @@ struct fq_nmod_mat_struct
   rows::Ptr{Ptr{fq_nmod_struct}}
 end
 
-const fq_nmod_mat_t = Ref{fq_nmod_mat_struct}
+const fq_nmod_mat_t = Tuple{fq_nmod_mat_struct}
 
 struct fq_nmod_poly_struct
   coeffs::Ptr{fq_nmod_struct}
@@ -442,7 +442,7 @@ struct fq_nmod_poly_struct
   length::slong
 end
 
-const fq_nmod_poly_t = Ref{fq_nmod_poly_struct}
+const fq_nmod_poly_t = Tuple{fq_nmod_poly_struct}
 
 struct fq_nmod_poly_factor_struct
   poly::Ptr{fq_nmod_poly_struct}
@@ -451,7 +451,7 @@ struct fq_nmod_poly_factor_struct
   alloc::slong
 end
 
-const fq_nmod_poly_factor_t = Ref{fq_nmod_poly_factor_struct}
+const fq_nmod_poly_factor_t = Tuple{fq_nmod_poly_factor_struct}
 
 struct fq_nmod_mpoly_struct
   coeffs::Ptr{ulong}
@@ -462,7 +462,7 @@ struct fq_nmod_mpoly_struct
   exps_alloc::slong
 end
 
-const fq_nmod_mpoly_t = Ref{fq_nmod_mpoly_struct}
+const fq_nmod_mpoly_t = Tuple{fq_nmod_mpoly_struct}
 
 # end fq_nmod_types.h
 ###############################################################################
@@ -475,7 +475,7 @@ struct fq_zech_struct
   value::ulong
 end
 
-const fq_zech_t = Ref{fq_zech_struct}
+const fq_zech_t = Tuple{fq_zech_struct}
 
 struct fq_zech_ctx_struct
   qm1::ulong
@@ -493,7 +493,7 @@ struct fq_zech_ctx_struct
   is_conway::Cint
 end
 
-const fq_zech_ctx_t = Ref{fq_zech_ctx_struct}
+const fq_zech_ctx_t = Tuple{fq_zech_ctx_struct}
 
 struct fq_zech_mat_struct
   entries::Ptr{fq_zech_struct}
@@ -502,7 +502,7 @@ struct fq_zech_mat_struct
   rows::Ptr{Ptr{fq_zech_struct}}
 end
 
-const fq_zech_mat_t = Ref{fq_zech_mat_struct}
+const fq_zech_mat_t = Tuple{fq_zech_mat_struct}
 
 struct fq_zech_poly_struct
   coeffs::Ptr{fq_zech_struct}
@@ -510,7 +510,7 @@ struct fq_zech_poly_struct
   length::slong
 end
 
-const fq_zech_poly_t = Ref{fq_zech_poly_struct}
+const fq_zech_poly_t = Tuple{fq_zech_poly_struct}
 
 struct fq_zech_poly_factor_struct
   poly::Ptr{fq_zech_poly_struct}
@@ -519,7 +519,7 @@ struct fq_zech_poly_factor_struct
   alloc::slong
 end
 
-const fq_zech_poly_factor_t = Ref{fq_zech_poly_factor_struct}
+const fq_zech_poly_factor_t = Tuple{fq_zech_poly_factor_struct}
 
 # end fq_zech_types.h
 ###############################################################################
@@ -548,7 +548,7 @@ struct fq_ctx_struct
   var::Ptr{Cchar}
 end
 
-const fq_ctx_t = Ref{fq_ctx_struct}
+const fq_ctx_t = Tuple{fq_ctx_struct}
 
 struct fq_mat_struct
   entries::Ptr{fq_struct}
@@ -557,7 +557,7 @@ struct fq_mat_struct
   rows::Ptr{Ptr{fq_struct}}
 end
 
-const fq_mat_t = Ref{fq_mat_struct}
+const fq_mat_t = Tuple{fq_mat_struct}
 
 struct fq_poly_struct
   coeffs::Ptr{fq_struct}
@@ -565,7 +565,7 @@ struct fq_poly_struct
   length::slong
 end
 
-const fq_poly_t = Ref{fq_poly_struct}
+const fq_poly_t = Tuple{fq_poly_struct}
 
 struct fq_poly_factor_struct
   poly::Ptr{fq_poly_struct}
@@ -574,7 +574,7 @@ struct fq_poly_factor_struct
   alloc::slong
 end
 
-const fq_poly_factor_t = Ref{fq_poly_factor_struct}
+const fq_poly_factor_t = Tuple{fq_poly_factor_struct}
 
 # end fq_types.h
 ###############################################################################
@@ -604,7 +604,7 @@ struct gr_stream_struct
   alloc::slong
 end
 
-const gr_stream_t = Ref{gr_stream_struct}
+const gr_stream_t = Tuple{gr_stream_struct}
 
 const gr_funcptr = Ptr{Cvoid}
 
@@ -618,7 +618,7 @@ struct gr_ctx_struct
   size_limit::ulong
 end
 
-const gr_ctx_t = Ref{gr_ctx_struct}
+const gr_ctx_t = Tuple{gr_ctx_struct}
 
 const gr_ptr = Ptr{Cvoid}
 
@@ -632,7 +632,7 @@ struct gr_vec_struct
   length::slong
 end
 
-const gr_vec_t = Ref{gr_vec_struct}
+const gr_vec_t = Tuple{gr_vec_struct}
 
 struct gr_mat_struct
   entries::gr_ptr
@@ -641,7 +641,7 @@ struct gr_mat_struct
   rows::Ptr{gr_ptr}
 end
 
-const gr_mat_t = Ref{gr_mat_struct}
+const gr_mat_t = Tuple{gr_mat_struct}
 
 struct gr_poly_struct
   coeffs::gr_ptr
@@ -649,7 +649,7 @@ struct gr_poly_struct
   length::slong
 end
 
-const gr_poly_t = Ref{gr_poly_struct}
+const gr_poly_t = Tuple{gr_poly_struct}
 
 # end gr_types.h
 ###############################################################################
@@ -669,21 +669,21 @@ const FQ_DEFAULT_NMOD = 4
 const FQ_DEFAULT_FMPZ_MOD = 5
 
 struct fq_default_struct
-  uniondata::Union{
+  uniondata::NTuple{maximum(sizeof, (
     fq_t,
     fq_nmod_t,
     fq_zech_t,
     ulong,
     fmpz_t,
-  }
+  )), UInt8}
 end
 const union_fq_default_struct = fq_default_struct
 
-const fq_default_t = Ref{fq_default_struct}
+const fq_default_t = Tuple{fq_default_struct}
 
 const fq_default_ctx_struct = gr_ctx_struct
 
-const fq_default_ctx_t = Ref{fq_default_ctx_struct}
+const fq_default_ctx_t = Tuple{fq_default_ctx_struct}
 
 struct _gr_fmpz_mod_ctx_struct
   ctx::Ptr{fmpz_mod_ctx_struct}
@@ -709,7 +709,7 @@ struct padic_struct
   N::slong
 end
 
-const padic_t = Ref{padic_struct}
+const padic_t = Tuple{padic_struct}
 
 @enum enum_padic_print_mode begin
   PADIC_TERSE
@@ -726,14 +726,14 @@ struct padic_ctx_struct
   mode::enum_padic_print_mode
 end
 
-const padic_ctx_t = Ref{padic_ctx_struct}
+const padic_ctx_t = Tuple{padic_ctx_struct}
 
 struct padic_inv_struct
   n::slong
   pow::Ptr{fmpz}
 end
 
-const padic_inv_t = Ref{padic_inv_struct}
+const padic_inv_t = Tuple{padic_inv_struct}
 
 struct padic_mat_struct
   mat::fmpz_mat_struct
@@ -741,7 +741,7 @@ struct padic_mat_struct
   N::slong
 end
 
-const padic_mat_t = Ref{padic_mat_struct}
+const padic_mat_t = Tuple{padic_mat_struct}
 
 struct padic_poly_struct
   coeffs::Ptr{fmpz}
@@ -751,7 +751,7 @@ struct padic_poly_struct
   N::slong
 end
 
-const padic_poly_t = Ref{padic_poly_struct}
+const padic_poly_t = Tuple{padic_poly_struct}
 
 # end padic_types.h
 ###############################################################################
@@ -766,7 +766,7 @@ struct n_poly_struct
   length::slong
 end
 
-const n_poly_t = Ref{n_poly_struct}
+const n_poly_t = Tuple{n_poly_struct}
 
 const n_fq_poly_struct = n_poly_struct
 
@@ -778,7 +778,7 @@ struct n_bpoly_struct
   length::slong
 end
 
-const n_bpoly_t = Ref{n_bpoly_struct}
+const n_bpoly_t = Tuple{n_bpoly_struct}
 
 const n_fq_bpoly_struct = n_bpoly_struct
 
@@ -790,7 +790,7 @@ struct n_tpoly_struct
   length::slong
 end
 
-const n_tpoly_t = Ref{n_tpoly_struct}
+const n_tpoly_t = Tuple{n_tpoly_struct}
 
 const n_fq_tpoly_struct = n_tpoly_struct
 
@@ -803,7 +803,7 @@ struct n_polyu_struct
   alloc::slong
 end
 
-const n_polyu_t = Ref{n_polyu_struct}
+const n_polyu_t = Tuple{n_polyu_struct}
 
 const n_fq_polyu_struct = n_polyu_struct
 
@@ -816,7 +816,7 @@ struct n_polyun_struct
   alloc::slong
 end
 
-const n_polyun_t = Ref{n_polyun_struct}
+const n_polyun_t = Tuple{n_polyun_struct}
 
 const n_fq_polyun_struct = n_polyun_struct
 
@@ -828,7 +828,7 @@ struct n_poly_stack_struct
   top::slong
 end
 
-const n_poly_stack_t = Ref{n_poly_stack_struct}
+const n_poly_stack_t = Tuple{n_poly_stack_struct}
 
 struct n_bpoly_stack_struct
   array::Ptr{Ptr{n_bpoly_struct}}
@@ -836,14 +836,14 @@ struct n_bpoly_stack_struct
   top::slong
 end
 
-const n_bpoly_stack_t = Ref{n_bpoly_stack_struct}
+const n_bpoly_stack_t = Tuple{n_bpoly_stack_struct}
 
 struct n_poly_bpoly_stack_struct
   poly_stack::n_poly_stack_t
   bpoly_stack::n_bpoly_stack_t
 end
 
-const n_poly_bpoly_stack_t = Ref{n_poly_bpoly_stack_struct}
+const n_poly_bpoly_stack_t = Tuple{n_poly_bpoly_stack_struct}
 
 struct nmod_eval_interp_struct
   M::Ptr{ulong}
@@ -856,7 +856,7 @@ struct nmod_eval_interp_struct
   w::ulong
 end
 
-const nmod_eval_interp_t = Ref{nmod_eval_interp_struct}
+const nmod_eval_interp_t = Tuple{nmod_eval_interp_struct}
 
 # end n_poly_types.h
 ###############################################################################
@@ -885,40 +885,40 @@ struct mpoly_ctx_struct
   lut_fix_bits::NTuple{FLINT_BITS, Cuchar}
 end
 
-const mpoly_ctx_t = Ref{mpoly_ctx_struct}
+const mpoly_ctx_t = Tuple{mpoly_ctx_struct}
 
 struct nmod_mpoly_ctx_struct
   minfo::mpoly_ctx_t
   mod::nmod_t
 end
 
-const nmod_mpoly_ctx_t = Ref{nmod_mpoly_ctx_struct}
+const nmod_mpoly_ctx_t = Tuple{nmod_mpoly_ctx_struct}
 
 struct fmpz_mpoly_ctx_struct
   minfo::mpoly_ctx_t
 end
 
-const fmpz_mpoly_ctx_t = Ref{fmpz_mpoly_ctx_struct}
+const fmpz_mpoly_ctx_t = Tuple{fmpz_mpoly_ctx_struct}
 
 struct fmpq_mpoly_ctx_struct
   zctx::fmpz_mpoly_ctx_t
 end
 
-const fmpq_mpoly_ctx_t = Ref{fmpq_mpoly_ctx_struct}
+const fmpq_mpoly_ctx_t = Tuple{fmpq_mpoly_ctx_struct}
 
 struct fmpz_mod_mpoly_ctx_struct
   minfo::mpoly_ctx_t
   ffinfo::fmpz_mod_ctx_t
 end
 
-const fmpz_mod_mpoly_ctx_t = Ref{fmpz_mod_mpoly_ctx_struct}
+const fmpz_mod_mpoly_ctx_t = Tuple{fmpz_mod_mpoly_ctx_struct}
 
 struct fq_nmod_mpoly_ctx_struct
   minfo::mpoly_ctx_t
   fqctx::fq_nmod_ctx_t
 end
 
-const fq_nmod_mpoly_ctx_t = Ref{fq_nmod_mpoly_ctx_struct}
+const fq_nmod_mpoly_ctx_t = Tuple{fq_nmod_mpoly_ctx_struct}
 
 struct struct_mpoly_void_ring_t
   elem_size::slong
@@ -941,7 +941,7 @@ struct struct_mpoly_void_ring_t
   pow_fmpz::Ptr{Cvoid}
   length::Ptr{Cvoid}
 end
-const mpoly_void_ring_t = Ref{struct_mpoly_void_ring_t}
+const mpoly_void_ring_t = Tuple{struct_mpoly_void_ring_t}
 
 struct mpoly_gcd_info_struct
   Amax_exp::Ptr{ulong}
@@ -990,7 +990,7 @@ struct mpoly_gcd_info_struct
   data::Ptr{Cchar}
 end
 
-const mpoly_gcd_info_t = Ref{mpoly_gcd_info_struct}
+const mpoly_gcd_info_t = Tuple{mpoly_gcd_info_struct}
 
 struct mpoly_compression_struct
   mvars::slong
@@ -1007,7 +1007,7 @@ struct mpoly_compression_struct
   is_irred::Cint
 end
 
-const mpoly_compression_t = Ref{mpoly_compression_struct}
+const mpoly_compression_t = Tuple{mpoly_compression_struct}
 
 struct nmod_mpolyn_struct
   coeffs::Ptr{n_poly_struct}
@@ -1017,7 +1017,7 @@ struct nmod_mpolyn_struct
   bits::slong
 end
 
-const nmod_mpolyn_t = Ref{nmod_mpolyn_struct}
+const nmod_mpolyn_t = Tuple{nmod_mpolyn_struct}
 
 struct nmod_mpolyun_struct
   coeffs::Ptr{nmod_mpolyn_struct}
@@ -1027,7 +1027,7 @@ struct nmod_mpolyun_struct
   bits::flint_bitcnt_t
 end
 
-const nmod_mpolyun_t = Ref{nmod_mpolyun_struct}
+const nmod_mpolyun_t = Tuple{nmod_mpolyun_struct}
 
 @enum nmod_gcds_ret_t begin
   nmod_gcds_success
