@@ -180,6 +180,7 @@ const nemopath = dirname(dirname(@__FILE__))
 
 @info "Setting up environment"
 using Pkg
+ENV["JULIA_PKG_PRECOMPILE_AUTO"]=0
 Pkg.activate(; temp=true)
 Pkg.develop(PackageSpec(; path=nemopath))
 Pkg.add("FLINT_jll") # version is fixed by Nemo.jl in the line above
