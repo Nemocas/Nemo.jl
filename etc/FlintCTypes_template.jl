@@ -6,6 +6,8 @@
 
 module FlintC
 
+using ..Nemo: @flintstruct, FlintStruct
+
 #
 # FLINT configuration and global definitions
 #

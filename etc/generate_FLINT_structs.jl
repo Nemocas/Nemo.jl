@@ -42,11 +42,11 @@ const regex_typedef_union_unionname_values_name = r"^typedef union *([A-Za-z0-9_
 
 function convert_struct(str::AbstractString)
   substitutions = Pair{Regex,Union{SubstitutionString,Function}}[
-    regex_typedef_struct_fields_name => s"struct \2\1end",                                        # whole typedef struct construct
-    regex_struct_structname_fields => s"struct struct_\1\2end",                                   # whole struct construct
-    regex_struct_structname => s"struct struct_\1 end",                                           # whole struct construct without fields
-    regex_typedef_struct_fields_refname => s"struct struct_\2\1end\nconst \2 = Tuple{struct_\2}", # whole typedef struct singleton array construct
-    regex_typedef_struct_structname_fields_name => s"struct \3\2end\nconst struct_\1 = \3",       # whole typedef struct construct with two names
+    regex_typedef_struct_fields_name => s"@flintstruct struct \2\1end",                                        # whole typedef struct construct
+    regex_struct_structname_fields => s"@flintstruct struct struct_\1\2end",                                   # whole struct construct
+    regex_struct_structname => s"@flintstruct struct struct_\1 end",                                           # whole struct construct without fields
+    regex_typedef_struct_fields_refname => s"@flintstruct struct struct_\2\1end\nconst \2 = Tuple{struct_\2}", # whole typedef struct singleton array construct
+    regex_typedef_struct_structname_fields_name => s"@flintstruct struct \3\2end\nconst struct_\1 = \3",       # whole typedef struct construct with two names
     r"^ +([A-Za-z0-9_]+) +([A-Za-z0-9_]+);"m => s"  \2::\1",                                      # simple fields (one to five declared on one line)
     r"^ +([A-Za-z0-9_]+) +([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+);"m => s"  \2::\1\n  \3::\1",
     r"^ +([A-Za-z0-9_]+) +([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+) *, *([A-Za-z0-9_]+);"m => s"  \2::\1\n  \3::\1\n  \4::\1",
