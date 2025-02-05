@@ -73,7 +73,13 @@ characteristic(::ComplexField) = 0
 #
 ################################################################################
 
-function convert(::Type{ComplexF64}, x::ComplexFieldElem)
+@doc raw"""
+    ComplexF64(x::ComplexFieldElem)
+
+Converts $x$ to a `ComplexF64`, rounded to the nearest.
+The return value approximates the midpoint of the real and imaginary parts of $x$.
+"""
+function ComplexF64(x::ComplexFieldElem)
   GC.@preserve x begin
     re = _real_ptr(x)
     im = _imag_ptr(x)
@@ -85,6 +91,7 @@ function convert(::Type{ComplexF64}, x::ComplexFieldElem)
   end
   return complex(v, w)
 end
+
 @doc raw"""
     Float64(x::ComplexFieldElem)
 
@@ -101,6 +108,11 @@ function Float64(x::ComplexFieldElem)
   end
   return v
 end
+
+function convert(::Type{ComplexF64}, x::ComplexFieldElem)
+  return ComplexF64(x)
+end
+
 function convert(::Type{Float64}, x::ComplexFieldElem)
   return Float64(x)
 end
