@@ -99,6 +99,14 @@ function Float64(x::AcbFieldElem)
   end
   return v
 end
+
+@doc raw"""
+    ComplexF64(x::AcbFieldElem)
+
+Converts $x$ to a `ComplexF64`, rounded to the nearest.
+The return value approximates the midpoint of the real and imaginary parts of $x$.
+"""
+function ComplexF64(x::AcbFieldElem)
   GC.@preserve x begin
     re = _real_ptr(x)
     im = _imag_ptr(x)
@@ -110,6 +118,11 @@ end
   end
   return complex(v, w)
 end
+
+function convert(::Type{ComplexF64}, x::AcbFieldElem)
+  return ComplexF64(x)
+end
+
 function convert(::Type{Float64}, x::AcbFieldElem)
   return Float64(x)
 end
