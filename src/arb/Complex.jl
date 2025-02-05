@@ -85,6 +85,25 @@ function convert(::Type{ComplexF64}, x::ComplexFieldElem)
   end
   return complex(v, w)
 end
+@doc raw"""
+    Float64(x::ComplexFieldElem)
+
+Converts $x$ to a `Float64`, rounded to the nearest.
+The return value approximates the midpoint of the real part of $x$.
+"""
+function Float64(x::ComplexFieldElem)
+  @req isreal(x) "conversion to float must have no imaginary part"
+  GC.@preserve x begin
+    re = _real_ptr(x)
+    t = _mid_ptr(re)
+    # 4 == round to nearest
+    v = @ccall libflint.arf_get_d(t::Ptr{arf_struct}, 4::Int)::Float64
+  end
+  return v
+end
+function convert(::Type{Float64}, x::ComplexFieldElem)
+  return Float64(x)
+end
 
 ################################################################################
 #
