@@ -106,7 +106,7 @@ end
 Converts $x$ to a `ComplexF64`, rounded to the nearest.
 The return value approximates the midpoint of the real and imaginary parts of $x$.
 """
-function ComplexF64(x::AcbFieldElem)
+function Base.ComplexF64(x::AcbFieldElem)
   GC.@preserve x begin
     re = _real_ptr(x)
     im = _imag_ptr(x)

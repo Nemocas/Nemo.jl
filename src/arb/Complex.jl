@@ -79,7 +79,7 @@ characteristic(::ComplexField) = 0
 Converts $x$ to a `ComplexF64`, rounded to the nearest.
 The return value approximates the midpoint of the real and imaginary parts of $x$.
 """
-function ComplexF64(x::ComplexFieldElem)
+function Base.ComplexF64(x::ComplexFieldElem)
   GC.@preserve x begin
     re = _real_ptr(x)
     im = _imag_ptr(x)
