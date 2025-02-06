@@ -1108,10 +1108,6 @@ julia> QQBar = algebraic_closure(QQ);
 
 julia> x = sinpi(QQBar(1//3))
 Root 0.866025 of 4x^2 - 3
-
-julia> sinpi(x)
-ERROR: DomainError with Root 0.866025 of 4x^2 - 3:
-nonrational algebraic number
 ```
 """
 function sinpi(a::QQBarFieldElem)
@@ -1136,10 +1132,6 @@ julia> QQBar = algebraic_closure(QQ);
 
 julia> x = cospi(QQBar(1//6))
 Root 0.866025 of 4x^2 - 3
-
-julia> cospi(x)
-ERROR: DomainError with Root 0.866025 of 4x^2 - 3:
-nonrational algebraic number
 ```
 """
 function cospi(a::QQBarFieldElem)
@@ -1164,10 +1156,6 @@ julia> QQBar = algebraic_closure(QQ);
 
 julia> s, c = sincospi(QQBar(1//3))
 (Root 0.866025 of 4x^2 - 3, Root 0.500000 of 2x - 1)
-
-julia> sincospi(s)
-ERROR: DomainError with Root 0.866025 of 4x^2 - 3:
-nonrational algebraic number
 ```
 """
 function sincospi(a::QQBarFieldElem)
