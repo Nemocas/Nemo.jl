@@ -94,8 +94,7 @@ function Float64(x::AcbFieldElem)
   GC.@preserve x begin
     re = _real_ptr(x)
     t = _mid_ptr(re)
-    # 4 == round to nearest
-    v = @ccall libflint.arf_get_d(t::Ptr{arf_struct}, 4::Int)::Float64
+    v = @ccall libflint.arf_get_d(t::Ptr{arf_struct}, ARB_RND_NEAR::Int)::Float64
   end
   return v
 end
@@ -112,9 +111,8 @@ function Base.ComplexF64(x::AcbFieldElem)
     im = _imag_ptr(x)
     t = _mid_ptr(re)
     u = _mid_ptr(im)
-    # 4 == round to nearest
-    v = @ccall libflint.arf_get_d(t::Ptr{arf_struct}, 4::Int)::Float64
-    w = @ccall libflint.arf_get_d(u::Ptr{arf_struct}, 4::Int)::Float64
+    v = @ccall libflint.arf_get_d(t::Ptr{arf_struct}, ARB_RND_NEAR::Int)::Float64
+    w = @ccall libflint.arf_get_d(u::Ptr{arf_struct}, ARB_RND_NEAR::Int)::Float64
   end
   return complex(v, w)
 end

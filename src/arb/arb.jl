@@ -113,9 +113,9 @@ for (b, f) in ((RoundingMode{:Down}, :arb_get_lbound_arf),
   end
 end
 
-for (b, i) in ((RoundingMode{:Down}, 2),
-               (RoundingMode{:Up}, 3),
-               (RoundingMode{:Nearest}, 4))
+for (b, i) in ((RoundingMode{:Down}, ARB_RND_FLOOR),
+               (RoundingMode{:Up}, ARB_RND_CEIL),
+               (RoundingMode{:Nearest}, ARB_RND_NEAR))
   @eval begin
     function _arf_get_d(t::arf_struct, ::$b)
       d = @ccall libflint.arf_get_d(t::Ref{arf_struct}, $i::Int)::Float64
