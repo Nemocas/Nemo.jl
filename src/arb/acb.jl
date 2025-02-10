@@ -89,7 +89,7 @@ characteristic(::AcbField) = 0
 Converts $x$ to a `Float64`, rounded to the nearest.
 The return value approximates the midpoint of $x$.
 """
-function Float64(x::AcbFieldElem)
+function Core.Float64(x::AcbFieldElem)
   @req isreal(x) "conversion to float must have no imaginary part"
   GC.@preserve x begin
     re = _real_ptr(x)

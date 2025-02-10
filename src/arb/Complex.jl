@@ -97,7 +97,7 @@ end
 Converts $x$ to a `Float64`, rounded to the nearest.
 The return value approximates the midpoint of the real part of $x$.
 """
-function Float64(x::ComplexFieldElem)
+function Core.Float64(x::ComplexFieldElem)
   @req isreal(x) "conversion to float must have no imaginary part"
   GC.@preserve x begin
     re = _real_ptr(x)

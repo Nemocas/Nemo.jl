@@ -1285,13 +1285,13 @@ end
 
 @inline __get_rounding_mode() = Base.Rounding.rounding_raw(BigFloat)
 
-function BigFloat(a::QQFieldElem)
+function Base.BigFloat(a::QQFieldElem)
   r = BigFloat(0)
   @ccall libflint.fmpq_get_mpfr(r::Ref{BigFloat}, a::Ref{QQFieldElem}, __get_rounding_mode()::Int32)::Cint
   return r
 end
 
-Float64(a::QQFieldElem) = Float64(BigFloat(a))
+Core.Float64(a::QQFieldElem) = Float64(BigFloat(a))
 
 ###############################################################################
 #

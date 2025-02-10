@@ -72,7 +72,7 @@ For `RoundNearest` the return value approximates the midpoint of $x$. For
 `RoundDown` or `RoundUp` the return value is a lower bound or upper bound for
 all values in $x$.
 """
-function Float64(x::RealFieldElem, round::RoundingMode=RoundNearest)
+function Core.Float64(x::RealFieldElem, round::RoundingMode=RoundNearest)
   t = _arb_get_arf(x, round)
   return _arf_get_d(t, round)
 end
@@ -85,7 +85,7 @@ direction specified by $round$. For `RoundNearest` the return value
 approximates the midpoint of $x$. For `RoundDown` or `RoundUp` the return
 value is a lower bound or upper bound for all values in $x$.
 """
-function BigFloat(x::RealFieldElem, round::RoundingMode=RoundNearest)
+function Base.BigFloat(x::RealFieldElem, round::RoundingMode=RoundNearest)
   t = _arb_get_arf(x, round)
   return _arf_get_mpfr(t, round)
 end
@@ -134,7 +134,7 @@ function ZZRingElem(x::RealFieldElem)
   error("Argument must represent a unique integer")
 end
 
-BigInt(x::RealFieldElem) = BigInt(ZZRingElem(x))
+Base.BigInt(x::RealFieldElem) = BigInt(ZZRingElem(x))
 
 function (::Type{T})(x::RealFieldElem) where {T <: Integer}
   typemin(T) <= x <= typemax(T) ||

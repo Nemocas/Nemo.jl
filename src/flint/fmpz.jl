@@ -2916,7 +2916,7 @@ end
 (::Type{Int128})(a::ZZRingElem) = Int128(BigInt(a))
 (::Type{UInt128})(a::ZZRingElem) = UInt128(BigInt(a))
 
-Integer(a::ZZRingElem) = BigInt(a)
+Core.Integer(a::ZZRingElem) = BigInt(a)
 
 convert(::Type{T}, a::ZZRingElem) where T <: Integer = T(a)
 
