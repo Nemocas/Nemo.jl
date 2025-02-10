@@ -1291,7 +1291,7 @@ function Base.BigFloat(a::QQFieldElem)
   return r
 end
 
-Core.Float64(a::QQFieldElem) = Float64(BigFloat(a))
+Base.Float64(a::QQFieldElem) = Float64(BigFloat(a))
 
 ###############################################################################
 #

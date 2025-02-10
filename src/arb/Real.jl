@@ -72,7 +72,7 @@ For `RoundNearest` the return value approximates the midpoint of $x$. For
 `RoundDown` or `RoundUp` the return value is a lower bound or upper bound for
 all values in $x$.
 """
-function Core.Float64(x::RealFieldElem, round::RoundingMode=RoundNearest)
+function Base.Float64(x::RealFieldElem, round::RoundingMode=RoundNearest)
   t = _arb_get_arf(x, round)
   return _arf_get_d(t, round)
 end
