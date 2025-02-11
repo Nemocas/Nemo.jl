@@ -10,26 +10,13 @@
 
 denominator(f::UniversalPolyRingElem{QQFieldElem}) = denominator(data(f))
 
-function +(p::Generic.UnivPoly{T}, n::ZZRingElem) where {T}
-  S = parent(p)
-  return Generic.UnivPoly{T}(data(p)+n, S)
+for op in (:+, :*, :-)
+  @eval begin
+    $op(a::T, b::ZZRingElem) where {T <: Generic.UnivPoly} = T($op(data(a), b), parent(a))
+    $op(a::ZZRingElem, b::T) where {T <: Generic.UnivPoly} = T($op(a, data(b)), parent(b))
+
+    # to avoid ambiguity
+    $op(a::T, b::ZZRingElem) where {T <: Generic.UnivPoly{ZZRingElem}} = T($op(data(a), b), parent(a))
+    $op(a::ZZRingElem, b::T) where {T <: Generic.UnivPoly{ZZRingElem}} = T($op(a, data(b)), parent(b))
+  end
 end
-
-+(n::ZZRingElem, p::Generic.UnivPoly) = p+n
-
-function -(p::Generic.UnivPoly{T}, n::ZZRingElem) where {T}
-  S = parent(p)
-  return Generic.UnivPoly{T}(data(p)-n, S)
-end
-
-function -(n::ZZRingElem, p::Generic.UnivPoly{T}) where {T}
-  S = parent(p)
-  return Generic.UnivPoly{T}(n-data(p), S)
-end
-
-function *(p::Generic.UnivPoly{T}, n::ZZRingElem) where {T}
-  S = parent(p)
-  return Generic.UnivPoly{T}(data(p)*n, S)
-end
-
-*(n::ZZRingElem, p::Generic.UnivPoly) = p*n
