@@ -96,37 +96,6 @@ canonical_unit(a::QQBarFieldElem) = a
 # function expressify(a::QQBarFieldElem; context = nothing)
 # end
 
-#=
-function qqbar_vec(n::Int)
-return @ccall libflint._qqbar_vec_init(n::Int)::Ptr{qqbar_struct}
-end
-
-function array(R::QQBarField, v::Ptr{qqbar_struct}, n::Int)
-r = Vector{QQBarFieldElem}(undef, n)
-for i=1:n
-r[i] = R()
-@ccall libflint.qqbar_set(r[i]::Ref{QQBarFieldElem}, (v + (i-1)*sizeof(qqbar_struct))::Ptr{qqbar_struct})::Nothing
-end
-return r
-end
-
-function qqbar_vec_clear(v::Ptr{qqbar_struct}, n::Int)
-@ccall libflint._qqbar_vec_clear(v::Ptr{qqbar_struct}, n::Int)::Nothing
-end
-
-function roots(R::QQBarField, f::ZZPolyRingElem)
-deg = degree(f)
-if deg <= 0
-return QQBarFieldElem[]
-end
-roots = qqbar_vec(deg)
-@ccall libflint.qqbar_roots_fmpz_poly(roots::Ptr{qqbar_struct}, f::Ref{ZZPolyRingElem}, 0::Int)::Nothing
-res = array(R, roots, deg)
-qqbar_vec_clear(roots, deg)
-return res
-end
-=#
-
 function native_string(x::QQBarFieldElem)
   cstr = @ccall libflint.qqbar_get_str_nd(x::Ref{QQBarFieldElem}, Int(6)::Int)::Ptr{UInt8}
   number = unsafe_string(cstr)
@@ -1030,25 +999,12 @@ end
 ###############################################################################
 
 @doc raw"""
-    root_of_unity(C::QQBarField, n::Int)
-
-Return the root of unity $e^{2 \pi i / n}$ as an element of the field
-of algebraic numbers `C`.
-"""
-function root_of_unity(C::QQBarField, n::Int)
-  n <= 0 && throw(DomainError(n))
-  z = QQBarFieldElem()
-  @ccall libflint.qqbar_root_of_unity(z::Ref{QQBarFieldElem}, 1::Int, n::UInt)::Nothing
-  return z
-end
-
-@doc raw"""
-    root_of_unity(C::QQBarField, n::Int, k::Int)
+    root_of_unity(C::QQBarField, n::Int, k::Int = 1)
 
 Return the root of unity $e^{2 \pi i k / n}$ as an element of the field
 of algebraic numbers `C`.
 """
-function root_of_unity(C::QQBarField, n::Int, k::Int)
+function root_of_unity(C::QQBarField, n::Int, k::Int = 1)
   n <= 0 && throw(DomainError(n))
   z = QQBarFieldElem()
   @ccall libflint.qqbar_root_of_unity(z::Ref{QQBarFieldElem}, k::Int, n::UInt)::Nothing
