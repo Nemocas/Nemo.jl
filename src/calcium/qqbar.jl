@@ -145,11 +145,11 @@ end
 
 function show(io::IO, F::QQBarField)
   # deliberately no @show_name or @show_special here as this is a singleton type
+  io = pretty(io)
   if is_terse(io)
-    io = pretty(io)
     print(io, LowercaseOff(), "QQBar")
   else
-    print(io, "Field of algebraic numbers")
+    print(io, "Algebraic closure of ", Lowercase(), QQ)
   end
 end
 
@@ -1472,7 +1472,7 @@ rational numbers.
 
 ```jldoctest
 julia> K = algebraic_closure(QQ)
-Field of algebraic numbers
+Algebraic closure of rational field
 
 julia> sqrt(K(2))
 Root 1.41421 of x^2 - 2
