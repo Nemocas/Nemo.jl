@@ -706,6 +706,8 @@ $0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor$ and
 $0 < d \leq \lfloor\sqrt{m/2}\rfloor$ such that gcd$(n, d) = 1$ and
 $a \equiv nd^{-1} \pmod{m}$. If no solution exists, an exception is thrown.
 
+See also [`unsafe_reconstruct`](@ref) and [`rational_reconstruction`](@ref).
+
 # Examples
 
 ```jldoctest
@@ -740,6 +742,8 @@ Attempt to return a rational number $n/d$ such that $0 \leq |n| \leq N$ and $0 <
 such that $2 N D < m$, gcd$(n, d) = 1$, and $a \equiv nd^{-1} \pmod{m}$.
 
 Returns a tuple (`success`, `n/d`), where `success` signals the success of reconstruction.
+
+The behaviour is undefined if $a$ is negative or larger than $m$.
 """
 function reconstruct(a::ZZRingElem, m::ZZRingElem, N::ZZRingElem, D::ZZRingElem)
   c = QQFieldElem()
@@ -752,6 +756,8 @@ end
 
 Same as [`reconstruct`](@ref), but does not throw if reconstruction fails.
 Returns a tuple (`success`, `n/d`), where `success` signals the success of reconstruction.
+
+The behaviour is undefined if $a$ is negative or larger than $m$.
 """
 function unsafe_reconstruct(a::ZZRingElem, m::ZZRingElem)
   c = QQFieldElem()

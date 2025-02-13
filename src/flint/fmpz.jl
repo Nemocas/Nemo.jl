@@ -2951,6 +2951,112 @@ Base.promote_rule(::Type{ZZRingElem}, ::Type{T}) where {T <: Integer} = ZZRingEl
 
 promote_rule(::Type{ZZRingElem}, ::Type{T}) where {T <: Integer} = ZZRingElem
 
+
+#output sensitive rational_reconstruction, in particular if
+#numerator is larger than den 
+#used below in rational_reconstruction and, more seriously, in the 
+#solvers in ZZMatrix-Linalg
+
+function _ratrec!(n::ZZRingElem, d::ZZRingElem, a::ZZRingElem, b::ZZRingElem, N::ZZRingElem = ZZ(), D::ZZRingElem= ZZ())
+  k = nbits(b)
+  l = 1
+  set!(N, b)
+  set!(D, 2)
+
+#  @assert 0<a<b
+  done = false
+  while !done && D <= N
+    Nemo.mul!(D, D, D)
+    tdiv_q!(N, b, D)
+    shift_right!(N, N, 1)
+    if D>N
+      @ccall Nemo.libflint.fmpz_root(N::Ref{ZZRingElem}, b::Ref{ZZRingElem}, 2::Int)::Nothing
+      shift_right!(D, N, 1)
+      done = true
+    end
+
+#    @assert 2*N*D < b
+
+    fl = ccall((:_fmpq_reconstruct_fmpz_2, Nemo.libflint), Bool, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), n, d, a, b, N, D)
+
+    if fl && (nbits(n)+nbits(d) < k - 30 || D>N)
+      return fl
+    end
+    l += 1
+  end
+  return false
+end
+
+#Note: this is not the best (fastest) algorithm, not the most general
+#      signature, not the best (fastest) interface, ....
+#However: for now it works.
+
+@doc raw"""
+    rational_reconstruction(a::ZZRingElem, b::ZZRingElem)
+    rational_reconstruction(a::Integer, b::Integer)
+
+Tries to solve $ay=x mod b$ for $x,y < sqrt(b/2)$. If possible, returns
+  (`true`, $x$, $y$) or (`false`, garbage) if not possible.
+
+If `Unbalanced` is set to `true`, a solution is accepted if `nbits(x) + nbits(y) + 30 <= nbits(b)` - this allows for the numberator or denominator to be much smaller
+than the other one.
+
+By default `y` and `b` have to be coprime for a valid solution. It is
+well known that then the solution is unique.
+
+If `ErrorTolerant` is set to `true`, then a solution is also accepted if
+`x`, `y` and `b` have a common divisor `g` and if
+  `a(y/g) = (x/g) mod (b/g)` is true and if the combined size is small enough.
+
+The typical application are modular algorithms where
+ - there are finitely many bad primes (ie. the `mod p` datum does
+   not match the global solution modulo `p`)
+ - that cannot be detected
+In this case `g` will be the product of the bad primes.
+
+See also [`ratrecon`](@ref).
+
+"""
+function rational_reconstruction(a::ZZRingElem, b::ZZRingElem; ErrorTolerant::Bool = false, Unbalanced::Bool = false)
+  @req !ErrorTolerant || !Unbalanced "only one of `ErrorTolerant` and `Unbalanced` can be used at a time"
+
+  if Unbalanced
+    n = ZZ()
+    d = ZZ()
+    fl = ratcec!(n, d, a, b)
+    return fl, n, d
+  elseif ErrorTolerant
+    m = matrix(ZZ, 2, 2, [a, ZZRingElem(1), b, ZZRingElem(0)])
+    lll!(m)
+    x = m[1,1]
+    y = m[1,2]
+    @assert (a*y-x) % b == 0
+    g = gcd(x, y)
+    divexact!(x, g)
+    divexact!(y, g)
+    return nbits(x)+nbits(y)+2*nbits(g) + 20 < nbits(b), x, y
+  else
+    res = QQFieldElem()
+    a = mod(a, b)
+    fl = ccall((:fmpq_reconstruct_fmpz, libflint), Int, (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), res, a, b)
+    return fl!=0, numerator(res), denominator(res)
+  end
+end
+
+@doc raw"""
+    rational_reconstruction(a::ZZRingElem, b::ZZRingElem, N::ZZRingElem, D::ZZRingElem) -> Bool, ZZRingElem, ZZRingElem
+
+Given $a$ modulo $b$ and $N>0$, $D>0$ such that $2ND<b$, find $|x|\le N$, $0<y\le D$
+satisfying $x/y \equiv a \bmod b$ or $a \equiv ya \bmod b$.
+"""
+function rational_reconstruction(a::ZZRingElem, b::ZZRingElem, N::ZZRingElem, D::ZZRingElem)
+  res = QQFieldElem()
+  a = mod(a, b)
+  fl = ccall((:fmpq_reconstruct_fmpz_2, libflint), Int, (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), res, a, b, N, D)
+  return fl!=0, numerator(res), denominator(res)
+end
+
+
 ###############################################################################
 #
 #  Perfect power detection
@@ -2969,7 +3075,7 @@ end
     is_perfect_power(a::IntegerUnion)
 
 Return whether $a$ is a perfect power, that is, whether $a = m^r$ for some
-integer $m$ and $r > 1$.
+integer $m$ and $r > 1$. Neither $m$ nor $r$ is returned.
 """
 function is_perfect_power(a::ZZRingElem)
   _, ex = _is_perfect_power(a)
