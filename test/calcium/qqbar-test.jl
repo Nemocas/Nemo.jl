@@ -48,6 +48,42 @@ end
 
 end
 
+@testset "QQBarFieldElem.unsafe" begin
+  a = QQBarFieldElem(32//17)
+  b = QQBarFieldElem(23//11)
+  c = one(QQ)
+  b_copy = deepcopy(b)
+  c_copy = deepcopy(c)
+
+  a = zero!(a)
+  @test iszero(a)
+  a = mul!(a, a, b)
+  @test iszero(a)
+
+  a = add!(a, a, b)
+  @test a == b
+  a = add!(a, a, 1)
+  @test a == b + 1
+  a = add!(a, a, ZZRingElem(0))
+  @test a == b + 1
+
+  a = add!(a, b^2)
+  @test a == 1 + b + b^2
+
+  a = mul!(a, a, b)
+  @test a == (1 + b + b^2) * b
+  a = mul!(a, a, 3)
+  @test a == (1 + b + b^2) * b * 3
+  a = mul!(a, a, ZZRingElem(3))
+  @test a == (1 + b + b^2) * b * 9
+
+  a = addmul!(a, a, c)
+  @test a == 2 * (1 + b + b^2) * b * 9
+
+  @test b_copy == b
+  @test c_copy == c
+end
+
 @testset "QQBarFieldElem.printing" begin
   R = algebraic_closure(QQ)
   a = R(1)

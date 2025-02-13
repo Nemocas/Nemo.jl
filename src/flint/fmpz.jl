@@ -497,32 +497,18 @@ end
 #
 ###############################################################################
 
-+(a::ZZRingElem, b::Int) = add!(ZZRingElem(), a, b)
-+(a::Int, b::ZZRingElem) = b + a
+for T in (Int, UInt, Integer)
+  @eval begin
+    +(a::ZZRingElem, b::$T) = add!(ZZRingElem(), a, b)
+    +(a::$T, b::ZZRingElem) = add!(ZZRingElem(), a, b)
 
-+(a::ZZRingElem, b::UInt) = add!(ZZRingElem(), a, b)
-+(a::UInt, b::ZZRingElem) = b + a
+    -(a::ZZRingElem, b::$T) = sub!(ZZRingElem(), a, b)
+    -(a::$T, b::ZZRingElem) = sub!(ZZRingElem(), a, b)
 
-+(a::ZZRingElem, b::Integer) = a + flintify(b)
-+(a::Integer, b::ZZRingElem) = flintify(a) + b
-
--(a::ZZRingElem, b::Int) = sub!(ZZRingElem(), a, b)
--(a::Int, b::ZZRingElem) = neg!(b - a)
-
--(a::ZZRingElem, b::UInt) = sub!(ZZRingElem(), a, b)
--(a::UInt, b::ZZRingElem) = neg!(b - a)
-
--(a::ZZRingElem, b::Integer) = a - flintify(b)
--(a::Integer, b::ZZRingElem) = flintify(a) - b
-
-*(a::ZZRingElem, b::Int) = mul!(ZZRingElem(), a, b)
-*(a::Int, b::ZZRingElem) = b * a
-
-*(a::ZZRingElem, b::UInt) = mul!(ZZRingElem(), a, b)
-*(a::UInt, b::ZZRingElem) = b * a
-
-*(a::ZZRingElem, b::Integer) = a*flintify(b)
-*(a::Integer, b::ZZRingElem) = flintify(a)*b
+    *(a::ZZRingElem, b::$T) = mul!(ZZRingElem(), a, b)
+    *(a::$T, b::ZZRingElem) = mul!(ZZRingElem(), a, b)
+  end
+end
 
 *(a::ZZRingElem, b::AbstractFloat) = BigInt(a) * b
 *(a::AbstractFloat, b::ZZRingElem) = a * BigInt(b)

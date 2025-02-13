@@ -286,34 +286,14 @@ conj(x::QQFieldElem) = x
 #
 ###############################################################################
 
-for T in (ZZRingElem, Int, UInt)
+for T in (ZZRingElem, Int, UInt, Integer, Rational)
   @eval begin
     +(a::QQFieldElem, b::$T) = add!(QQFieldElem(), a, b)
     +(a::$T, b::QQFieldElem) = add!(QQFieldElem(), a, b)
-  end
-end
 
-+(a::QQFieldElem, b::Integer) = a + flintify(b)
-+(a::Integer, b::QQFieldElem) = b + a
-
-+(a::QQFieldElem, b::Rational{T}) where {T <: Integer} = a + QQFieldElem(b)
-+(a::Rational{T}, b::QQFieldElem) where {T <: Integer} = b + a
-
-for T in (ZZRingElem, Int, UInt)
-  @eval begin
     -(a::QQFieldElem, b::$T) = sub!(QQFieldElem(), a, b)
     -(a::$T, b::QQFieldElem) = sub!(QQFieldElem(), a, b)
-  end
-end
 
--(a::QQFieldElem, b::Integer) = a - flintify(b)
--(a::Integer, b::QQFieldElem) = flintify(a) - b
-
--(a::QQFieldElem, b::Rational{T}) where {T <: Integer} = a - QQFieldElem(b)
--(a::Rational{T}, b::QQFieldElem) where {T <: Integer} = QQFieldElem(a) - b
-
-for T in (ZZRingElem, Int, UInt, Integer, Rational)
-  @eval begin
     *(a::QQFieldElem, b::$T) = mul!(QQFieldElem(), a, b)
     *(a::$T, b::QQFieldElem) = mul!(QQFieldElem(), a, b)
   end
