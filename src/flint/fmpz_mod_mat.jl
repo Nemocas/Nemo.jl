@@ -270,6 +270,7 @@ end
 #= Not implemented in FLINT yet
 
 function ^(x::T, y::Int) where T <: Zmod_fmpz_mat
+nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
 if y < 0
 x = inv(x)
 y = -y
