@@ -390,14 +390,6 @@ for T in (QQFieldElem, ZZRingElem, Int, UInt, Integer, Rational)
   end
 end
 
-# todo: want qqbar_pow_fmpz, qqbar_pow_fmpq, qqbar_pow_si
-^(a::QQBarFieldElem, b::ZZRingElem) = a ^ QQBarFieldElem(b)
-^(a::QQBarFieldElem, b::QQFieldElem) = a ^ QQBarFieldElem(b)
-^(a::QQBarFieldElem, b::Int) = a ^ QQBarFieldElem(b)
-^(a::ZZRingElem, b::QQBarFieldElem) = QQBarFieldElem(a) ^ b
-^(a::QQFieldElem, b::QQBarFieldElem) = QQBarFieldElem(a) ^ b
-^(a::Int, b::QQBarFieldElem) = QQBarFieldElem(a) ^ b
-
 ###############################################################################
 #
 #   Exact division
