@@ -1,4 +1,6 @@
 testlist = [
+# Aqua.jl
+  "Aqua.jl",
 # Fields-test.jl
   "flint/fmpq-test.jl",
   "flint/gfp-test.jl",

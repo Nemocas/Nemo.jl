@@ -22,9 +22,6 @@ end
 @everywhere using Test
 @everywhere using InteractiveUtils: @which
 @everywhere import Nemo.AbstractAlgebra
-
-include("Aqua.jl")
-
 @everywhere const ring_to_mat = Dict(ZZ                         => ZZMatrix,
                          QQ                         => QQMatrix,
                          residue_ring(ZZ, 9)[1]          => zzModMatrix,
