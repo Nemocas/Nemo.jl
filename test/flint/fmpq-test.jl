@@ -699,3 +699,6 @@ end
   @test is_power(QQ(1//2), 2)[1] == false
   @test is_power(QQ(4//9), 2) == (true, 2//3)
 end
+
+include("fmpq_rel_series-test.jl")
+include("fmpq_abs_series-test.jl")

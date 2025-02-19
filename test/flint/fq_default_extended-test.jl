@@ -1,3 +1,5 @@
+import Nemo: AbstractAlgebra.PrettyPrinting
+
 @testset "FqFieldElem.constructors" begin
   R, a = finite_field(ZZRingElem(7), 5, "a")
   Rx, x = R["x"]
