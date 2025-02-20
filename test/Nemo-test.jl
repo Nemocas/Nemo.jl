@@ -36,14 +36,12 @@ testlist = [
   "flint/fq_poly-test.jl",
   "flint/fq_nmod_poly-test.jl",
   "flint/fq_default_poly-test.jl",
-# The following two tests are included in fmpz-test.jl
-#  "flint/fmpz_rel_series-test.jl",
-#  "flint/fmpz_abs_series-test.jl",
+ "flint/fmpz_rel_series-test.jl",
+ "flint/fmpz_abs_series-test.jl",
   "flint/fmpz_laurent_series-test.jl",
   "flint/fmpz_puiseux_series-test.jl",
-# The following two tests are included in fmpq-test.jl
-#  "flint/fmpq_rel_series-test.jl",
-#  "flint/fmpq_abs_series-test.jl",
+ "flint/fmpq_rel_series-test.jl",
+ "flint/fmpq_abs_series-test.jl",
   "flint/nmod_abs_series-test.jl",
   "flint/gfp_abs_series-test.jl",
   "flint/fmpz_mod_abs_series-test.jl",

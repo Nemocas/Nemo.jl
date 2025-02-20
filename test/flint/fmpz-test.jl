@@ -1679,6 +1679,3 @@ end
   @test @inferred collect(bits(ZZ(5))) == Bool[true, false, true]
   @test @inferred collect(bits(ZZ(2)^64)) == append!([true], falses(64))
 end
-
-include("fmpz_rel_series-test.jl")
-include("fmpz_abs_series-test.jl")
