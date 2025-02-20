@@ -219,7 +219,7 @@ function test_elem(R::Nemo.ZZiRing)
 end
 
 @testset "ZZiRingElem.conformance_tests" begin
-  test_Ring_interface(ZZi)
-  test_EuclideanRing_interface(ZZi)
+  ConformanceTests.test_Ring_interface(ZZi)
+  ConformanceTests.test_EuclideanRing_interface(ZZi)
 end
 

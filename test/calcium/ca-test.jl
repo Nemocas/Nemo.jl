@@ -4,8 +4,8 @@ end
 
 @testset "CalciumFieldElem.conformance_tests" begin
   R = CalciumField()
-  test_Field_interface(R)
-  #test_Field_interface_recursive(R)  # polynomial ring tests too slow
+  ConformanceTests.test_Field_interface(R)
+  #ConformanceTests.test_Field_interface_recursive(R)  # polynomial ring tests too slow
 end
 
 @testset "CalciumFieldElem.constructors" begin

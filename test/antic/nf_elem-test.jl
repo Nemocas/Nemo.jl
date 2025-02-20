@@ -5,7 +5,7 @@ end
 @testset "AbsSimpleNumFieldElem.conformance_tests" begin
   R, x = polynomial_ring(QQ, "x")
   K, a = number_field(x^3 + 3x + 1, "a")
-  test_Field_interface_recursive(K)
+  ConformanceTests.test_Field_interface_recursive(K)
 end
 
 @testset "AbsSimpleNumFieldElem.constructors" begin

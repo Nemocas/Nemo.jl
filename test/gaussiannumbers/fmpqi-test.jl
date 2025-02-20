@@ -135,5 +135,5 @@ function test_elem(R::Nemo.QQiField)
 end
 
 @testset "QQiFieldElem.conformance_tests" begin
-  test_Field_interface(QQi)
+  ConformanceTests.test_Field_interface(QQi)
 end

@@ -8,8 +8,8 @@ end
 @testset "PadicFieldElem.conformance_tests" begin
   # TODO: make the following work; for now they fail because the conformance
   # tests want to use isapprox on PadicFieldElem elements, but no such method exists
-  #   test_Field_interface_recursive(PadicField(7, 30))
-  #   test_Field_interface_recursive(PadicField(ZZRingElem(65537), 30))
+  #   ConformanceTests.test_Field_interface_recursive(PadicField(7, 30))
+  #   ConformanceTests.test_Field_interface_recursive(PadicField(ZZRingElem(65537), 30))
 end
 
 @testset "PadicFieldElem.constructors" begin

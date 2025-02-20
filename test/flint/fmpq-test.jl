@@ -5,7 +5,7 @@ function test_elem(R::QQField)
 end
 
 @testset "QQFieldElem.conformance_tests" begin
-  test_Field_interface_recursive(QQ)
+  ConformanceTests.test_Field_interface_recursive(QQ)
 end
 
 @testset "QQFieldElem.issingletontype" begin

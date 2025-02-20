@@ -5,7 +5,7 @@ function test_elem(R::ZZRing)
 end
 
 @testset "ZZRingElem.conformance_tests" begin
-  test_Ring_interface_recursive(ZZ)
+  ConformanceTests.test_Ring_interface_recursive(ZZ)
 end
 
 @testset "ZZRingElem.issingletontype" begin
