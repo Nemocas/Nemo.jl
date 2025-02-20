@@ -1,7 +1,3 @@
-function test_elem(R::Nemo.ZZModRing)
-  return R(rand(Int))
-end
-
 @testset "ZZModRingElem.conformance_tests" begin
   # for the modulus 1 we get a null ring and some things don't work quite
   # right, e.g. isone(one(S))==false when S is a univariate polynomial ring

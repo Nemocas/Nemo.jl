@@ -379,6 +379,16 @@ rand(R::zzModRing, b::AbstractArray) = rand(Random.default_rng(), R, b)
 
 ###############################################################################
 #
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::Nemo.zzModRing)
+  return R(rand(Int))
+end
+
+###############################################################################
+#
 #   Promotions
 #
 ###############################################################################

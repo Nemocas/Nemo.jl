@@ -1,10 +1,3 @@
-function test_elem(R::PadicField)
-  p = prime(R)
-  prec = rand(1:R.prec_max)
-  r = ZZRingElem(0):p-1
-  return R(sum(rand(r)*p^i for i in 0:prec))
-end
-
 @testset "PadicFieldElem.conformance_tests" begin
   # TODO: make the following work; for now they fail because the conformance
   # tests want to use isapprox on PadicFieldElem elements, but no such method exists

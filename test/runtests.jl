@@ -34,6 +34,5 @@ end
                          ComplexField()                  => ComplexMatrix,
                         )
 
-@everywhere include(joinpath(pathof(AbstractAlgebra), "..", "..", "test", "Rings-conformance-tests.jl"))
 @everywhere include("rand.jl")
 include("Nemo-test.jl")
