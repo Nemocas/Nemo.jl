@@ -4,6 +4,9 @@
 #
 ###############################################################################
 
+include("FlintCHelpers.jl")
+include("FlintCTypes.jl")
+
 const _err_dim_negative = ErrorException("Dimensions must be non-negative")
 
 ###############################################################################
