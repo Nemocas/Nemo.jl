@@ -425,10 +425,18 @@ function divexact(x::ZZRingElem, y::ZZRingElem; check::Bool=true)
   return z
 end
 
-function divides(x::ZZRingElem, y::ZZRingElem)
-  z = ZZRingElem()
+function divides!(z::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
   res = @ccall libflint.fmpz_divides(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Bool
   return res, z
+end
+
+function divides!(z::T, x::T, y::T) where {T}
+  return AbstractAlgebra.divides(x, y)
+end
+
+function AbstractAlgebra.divides(x::ZZRingElem, y::ZZRingElem)
+  z = ZZRingElem()
+  return divides!(z, x, y)
 end
 
 divides(x::ZZRingElem, y::Integer) = divides(x, ZZRingElem(y))
