@@ -285,10 +285,10 @@ end
 @testset "FqFieldElem.iteration" begin
   for n = [2, 3, 5, 13, 31]
     R, _ = finite_field(ZZRingElem(n), 1, "x")
-    elts = Nemo.AbstractAlgebra.test_iterate(R)
+    elts = ConformanceTests.test_iterate(R)
     @test elts == R.(0:n-1)
     R, _ = finite_field(ZZRingElem(n), rand(2:9), "x")
-    Nemo.AbstractAlgebra.test_iterate(R)
+    ConformanceTests.test_iterate(R)
   end
 end
 
