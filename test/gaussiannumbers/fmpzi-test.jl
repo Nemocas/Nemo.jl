@@ -80,6 +80,11 @@ end
   @test_throws Exception remove(ZZi(1), ZZi(0))
   @test remove(ZZi(0), ZZi(2)) == (0, ZZi(0))
   @test remove(ZZi(-10,-2), ZZi(1,1)) == (3, ZZi(2,3))
+
+  fl, q = divides(one(ZZi), zero(ZZi))
+  @test !fl
+  fl, q = divides(zero(ZZi), zero(ZZi))
+  @test fl
 end
 
 @testset "ZZiRingElem.gcd" begin

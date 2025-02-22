@@ -498,6 +498,9 @@ function mod(a::ZZiRingElem, b::ZZiRingElem)
 end
 
 function divides(a::ZZiRingElem, b::Union{ZZRingElem, ZZiRingElem})
+  if iszero(b)
+    return iszero(a), b
+  end
   q, r = divrem(a, b)
   return iszero(r), q
 end
