@@ -3014,7 +3014,7 @@ The typical application are modular algorithms where
  - that cannot be detected
 In this case `g` will be the product of the bad primes.
 
-See also [`ratrecon`](@ref).
+See also [`reconstruct`](@ref).
 
 """
 function rational_reconstruction(a::ZZRingElem, b::ZZRingElem; ErrorTolerant::Bool = false, Unbalanced::Bool = false)
