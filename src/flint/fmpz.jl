@@ -2538,6 +2538,7 @@ addmul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr) = addmul!(z, y, x)
 
 # ignore fourth argument
 addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Union{ZZRingElemOrPtr,Integer}, ::ZZRingElemOrPtr) = addmul!(z, x, y)
+addmul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr, ::ZZRingElemOrPtr) = addmul!(z, x, y)
 
 function submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   @ccall libflint.fmpz_submul(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
@@ -2558,6 +2559,7 @@ submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Integer) = submul!(z, x, flin
 
 # ignore fourth argument
 submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Union{ZZRingElemOrPtr,Integer}, ::ZZRingElemOrPtr) = submul!(z, x, y)
+submul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr, ::ZZRingElemOrPtr) = submul!(z, x, y)
 
 @doc raw"""
     fmma!(r::ZZRingElem, a::ZZRingElem, b::ZZRingElem, c::ZZRingElem, d::ZZRingElem)

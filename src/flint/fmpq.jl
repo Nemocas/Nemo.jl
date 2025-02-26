@@ -1133,10 +1133,16 @@ function addmul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
   return c
 end
 
+# ignore fourth argument
+addmul!(z::QQFieldElemOrPtr, x::QQFieldElemOrPtr, y::QQFieldElemOrPtr, ::QQFieldElemOrPtr) = addmul!(z, x, y)
+
 function submul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
   @ccall libflint.fmpq_submul(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Nothing
   return c
 end
+
+# ignore fourth argument
+submul!(z::QQFieldElemOrPtr, x::QQFieldElemOrPtr, y::QQFieldElemOrPtr, ::QQFieldElemOrPtr) = submul!(z, x, y)
 
 #
 
