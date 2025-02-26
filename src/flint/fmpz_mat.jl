@@ -144,6 +144,14 @@ end
   end
 end
 
+@inline function is_negative_entry(A::ZZMatrix, i::Int, j::Int)
+  @boundscheck _checkbounds(A, i, j)
+  GC.@preserve A begin
+    m = mat_entry_ptr(A, i, j)
+    return is_negative(m)
+  end
+end
+
 function deepcopy_internal(d::ZZMatrix, dict::IdDict)
   z = ZZMatrix(d)
   return z

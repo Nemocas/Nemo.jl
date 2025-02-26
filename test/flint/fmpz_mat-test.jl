@@ -111,17 +111,12 @@ end
   end
 end
 
-@testset "ZZMatrix.is_zero_entry" begin
-  M = matrix(ZZ, [1 2 3;4 0 6;0 8 9])
-  for i in 1:3, j in 1:3
+@testset "ZZMatrix.is_(zero/positive/negative)_entry" begin
+  M = matrix(ZZ, [1 2 -3 0; -4 -999 100 3; 0 0 2 -2])
+  for i in 1:nrows(M), j in 1:ncols(M)
     @test is_zero_entry(M, i, j) == is_zero(M[i, j])
-  end
-end
-
-@testset "ZZMatrix.is_positive_entry" begin
-  M = matrix(ZZ, [1 2 3;-4 0 6;0 8 9])
-  for i in 1:3, j in 1:3
     @test is_positive_entry(M, i, j) == is_positive(M[i, j])
+    @test is_negative_entry(M, i, j) == is_negative(M[i, j])
   end
 end
 
