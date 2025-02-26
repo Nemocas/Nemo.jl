@@ -441,12 +441,6 @@ function addmul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem)
   end
 end
 
-function addmul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem, t::ZZiRingElem)
-  _mul!(t, a, b)
-  return add!(z, z, t)
-end
-
-
 function submul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZRingElem)
   submul!(z.x, a.x, b)
   submul!(z.y, a.y, b)
@@ -463,11 +457,6 @@ function submul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem)
   else
     return submul!(z, a, b, ZZiRingElem())
   end
-end
-
-function submul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem, t::ZZiRingElem)
-  _mul!(t, a, b)
-  return sub!(z, z, t)
 end
 
 ###############################################################################
