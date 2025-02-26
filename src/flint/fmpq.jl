@@ -87,12 +87,12 @@ Return the sign of $a$ ($-1$, $0$ or $1$) as a fraction.
 """
 sign(a::QQFieldElem) = QQFieldElem(sign(numerator(a)))
 
-sign(::Type{Int}, a::QQFieldElem) = Int(@ccall libflint.fmpq_sgn(a::Ref{QQFieldElem})::Cint)
+sign(::Type{Int}, a::QQFieldElemOrPtr) = Int(@ccall libflint.fmpq_sgn(a::Ref{QQFieldElem})::Cint)
 
 Base.signbit(a::QQFieldElem) = signbit(sign(Int, a))
 
-is_negative(n::QQFieldElem) = sign(Int, n) < 0
-is_positive(n::QQFieldElem) = sign(Int, n) > 0
+is_negative(n::QQFieldElemOrPtr) = sign(Int, n) < 0
+is_positive(n::QQFieldElemOrPtr) = sign(Int, n) > 0
 
 function abs(a::QQFieldElem)
   z = QQFieldElem()
