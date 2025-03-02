@@ -341,7 +341,7 @@ function _induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; error_toler
 end
 
 @doc raw"""
-    induce_rational_reconstruction_nosplit(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = true) -> Bool, QQMatrix
+    _induce_rational_reconstruction_nosplit(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = true) -> Bool, QQMatrix
 
 Apply rational reconstruction to all entries in the matrix `a` in the attempt
 to find `D` (over QQ) such that `a - D` is divisible by `b`.
@@ -349,8 +349,8 @@ to find `D` (over QQ) such that `a - D` is divisible by `b`.
 See also [`rational_reconstruction`](@ref) for an explanation of the parameters
   and [`induce_rational_reconstruction`](@ref) for a version returing the numerator matrix and the denominator seperately.
 """
-function induce_rational_reconstruction_nosplit(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = true)
-  fl, n, d = induce_rational_reconstruction_split( a, b; error_tolerant, unbalanced)
+function _induce_rational_reconstruction_nosplit(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = true)
+  fl, n, d = _induce_rational_reconstruction(a, b; error_tolerant, unbalanced)
   D = matrix(QQ, n)*QQ(ZZ(1), d)
   return fl, D
 end
