@@ -3000,13 +3000,13 @@ end
 Tries to solve $ay=x mod b$ for $x,y < sqrt(b/2)$. If possible, returns
   (`true`, $x$, $y$) or (`false`, garbage) if not possible.
 
-If `Unbalanced` is set to `true`, a solution is accepted if `nbits(x) + nbits(y) + 30 <= nbits(b)` - this allows for the numberator or denominator to be much smaller
+If `unbalanced` is set to `true`, a solution is accepted if `nbits(x) + nbits(y) + 30 <= nbits(b)` - this allows for the numberator or denominator to be much smaller
 than the other one.
 
 By default `y` and `b` have to be coprime for a valid solution. It is
 well known that then the solution is unique.
 
-If `ErrorTolerant` is set to `true`, then a solution is also accepted if
+If `error_tolerant` is set to `true`, then a solution is also accepted if
 `x`, `y` and `b` have a common divisor `g` and if
   `a(y/g) = (x/g) mod (b/g)` is true and if the combined size is small enough.
 
@@ -3019,15 +3019,15 @@ In this case `g` will be the product of the bad primes.
 See also [`reconstruct`](@ref).
 
 """
-function rational_reconstruction(a::ZZRingElem, b::ZZRingElem; ErrorTolerant::Bool = false, Unbalanced::Bool = false)
-  @req !ErrorTolerant || !Unbalanced "only one of `ErrorTolerant` and `Unbalanced` can be used at a time"
+function rational_reconstruction(a::ZZRingElem, b::ZZRingElem; error_tolerant::Bool = false, unbalanced::Bool = false)
+  @req !error_tolerant || !unbalanced "only one of `error_tolerant` and `unbalanced` can be used at a time"
 
-  if Unbalanced
+  if unbalanced
     n = ZZ()
     d = ZZ()
     fl = ratcec!(n, d, a, b)
     return fl, n, d
-  elseif ErrorTolerant
+  elseif error_tolerant
     m = matrix(ZZ, 2, 2, [a, ZZRingElem(1), b, ZZRingElem(0)])
     lll!(m)
     x = m[1,1]
@@ -3040,8 +3040,8 @@ function rational_reconstruction(a::ZZRingElem, b::ZZRingElem; ErrorTolerant::Bo
   else
     res = QQFieldElem()
     a = mod(a, b)
-    fl = ccall((:fmpq_reconstruct_fmpz, libflint), Int, (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), res, a, b)
-    return fl!=0, numerator(res), denominator(res)
+    fl = ccall((:fmpq_reconstruct_fmpz, libflint), Cint, (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), res, a, b)
+    return Bool(fl), numerator(res), denominator(res)
   end
 end
 
@@ -3054,8 +3054,8 @@ satisfying $x/y \equiv a \bmod b$ or $a \equiv ya \bmod b$.
 function rational_reconstruction(a::ZZRingElem, b::ZZRingElem, N::ZZRingElem, D::ZZRingElem)
   res = QQFieldElem()
   a = mod(a, b)
-  fl = ccall((:fmpq_reconstruct_fmpz_2, libflint), Int, (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), res, a, b, N, D)
-  return fl!=0, numerator(res), denominator(res)
+  fl = ccall((:fmpq_reconstruct_fmpz_2, libflint), Cint, (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), res, a, b, N, D)
+  return Bool(fl), numerator(res), denominator(res)
 end
 
 

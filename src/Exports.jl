@@ -313,7 +313,6 @@ export hypergeometric_u
 export hypot
 export imag
 export induce_rational_reconstruction
-export induce_rational_reconstruction_split
 export inf
 export infinity
 export inflate
