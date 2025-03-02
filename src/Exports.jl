@@ -312,7 +312,7 @@ export hypergeometric_2f1
 export hypergeometric_u
 export hypot
 export imag
-export induce_rational_reconstruction
+#export induce_rational_reconstruction
 export inf
 export infinity
 export inflate
@@ -520,7 +520,7 @@ export rand_bits_prime
 export rank
 export Rational
 export rational_field
-export rational_reconstruction
+#export rational_reconstruction
 export real
 export RealField
 export RealFieldElem

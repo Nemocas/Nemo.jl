@@ -283,7 +283,7 @@ end
 #adaptive rational_reconstruction: if solution is unbalanced with
 #denominator smaller than numerator
 @doc raw"""
-    induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = true) -> Bool, ZZMatrix, ZZRingElem
+    _induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = true) -> Bool, ZZMatrix, ZZRingElem
 
 Apply rational reconstruction to all entries in the matrix `a` in the attempt
 to find `D` (over ZZ) and `n` (in ZZ) such that `an - D` is divisible by `b`.
@@ -294,7 +294,7 @@ See also [`rational_reconstruction`](@ref) for an explanation of the parameters
   and [`induce_rational_reconstruction`](@ref) for a version returing the rational
     matrix.
 """
-function induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = true)
+function _induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = true)
 
   @req !error_tolerant || !unbalanced "only one of `error_tolerant` and `unbalanced` can be used at a time"
 
@@ -317,7 +317,7 @@ function induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; error_tolera
         if unbalanced
           fl = _ratrec!(n, d, T, b, bN, bD)
         else
-          fl, n, d = rational_reconstruction(T, n; error_tolerant)
+          fl, n, d = _rational_reconstruction(T, n; error_tolerant)
         end
         fl || return fl, A, D
         if !isone(d)
@@ -518,7 +518,7 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
       nexti = ceil(Int,(i*1.4)) + 1;
       #TODO: maybe col by col? to stop doing cols that are already there?
       #main use currently is 1 col anyway
-      fl, num, den = induce_rational_reconstruction(D.x, ppow)
+      fl, num, den = _induce_rational_reconstruction(D.x, ppow)
 
       if fl
 #        @show fl = (D.A*num == den*_B)
@@ -598,7 +598,7 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
     end
     divexact!(d, d, ZZ(D.p))
   end
-  fl, num, den = induce_rational_reconstruction(D.x, ppow)
+  fl, num, den = _induce_rational_reconstruction(D.x, ppow)
   @assert fl
 
   if side == :right
@@ -881,7 +881,7 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
 
   if is_zero(R)
     mu = vcat([_to_base!(t, m) for t = allV]...)
-    tau = induce_rational_reconstruction(mu, m)
+    tau = _induce_rational_reconstruction(mu, m)
     @assert tau[1]
     GC.enable(GC_d)
     return tau[2], tau[3]
@@ -941,11 +941,11 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
 
     mex = m^(2*ex)
     mu = vcat([_to_base!(t[:, 1:1], m) for t = allV]...)
-    tau = induce_rational_reconstruction(mu, mex)
+    tau = _induce_rational_reconstruction(mu, mex)
     if tau[1]
       GC.enable(true)
       mu = vcat([_to_base!(deepcopy(t), m) for t = allV]...)
-      tau = induce_rational_reconstruction(mu, mex)
+      tau = _induce_rational_reconstruction(mu, mex)
       if tau[1]
         GC.enable(GC_d)
         return tau[2], tau[3]
@@ -955,7 +955,7 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
     end
   end
   mu = vcat([_to_base!(t, m) for t = allV]...)
-  tau = induce_rational_reconstruction(mu, mex)
+  tau = _induce_rational_reconstruction(mu, mex)
   @assert tau[1]
   GC.enable(GC_d)
   return tau[2], tau[3]

@@ -2994,8 +2994,8 @@ end
 #However: for now it works.
 
 @doc raw"""
-    rational_reconstruction(a::ZZRingElem, b::ZZRingElem)
-    rational_reconstruction(a::Integer, b::Integer)
+    _rational_reconstruction(a::ZZRingElem, b::ZZRingElem)
+    _rational_reconstruction(a::Integer, b::Integer)
 
 Tries to solve $ay=x mod b$ for $x,y < sqrt(b/2)$. If possible, returns
   (`true`, $x$, $y$) or (`false`, garbage) if not possible.
@@ -3019,7 +3019,7 @@ In this case `g` will be the product of the bad primes.
 See also [`reconstruct`](@ref).
 
 """
-function rational_reconstruction(a::ZZRingElem, b::ZZRingElem; error_tolerant::Bool = false, unbalanced::Bool = false)
+function _rational_reconstruction(a::ZZRingElem, b::ZZRingElem; error_tolerant::Bool = false, unbalanced::Bool = false)
   @req !error_tolerant || !unbalanced "only one of `error_tolerant` and `unbalanced` can be used at a time"
 
   if unbalanced
@@ -3046,12 +3046,12 @@ function rational_reconstruction(a::ZZRingElem, b::ZZRingElem; error_tolerant::B
 end
 
 @doc raw"""
-    rational_reconstruction(a::ZZRingElem, b::ZZRingElem, N::ZZRingElem, D::ZZRingElem) -> Bool, ZZRingElem, ZZRingElem
+    _rational_reconstruction(a::ZZRingElem, b::ZZRingElem, N::ZZRingElem, D::ZZRingElem) -> Bool, ZZRingElem, ZZRingElem
 
 Given $a$ modulo $b$ and $N>0$, $D>0$ such that $2ND<b$, find $|x|\le N$, $0<y\le D$
 satisfying $x/y \equiv a \bmod b$ or $a \equiv ya \bmod b$.
 """
-function rational_reconstruction(a::ZZRingElem, b::ZZRingElem, N::ZZRingElem, D::ZZRingElem)
+function _rational_reconstruction(a::ZZRingElem, b::ZZRingElem, N::ZZRingElem, D::ZZRingElem)
   res = QQFieldElem()
   a = mod(a, b)
   fl = ccall((:fmpq_reconstruct_fmpz_2, libflint), Cint, (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), res, a, b, N, D)
