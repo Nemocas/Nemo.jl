@@ -291,9 +291,7 @@ Should be used mainly if a common denominator is expected as `rational_reconstru
   is called for each entry in `a` and the denominators are accumulated.
 """
 function _induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = false)
-  #@req !error_tolerant || !unbalanced "only one of `error_tolerant` and `unbalanced` can be used at a time"
-  # GModulel code wants to set them independently
-  # What do the parameters actually mean in this context?
+  @req !error_tolerant || !unbalanced "only one of `error_tolerant` and `unbalanced` can be used at a time"
 
   A = similar(a)
 
