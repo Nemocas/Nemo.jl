@@ -289,14 +289,11 @@ Apply rational reconstruction to all entries in the matrix `a` in the attempt
 to find `D` (over ZZ) and `n` (in ZZ) such that `an - D` is divisible by `b`.
 Should be used mainly if a common denominator is expected as `rational_reconstrucion`
   is called for each entry in `a` and the denominators are accumulated.
-
-See also [`rational_reconstruction`](@ref) for an explanation of the parameters
-  and [`induce_rational_reconstruction`](@ref) for a version returing the rational
-    matrix.
 """
 function _induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = true)
-
-  @req !error_tolerant || !unbalanced "only one of `error_tolerant` and `unbalanced` can be used at a time"
+  #@req !error_tolerant || !unbalanced "only one of `error_tolerant` and `unbalanced` can be used at a time"
+  # GModulel code wants to set them independently
+  # What do the parameters actually mean in this context?
 
   A = similar(a)
 
