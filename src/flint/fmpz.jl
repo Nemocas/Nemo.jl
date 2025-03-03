@@ -2981,7 +2981,7 @@ function _ratrec!(n::ZZRingElem, d::ZZRingElem, a::ZZRingElem, b::ZZRingElem, N:
 
     fl = ccall((:_fmpq_reconstruct_fmpz_2, Nemo.libflint), Bool, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), n, d, a, b, N, D)
 
-    if fl && (nbits(n)+nbits(d) < k - 30 || D>N)
+    if fl && (nbits(n)+nbits(d) < max(k/2, k - 30) || D>N)
       return fl
     end
     l += 1
