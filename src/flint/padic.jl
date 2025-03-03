@@ -797,3 +797,16 @@ function with_precision(f, K::PadicField, n::Int)
 end
 
 Base.setprecision(f::Function, K::PadicField, n::Int) = with_precision(f, K, n)
+
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::PadicField)
+  p = prime(R)
+  prec = rand(1:R.prec_max)
+  r = ZZRingElem(0):p-1
+  return R(sum(rand(r)*p^i for i in 0:prec))
+end

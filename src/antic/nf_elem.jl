@@ -1053,6 +1053,16 @@ rand(K::AbsSimpleNumField, r) = rand(Random.default_rng(), K, r)
 
 ###############################################################################
 #
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(K::AbsSimpleNumField)
+  return rand(K, -10:10)
+end
+
+###############################################################################
+#
 #   AbsSimpleNumField constructor
 #
 ###############################################################################

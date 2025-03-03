@@ -895,6 +895,45 @@ mul!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::Integer) = mul!(z, x, fl
 
 mul!(z::ZZPolyRingElemOrPtr, x::IntegerUnionOrPtr, y::ZZPolyRingElemOrPtr) = mul!(z, y, x)
 
+#
+
+function addmul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_poly_scalar_addmul_fmpz(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem}, b::Ref{ZZRingElem})::Nothing
+  return z
+end
+
+function addmul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::Int)
+  @ccall libflint.fmpz_poly_scalar_addmul_si(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem}, b::Int)::Nothing
+  return z
+end
+
+function addmul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::UInt)
+  @ccall libflint.fmpz_poly_scalar_addmul_ui(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem}, b::UInt)::Nothing
+  return z
+end
+
+addmul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::Integer) = addmul!(z, a, flintify(b))
+addmul!(z::ZZPolyRingElemOrPtr, a::IntegerUnionOrPtr, b::ZZPolyRingElemOrPtr) = addmul!(z, b, a)
+
+# ignore fourth argument
+addmul!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::IntegerUnionOrPtr, ::ZZPolyRingElemOrPtr) = addmul!(z, x, y)
+addmul!(z::ZZPolyRingElemOrPtr, x::IntegerUnionOrPtr, y::ZZPolyRingElemOrPtr, ::ZZPolyRingElemOrPtr) = addmul!(z, x, y)
+
+#
+
+function submul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_poly_scalar_submul_fmpz(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem}, b::Ref{ZZRingElem})::Nothing
+  return z
+end
+
+submul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::Integer) = addmul!(z, a, ZZRingElem(b))
+submul!(z::ZZPolyRingElemOrPtr, a::IntegerUnionOrPtr, b::ZZPolyRingElemOrPtr) = addmul!(z, b, a)
+
+# ignore fourth argument
+submul!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::IntegerUnionOrPtr, ::ZZPolyRingElemOrPtr) = submul!(z, x, y)
+submul!(z::ZZPolyRingElemOrPtr, x::IntegerUnionOrPtr, y::ZZPolyRingElemOrPtr, ::ZZPolyRingElemOrPtr) = submul!(z, x, y)
+
+
 ###############################################################################
 #
 #   Promotions

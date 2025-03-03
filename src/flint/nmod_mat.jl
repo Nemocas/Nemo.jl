@@ -315,6 +315,7 @@ end
 ################################################################################
 
 function ^(x::T, y::UInt) where T <: Zmodn_mat
+  nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
   z = similar(x)
   @ccall libflint.nmod_mat_pow(z::Ref{T}, x::Ref{T}, y::UInt)::Nothing
   return z

@@ -312,8 +312,7 @@ export hypergeometric_2f1
 export hypergeometric_u
 export hypot
 export imag
-export induce_rational_reconstruction
-export induce_rational_reconstruction_split
+#export induce_rational_reconstruction
 export inf
 export infinity
 export inflate
@@ -353,6 +352,7 @@ export is_less_real
 export is_less_root_order
 export is_lower_triangular
 export is_negative
+export is_negative_entry
 export is_nonnegative
 export is_nonpositive
 export is_nonzero
@@ -520,7 +520,7 @@ export rand_bits_prime
 export rank
 export Rational
 export rational_field
-export rational_reconstruction
+#export rational_reconstruction
 export real
 export RealField
 export RealFieldElem

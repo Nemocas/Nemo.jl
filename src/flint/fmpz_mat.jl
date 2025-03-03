@@ -144,6 +144,14 @@ end
   end
 end
 
+@inline function is_negative_entry(A::ZZMatrix, i::Int, j::Int)
+  @boundscheck _checkbounds(A, i, j)
+  GC.@preserve A begin
+    m = mat_entry_ptr(A, i, j)
+    return is_negative(m)
+  end
+end
+
 function deepcopy_internal(d::ZZMatrix, dict::IdDict)
   z = ZZMatrix(d)
   return z
@@ -1911,6 +1919,32 @@ end
 
 addmul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::Integer) = addmul!(z, a, flintify(b))
 addmul!(z::ZZMatrixOrPtr, a::IntegerUnionOrPtr, b::ZZMatrixOrPtr) = addmul!(z, b, a)
+
+# ignore fourth argument
+addmul!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::IntegerUnionOrPtr, ::ZZMatrixOrPtr) = addmul!(z, x, y)
+addmul!(z::ZZMatrixOrPtr, x::IntegerUnionOrPtr, y::ZZMatrixOrPtr, ::ZZMatrixOrPtr) = addmul!(z, x, y)
+
+function submul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_mat_scalar_submul_fmpz(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::Ref{ZZRingElem})::Nothing
+  return z
+end
+
+function submul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::Int)
+  @ccall libflint.fmpz_mat_scalar_submul_si(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::Int)::Nothing
+  return z
+end
+
+function submul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::UInt)
+  @ccall libflint.fmpz_mat_scalar_submul_ui(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::UInt)::Nothing
+  return z
+end
+
+submul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::Integer) = submul!(z, a, flintify(b))
+submul!(z::ZZMatrixOrPtr, a::IntegerUnionOrPtr, b::ZZMatrixOrPtr) = submul!(z, b, a)
+
+# ignore fourth argument
+submul!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::IntegerUnionOrPtr, ::ZZMatrixOrPtr) = submul!(z, x, y)
+submul!(z::ZZMatrixOrPtr, x::IntegerUnionOrPtr, y::ZZMatrixOrPtr, ::ZZMatrixOrPtr) = submul!(z, x, y)
 
 function Generic.add_one!(a::ZZMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)

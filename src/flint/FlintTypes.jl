@@ -1008,8 +1008,8 @@ const flint_orderings = [:lex, :deglex, :degrevlex]
 
 @attributes mutable struct ZZMPolyRing <: MPolyRing{ZZRingElem}
   nvars::Int
-  nfields::Cint
-  ord::Int
+  nfields::Int
+  ord::Cint
   deg::Cint
   rev::Cint
   lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}
@@ -1136,8 +1136,8 @@ end
 
 @attributes mutable struct QQMPolyRing <: MPolyRing{QQFieldElem}
   nvars::Int
-  nfields::Cint
-  ord::Int
+  nfields::Int
+  ord::Cint
   deg::Cint
   rev::Cint
   lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}

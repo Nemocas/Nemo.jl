@@ -1,6 +1,6 @@
 @testset "ZZRelPowerSeriesRingElem.conformance_tests" begin
   R, x = power_series_ring(ZZ, 30, "x")
-  test_Ring_interface(R)
+  ConformanceTests.test_Ring_interface(R)
 end
 
 @testset "ZZRelPowerSeriesRingElem.types" begin

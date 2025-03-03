@@ -1,3 +1,5 @@
+import Nemo: AbstractAlgebra.PrettyPrinting
+
 @testset "FqFieldElem.constructors" begin
   R, a = finite_field(ZZRingElem(7), 5, "a")
   Rx, x = R["x"]
@@ -199,7 +201,7 @@ end
   Rx, x = R["x"]
   f = x^3 + x + 1
   F, _ = finite_field(f, "b")
-  AbstractAlgebra.test_iterate(F)
+  ConformanceTests.test_iterate(F)
   @test length(collect(F)) == order(F)
 end
 

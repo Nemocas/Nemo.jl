@@ -131,6 +131,16 @@ end
 
 ###############################################################################
 #
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::Nemo.ZZiRing)
+  return rand_bits(R, rand(0:200))
+end
+
+###############################################################################
+#
 #   Basic manipulation
 #
 ###############################################################################
@@ -431,12 +441,6 @@ function addmul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem)
   end
 end
 
-function addmul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem, t::ZZiRingElem)
-  _mul!(t, a, b)
-  return add!(z, z, t)
-end
-
-
 function submul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZRingElem)
   submul!(z.x, a.x, b)
   submul!(z.y, a.y, b)
@@ -453,11 +457,6 @@ function submul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem)
   else
     return submul!(z, a, b, ZZiRingElem())
   end
-end
-
-function submul!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem, t::ZZiRingElem)
-  _mul!(t, a, b)
-  return sub!(z, z, t)
 end
 
 ###############################################################################
@@ -498,6 +497,9 @@ function mod(a::ZZiRingElem, b::ZZiRingElem)
 end
 
 function divides(a::ZZiRingElem, b::Union{ZZRingElem, ZZiRingElem})
+  if iszero(b)
+    return iszero(a), b
+  end
   q, r = divrem(a, b)
   return iszero(r), q
 end

@@ -425,10 +425,14 @@ function divexact(x::ZZRingElem, y::ZZRingElem; check::Bool=true)
   return z
 end
 
-function divides(x::ZZRingElem, y::ZZRingElem)
-  z = ZZRingElem()
+function AbstractAlgebra.divides!(z::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
   res = @ccall libflint.fmpz_divides(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Bool
   return res, z
+end
+
+function AbstractAlgebra.divides(x::ZZRingElem, y::ZZRingElem)
+  z = ZZRingElem()
+  return divides!(z, x, y)
 end
 
 divides(x::ZZRingElem, y::Integer) = divides(x, ZZRingElem(y))
@@ -497,32 +501,18 @@ end
 #
 ###############################################################################
 
-+(a::ZZRingElem, b::Int) = add!(ZZRingElem(), a, b)
-+(a::Int, b::ZZRingElem) = b + a
+for T in (Int, UInt, Integer)
+  @eval begin
+    +(a::ZZRingElem, b::$T) = add!(ZZRingElem(), a, b)
+    +(a::$T, b::ZZRingElem) = add!(ZZRingElem(), a, b)
 
-+(a::ZZRingElem, b::UInt) = add!(ZZRingElem(), a, b)
-+(a::UInt, b::ZZRingElem) = b + a
+    -(a::ZZRingElem, b::$T) = sub!(ZZRingElem(), a, b)
+    -(a::$T, b::ZZRingElem) = sub!(ZZRingElem(), a, b)
 
-+(a::ZZRingElem, b::Integer) = a + flintify(b)
-+(a::Integer, b::ZZRingElem) = flintify(a) + b
-
--(a::ZZRingElem, b::Int) = sub!(ZZRingElem(), a, b)
--(a::Int, b::ZZRingElem) = neg!(b - a)
-
--(a::ZZRingElem, b::UInt) = sub!(ZZRingElem(), a, b)
--(a::UInt, b::ZZRingElem) = neg!(b - a)
-
--(a::ZZRingElem, b::Integer) = a - flintify(b)
--(a::Integer, b::ZZRingElem) = flintify(a) - b
-
-*(a::ZZRingElem, b::Int) = mul!(ZZRingElem(), a, b)
-*(a::Int, b::ZZRingElem) = b * a
-
-*(a::ZZRingElem, b::UInt) = mul!(ZZRingElem(), a, b)
-*(a::UInt, b::ZZRingElem) = b * a
-
-*(a::ZZRingElem, b::Integer) = a*flintify(b)
-*(a::Integer, b::ZZRingElem) = flintify(a)*b
+    *(a::ZZRingElem, b::$T) = mul!(ZZRingElem(), a, b)
+    *(a::$T, b::ZZRingElem) = mul!(ZZRingElem(), a, b)
+  end
+end
 
 *(a::ZZRingElem, b::AbstractFloat) = BigInt(a) * b
 *(a::AbstractFloat, b::ZZRingElem) = a * BigInt(b)
@@ -2548,6 +2538,7 @@ addmul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr) = addmul!(z, y, x)
 
 # ignore fourth argument
 addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Union{ZZRingElemOrPtr,Integer}, ::ZZRingElemOrPtr) = addmul!(z, x, y)
+addmul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr, ::ZZRingElemOrPtr) = addmul!(z, x, y)
 
 function submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   @ccall libflint.fmpz_submul(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
@@ -2568,6 +2559,7 @@ submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Integer) = submul!(z, x, flin
 
 # ignore fourth argument
 submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Union{ZZRingElemOrPtr,Integer}, ::ZZRingElemOrPtr) = submul!(z, x, y)
+submul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr, ::ZZRingElemOrPtr) = submul!(z, x, y)
 
 @doc raw"""
     fmma!(r::ZZRingElem, a::ZZRingElem, b::ZZRingElem, c::ZZRingElem, d::ZZRingElem)
@@ -2872,6 +2864,16 @@ end
 
 ###############################################################################
 #
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::ZZRing)
+  return rand_bits(ZZ, rand(0:100))
+end
+
+###############################################################################
+#
 #   Constructors
 #
 ###############################################################################
@@ -2992,19 +2994,19 @@ end
 #However: for now it works.
 
 @doc raw"""
-    rational_reconstruction(a::ZZRingElem, b::ZZRingElem)
-    rational_reconstruction(a::Integer, b::Integer)
+    _rational_reconstruction(a::ZZRingElem, b::ZZRingElem)
+    _rational_reconstruction(a::Integer, b::Integer)
 
 Tries to solve $ay=x mod b$ for $x,y < sqrt(b/2)$. If possible, returns
   (`true`, $x$, $y$) or (`false`, garbage) if not possible.
 
-If `Unbalanced` is set to `true`, a solution is accepted if `nbits(x) + nbits(y) + 30 <= nbits(b)` - this allows for the numberator or denominator to be much smaller
+If `unbalanced` is set to `true`, a solution is accepted if `nbits(x) + nbits(y) + 30 <= nbits(b)` or if the compined size of smaller than half of the modulus - this allows for the numberator or denominator to be much smaller
 than the other one.
 
 By default `y` and `b` have to be coprime for a valid solution. It is
 well known that then the solution is unique.
 
-If `ErrorTolerant` is set to `true`, then a solution is also accepted if
+If `error_tolerant` is set to `true`, then a solution is also accepted if
 `x`, `y` and `b` have a common divisor `g` and if
   `a(y/g) = (x/g) mod (b/g)` is true and if the combined size is small enough.
 
@@ -3017,15 +3019,15 @@ In this case `g` will be the product of the bad primes.
 See also [`reconstruct`](@ref).
 
 """
-function rational_reconstruction(a::ZZRingElem, b::ZZRingElem; ErrorTolerant::Bool = false, Unbalanced::Bool = false)
-  @req !ErrorTolerant || !Unbalanced "only one of `ErrorTolerant` and `Unbalanced` can be used at a time"
+function _rational_reconstruction(a::ZZRingElem, b::ZZRingElem; error_tolerant::Bool = false, unbalanced::Bool = false)
+  @req !error_tolerant || !unbalanced "only one of `error_tolerant` and `unbalanced` can be used at a time"
 
-  if Unbalanced
+  if unbalanced
     n = ZZ()
     d = ZZ()
     fl = ratcec!(n, d, a, b)
     return fl, n, d
-  elseif ErrorTolerant
+  elseif error_tolerant
     m = matrix(ZZ, 2, 2, [a, ZZRingElem(1), b, ZZRingElem(0)])
     lll!(m)
     x = m[1,1]
@@ -3038,22 +3040,22 @@ function rational_reconstruction(a::ZZRingElem, b::ZZRingElem; ErrorTolerant::Bo
   else
     res = QQFieldElem()
     a = mod(a, b)
-    fl = ccall((:fmpq_reconstruct_fmpz, libflint), Int, (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), res, a, b)
-    return fl!=0, numerator(res), denominator(res)
+    fl = ccall((:fmpq_reconstruct_fmpz, libflint), Cint, (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), res, a, b)
+    return Bool(fl), numerator(res), denominator(res)
   end
 end
 
 @doc raw"""
-    rational_reconstruction(a::ZZRingElem, b::ZZRingElem, N::ZZRingElem, D::ZZRingElem) -> Bool, ZZRingElem, ZZRingElem
+    _rational_reconstruction(a::ZZRingElem, b::ZZRingElem, N::ZZRingElem, D::ZZRingElem) -> Bool, ZZRingElem, ZZRingElem
 
 Given $a$ modulo $b$ and $N>0$, $D>0$ such that $2ND<b$, find $|x|\le N$, $0<y\le D$
 satisfying $x/y \equiv a \bmod b$ or $a \equiv ya \bmod b$.
 """
-function rational_reconstruction(a::ZZRingElem, b::ZZRingElem, N::ZZRingElem, D::ZZRingElem)
+function _rational_reconstruction(a::ZZRingElem, b::ZZRingElem, N::ZZRingElem, D::ZZRingElem)
   res = QQFieldElem()
   a = mod(a, b)
-  fl = ccall((:fmpq_reconstruct_fmpz_2, libflint), Int, (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), res, a, b, N, D)
-  return fl!=0, numerator(res), denominator(res)
+  fl = ccall((:fmpq_reconstruct_fmpz_2, libflint), Cint, (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), res, a, b, N, D)
+  return Bool(fl), numerator(res), denominator(res)
 end
 
 

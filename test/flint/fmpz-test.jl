@@ -1,11 +1,7 @@
 import Nemo: AbstractAlgebra.PrettyPrinting
 
-function test_elem(R::ZZRing)
-  return rand_bits(ZZ, rand(0:100))
-end
-
 @testset "ZZRingElem.conformance_tests" begin
-  test_Ring_interface_recursive(ZZ)
+  ConformanceTests.test_Ring_interface_recursive(ZZ)
 end
 
 @testset "ZZRingElem.issingletontype" begin
