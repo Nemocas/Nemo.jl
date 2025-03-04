@@ -51,12 +51,11 @@ end
 function is_gen(a::QQMPolyRingElem, i::Int)
   n = nvars(parent(a))
   (i <= 0 || i > n) && error("Index must be between 1 and $n")
-  R = parent(a)
-  return Bool(@ccall libflint.fmpq_mpoly_is_gen(a::Ref{QQMPolyRingElem}, (i - 1)::Int, a.parent::Ref{QQMPolyRing})::Cint)
+  return Bool(@ccall libflint.fmpq_mpoly_is_gen(a::Ref{QQMPolyRingElem}, (i - 1)::Int, parent(a)::Ref{QQMPolyRing})::Cint)
 end
 
 function is_gen(a::QQMPolyRingElem)
-  return Bool(@ccall libflint.fmpq_mpoly_is_gen(a::Ref{QQMPolyRingElem}, (-1)::Int, a.parent::Ref{QQMPolyRing})::Cint)
+  return Bool(@ccall libflint.fmpq_mpoly_is_gen(a::Ref{QQMPolyRingElem}, (-1)::Int, parent(a)::Ref{QQMPolyRing})::Cint)
 end
 
 function deepcopy_internal(a::QQMPolyRingElem, dict::IdDict)
