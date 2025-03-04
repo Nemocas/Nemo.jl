@@ -158,11 +158,16 @@ end
 #
 ###############################################################################
 
-function ^(x::ZZPolyRingElem, y::Int)
-  y < 0 && throw(DomainError(y, "Exponent must be non-negative"))
-  z = parent(x)()
-  @ccall libflint.fmpz_poly_pow(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Int)::Nothing
+function pow!(z::ZZPolyRingElem, x::ZZPolyRingElem, e::Int)
+  @ccall libflint.fmpz_poly_pow(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, e::Int)::Nothing
   return z
+end
+
+function ^(x::ZZPolyRingElem, e::Int)
+  if e < 0
+    throw(DomainError(e, "exponent must be non-negative"))
+  end
+  pow!(parent(x)(), x, e)
 end
 
 ###############################################################################
@@ -235,7 +240,10 @@ end
 
 function reverse(x::ZZPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Index must be non-negative"))
-  z = parent(x)()
+  return reverse!(parent(x)(), x, len)
+end
+
+function reverse!(z::ZZPolyRingElem, x::ZZPolyRingElem, len::Int)
   @ccall libflint.fmpz_poly_reverse(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, len::Int)::Nothing
   return z
 end
