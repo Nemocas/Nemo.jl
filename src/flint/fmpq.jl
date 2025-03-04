@@ -686,8 +686,6 @@ $0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor$ and
 $0 < d \leq \lfloor\sqrt{m/2}\rfloor$ such that gcd$(n, d) = 1$ and
 $a \equiv nd^{-1} \pmod{m}$. If no solution exists, an exception is thrown.
 
-See also [`Nemo.unsafe_reconstruct`](@ref) and [`rational_reconstruction`](@ref).
-
 # Examples
 
 ```jldoctest
