@@ -56,11 +56,7 @@ function is_gen(a::QQMPolyRingElem, i::Int)
 end
 
 function is_gen(a::QQMPolyRingElem)
-  n = nvars(parent(a))
-  for i in 1:n
-    is_gen(a, i) && return true
-  end
-  return false
+  return Bool(@ccall libflint.fmpq_mpoly_is_gen(a::Ref{QQMPolyRingElem}, (-1)::Int, a.parent::Ref{QQMPolyRing})::Cint)
 end
 
 function deepcopy_internal(a::QQMPolyRingElem, dict::IdDict)
