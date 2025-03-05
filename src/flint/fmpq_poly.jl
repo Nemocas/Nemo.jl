@@ -239,9 +239,7 @@ end
 
 function reverse(x::QQPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Length must be non-negative"))
-  z = parent(x)()
-  @ccall libflint.fmpq_poly_reverse(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, len::Int)::Nothing
-  return z
+  return reverse!(parent(x)(), x, len)
 end
 
 ###############################################################################
@@ -799,6 +797,13 @@ end
 mul!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::Union{Integer, Rational}) = mul!(z, x, flintify(y))
 
 mul!(z::QQPolyRingElemOrPtr, x::RationalUnionOrPtr, y::QQPolyRingElemOrPtr) = mul!(z, y, x)
+
+#
+
+function reverse!(z::QQPolyRingElemOrPtr, x::QQPolyRingElem, len::Int)
+  @ccall libflint.fmpq_poly_reverse(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, len::Int)::Nothing
+  return z
+end
 
 ###############################################################################
 #

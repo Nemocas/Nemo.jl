@@ -941,6 +941,12 @@ submul!(z::ZZPolyRingElemOrPtr, a::IntegerUnionOrPtr, b::ZZPolyRingElemOrPtr) = 
 submul!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::IntegerUnionOrPtr, ::ZZPolyRingElemOrPtr) = submul!(z, x, y)
 submul!(z::ZZPolyRingElemOrPtr, x::IntegerUnionOrPtr, y::ZZPolyRingElemOrPtr, ::ZZPolyRingElemOrPtr) = submul!(z, x, y)
 
+#
+
+function reverse!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, len::Int)
+  @ccall libflint.fmpz_poly_reverse(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, len::Int)::Nothing
+  return z
+end
 
 ###############################################################################
 #

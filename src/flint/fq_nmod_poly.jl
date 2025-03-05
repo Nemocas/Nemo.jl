@@ -265,9 +265,7 @@ end
 
 function reverse(x::fqPolyRepPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Index must be non-negative"))
-  z = parent(x)()
-  @ccall libflint.fq_nmod_poly_reverse(z::Ref{fqPolyRepPolyRingElem}, x::Ref{fqPolyRepPolyRingElem}, len::Int, base_ring(parent(x))::Ref{fqPolyRepField})::Nothing
-  return z
+  return reverse!(parent(x)(), x, len)
 end
 
 ################################################################################
@@ -661,6 +659,11 @@ end
 
 function sub!(z::fqPolyRepPolyRingElem, x::fqPolyRepPolyRingElem, y::fqPolyRepPolyRingElem)
   @ccall libflint.fq_nmod_poly_sub(z::Ref{fqPolyRepPolyRingElem}, x::Ref{fqPolyRepPolyRingElem}, y::Ref{fqPolyRepPolyRingElem}, base_ring(parent(x))::Ref{fqPolyRepField})::Nothing
+  return z
+end
+
+function reverse!(z::fqPolyRepPolyRingElem, x::fqPolyRepPolyRingElem, len::Int)
+  @ccall libflint.fq_nmod_poly_reverse(z::Ref{fqPolyRepPolyRingElem}, x::Ref{fqPolyRepPolyRingElem}, len::Int, base_ring(parent(x))::Ref{fqPolyRepField})::Nothing
   return z
 end
 
