@@ -159,7 +159,7 @@ end
 ###############################################################################
 
 function ^(x::ZZPolyRingElem, e::IntegerUnion)
-  if e < 0
+  if is_negative(e)
     throw(DomainError(e, "exponent must be non-negative"))
   end
   return pow!(parent(x)(), x, e)

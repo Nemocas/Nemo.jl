@@ -206,7 +206,7 @@ function ^(x::ZZModRingElem, y::Integer)
   if y < 0
     z = inv(x)
     x = pow!(x, z, -y)
-    swap!(z, x)
+    swap!(inv!(z), x)
   else
     z = pow!(parent(x)(), x, y)
   end
@@ -400,9 +400,7 @@ end
 #
 
 function inv!(x::ZZModRingElem)
-  R = parent(x)
-  @ccall libflint.fmpz_mod_inv(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
+  return inv!(x, x)
 end
 
 function inv!(z::ZZModRingElem, x::ZZModRingElem)

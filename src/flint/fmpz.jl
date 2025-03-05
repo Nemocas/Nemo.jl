@@ -760,7 +760,7 @@ end
 ###############################################################################
 
 function ^(x::ZZRingElemOrPtr, y::IntegerUnionOrPtr)
-  if y < 0
+  if is_negative(y)
     throw(DomainError(y, "Exponent must be non-negative"))
   end
   return pow!(ZZRingElem(), x, y)

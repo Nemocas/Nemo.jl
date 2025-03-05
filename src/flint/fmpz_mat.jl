@@ -349,7 +349,7 @@ end
 ###############################################################################
 
 function ^(x::ZZMatrix, y::IntegerUnion)
-  y < 0 && throw(DomainError(y, "Exponent must be non-negative"))
+  is_negative(y) && throw(DomainError(y, "Exponent must be non-negative"))
   nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
   return pow!(similar(x), x, y)
 end

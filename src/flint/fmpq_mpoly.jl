@@ -310,7 +310,7 @@ end
 ###############################################################################
 
 function ^(x::QQMPolyRingElem, n::IntegerUnionOrPtr)
-  n < 0 && throw(DomainError("Exponent must be non-negative"))
+  is_negative(n) && throw(DomainError("Exponent must be non-negative"))
   return pow!(parent(x)(), x, n)
 end
 
