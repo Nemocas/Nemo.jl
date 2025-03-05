@@ -58,6 +58,13 @@ end
   @test real(b) == 2
   @test imag(b) == 3
 
+  @test Float64(CC(0.5)) == 0.5
+  @test convert(Float64, CC(0.5)) == 0.5
+  @test ComplexF64(CC(0.5, 1.5)) == 0.5 + 1.5im
+  @test convert(ComplexF64, CC(0.5, 1.5)) == 0.5 + 1.5im
+  @test_throws ArgumentError Float64(CC(2.0, 3.0))
+  @test_throws ArgumentError convert(Float64, CC(2.0, 3.0))
+
   @test CC(UInt(4), Int(2)) == CC(4.0, ZZ(2))
   @test CC("4 +/- 0", BigFloat(2)) == CC(RR(4), QQ(2))
   @test CC(UInt(8)//UInt(2), BigInt(2)) == CC(4, 2)

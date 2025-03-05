@@ -135,7 +135,7 @@ end
     M = randmat_triu(S, -100:100)
     b = rand(U, -100:100)
 
-    x = AbstractAlgebra._solve_triu_right(M, b; unipotent = false)
+    x = Nemo.AbstractAlgebra._solve_triu(M, b; unipotent = false, side = :right)
 
     @test M*x == b
   end

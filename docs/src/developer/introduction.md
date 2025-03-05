@@ -11,17 +11,17 @@ AbstractAlgebra.jl. The purpose was to provide a Julia only package which
 did some subset of what Nemo could do, albeit slower. This was requested by
 people in the Julia community.
 
-Unfortunately this hasn't been terribly successful. Most Julia developers
+Unfortunately, this hasn't been terribly successful. Most Julia developers
 expect that AbstractAlgebra and Nemo functionality will work for Julia
 matrices over AbstractAlgebra/Nemo rings. This would be possible for
-functions that do not conflict with `Base` or `LinearAlgebra` at least
+functions that do not conflict with `Base` or `LinearAlgebra`, at least
 when working with non-empty matrices. However, for reasons that we explain
 in both the Appendix to the AbstractAlgebra package and in the parent object
-section of the developer documentation, this is not possible even in theory
+section of the developer documentation, this is not possible, even in theory,
 for functions that would conflict with Julia's standard library or for empty
 matrices (except in a limited number of special cases).
 
-Unfortunately the Julia standard library functions do not work with matrices
+Unfortunately, the Julia standard library functions do not work with matrices
 of Nemo objects and there is little we can do about this. Moreover, some Julia
 functionality isn't supported by the underlying C libraries in Nemo and would
 be difficult or impossible to provide on the C side.
@@ -59,25 +59,25 @@ the C libraries, e.g. the `fmpz.jl` file wraps the FLINT `fmpz` module for
 multiple precision integers. The `fmpz_poly.jl` file wraps the FLINT
 univariate polynomials over `fmpz` integers, and so on.
 
-The `QQFieldElem` prefix is for FLINT rationals, `FqPolyRepFieldElem` for FLINT finite fields with
-multiprecision characteristic, `fqPolyRepFieldElem` is the same but for single word
-characteristic. The `PadicFieldElem` prefix is for the field of p-adic numbers for a
-given `p`. The `zzModRingElem` prefix is for `Z/nZ` for a given `n`. The `gfp` prefix is
+The `fmpq` prefix is for FLINT rationals, `fq` for FLINT finite fields with
+multiprecision characteristic, `fq_nmod` is the same but for single word
+characteristic. The `padic` prefix is for the field of p-adic numbers for a
+given `p`. The `nmod` prefix is for `Z/nZ` for a given `n`. The `gfp` prefix is
 the same as `Z/nZ` but where `n` is prime, so that we are dealing with a field.
 
 The `FlintTypes.jl` file contains the implementation of all the FLINT types.
 
-In the `antic` directory, `AbsSimpleNumFieldElem` is for elements of a number field.
+In the `antic` directory, `nf_elem` is for elements of a number field.
 
 The `AnticTypes.jl` file contains the Antic types.
 
-In the `ArbFieldElem` directory the `ArbFieldElem` prefix is for arbitrary precision ball
-arithmetic over the reals. The `AcbFieldElem` prefix is similar but for complex numbers.
+In the `arb` directory the `arb` prefix is for arbitrary precision ball
+arithmetic over the reals. The `acb` prefix is similar but for complex numbers.
 
 The `ArbTypes.jl` file contains the Arb types.
 
-In the `calcium` directory the `CalciumFieldElem` prefix is for Calcium's type. There is also
-a `QQBarFieldElem` file for the field of algebraic numbers.
+In the `calcium` directory the `ca` prefix is for Calcium's type. There is also
+a `qqbar` file for the field of algebraic numbers.
 
 In the AbstractAlgebra.jl package the `src` directory contains a directory
 called `generic`. This is where the implementations of generic types, such as

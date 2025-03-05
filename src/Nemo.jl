@@ -433,11 +433,14 @@ include("Rings.jl")
 
 include("matrix.jl")
 include("poly.jl")
+include("ZZMatrix-linalg.jl")
 
 include("Infinity.jl")
 
 include("HeckeMiscFiniteField.jl")
 include("HeckeMoreStuff.jl")
+
+include("UnivPoly.jl")
 
 # More functionality for Julia types
 include("julia/Integer.jl")

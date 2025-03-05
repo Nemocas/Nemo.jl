@@ -83,17 +83,46 @@ characteristic(::AcbField) = 0
 #
 ################################################################################
 
-function convert(::Type{ComplexF64}, x::AcbFieldElem)
+@doc raw"""
+    Float64(x::AcbFieldElem)
+
+Converts $x$ to a `Float64`, rounded to the nearest.
+The return value approximates the midpoint of $x$.
+"""
+function Base.Float64(x::AcbFieldElem)
+  @req isreal(x) "conversion to float must have no imaginary part"
+  GC.@preserve x begin
+    re = _real_ptr(x)
+    t = _mid_ptr(re)
+    v = @ccall libflint.arf_get_d(t::Ptr{arf_struct}, ARB_RND_NEAR::Int)::Float64
+  end
+  return v
+end
+
+@doc raw"""
+    ComplexF64(x::AcbFieldElem)
+
+Converts $x$ to a `ComplexF64`, rounded to the nearest.
+The return value approximates the midpoint of the real and imaginary parts of $x$.
+"""
+function Base.ComplexF64(x::AcbFieldElem)
   GC.@preserve x begin
     re = _real_ptr(x)
     im = _imag_ptr(x)
     t = _mid_ptr(re)
     u = _mid_ptr(im)
-    # 4 == round to nearest
-    v = @ccall libflint.arf_get_d(t::Ptr{arf_struct}, 4::Int)::Float64
-    w = @ccall libflint.arf_get_d(u::Ptr{arf_struct}, 4::Int)::Float64
+    v = @ccall libflint.arf_get_d(t::Ptr{arf_struct}, ARB_RND_NEAR::Int)::Float64
+    w = @ccall libflint.arf_get_d(u::Ptr{arf_struct}, ARB_RND_NEAR::Int)::Float64
   end
   return complex(v, w)
+end
+
+function convert(::Type{ComplexF64}, x::AcbFieldElem)
+  return ComplexF64(x)
+end
+
+function convert(::Type{Float64}, x::AcbFieldElem)
+  return Float64(x)
 end
 
 ################################################################################

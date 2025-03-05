@@ -425,10 +425,14 @@ function divexact(x::ZZRingElem, y::ZZRingElem; check::Bool=true)
   return z
 end
 
-function divides(x::ZZRingElem, y::ZZRingElem)
-  z = ZZRingElem()
+function AbstractAlgebra.divides!(z::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
   res = @ccall libflint.fmpz_divides(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Bool
   return res, z
+end
+
+function AbstractAlgebra.divides(x::ZZRingElem, y::ZZRingElem)
+  z = ZZRingElem()
+  return divides!(z, x, y)
 end
 
 divides(x::ZZRingElem, y::Integer) = divides(x, ZZRingElem(y))
@@ -497,32 +501,18 @@ end
 #
 ###############################################################################
 
-+(a::ZZRingElem, b::Int) = add!(ZZRingElem(), a, b)
-+(a::Int, b::ZZRingElem) = b + a
+for T in (Int, UInt, Integer)
+  @eval begin
+    +(a::ZZRingElem, b::$T) = add!(ZZRingElem(), a, b)
+    +(a::$T, b::ZZRingElem) = add!(ZZRingElem(), a, b)
 
-+(a::ZZRingElem, b::UInt) = add!(ZZRingElem(), a, b)
-+(a::UInt, b::ZZRingElem) = b + a
+    -(a::ZZRingElem, b::$T) = sub!(ZZRingElem(), a, b)
+    -(a::$T, b::ZZRingElem) = sub!(ZZRingElem(), a, b)
 
-+(a::ZZRingElem, b::Integer) = a + flintify(b)
-+(a::Integer, b::ZZRingElem) = flintify(a) + b
-
--(a::ZZRingElem, b::Int) = sub!(ZZRingElem(), a, b)
--(a::Int, b::ZZRingElem) = neg!(b - a)
-
--(a::ZZRingElem, b::UInt) = sub!(ZZRingElem(), a, b)
--(a::UInt, b::ZZRingElem) = neg!(b - a)
-
--(a::ZZRingElem, b::Integer) = a - flintify(b)
--(a::Integer, b::ZZRingElem) = flintify(a) - b
-
-*(a::ZZRingElem, b::Int) = mul!(ZZRingElem(), a, b)
-*(a::Int, b::ZZRingElem) = b * a
-
-*(a::ZZRingElem, b::UInt) = mul!(ZZRingElem(), a, b)
-*(a::UInt, b::ZZRingElem) = b * a
-
-*(a::ZZRingElem, b::Integer) = a*flintify(b)
-*(a::Integer, b::ZZRingElem) = flintify(a)*b
+    *(a::ZZRingElem, b::$T) = mul!(ZZRingElem(), a, b)
+    *(a::$T, b::ZZRingElem) = mul!(ZZRingElem(), a, b)
+  end
+end
 
 *(a::ZZRingElem, b::AbstractFloat) = BigInt(a) * b
 *(a::AbstractFloat, b::ZZRingElem) = a * BigInt(b)
@@ -2548,6 +2538,7 @@ addmul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr) = addmul!(z, y, x)
 
 # ignore fourth argument
 addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Union{ZZRingElemOrPtr,Integer}, ::ZZRingElemOrPtr) = addmul!(z, x, y)
+addmul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr, ::ZZRingElemOrPtr) = addmul!(z, x, y)
 
 function submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   @ccall libflint.fmpz_submul(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
@@ -2568,6 +2559,7 @@ submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Integer) = submul!(z, x, flin
 
 # ignore fourth argument
 submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Union{ZZRingElemOrPtr,Integer}, ::ZZRingElemOrPtr) = submul!(z, x, y)
+submul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr, ::ZZRingElemOrPtr) = submul!(z, x, y)
 
 @doc raw"""
     fmma!(r::ZZRingElem, a::ZZRingElem, b::ZZRingElem, c::ZZRingElem, d::ZZRingElem)
@@ -2617,6 +2609,14 @@ function rem!(a::ZZRingElem, b::ZZRingElem, c::ZZRingElem)
 end
 
 #
+
+function tdiv_q!(a::ZZRingElem, b::ZZRingElem, c::ZZRingElem)
+  ccall((:fmpz_tdiv_q, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), a, b, c)
+end
+
+function shift_right!(a::ZZRingElem, b::ZZRingElem, i::Int)
+  @ccall Nemo.libflint.fmpz_fdiv_q_2exp(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, i::Int)::Nothing
+end
 
 function pow!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer)
   @ccall libflint.fmpz_pow_ui(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, UInt(b)::UInt)::Nothing
@@ -2864,6 +2864,16 @@ end
 
 ###############################################################################
 #
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::ZZRing)
+  return rand_bits(ZZ, rand(0:100))
+end
+
+###############################################################################
+#
 #   Constructors
 #
 ###############################################################################
@@ -2916,7 +2926,7 @@ end
 (::Type{Int128})(a::ZZRingElem) = Int128(BigInt(a))
 (::Type{UInt128})(a::ZZRingElem) = UInt128(BigInt(a))
 
-Integer(a::ZZRingElem) = BigInt(a)
+Base.Integer(a::ZZRingElem) = BigInt(a)
 
 convert(::Type{T}, a::ZZRingElem) where T <: Integer = T(a)
 
@@ -3225,3 +3235,5 @@ function resultant(f::ZZPolyRingElem, g::ZZPolyRingElem, d::ZZRingElem, nb::Int)
   @ccall libflint.fmpz_poly_resultant_modular_div(z::Ref{ZZRingElem}, f::Ref{ZZPolyRingElem}, g::Ref{ZZPolyRingElem}, d::Ref{ZZRingElem}, nb::Int)::Nothing
   return z
 end
+
+

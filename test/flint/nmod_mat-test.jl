@@ -473,6 +473,10 @@ end
   @test g == matrix_space(Z17, 3, 3)([1 2 2; 2 13 12; 2 12 15])
 
   @test_throws ErrorException f^(ZZ(2)^1000)
+
+  # issue Oscar.jl#4590
+  a = matrix(Z17, [2 3])
+  @test_throws ErrorException a^2
 end
 
 @testset "zzModMatrix.row_echelon_form" begin

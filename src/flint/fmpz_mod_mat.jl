@@ -268,6 +268,7 @@ end
 ################################################################################
 
 function ^(x::T, y::Int) where {T<:Zmod_fmpz_mat}
+  nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
   if y < 0
     x = inv(x)
     y = -y
@@ -437,49 +438,43 @@ end
 #
 ################################################################################
 
-#= Not implemented in FLINT yet
-
 function lu!(P::Perm, x::T) where T <: Zmod_fmpz_mat
-P.d .-= 1
+  P.d .-= 1
+  rank = Int(@ccall libflint.fmpz_mod_mat_lu(P.d::Ptr{Int}, x::Ref{T}, 0::Cint, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Cint)
+  P.d .+= 1
 
-rank = Int(@ccall libflint.fmpz_mod_mat_lu(P.d::Ptr{Int}, x::Ref{T}, 0::Cint)::Cint)
+  inv!(P) # FLINT does PLU = x instead of Px = LU
 
-P.d .+= 1
-
-# flint does x == PLU instead of Px == LU (docs are wrong)
-inv!(P)
-
-return rank
+  return rank
 end
 
-function lu(x::T, P = SymmetricGroup(nrows(x))) where T <: Zmod_fmpz_mat
-m = nrows(x)
-n = ncols(x)
-P.n != m && error("Permutation does not match matrix")
-p = one(P)
-R = base_ring(x)
-U = deepcopy(x)
+function lu(x::T, P=SymmetricGroup(nrows(x))) where T <: Zmod_fmpz_mat
+  m = nrows(x)
+  n = ncols(x)
+  P.n != m && error("Permutation does not match matrix")
+  p = one(P)
+  R = base_ring(x)
+  U = deepcopy(x)
 
-L = similar(x, m, m)
+  L = similar(x, m, m)
 
-rank = lu!(p, U)
+  rank = lu!(p, U)
 
-for i = 1:m
-for j = 1:n
-if i > j
-L[i, j] = U[i, j]
-U[i, j] = R()
-elseif i == j
-L[i, j] = R(1)
-elseif j <= m
-L[i, j] = R()
-end
-end
-end
-return rank, p, L, U
+  for i in 1:m
+    for j in 1:n
+      if i > j
+        L[i, j] = U[i, j]
+        U[i, j] = R()
+      elseif i == j
+        L[i, j] = R(1)
+      elseif j <= m
+        L[i, j] = R()
+      end
+    end
+  end
+  return rank, p, L, U
 end
 
-=#
 
 ################################################################################
 #

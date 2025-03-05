@@ -431,7 +431,7 @@ function lu!(P::Perm, z::RealMatrix, x::RealMatrix)
   r = @ccall libflint.arb_mat_lu(P.d::Ptr{Int}, z::Ref{RealMatrix}, x::Ref{RealMatrix}, precision(Balls)::Int)::Cint
   r == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
-  inv!(P)
+  inv!(P) # FLINT does PLU = x instead of Px = LU
   return min(nrows(x), ncols(x))
 end
 

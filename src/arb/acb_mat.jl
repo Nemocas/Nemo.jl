@@ -486,7 +486,7 @@ function lu!(P::Perm, z::AcbMatrix, x::AcbMatrix)
   r = @ccall libflint.acb_mat_lu(P.d::Ptr{Int}, z::Ref{AcbMatrix}, x::Ref{AcbMatrix}, precision(base_ring(x))::Int)::Cint
   r == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
-  inv!(P)
+  inv!(P) # FLINT does PLU = x instead of Px = LU
   return nrows(x)
 end
 

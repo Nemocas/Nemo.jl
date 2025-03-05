@@ -144,6 +144,14 @@ end
   end
 end
 
+@inline function is_negative_entry(A::ZZMatrix, i::Int, j::Int)
+  @boundscheck _checkbounds(A, i, j)
+  GC.@preserve A begin
+    m = mat_entry_ptr(A, i, j)
+    return is_negative(m)
+  end
+end
+
 function deepcopy_internal(d::ZZMatrix, dict::IdDict)
   z = ZZMatrix(d)
   return z
@@ -558,6 +566,11 @@ function mod_sym!(M::ZZMatrix, B::ZZRingElem)
 end
 mod_sym!(M::ZZMatrix, B::Integer) = mod_sym!(M, ZZRingElem(B))
 
+function mod_sym!(M::ZZMatrix, N::ZZMatrix, B::ZZRingElem)
+  @assert !iszero(B)
+  @ccall libflint.fmpz_mat_scalar_smod(M::Ref{ZZMatrix}, N::Ref{ZZMatrix}, B::Ref{ZZRingElem})::Nothing
+end
+
 @doc raw"""
     mod_sym(M::ZZMatrix, p::ZZRingElem) -> ZZMatrix
 
@@ -957,10 +970,7 @@ input.
 """
 function lll_with_transform(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51))
   z = deepcopy(x)
-  u = similar(x, nrows(x), nrows(x))
-  for i in 1:nrows(u)
-    u[i, i] = 1
-  end
+  u = identity_matrix(ZZ, nrows(x))
   @ccall libflint.fmpz_lll(z::Ref{ZZMatrix}, u::Ref{ZZMatrix}, ctx::Ref{LLLContext})::Nothing
   return z, u
 end
@@ -1003,6 +1013,30 @@ function lll!(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51))
   return x
 end
 
+# for lll_gram, we use the following helpers to deal with the degenerate case.
+
+function _is_definitely_full_rank(x::ZZMatrix)
+  if Int == Int64
+    p = 1099511627791 % Int64
+  else
+    p = 1048583 % Int32
+  end
+  F = Nemo.Native.GF(p; cached = false)
+  xmodp = F.(x)
+  return rank(xmodp) == nrows(x)
+end
+
+function _complete_to_basis(x::ZZMatrix)
+  @assert nrows(x) <= ncols(x)
+  # compute column HNF and take the inverse
+  h, t = hnf_with_transform(transpose(x))
+  for i in 1:nrows(x)
+    @assert is_one(h[i, i])
+  end
+  transpose!(t)
+  return inv!(t)
+end
+
 @doc raw"""
     lll_gram_with_transform(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
 
@@ -1015,13 +1049,54 @@ See [`lll_gram`](@ref) for the used default parameters which can be overridden b
 supplying an optional context object.
 """
 function lll_gram_with_transform(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
-  z = deepcopy(x)
-  u = similar(x, nrows(x), nrows(x))
-  for i in 1:nrows(u)
-    u[i, i] = 1
+  @req is_square(x) && is_symmetric(x) "The matrix must be a symmetric square matrix"
+  # try to recognize the definite case
+  if nrows(x) == 0
+    return x, x
   end
-  @ccall libflint.fmpz_lll(z::Ref{ZZMatrix}, u::Ref{ZZMatrix}, ctx::Ref{LLLContext})::Nothing
-  return z, u
+  if _is_definitely_full_rank(x)
+    u = identity_matrix(ZZ, nrows(x))
+    if x[1, 1] < 0
+      y = neg(x)
+      _lll_gram_with_transform!(y, u, ctx)
+      return neg!(y), u
+    else
+      y = deepcopy(x)
+      _lll_gram_with_transform!(y, u, ctx)
+      return y, u
+    end
+  end
+  # remove the radical using a unimodular transformation
+  L = kernel(x; side = :left)
+  n = nrows(L)
+  r = nrows(x) - n
+  C = _complete_to_basis(L)
+  # move kernel to bottom, so that
+  # C * x * transpose(C) = [ * | 0 ]
+  #                        [-------]
+  #                        [ 0 | 0 ]
+  uu = deepcopy(reverse_rows!(C))
+  mul!(C, C, x * transpose(C))
+  u = identity_matrix(ZZ, nrows(x))
+  if C[1, 1] < 0
+    _lll_gram_with_transform!(neg!(@view(C[1:r, 1:r])), @view(u[1:r, 1:r]), ctx)
+    neg!(C)
+  else
+    _lll_gram_with_transform!(@view(C[1:r, 1:r]), @view(u[1:r, 1:r]), ctx)
+  end
+  return C, u * uu
+end
+
+function _lll_gram_with_transform!(x::ZZMatrix, u::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
+  # modifies x and u
+  @ccall libflint.fmpz_lll(x::Ref{ZZMatrix}, u::Ref{ZZMatrix}, ctx::Ref{LLLContext})::Nothing
+  return x, u
+end
+
+function _lll_gram_with_transform!(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
+  u = identity_matrix(ZZ, nrows(x))
+  @ccall libflint.fmpz_lll(x::Ref{ZZMatrix}, u::Ref{ZZMatrix}, ctx::Ref{LLLContext})::Nothing
+  return x, u
 end
 
 @doc raw"""
@@ -1029,29 +1104,62 @@ end
 
 Return the Gram matrix $L$ of an LLL-reduced basis of the lattice given by the
 Gram matrix $x$.
-The matrix $x$ must be symmetric and non-singular.
+The matrix $x$ must be symmetric and semidefinite. If an indefinite matrix is
+provided, the output is undefined.
 
 By default, the LLL is performed with reduction parameters $\delta = 0.99$ and
 $\eta = 0.51$. These defaults can be overridden by specifying an optional context
 object.
 """
 function lll_gram(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
+  @req is_square(x) && is_symmetric(x) "The matrix must be a symmetric square matrix"
   z = deepcopy(x)
   return lll_gram!(z)
 end
-
 @doc raw"""
     lll_gram!(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
 
 Compute the Gram matrix of an LLL-reduced basis of the lattice given by the
 Gram matrix $x$ inplace.
-The matrix $x$ must be symmetric and non-singular.
+The matrix $x$ must be symmetric and semidefinite.
 
 By default, the LLL is performed with reduction parameters $\delta = 0.99$ and
 $\eta = 0.51$. These defaults can be overridden by specifying an optional context
 object.
 """
 function lll_gram!(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
+  if nrows(x) == 0
+    return x
+  end
+  # try to recognize the definite case
+  if _is_definitely_full_rank(x)
+    if x[1, 1] < 0
+      return neg!(_lll_gram!(!neg(x), ctx))
+    else
+      return _lll_gram!(x, ctx)
+    end
+  end
+  # remove the radical using a unimodular transformation
+  L = kernel(x; side = :left)
+  n = nrows(L)
+  r = nrows(x) - n
+  C = _complete_to_basis(L)
+  # move kernel to bottom, so that
+  # C * x * transpose(C) = [ * | 0 ]
+  #                        [-------]
+  #                        [ 0 | 0 ]
+  reverse_rows!(C)
+  mul!(x, x, transpose(C))
+  C = mul!(x, C, x)
+  if C[1, 1] < 0
+    neg!(_lll_gram!(neg!(@view(x[1:r, 1:r])), ctx))
+  else
+    _lll_gram!(@view(x[1:r, 1:r]), ctx)
+  end
+  return x
+end
+
+function _lll_gram!(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
   @ccall libflint.fmpz_lll(x::Ref{ZZMatrix}, C_NULL::Ptr{Nothing}, ctx::Ref{LLLContext})::Nothing
   return x
 end
@@ -1159,7 +1267,11 @@ end
 
 Compute the Smith normal form of $x$.
 """
-function snf(x::ZZMatrix)
+@inline snf(x::ZZMatrix) = _snf(x)
+
+@inline _snf(x) = __snf(x)
+
+function __snf(x::ZZMatrix)
   z = similar(x)
   @ccall libflint.fmpz_mat_snf(z::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
   return z
@@ -1527,7 +1639,7 @@ function _solve_dixon(a::ZZMatrix, b::ZZMatrix)
 end
 
 #XU = B. only the upper triangular part of U is used
-function AbstractAlgebra._solve_triu_left(U::ZZMatrix, b::ZZMatrix)
+function AbstractAlgebra._solve_triu_left(U::ZZMatrix, b::ZZMatrix; unipotent::Bool = false)
   n = ncols(U)
   m = nrows(b)
   R = base_ring(U)
@@ -1554,7 +1666,11 @@ function AbstractAlgebra._solve_triu_left(U::ZZMatrix, b::ZZMatrix)
           tmp_p += sizeof(ZZRingElem)
         end
         sub!(s, mat_entry_ptr(b, i, j), s)
-        divexact!(mat_entry_ptr(tmp, 1, j), s, mat_entry_ptr(U, j, j))
+        if unipotent
+          set!(mat_entry_ptr(tmp, 1, j), s)
+        else
+          divexact!(mat_entry_ptr(tmp, 1, j), s, mat_entry_ptr(U, j, j))
+        end
       end
       tmp_p = mat_entry_ptr(tmp, 1, 1)
       X_p = mat_entry_ptr(X, i, 1)
@@ -1571,9 +1687,9 @@ end
 #UX = B, U has to be upper triangular
 #I think due to the Strassen calling path, where Strasse.solve(side = :left) 
 #call directly AA.solve_left, this has to be in AA and cannot be independent.
-function AbstractAlgebra._solve_triu(U::ZZMatrix, b::ZZMatrix; side::Symbol=:left) 
+function AbstractAlgebra._solve_triu(U::ZZMatrix, b::ZZMatrix; side::Symbol=:left, unipotent::Bool = false) 
   if side == :left
-    return AbstractAlgebra._solve_triu_left(U, b)
+    return AbstractAlgebra._solve_triu_left(U, b; unipotent)
   end
   @assert side == :right
   n = nrows(U)
@@ -1603,7 +1719,11 @@ function AbstractAlgebra._solve_triu(U::ZZMatrix, b::ZZMatrix; side::Symbol=:lef
         #         s = b[j, i] - s
         tmp_ptr = mat_entry_ptr(tmp, 1, j)
         U_ptr = mat_entry_ptr(U, j, j)
-        divexact!(tmp_ptr, s, U_ptr)
+        if unipotent
+          set!(tmp_ptr, s)
+        else
+          divexact!(tmp_ptr, s, U_ptr)
+        end
         #           tmp[j] = divexact(s, U[j,j])
       end
       tmp_ptr = mat_entry_ptr(tmp, 1, 1)
@@ -1703,8 +1823,23 @@ end
 #
 ###############################################################################
 
+function Base.copy!(A::ZZMatrix, B::ZZMatrix)
+  ccall((:fmpz_mat_set, Nemo.libflint), Cvoid, (Ref{ZZMatrix}, Ref{ZZMatrix}), A, B)
+end
+
 function zero!(z::ZZMatrixOrPtr)
   @ccall libflint.fmpz_mat_zero(z::Ref{ZZMatrix})::Nothing
+  return z
+end
+
+function zero_row!(z::ZZMatrix, i::Int)
+  GC.@preserve z begin
+    z_ptr = mat_entry_ptr(z, i, 1)
+    for i=1:ncols(z)
+      zero!(z_ptr)
+      z_ptr += sizeof(Int)
+    end
+  end
   return z
 end
 
@@ -1728,8 +1863,24 @@ function sub!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::ZZMatrixOrPtr)
   return z
 end
 
+function sub!(A::ZZMatrix, B::ZZMatrix, m::Int)
+  GC.@preserve A B begin
+    for i=1:nrows(A)
+      A_p = Nemo.mat_entry_ptr(A, i, i)
+      B_p = Nemo.mat_entry_ptr(B, i, i)
+      sub!(A_p, B_p, m)
+    end
+  end
+  return A
+end
+
 function mul!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::ZZMatrixOrPtr)
   @ccall libflint.fmpz_mat_mul(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Ref{ZZMatrix})::Nothing
+  return z
+end
+
+function mul_classical!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::ZZMatrixOrPtr)
+  @ccall libflint.fmpz_mat_mul_classical(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Ref{ZZMatrix})::Nothing
   return z
 end
 
@@ -1768,6 +1919,32 @@ end
 
 addmul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::Integer) = addmul!(z, a, flintify(b))
 addmul!(z::ZZMatrixOrPtr, a::IntegerUnionOrPtr, b::ZZMatrixOrPtr) = addmul!(z, b, a)
+
+# ignore fourth argument
+addmul!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::IntegerUnionOrPtr, ::ZZMatrixOrPtr) = addmul!(z, x, y)
+addmul!(z::ZZMatrixOrPtr, x::IntegerUnionOrPtr, y::ZZMatrixOrPtr, ::ZZMatrixOrPtr) = addmul!(z, x, y)
+
+function submul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_mat_scalar_submul_fmpz(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::Ref{ZZRingElem})::Nothing
+  return z
+end
+
+function submul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::Int)
+  @ccall libflint.fmpz_mat_scalar_submul_si(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::Int)::Nothing
+  return z
+end
+
+function submul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::UInt)
+  @ccall libflint.fmpz_mat_scalar_submul_ui(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::UInt)::Nothing
+  return z
+end
+
+submul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::Integer) = submul!(z, a, flintify(b))
+submul!(z::ZZMatrixOrPtr, a::IntegerUnionOrPtr, b::ZZMatrixOrPtr) = submul!(z, b, a)
+
+# ignore fourth argument
+submul!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::IntegerUnionOrPtr, ::ZZMatrixOrPtr) = submul!(z, x, y)
+submul!(z::ZZMatrixOrPtr, x::IntegerUnionOrPtr, y::ZZMatrixOrPtr, ::ZZMatrixOrPtr) = submul!(z, x, y)
 
 function Generic.add_one!(a::ZZMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
@@ -2051,3 +2228,4 @@ end
 ################################################################################
 
 mat_entry_ptr(A::ZZMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(ZZRingElem)
+

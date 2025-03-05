@@ -1,11 +1,7 @@
-function test_elem(R::QQBarField)
-  return rand(R, degree=5, bits=5)
-end
-
 @testset "QQBarFieldElem.conformance_tests" begin
   R = algebraic_closure(QQ)
-  test_Field_interface(R)
-  #test_Field_interface_recursive(R)  # polynomial ring tests too slow
+  ConformanceTests.test_Field_interface(R)
+  #ConformanceTests.test_Field_interface_recursive(R)  # polynomial ring tests too slow
 end
 
 @testset "QQBarFieldElem.constructors" begin
@@ -48,12 +44,52 @@ end
 
 end
 
+@testset "QQBarFieldElem.unsafe" begin
+  a = QQBarFieldElem(32//17)
+  b = QQBarFieldElem(23//11)
+  c = one(QQ)
+  b_copy = deepcopy(b)
+  c_copy = deepcopy(c)
+
+  a = zero!(a)
+  @test iszero(a)
+  a = mul!(a, a, b)
+  @test iszero(a)
+
+  a = add!(a, a, b)
+  @test a == b
+  a = add!(a, a, 1)
+  @test a == b + 1
+  a = add!(a, a, ZZRingElem(0))
+  @test a == b + 1
+
+  a = add!(a, b^2)
+  @test a == 1 + b + b^2
+
+  a = mul!(a, a, b)
+  @test a == (1 + b + b^2) * b
+  a = mul!(a, a, 3)
+  @test a == (1 + b + b^2) * b * 3
+  a = mul!(a, a, ZZRingElem(3))
+  @test a == (1 + b + b^2) * b * 9
+
+  a = addmul!(a, a, c)
+  @test a == 2 * (1 + b + b^2) * b * 9
+
+  @test b_copy == b
+  @test c_copy == c
+end
+
 @testset "QQBarFieldElem.printing" begin
   R = algebraic_closure(QQ)
+
+  @test PrettyPrinting.detailed(R) == "Algebraic closure of rational field"
+  @test PrettyPrinting.oneline(R) == "Algebraic closure of rational field"
+  @test PrettyPrinting.supercompact(R) == "QQBar"
+
   a = R(1)
 
   @test string(a) == "Root 1.00000 of x - 1"
-  @test string(parent(a)) == "Field of algebraic numbers"
 
   @test string(-(QQBarFieldElem(10) ^ 20)) == "Root -1.00000e+20 of x + 100000000000000000000"
   @test string(root_of_unity(R, 3)) == "Root -0.500000 + 0.866025*im of x^2 + x + 1"
