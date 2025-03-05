@@ -158,12 +158,7 @@ end
 #
 ###############################################################################
 
-function pow!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, e::Int)
-  @ccall libflint.fmpz_poly_pow(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, e::Int)::Nothing
-  return z
-end
-
-function ^(x::ZZPolyRingElem, e::Int)
+function ^(x::ZZPolyRingElem, e::IntegerUnion)
   if e < 0
     throw(DomainError(e, "exponent must be non-negative"))
   end
@@ -241,11 +236,6 @@ end
 function reverse(x::ZZPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Index must be non-negative"))
   return reverse!(parent(x)(), x, len)
-end
-
-function reverse!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, len::Int)
-  @ccall libflint.fmpz_poly_reverse(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, len::Int)::Nothing
-  return z
 end
 
 ###############################################################################
@@ -940,6 +930,13 @@ submul!(z::ZZPolyRingElemOrPtr, a::IntegerUnionOrPtr, b::ZZPolyRingElemOrPtr) = 
 # ignore fourth argument
 submul!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::IntegerUnionOrPtr, ::ZZPolyRingElemOrPtr) = submul!(z, x, y)
 submul!(z::ZZPolyRingElemOrPtr, x::IntegerUnionOrPtr, y::ZZPolyRingElemOrPtr, ::ZZPolyRingElemOrPtr) = submul!(z, x, y)
+
+#
+
+function pow!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, e::IntegerUnion)
+  @ccall libflint.fmpz_poly_pow(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, UInt(e)::UInt)::Nothing
+  return z
+end
 
 #
 

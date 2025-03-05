@@ -759,20 +759,11 @@ end
 #
 ###############################################################################
 
-function ^(x::ZZRingElem, y::Union{Int, UInt, ZZRingElem})
-  if isone(x) || iszero(y)
-    one(x)
-  elseif x == -1
-    isodd(y) ? deepcopy(x) : one(x)
-  elseif y < 0
+function ^(x::IntegerUnionOrPtr, y::IntegerUnionOrPtr)
+  if y < 0
     throw(DomainError(y, "Exponent must be non-negative"))
-  elseif isone(y)
-    deepcopy(x)
-  else
-    z = ZZRingElem()
-    @ccall libflint.fmpz_pow_ui(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, UInt(y)::UInt)::Nothing
-    z
   end
+  return pow!(ZZRingElem(), x, y)
 end
 
 ###############################################################################
@@ -2618,10 +2609,22 @@ function shift_right!(a::ZZRingElem, b::ZZRingElem, i::Int)
   @ccall Nemo.libflint.fmpz_fdiv_q_2exp(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, i::Int)::Nothing
 end
 
-function pow!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer)
-  @ccall libflint.fmpz_pow_ui(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, UInt(b)::UInt)::Nothing
+#
+
+function pow!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, n::Integer)
+  @ccall libflint.fmpz_pow_ui(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, UInt(n)::UInt)::Nothing
   return z
 end
+
+function pow!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, n::ZZRingElemOrPtr)
+  ok = Bool(@ccall libflint.fmpz_pow_fmpz(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, n::Ref{ZZRingElem})::Cint)
+  if !ok
+    error("unable to compute power")
+  end
+  return z
+end
+
+#
 
 function lcm!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   @ccall libflint.fmpz_lcm(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing

@@ -309,18 +309,9 @@ end
 #
 ###############################################################################
 
-function ^(a::QQMPolyRingElem, b::Int)
-  b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
-  z = parent(a)()
-  @ccall libflint.fmpq_mpoly_pow_ui(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, b::Int, parent(a)::Ref{QQMPolyRing})::Nothing
-  return z
-end
-
-function ^(a::QQMPolyRingElem, b::ZZRingElem)
-  b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
-  z = parent(a)()
-  @ccall libflint.fmpq_mpoly_pow_fmpz(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, b::Ref{ZZRingElem}, parent(a)::Ref{QQMPolyRing})::Nothing
-  return z
+function ^(x::QQMPolyRingElem, n::IntegerUnionOrPtr)
+  n < 0 && throw(DomainError("Exponent must be non-negative"))
+  return pow!(parent(x)(), x, n)
 end
 
 ################################################################################
@@ -797,6 +788,24 @@ setcoeff!(a, i, QQFieldElem(c))
 function combine_like_terms!(a::QQMPolyRingElem)
   @ccall libflint.fmpq_mpoly_combine_like_terms(a::Ref{QQMPolyRingElem}, a.parent::Ref{QQMPolyRing})::Nothing
   return a
+end
+
+#
+
+function pow!(z::QQMPolyRingElem, a::QQMPolyRingElem, n::Integer)
+  ok = Bool(libflint.fmpq_mpoly_pow_ui(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, UInt(n)::UInt, parent(a)::Ref{QQMPolyRing})::Cint)
+  if !ok
+    error("unable to compute power")
+  end
+  return z
+end
+
+function pow!(z::QQMPolyRingElem, a::QQMPolyRingElem, n::ZZRingElemOrPtr)
+  ok = Bool(libflint.fmpq_mpoly_pow_fmpz(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, n::Ref{ZZRingElem}, parent(a)::Ref{QQMPolyRing})::Cint)
+  if !ok
+    error("unable to compute power")
+  end
+  return z
 end
 
 ###############################################################################

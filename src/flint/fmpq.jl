@@ -387,18 +387,9 @@ isless(a::QQFieldElem, b::Float64) = isless(BigFloat(a), b)
 #
 ###############################################################################
 
-function ^(a::QQFieldElem, b::Int)
+function ^(a::QQFieldElemOrPtr, b::IntegerUnionOrPtr)
   iszero(a) && b < 0 && throw(DivideError())
-  temp = QQFieldElem()
-  @ccall libflint.fmpq_pow_si(temp::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Int)::Nothing
-  return temp
-end
-
-function ^(a::QQFieldElem, k::ZZRingElem)
-  is_zero(a) && return QQFieldElem(is_zero(k) ? 1 : 0)
-  is_one(a) && return QQFieldElem(1)
-  a == -1 && return QQFieldElem(isodd(k) ? -1 : 1)
-  return a^Int(k)
+  return pow!(QQFieldElem(), a, b)
 end
 
 ###############################################################################
@@ -1153,6 +1144,21 @@ end
 
 function divexact!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::ZZRingElemOrPtr)
   @ccall libflint.fmpq_div_fmpz(z::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{ZZRingElem})::Nothing
+  return z
+end
+
+#
+
+function pow!(z::QQFieldElemOrPtr, x::QQFieldElemOrPtr, n::Integer)
+  @ccall libflint.fmpq_pow_si(z::Ref{QQFieldElem}, x::Ref{QQFieldElem}, Int(n)::Int)::Nothing
+  return  z
+end
+
+function pow!(z::QQFieldElemOrPtr, x::QQFieldElemOrPtr, n::ZZRingElemOrPtr)
+  ok = Bool(@ccall libflint.fmpq_pow_fmpz(z::Ref{QQFieldElem}, x::Ref{QQFieldElem}, n::Ref{ZZRingElem})::Cint)
+  if !ok
+    error("unable to compute power")
+  end
   return z
 end
 
