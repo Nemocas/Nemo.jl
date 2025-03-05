@@ -759,7 +759,7 @@ end
 #
 ###############################################################################
 
-function ^(x::IntegerUnionOrPtr, y::IntegerUnionOrPtr)
+function ^(x::ZZRingElemOrPtr, y::IntegerUnionOrPtr)
   if y < 0
     throw(DomainError(y, "Exponent must be non-negative"))
   end
