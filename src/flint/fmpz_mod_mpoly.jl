@@ -672,7 +672,7 @@ for (etype, rtype, ftype, ctype) in (
     end
 
     function pow!(z::($etype), a::($etype), n::ZZRingElem)
-      ok = @ccall Bool(libflint.fmpz_mod_mpoly_pow_fmpz(z::Ref{($etype)}, a::Ref{($etype)}, n::Ref{ZZRingElem}, parent(a)::Ref{($rtype)})::Cint)
+      ok = Bool(@ccall libflint.fmpz_mod_mpoly_pow_fmpz(z::Ref{($etype)}, a::Ref{($etype)}, n::Ref{ZZRingElem}, parent(a)::Ref{($rtype)})::Cint)
       if !ok
         error("unable to compute power")
       end
