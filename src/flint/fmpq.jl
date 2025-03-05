@@ -388,7 +388,7 @@ isless(a::QQFieldElem, b::Float64) = isless(BigFloat(a), b)
 ###############################################################################
 
 function ^(a::QQFieldElemOrPtr, b::IntegerUnionOrPtr)
-  iszero(a) && b < 0 && throw(DivideError())
+  iszero(a) && is_negative(b) && throw(DivideError())
   return pow!(QQFieldElem(), a, b)
 end
 
