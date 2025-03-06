@@ -238,7 +238,14 @@ end
 #
 ################################################################################
 
-function ^(x::T, y::IntegerUnion) where {T <: Zmodn_fmpz_poly}
+# Cannot use IntegerUnion here to avoid ambiguity.
+
+function ^(x::T, y::Int) where {T <: Zmodn_fmpz_poly}
+  is_negative(y) && throw(DomainError(y, "Exponent must be non-negative"))
+  return pow!(parent(x)(), x, y)
+end
+
+function ^(x::T, y::ZZRingElem) where {T <: Zmodn_fmpz_poly}
   is_negative(y) && throw(DomainError(y, "Exponent must be non-negative"))
   return pow!(parent(x)(), x, y)
 end

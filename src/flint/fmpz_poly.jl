@@ -158,11 +158,16 @@ end
 #
 ###############################################################################
 
-function ^(x::ZZPolyRingElem, e::IntegerUnion)
-  if is_negative(e)
-    throw(DomainError(e, "exponent must be non-negative"))
-  end
-  return pow!(parent(x)(), x, e)
+# Cannot use IntegerUnion here to avoid ambiguity.
+
+function ^(x::ZZPolyRingElem, n::Int)
+  is_negative(n) && throw(DomainError(n, "Exponent must be non-negative"))
+  return pow!(parent(x)(), x, n)
+end
+
+function ^(x::ZZPolyRingElem, n::ZZRingElem)
+  is_negative(n) && throw(DomainError(n, "Exponent must be non-negative"))
+  return pow!(parent(x)(), x, n)
 end
 
 ###############################################################################

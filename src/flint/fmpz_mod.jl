@@ -202,7 +202,7 @@ end
 #
 ###############################################################################
 
-function ^(x::ZZModRingElem, y::Integer)
+function ^(x::ZZModRingElem, y::Int)
   if y < 0
     z = inv(x)
     x = pow!(x, z, -y)
@@ -214,7 +214,7 @@ function ^(x::ZZModRingElem, y::Integer)
 end
 
 # FLINT accepts negative values for the exponent if it is a ZZRingElem
-function ^(x::ZZModRingElem, n::ZZRingElemOrPtr)
+function ^(x::ZZModRingElem, n::ZZRingElem)
   return pow!(parent(x)(), x, n)
 end
 
@@ -419,7 +419,7 @@ end
 
 function pow!(z::ZZModRingElem, x::ZZModRingElem, n::ZZRingElemOrPtr)
   R = parent(z)
-  ok = Bool(@ccall libflint.fmpz_mod_pow(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, n::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Cint)
+  ok = Bool(@ccall libflint.fmpz_mod_pow_fmpz(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, n::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Cint)
   if !ok
     error("not invertible")
   end

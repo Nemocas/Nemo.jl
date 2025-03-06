@@ -348,7 +348,15 @@ end
 #
 ###############################################################################
 
-function ^(x::ZZMatrix, y::IntegerUnion)
+# Cannot use IntegerUnion here to avoid ambiguity.
+
+function ^(x::ZZMatrix, y::Int)
+  is_negative(y) && throw(DomainError(y, "Exponent must be non-negative"))
+  nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
+  return pow!(similar(x), x, y)
+end
+
+function ^(x::ZZMatrix, y::ZZRingElem)
   is_negative(y) && throw(DomainError(y, "Exponent must be non-negative"))
   nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
   return pow!(similar(x), x, y)

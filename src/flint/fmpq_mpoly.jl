@@ -309,7 +309,14 @@ end
 #
 ###############################################################################
 
-function ^(x::QQMPolyRingElem, n::IntegerUnionOrPtr)
+# Cannot use IntegerUnion here to avoid ambiguity.
+
+function ^(x::QQMPolyRingElem, n::Int)
+  is_negative(n) && throw(DomainError("Exponent must be non-negative"))
+  return pow!(parent(x)(), x, n)
+end
+
+function ^(x::QQMPolyRingElem, n::ZZRingElem)
   is_negative(n) && throw(DomainError("Exponent must be non-negative"))
   return pow!(parent(x)(), x, n)
 end
@@ -793,7 +800,7 @@ end
 #
 
 function pow!(z::QQMPolyRingElem, a::QQMPolyRingElem, n::Integer)
-  ok = Bool(libflint.fmpq_mpoly_pow_ui(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, UInt(n)::UInt, parent(a)::Ref{QQMPolyRing})::Cint)
+  ok = Bool(@ccall libflint.fmpq_mpoly_pow_ui(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, UInt(n)::UInt, parent(a)::Ref{QQMPolyRing})::Cint)
   if !ok
     error("unable to compute power")
   end
@@ -801,7 +808,7 @@ function pow!(z::QQMPolyRingElem, a::QQMPolyRingElem, n::Integer)
 end
 
 function pow!(z::QQMPolyRingElem, a::QQMPolyRingElem, n::ZZRingElemOrPtr)
-  ok = Bool(libflint.fmpq_mpoly_pow_fmpz(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, n::Ref{ZZRingElem}, parent(a)::Ref{QQMPolyRing})::Cint)
+  ok = Bool(@ccall libflint.fmpq_mpoly_pow_fmpz(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, n::Ref{ZZRingElem}, parent(a)::Ref{QQMPolyRing})::Cint)
   if !ok
     error("unable to compute power")
   end

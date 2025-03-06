@@ -162,7 +162,14 @@ end
 #
 ###############################################################################
 
-function ^(x::QQPolyRingElem, y::IntegerUnion)
+# Cannot use IntegerUnion here to avoid ambiguity.
+
+function ^(x::QQPolyRingElem, y::Int)
+  is_negative(y) && throw(DomainError(y, "Exponent must be non-negative"))
+  return pow!(parent(x)(), x, y)
+end
+
+function ^(x::QQPolyRingElem, y::ZZRingElem)
   is_negative(y) && throw(DomainError(y, "Exponent must be non-negative"))
   return pow!(parent(x)(), x, y)
 end
@@ -805,7 +812,7 @@ end
 
 #
 
-function reverse!(z::QQPolyRingElemOrPtr, x::QQPolyRingElem, len::Int)
+function reverse!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, len::Int)
   @ccall libflint.fmpq_poly_reverse(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, len::Int)::Nothing
   return z
 end

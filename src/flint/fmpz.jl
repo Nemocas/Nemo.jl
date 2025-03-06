@@ -759,8 +759,23 @@ end
 #
 ###############################################################################
 
-function ^(x::ZZRingElemOrPtr, y::IntegerUnionOrPtr)
+# Cannot use IntegerUnion here to avoid ambiguity.
+
+function ^(x::ZZRingElem, y::Int)
   if is_negative(y)
+    if abs(x) == 1
+      return isodd(y) ? deepcopy(x) : one(x)
+    end
+    throw(DomainError(y, "Exponent must be non-negative"))
+  end
+  return pow!(ZZRingElem(), x, y)
+end
+
+function ^(x::ZZRingElem, y::ZZRingElem)
+  if is_negative(y)
+    if abs(x) == 1
+      return isodd(y) ? deepcopy(x) : one(x)
+    end
     throw(DomainError(y, "Exponent must be non-negative"))
   end
   return pow!(ZZRingElem(), x, y)
@@ -772,9 +787,9 @@ end
 #
 ###############################################################################
 
-^(a::T, n::IntegerUnion) where {T<:RingElem} = _generic_power(a, n)
+^(a::T, n::ZZRingElem) where {T<:RingElem} = _generic_power(a, n)
 
-function _generic_power(a, n::IntegerUnion)
+function _generic_power(a, n::ZZRingElem)
   fits(Int, n) && return a^Int(n)
   if is_negative(n)
     a = inv(a)
@@ -3238,5 +3253,3 @@ function resultant(f::ZZPolyRingElem, g::ZZPolyRingElem, d::ZZRingElem, nb::Int)
   @ccall libflint.fmpz_poly_resultant_modular_div(z::Ref{ZZRingElem}, f::Ref{ZZPolyRingElem}, g::Ref{ZZPolyRingElem}, d::Ref{ZZRingElem}, nb::Int)::Nothing
   return z
 end
-
-
