@@ -399,10 +399,6 @@ end
 
 #
 
-function inv!(x::ZZModRingElem)
-  return inv!(x, x)
-end
-
 function inv!(z::ZZModRingElem, x::ZZModRingElem)
   R = parent(x)
   @ccall libflint.fmpz_mod_inv(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
