@@ -162,11 +162,16 @@ end
 #
 ###############################################################################
 
+# Cannot use IntegerUnion here to avoid ambiguity.
+
 function ^(x::QQPolyRingElem, y::Int)
-  y < 0 && throw(DomainError(y, "Exponent must be non-negative"))
-  z = parent(x)()
-  @ccall libflint.fmpq_poly_pow(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Int)::Nothing
-  return z
+  is_negative(y) && throw(DomainError(y, "Exponent must be non-negative"))
+  return pow!(parent(x)(), x, y)
+end
+
+function ^(x::QQPolyRingElem, y::ZZRingElem)
+  is_negative(y) && throw(DomainError(y, "Exponent must be non-negative"))
+  return pow!(parent(x)(), x, y)
 end
 
 ###############################################################################
@@ -239,7 +244,10 @@ end
 
 function reverse(x::QQPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Length must be non-negative"))
-  z = parent(x)()
+  return reverse!(parent(x)(), x, len)
+end
+
+function reverse!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, len::Int)
   @ccall libflint.fmpq_poly_reverse(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, len::Int)::Nothing
   return z
 end
@@ -799,6 +807,13 @@ end
 mul!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::Union{Integer, Rational}) = mul!(z, x, flintify(y))
 
 mul!(z::QQPolyRingElemOrPtr, x::RationalUnionOrPtr, y::QQPolyRingElemOrPtr) = mul!(z, y, x)
+
+#
+
+function pow!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, n::IntegerUnion)
+  @ccall libflint.fmpq_poly_pow(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, UInt(n)::UInt)::Nothing
+  return z
+end
 
 ###############################################################################
 #

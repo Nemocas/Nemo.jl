@@ -339,7 +339,10 @@ end
 
 function reverse(x::T, len::Int) where T <: Zmodn_poly
   len < 0 && throw(DomainError(len, "Index must be non-negative"))
-  z = parent(x)()
+  return reverse!(parent(x)(), x, len)
+end
+
+function reverse!(z::T, x::T, len::Int) where T <: Zmodn_poly
   @ccall libflint.nmod_poly_reverse(z::Ref{T}, x::Ref{T}, len::Int)::Nothing
   return z
 end

@@ -348,12 +348,18 @@ end
 #
 ###############################################################################
 
+# Cannot use IntegerUnion here to avoid ambiguity.
+
 function ^(x::ZZMatrix, y::Int)
-  y < 0 && throw(DomainError(y, "Exponent must be non-negative"))
+  is_negative(y) && throw(DomainError(y, "Exponent must be non-negative"))
   nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
-  z = similar(x)
-  @ccall libflint.fmpz_mat_pow(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Int)::Nothing
-  return z
+  return pow!(similar(x), x, y)
+end
+
+function ^(x::ZZMatrix, y::ZZRingElem)
+  is_negative(y) && throw(DomainError(y, "Exponent must be non-negative"))
+  nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
+  return pow!(similar(x), x, y)
 end
 
 ###############################################################################
@@ -1969,6 +1975,11 @@ function shift!(g::ZZMatrix, l::Int)
     end
   end
   return g
+end
+
+function pow!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, n::IntegerUnion)
+  @ccall libflint.fmpz_mat_pow(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, UInt(n)::UInt)::Nothing
+  return z
 end
 
 ################################################################################

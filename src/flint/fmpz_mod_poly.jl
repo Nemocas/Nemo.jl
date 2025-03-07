@@ -238,11 +238,16 @@ end
 #
 ################################################################################
 
+# Cannot use IntegerUnion here to avoid ambiguity.
+
 function ^(x::T, y::Int) where {T <: Zmodn_fmpz_poly}
-  y < 0 && throw(DomainError(y, "Exponent must be non-negative"))
-  z = parent(x)()
-  @ccall libflint.fmpz_mod_poly_pow(z::Ref{T}, x::Ref{T}, y::UInt, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
+  is_negative(y) && throw(DomainError(y, "Exponent must be non-negative"))
+  return pow!(parent(x)(), x, y)
+end
+
+function ^(x::T, y::ZZRingElem) where {T <: Zmodn_fmpz_poly}
+  is_negative(y) && throw(DomainError(y, "Exponent must be non-negative"))
+  return pow!(parent(x)(), x, y)
 end
 
 ################################################################################
@@ -313,7 +318,10 @@ end
 
 function reverse(x::T, len::Int) where {T <: Zmodn_fmpz_poly}
   len < 0 && throw(DomainError(len, "Length must be non-negative"))
-  z = parent(x)()
+  return reverse!(parent(x)(), x, len)
+end
+
+function reverse!(z::T, x::T, len::Int) where {T <: Zmodn_fmpz_poly}
   @ccall libflint.fmpz_mod_poly_reverse(z::Ref{T}, x::Ref{T}, len::Int, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
@@ -802,6 +810,11 @@ end
 
 function mul!(z::T, x::T, y::T) where {T <: Zmodn_fmpz_poly}
   @ccall libflint.fmpz_mod_poly_mul(z::Ref{T}, x::Ref{T}, y::Ref{T}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return z
+end
+
+function pow!(z::T, x::T, y::IntegerUnion) where {T <: Zmodn_fmpz_poly}
+  @ccall libflint.fmpz_mod_poly_pow(z::Ref{T}, x::Ref{T}, UInt(y)::UInt, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 

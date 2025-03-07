@@ -536,7 +536,7 @@ end
   @test isone(a^0) && isone(a^ZZRingElem(0))
 
   a = ZZRingElem(2)
-  @test_throws InexactError a^(a^200)
+  @test_throws ErrorException a^(a^200)
 
   for a in ZZRingElem.(-5:5)
     for e = -5:-1

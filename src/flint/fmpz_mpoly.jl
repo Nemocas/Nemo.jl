@@ -289,18 +289,16 @@ end
 #
 ###############################################################################
 
+# Cannot use IntegerUnion here to avoid ambiguity.
+
 function ^(a::ZZMPolyRingElem, b::Int)
-  b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
-  z = parent(a)()
-  @ccall libflint.fmpz_mpoly_pow_ui(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, b::Int, parent(a)::Ref{ZZMPolyRing})::Nothing
-  return z
+  is_negative(b) && throw(DomainError(b, "Exponent must be non-negative"))
+  return pow!(parent(a)(), a, b)
 end
 
 function ^(a::ZZMPolyRingElem, b::ZZRingElem)
-  b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
-  z = parent(a)()
-  @ccall libflint.fmpz_mpoly_pow_fmpz(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, b::Ref{ZZRingElem}, parent(a)::Ref{ZZMPolyRing})::Nothing
-  return z
+  is_negative(b) && throw(DomainError(b, "Exponent must be non-negative"))
+  return pow!(parent(a)(), a, b)
 end
 
 ################################################################################
@@ -736,6 +734,24 @@ setcoeff!(a::ZZMPolyRingElem, i::Int, c::Integer) = setcoeff!(a, i, ZZRingElem(c
 function combine_like_terms!(a::ZZMPolyRingElem)
   @ccall libflint.fmpz_mpoly_combine_like_terms(a::Ref{ZZMPolyRingElem}, a.parent::Ref{ZZMPolyRing})::Nothing
   return a
+end
+
+#
+
+function pow!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, n::Integer)
+  ok = Bool(@ccall libflint.fmpz_mpoly_pow_ui(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, UInt(n)::UInt, parent(a)::Ref{ZZMPolyRing})::Cint)
+  if !ok
+    error("unable to compute power")
+  end
+  return z
+end
+
+function pow!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, n::ZZRingElemOrPtr)
+  ok = Bool(@ccall libflint.fmpz_mpoly_pow_fmpz(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, n::Ref{ZZRingElem}, parent(a)::Ref{ZZMPolyRing})::Cint)
+  if !ok
+    error("unable to compute power")
+  end
+  return z
 end
 
 ###############################################################################

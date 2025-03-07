@@ -109,6 +109,7 @@ import Base: Rational
 import Base: real
 import Base: rem
 import Base: reverse
+import Base: reverse!
 import Base: round
 import Base: setindex!
 import Base: show

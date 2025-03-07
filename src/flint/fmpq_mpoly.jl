@@ -51,16 +51,11 @@ end
 function is_gen(a::QQMPolyRingElem, i::Int)
   n = nvars(parent(a))
   (i <= 0 || i > n) && error("Index must be between 1 and $n")
-  R = parent(a)
-  return Bool(@ccall libflint.fmpq_mpoly_is_gen(a::Ref{QQMPolyRingElem}, (i - 1)::Int, a.parent::Ref{QQMPolyRing})::Cint)
+  return Bool(@ccall libflint.fmpq_mpoly_is_gen(a::Ref{QQMPolyRingElem}, (i - 1)::Int, parent(a)::Ref{QQMPolyRing})::Cint)
 end
 
 function is_gen(a::QQMPolyRingElem)
-  n = nvars(parent(a))
-  for i in 1:n
-    is_gen(a, i) && return true
-  end
-  return false
+  return Bool(@ccall libflint.fmpq_mpoly_is_gen(a::Ref{QQMPolyRingElem}, (-1)::Int, parent(a)::Ref{QQMPolyRing})::Cint)
 end
 
 function deepcopy_internal(a::QQMPolyRingElem, dict::IdDict)
@@ -309,18 +304,16 @@ end
 #
 ###############################################################################
 
-function ^(a::QQMPolyRingElem, b::Int)
-  b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
-  z = parent(a)()
-  @ccall libflint.fmpq_mpoly_pow_ui(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, b::Int, parent(a)::Ref{QQMPolyRing})::Nothing
-  return z
+# Cannot use IntegerUnion here to avoid ambiguity.
+
+function ^(x::QQMPolyRingElem, n::Int)
+  is_negative(n) && throw(DomainError("Exponent must be non-negative"))
+  return pow!(parent(x)(), x, n)
 end
 
-function ^(a::QQMPolyRingElem, b::ZZRingElem)
-  b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
-  z = parent(a)()
-  @ccall libflint.fmpq_mpoly_pow_fmpz(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, b::Ref{ZZRingElem}, parent(a)::Ref{QQMPolyRing})::Nothing
-  return z
+function ^(x::QQMPolyRingElem, n::ZZRingElem)
+  is_negative(n) && throw(DomainError("Exponent must be non-negative"))
+  return pow!(parent(x)(), x, n)
 end
 
 ################################################################################
@@ -797,6 +790,24 @@ setcoeff!(a, i, QQFieldElem(c))
 function combine_like_terms!(a::QQMPolyRingElem)
   @ccall libflint.fmpq_mpoly_combine_like_terms(a::Ref{QQMPolyRingElem}, a.parent::Ref{QQMPolyRing})::Nothing
   return a
+end
+
+#
+
+function pow!(z::QQMPolyRingElem, a::QQMPolyRingElem, n::Integer)
+  ok = Bool(@ccall libflint.fmpq_mpoly_pow_ui(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, UInt(n)::UInt, parent(a)::Ref{QQMPolyRing})::Cint)
+  if !ok
+    error("unable to compute power")
+  end
+  return z
+end
+
+function pow!(z::QQMPolyRingElem, a::QQMPolyRingElem, n::ZZRingElemOrPtr)
+  ok = Bool(@ccall libflint.fmpq_mpoly_pow_fmpz(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, n::Ref{ZZRingElem}, parent(a)::Ref{QQMPolyRing})::Cint)
+  if !ok
+    error("unable to compute power")
+  end
+  return z
 end
 
 ###############################################################################

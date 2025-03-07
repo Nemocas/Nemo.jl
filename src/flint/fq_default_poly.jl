@@ -257,7 +257,10 @@ end
 
 function reverse(x::FqPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Index must be non-negative"))
-  z = parent(x)()
+  return reverse!(parent(x)(), x, len)
+end
+
+function reverse!(z::FqPolyRingElem, x::FqPolyRingElem, len::Int)
   @ccall libflint.fq_default_poly_reverse(z::Ref{FqPolyRingElem}, x::Ref{FqPolyRingElem}, len::Int, base_ring(parent(x))::Ref{FqField})::Nothing
   return z
 end

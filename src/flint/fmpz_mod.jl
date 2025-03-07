@@ -202,15 +202,21 @@ end
 #
 ###############################################################################
 
+# Cannot use IntegerUnion here to avoid ambiguity.
+
 function ^(x::ZZModRingElem, y::Int)
-  R = parent(x)
   if y < 0
-    x = inv(x)
-    y = -y
+    z = inv(x)
+    z = pow!(z, z, -y)
+  else
+    z = pow!(parent(x)(), x, y)
   end
-  d = ZZRingElem()
-  @ccall libflint.fmpz_mod_pow_ui(d::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y::UInt, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return ZZModRingElem(d, R)
+  return z
+end
+
+# FLINT accepts negative values for the exponent if it is a ZZRingElem
+function ^(x::ZZModRingElem, n::ZZRingElem)
+  return pow!(parent(x)(), x, n)
 end
 
 
@@ -389,6 +395,23 @@ end
 function add!(z::ZZModRingElem, x::ZZModRingElem, y::ZZModRingElem)
   R = parent(z)
   @ccall libflint.fmpz_mod_add(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return z
+end
+
+#
+
+function pow!(z::ZZModRingElem, x::ZZModRingElem, n::Integer)
+  R = parent(z)
+  @ccall libflint.fmpz_mod_pow_ui(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, n::UInt, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return z
+end
+
+function pow!(z::ZZModRingElem, x::ZZModRingElem, n::ZZRingElemOrPtr)
+  R = parent(z)
+  ok = Bool(@ccall libflint.fmpz_mod_pow_fmpz(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, n::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Cint)
+  if !ok
+    error("not invertible")
+  end
   return z
 end
 
