@@ -205,8 +205,7 @@ end
 function ^(x::ZZModRingElem, y::Int)
   if y < 0
     z = inv(x)
-    x = pow!(x, z, -y)
-    swap!(inv!(z), x)
+    z = pow!(z, z, -y)
   else
     z = pow!(parent(x)(), x, y)
   end
