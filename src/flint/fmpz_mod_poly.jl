@@ -321,6 +321,11 @@ function reverse(x::T, len::Int) where {T <: Zmodn_fmpz_poly}
   return reverse!(parent(x)(), x, len)
 end
 
+function reverse!(z::T, x::T, len::Int) where {T <: Zmodn_fmpz_poly}
+  @ccall libflint.fmpz_mod_poly_reverse(z::Ref{T}, x::Ref{T}, len::Int, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return z
+end
+
 ###############################################################################
 #
 #   Shifting
@@ -810,11 +815,6 @@ end
 
 function pow!(z::T, x::T, y::IntegerUnion) where {T <: Zmodn_fmpz_poly}
   @ccall libflint.fmpz_mod_poly_pow(z::Ref{T}, x::Ref{T}, UInt(y)::UInt, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
-end
-
-function reverse!(z::T, x::T, len::Int) where {T <: Zmodn_fmpz_poly}
-  @ccall libflint.fmpz_mod_poly_reverse(z::Ref{T}, x::Ref{T}, len::Int, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 

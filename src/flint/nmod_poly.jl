@@ -342,6 +342,11 @@ function reverse(x::T, len::Int) where T <: Zmodn_poly
   return reverse!(parent(x)(), x, len)
 end
 
+function reverse!(z::T, x::T, len::Int) where T <: Zmodn_poly
+  @ccall libflint.nmod_poly_reverse(z::Ref{T}, x::Ref{T}, len::Int)::Nothing
+  return z
+end
+
 ###############################################################################
 #
 #   Shifting
@@ -880,11 +885,6 @@ end
 
 function mul!(z::T, x::T, y::UInt) where T <: Zmodn_poly
   @ccall libflint.nmod_poly_scalar_mul_nmod(z::Ref{T}, x::Ref{T}, y::UInt)::Nothing
-  return z
-end
-
-function reverse!(z::T, x::T, len::Int) where T <: Zmodn_poly
-  @ccall libflint.nmod_poly_reverse(z::Ref{T}, x::Ref{T}, len::Int)::Nothing
   return z
 end
 

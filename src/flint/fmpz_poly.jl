@@ -243,6 +243,11 @@ function reverse(x::ZZPolyRingElem, len::Int)
   return reverse!(parent(x)(), x, len)
 end
 
+function reverse!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, len::Int)
+  @ccall libflint.fmpz_poly_reverse(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, len::Int)::Nothing
+  return z
+end
+
 ###############################################################################
 #
 #   Shifting
@@ -940,13 +945,6 @@ submul!(z::ZZPolyRingElemOrPtr, x::IntegerUnionOrPtr, y::ZZPolyRingElemOrPtr, ::
 
 function pow!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, e::IntegerUnion)
   @ccall libflint.fmpz_poly_pow(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, UInt(e)::UInt)::Nothing
-  return z
-end
-
-#
-
-function reverse!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, len::Int)
-  @ccall libflint.fmpz_poly_reverse(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, len::Int)::Nothing
   return z
 end
 

@@ -268,6 +268,11 @@ function reverse(x::fqPolyRepPolyRingElem, len::Int)
   return reverse!(parent(x)(), x, len)
 end
 
+function reverse!(z::fqPolyRepPolyRingElem, x::fqPolyRepPolyRingElem, len::Int)
+  @ccall libflint.fq_nmod_poly_reverse(z::Ref{fqPolyRepPolyRingElem}, x::Ref{fqPolyRepPolyRingElem}, len::Int, base_ring(parent(x))::Ref{fqPolyRepField})::Nothing
+  return z
+end
+
 ################################################################################
 #
 #   Shifting
@@ -659,11 +664,6 @@ end
 
 function sub!(z::fqPolyRepPolyRingElem, x::fqPolyRepPolyRingElem, y::fqPolyRepPolyRingElem)
   @ccall libflint.fq_nmod_poly_sub(z::Ref{fqPolyRepPolyRingElem}, x::Ref{fqPolyRepPolyRingElem}, y::Ref{fqPolyRepPolyRingElem}, base_ring(parent(x))::Ref{fqPolyRepField})::Nothing
-  return z
-end
-
-function reverse!(z::fqPolyRepPolyRingElem, x::fqPolyRepPolyRingElem, len::Int)
-  @ccall libflint.fq_nmod_poly_reverse(z::Ref{fqPolyRepPolyRingElem}, x::Ref{fqPolyRepPolyRingElem}, len::Int, base_ring(parent(x))::Ref{fqPolyRepField})::Nothing
   return z
 end
 

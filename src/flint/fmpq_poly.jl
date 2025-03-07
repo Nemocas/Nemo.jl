@@ -247,6 +247,11 @@ function reverse(x::QQPolyRingElem, len::Int)
   return reverse!(parent(x)(), x, len)
 end
 
+function reverse!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, len::Int)
+  @ccall libflint.fmpq_poly_reverse(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, len::Int)::Nothing
+  return z
+end
+
 ###############################################################################
 #
 #   Shifting
@@ -807,13 +812,6 @@ mul!(z::QQPolyRingElemOrPtr, x::RationalUnionOrPtr, y::QQPolyRingElemOrPtr) = mu
 
 function pow!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, n::IntegerUnion)
   @ccall libflint.fmpq_poly_pow(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, UInt(n)::UInt)::Nothing
-  return z
-end
-
-#
-
-function reverse!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, len::Int)
-  @ccall libflint.fmpq_poly_reverse(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, len::Int)::Nothing
   return z
 end
 

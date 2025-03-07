@@ -26,7 +26,7 @@ base_ring(a::ZZMPolyRing) = ZZ
 
 function internal_ordering(a::ZZMPolyRing)
   b = @ccall libflint.fmpz_mpoly_ctx_ord(a::Ref{ZZMPolyRing})::Cint
-  return flint_orderings[b+1]
+  return flint_orderings[b + 1]
 end
 
 function gens(R::ZZMPolyRing)
@@ -208,7 +208,7 @@ end
 function coeff(a::ZZMPolyRingElem, vars::Vector{Int}, exps::Vector{Int})
   unique(vars) != vars && error("Variables not unique")
   length(vars) != length(exps) &&
-    error("Number of variables does not match number of exponents")
+  error("Number of variables does not match number of exponents")
   z = parent(a)()
   vars = [UInt(i) - 1 for i in vars]
   for i = 1:length(vars)
@@ -330,7 +330,7 @@ end
 #
 ################################################################################
 
-function (::Type{Fac{ZZMPolyRingElem}})(fac::fmpz_mpoly_factor, preserve_input::Bool=true)
+function (::Type{Fac{ZZMPolyRingElem}})(fac::fmpz_mpoly_factor, preserve_input::Bool = true)
   R = fac.parent
   F = Fac{ZZMPolyRingElem}()
   empty!(F.fac)
@@ -438,7 +438,7 @@ end
 #
 ###############################################################################
 
-function divides(a::ZZMPolyRingElem, b::Union{IntegerUnion,ZZMPolyRingElem})
+function divides(a::ZZMPolyRingElem, b::Union{IntegerUnion, ZZMPolyRingElem})
   check_parent(a, b)
   z = zero(parent(a))
   iszero(a) && return true, z
@@ -534,7 +534,7 @@ function (a::ZZMPolyRingElem)(vals::Integer...)
   return evaluate(a, [vals...])
 end
 
-function (a::ZZMPolyRingElem)(vals::Union{NCRingElem,RingElement}...)
+function (a::ZZMPolyRingElem)(vals::Union{NCRingElem, RingElement}...)
   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
   R = base_ring(a)
   # The best we can do here is to cache previously used powers of the values
@@ -543,7 +543,7 @@ function (a::ZZMPolyRingElem)(vals::Union{NCRingElem,RingElement}...)
   # to optimise computing new powers in any way.
   # Note that this function accepts values in a non-commutative ring, so operations
   # must be done in a certain order.
-  powers = [Dict{Int,Any}() for i in 1:length(vals)]
+  powers = [Dict{Int, Any}() for i in 1:length(vals)]
   # First work out types of products
   r = R()
   c = zero(R)
@@ -552,11 +552,11 @@ function (a::ZZMPolyRingElem)(vals::Union{NCRingElem,RingElement}...)
     W = typeof(vals[j])
     if ((W <: Integer && W != BigInt) ||
         (W <: Rational && W != Rational{BigInt}))
-      c = c * zero(W)
+      c = c*zero(W)
       U[j] = parent(c)
     else
       U[j] = parent(vals[j])
-      c = c * zero(parent(vals[j]))
+      c = c*zero(parent(vals[j]))
     end
   end
   for i = 1:length(a)
@@ -567,7 +567,7 @@ function (a::ZZMPolyRingElem)(vals::Union{NCRingElem,RingElement}...)
       if !haskey(powers[j], exp)
         powers[j][exp] = (U[j](vals[j]))^exp
       end
-      t = t * powers[j][exp]
+      t = t*powers[j][exp]
     end
     r += t
   end
@@ -579,7 +579,7 @@ function evaluate(a::ZZMPolyRingElem, bs::Vector{ZZMPolyRingElem})
   S = parent(bs[1])
 
   length(bs) != nvars(R) &&
-    error("Number of variables does not match number of values")
+  error("Number of variables does not match number of values")
 
   c = S()
   fl = @ccall libflint.fmpz_mpoly_compose_fmpz_mpoly(c::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, bs::Ptr{Ref{ZZMPolyRingElem}}, R::Ref{ZZMPolyRing}, S::Ref{ZZMPolyRing})::Cint
@@ -592,7 +592,7 @@ function evaluate(a::ZZMPolyRingElem, bs::Vector{ZZPolyRingElem})
   S = parent(bs[1])
 
   length(bs) != nvars(R) &&
-    error("Number of variables does not match number of values")
+  error("Number of variables does not match number of values")
 
   c = S()
   fl = @ccall libflint.fmpz_mpoly_compose_fmpz_poly(c::Ref{ZZPolyRingElem}, a::Ref{ZZMPolyRingElem}, bs::Ptr{Ref{ZZPolyRingElem}}, R::Ref{ZZMPolyRing})::Cint
@@ -643,7 +643,7 @@ function set!(z::ZZMPolyRingElem, a::UInt)
   return z
 end
 
-set!(z::ZZMPolyRingElem, a::Union{Integer,Rational}) = set!(z, flintify(a))
+set!(z::ZZMPolyRingElem, a::Union{Integer, Rational}) = set!(z, flintify(a))
 
 #
 
@@ -672,31 +672,31 @@ for (jT, cN, cT) in ((ZZRingElem, :fmpz, Ref{ZZRingElem}), (Int, :si, Int), (UIn
   @eval begin
     function add!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::$jT)
       @ccall libflint.$(string(:fmpz_mpoly_add_, cN))(z::Ref{ZZMPolyRingElem},
-        a::Ref{ZZMPolyRingElem}, b::$cT, parent(a)::Ref{ZZMPolyRing})::Nothing
+                a::Ref{ZZMPolyRingElem}, b::$cT, parent(a)::Ref{ZZMPolyRing})::Nothing
       return z
     end
 
     function sub!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::($jT))
       @ccall libflint.$(string(:fmpz_mpoly_sub_, cN))(z::Ref{ZZMPolyRingElem},
-        a::Ref{ZZMPolyRingElem}, b::$cT, parent(a)::Ref{ZZMPolyRing})::Nothing
+                a::Ref{ZZMPolyRingElem}, b::$cT, parent(a)::Ref{ZZMPolyRing})::Nothing
       return z
     end
 
     function mul!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::($jT))
       @ccall libflint.$(string(:fmpz_mpoly_scalar_mul_, cN))(z::Ref{ZZMPolyRingElem},
-        a::Ref{ZZMPolyRingElem}, b::$cT, parent(a)::Ref{ZZMPolyRing})::Nothing
+                a::Ref{ZZMPolyRingElem}, b::$cT, parent(a)::Ref{ZZMPolyRing})::Nothing
       return z
     end
 
     function divexact!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::($jT))
       @ccall libflint.$(string(:fmpz_mpoly_scalar_divexact_, cN))(z::Ref{ZZMPolyRingElem},
-        a::Ref{ZZMPolyRingElem}, b::$cT, parent(a)::Ref{ZZMPolyRing})::Nothing
+                a::Ref{ZZMPolyRingElem}, b::$cT, parent(a)::Ref{ZZMPolyRing})::Nothing
       return z
     end
 
     function divides!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, b::($jT))
       d = @ccall libflint.$(string(:fmpz_mpoly_scalar_divides_, cN))(z::Ref{ZZMPolyRingElem},
-        a::Ref{ZZMPolyRingElem}, b::$cT, parent(a)::Ref{ZZMPolyRing})::Cint
+                    a::Ref{ZZMPolyRingElem}, b::$cT, parent(a)::Ref{ZZMPolyRing})::Cint
       return Bool(d), z
     end
   end
@@ -861,7 +861,7 @@ end
 
 # Set the coefficient of the term with the given exponent vector to the
 setcoeff!(a::ZZMPolyRingElem, exps::Vector{Int}, b::Integer) =
-  setcoeff!(a, exps, ZZRingElem(b))
+setcoeff!(a, exps, ZZRingElem(b))
 
 # Sort the terms according to the ordering. This is only needed if unsafe
 # functions such as those above have been called and terms have been inserted
@@ -898,7 +898,7 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{ZZMPolyRingElem}, ::Type{V}) where {V<:Integer} = ZZMPolyRingElem
+promote_rule(::Type{ZZMPolyRingElem}, ::Type{V}) where {V <: Integer} = ZZMPolyRingElem
 
 promote_rule(::Type{ZZMPolyRingElem}, ::Type{ZZRingElem}) = ZZMPolyRingElem
 
@@ -924,7 +924,7 @@ function _push_term!(z::ZZMPolyRingElem, c::UInt, exp::Vector{Int})
 end
 
 function push_term!(M::MPolyBuildCtx{ZZMPolyRingElem},
-  c::Union{ZZRingElem,Int,UInt}, expv::Vector{Int})
+    c::Union{ZZRingElem, Int, UInt}, expv::Vector{Int})
   if length(expv) != nvars(parent(M.poly))
     error("length of exponent vector should match the number of variables")
   end
@@ -933,7 +933,7 @@ function push_term!(M::MPolyBuildCtx{ZZMPolyRingElem},
 end
 
 function push_term!(M::MPolyBuildCtx{ZZMPolyRingElem},
-  c::RingElement, expv::Vector{Int})
+    c::RingElement, expv::Vector{Int})
   push_term!(M, ZZ(c), expv)
   return M
 end
@@ -969,7 +969,7 @@ function (R::ZZMPolyRing)(a::ZZMPolyRingElem)
 end
 
 # Create poly with given array of coefficients and array of exponent vectors (sorting is performed)
-function (R::ZZMPolyRing)(a::Vector{ZZRingElem}, b::Vector{Vector{T}}) where {T<:Union{ZZRingElem,UInt}}
+function (R::ZZMPolyRing)(a::Vector{ZZRingElem}, b::Vector{Vector{T}}) where {T <: Union{ZZRingElem, UInt}}
   length(a) != length(b) && error("Coefficient and exponent vector must have the same length")
 
   for i in 1:length(b)
@@ -993,7 +993,7 @@ function (R::ZZMPolyRing)(a::Vector{ZZRingElem}, b::Vector{Vector{Int}})
 end
 
 # Create poly with given array of coefficients and array of exponent vectors (sorting is performed)
-function (R::ZZMPolyRing)(a::Vector{Any}, b::Vector{Vector{T}}) where {T}
+function (R::ZZMPolyRing)(a::Vector{Any}, b::Vector{Vector{T}}) where T
   n = nvars(R)
   length(a) != length(b) && error("Coefficient and exponent vector must have the same length")
   newa = map(ZZ, a)

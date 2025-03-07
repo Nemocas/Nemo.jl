@@ -202,6 +202,8 @@ end
 #
 ###############################################################################
 
+# Cannot use IntegerUnion here to avoid ambiguity.
+
 function ^(x::ZZModRingElem, y::Int)
   if y < 0
     z = inv(x)
@@ -398,14 +400,6 @@ end
 
 #
 
-function inv!(z::ZZModRingElem, x::ZZModRingElem)
-  R = parent(x)
-  @ccall libflint.fmpz_mod_inv(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
-end
-
-#
-
 function pow!(z::ZZModRingElem, x::ZZModRingElem, n::Integer)
   R = parent(z)
   @ccall libflint.fmpz_mod_pow_ui(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, n::UInt, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
@@ -419,12 +413,6 @@ function pow!(z::ZZModRingElem, x::ZZModRingElem, n::ZZRingElemOrPtr)
     error("not invertible")
   end
   return z
-end
-
-#
-
-function swap!(x::ZZModRingElem, y::ZZModRingElem)
-  swap!(x.data, y.data)
 end
 
 ###############################################################################

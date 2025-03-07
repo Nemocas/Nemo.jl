@@ -6,7 +6,7 @@
 ###############################################################################
 
 for (etype, rtype, ftype, ctype) in (
-  (FpMPolyRingElem, FpMPolyRing, gfp_fmpz_mpoly_factor, FpFieldElem),)
+                                     (FpMPolyRingElem, FpMPolyRing, gfp_fmpz_mpoly_factor, FpFieldElem),)
   @eval begin
 
     ###############################################################################
@@ -45,7 +45,7 @@ for (etype, rtype, ftype, ctype) in (
     function internal_ordering(a::($rtype))
       b = a.ord
       #   b = @ccall libflint.fmpz_mod_mpoly_ctx_ord(a::Ref{zzModMPolyRing})::Cint
-      return flint_orderings[b+1]
+      return flint_orderings[b + 1]
     end
 
     function gens(R::($rtype))
@@ -112,11 +112,11 @@ for (etype, rtype, ftype, ctype) in (
     end
 
     # TODO move this
-    function expressify(a::($rtype); context=nothing)
+    function expressify(a::($rtype); context = nothing)
       return Expr(:sequence, Expr(:text, "Multivariate Polynomial Ring in "),
-        Expr(:series, symbols(a)...),
-        Expr(:text, " over "),
-        expressify(coefficient_ring(a); context=context))
+                  Expr(:series, symbols(a)...),
+                  Expr(:text, " over "),
+                  expressify(coefficient_ring(a); context = context))
     end
 
     @enable_all_show_via_expressify ($rtype)
@@ -401,7 +401,7 @@ for (etype, rtype, ftype, ctype) in (
     #
     ################################################################################
 
-    function (::Type{Fac{($etype)}})(fac::($ftype), preserve_input::Bool=true)
+    function (::Type{Fac{($etype)}})(fac::($ftype), preserve_input::Bool = true)
       R = fac.parent
       F = Fac{($etype)}()
       for i in 0:fac.num-1
@@ -585,10 +585,10 @@ for (etype, rtype, ftype, ctype) in (
 
     # TODO have AA define evaluate(a, vals) for general vals
     # so we can get rid of this copy pasta
-    function (a::($etype))(vals::Union{NCRingElem,RingElement}...)
+    function (a::($etype))(vals::Union{NCRingElem, RingElement}...)
       length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
       R = base_ring(a)
-      powers = [Dict{Int,Any}() for i in 1:length(vals)]
+      powers = [Dict{Int, Any}() for i in 1:length(vals)]
       r = R()
       c = zero(R)
       U = Vector{Any}(undef, length(vals))
@@ -596,11 +596,11 @@ for (etype, rtype, ftype, ctype) in (
         W = typeof(vals[j])
         if ((W <: Integer && W != BigInt) ||
             (W <: Rational && W != Rational{BigInt}))
-          c = c * zero(W)
+          c = c*zero(W)
           U[j] = parent(c)
         else
           U[j] = parent(vals[j])
-          c = c * zero(parent(vals[j]))
+          c = c*zero(parent(vals[j]))
         end
       end
       cvzip = zip(coefficients(a), exponent_vectors(a))
@@ -611,7 +611,7 @@ for (etype, rtype, ftype, ctype) in (
           if !haskey(powers[j], exp)
             powers[j][exp] = (U[j](vals[j]))^exp
           end
-          t = t * powers[j][exp]
+          t = t*powers[j][exp]
         end
         r += t
       end
@@ -794,7 +794,7 @@ for (etype, rtype, ftype, ctype) in (
     # Set the coefficient of the term with the given exponent vector to the
     # given integer. Removal of a zero term is performed.
     setcoeff!(a::($etype), exps::Vector{Int}, b::Integer) =
-      setcoeff!(a, exps, base_ring(parent(a))(b))
+    setcoeff!(a, exps, base_ring(parent(a))(b))
 
     # Sort the terms according to the ordering. This is only needed if unsafe
     # functions such as those above have been called and terms have been inserted
@@ -829,7 +829,7 @@ for (etype, rtype, ftype, ctype) in (
     #
     ###############################################################################
 
-    promote_rule(::Type{($etype)}, ::Type{V}) where {V<:Integer} = ($etype)
+    promote_rule(::Type{($etype)}, ::Type{V}) where {V <: Integer} = ($etype)
 
     promote_rule(::Type{($etype)}, ::Type{ZZRingElem}) = ($etype)
 
@@ -859,18 +859,18 @@ for (etype, rtype, ftype, ctype) in (
     end
 
     # Create poly with given array of coefficients and array of exponent vectors (sorting is performed)
-    function (R::($rtype))(a::Vector{($ctype)}, b::Vector{Vector{T}}) where {T<:Union{ZZRingElem,UInt,Int}}
+    function (R::($rtype))(a::Vector{($ctype)}, b::Vector{Vector{T}}) where {T <: Union{ZZRingElem, UInt, Int}}
       length(a) != length(b) && error("Coefficient and exponent vector must have the same length")
       for i in 1:length(b)
         length(b[i]) != nvars(R) && error("Exponent vector $i has length $(length(b[i])) (expected $(nvars(R))")
-        T !== UInt && any(x -> x < 0, b[i]) && error("negative exponent")
+        T !== UInt && any(x->x<0, b[i]) && error("negative exponent")
       end
       z = ($etype)(R, a, b)
       return z
     end
 
     # Create poly with given array of coefficients and array of exponent vectors (sorting is performed)
-    function (R::($rtype))(a::Vector, b::Vector{Vector{T}}) where {T}
+    function (R::($rtype))(a::Vector, b::Vector{Vector{T}}) where T
       n = nvars(R)
       length(a) != length(b) && error("Coefficient and exponent vector must have the same length")
       newa = map(base_ring(R), a)
@@ -893,7 +893,7 @@ end #for
 ################################################################################
 
 function divexact(f::FpMPolyRingElem, a::fpFieldElem; check::Bool=true)
-  return f * inv(a)
+  return f*inv(a)
 end
 
 function divexact(f::FpMPolyRingElem, a::IntegerUnion; check::Bool=true)
