@@ -38,6 +38,10 @@ function is_gen(a::FqMPolyRingElem)
   return is_gen(a.data)
 end
 
+function is_gen(a::FqMPolyRingElem, i::Int)
+  return is_gen(a.data, i)
+end
+
 function deepcopy_internal(a::FqMPolyRingElem, dict::IdDict)
   return FqMPolyRingElem(parent(a), deepcopy_internal(a.data, dict))
 end
