@@ -65,17 +65,9 @@ end
 
 length(a::QQMPolyRingElem) = a.length
 
-function one(R::QQMPolyRing)
-  z = R()
-  @ccall libflint.fmpq_mpoly_one(z::Ref{QQMPolyRingElem}, R::Ref{QQMPolyRing})::Nothing
-  return z
-end
+one(R::QQMPolyRing) = one!(R())
 
-function zero(R::QQMPolyRing)
-  z = R()
-  @ccall libflint.fmpq_mpoly_zero(z::Ref{QQMPolyRingElem}, R::Ref{QQMPolyRing})::Nothing
-  return z
-end
+zero(R::QQMPolyRing) = zero!(R())
 
 function isone(a::QQMPolyRingElem)
   b = @ccall libflint.fmpq_mpoly_is_one(a::Ref{QQMPolyRingElem}, a.parent::Ref{QQMPolyRing})::Cint
