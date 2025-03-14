@@ -1,3 +1,5 @@
+import Nemo: AbstractAlgebra.PrettyPrinting
+
 @testset "QQBarFieldElem.conformance_tests" begin
   R = algebraic_closure(QQ)
   ConformanceTests.test_Field_interface(R)
