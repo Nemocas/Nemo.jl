@@ -18,7 +18,7 @@
 #######################################################
 
 function _det(a::fpMatrix)
-  a.r < 10 && return lift(det(a))
+##??WHY??  a.r < 10 && return lift(det(a))
   #_det avoids a copy: det is computed destructively
   r = ccall((:_nmod_mat_det, Nemo.libflint), UInt, (Ref{fpMatrix}, ), a)
   return r
@@ -108,7 +108,7 @@ function _is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEl
   # Deal with two trivial cases -- does this make sense here???
   nrows(A) == 0 && return true
   nrows(A) == 1 && return (abs(A[1,1]) == 1)
-  @vprintln(:UnimodVerif,1,"is_unimodular_given_det_mod_m starting")
+  @vprintln(:UnimodVerif,1,"is_unimodular_given_det_mod_m starting; det_mod_m=$(det_mod_m)")
   if algorithm == :pauderis_storjohann
     @vprintln(:UnimodVerif,1,"User specified Pauderis_Storjohann --> delegating")
     return _is_unimodular_Pauderis_Storjohann_Hensel(A)
@@ -117,7 +117,7 @@ function _is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEl
   Hrow = hadamard_bound2(A)
   Hcol = hadamard_bound2(transpose(A))
   DetBoundSq = min(Hrow, Hcol)
-  Hbits = 1+div(nbits(DetBoundSq),2)
+  Hbits = 1+div(1+nbits(DetBoundSq),2)
   @vprintln(:UnimodVerif,1,"Hadamard bound in bits $(Hbits)")
   if algorithm == :auto
     # Estimate whether better to "climb out" with CRT or use Pauderis-Storjohann
@@ -146,7 +146,7 @@ function _is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEl
   # in CRT loop start with 22 bit primes; if we reach threshold (empirical), jump to much larger primes.
   p = 2^21; stride = 2^10; threshold = 5000000;
   A_mod_p = zero_matrix(Nemo.Native.GF(2), nrows(A), ncols(A))
-  while nbits(M) < Hbits
+  while nbits(M) <= Hbits
     @vprint(:UnimodVerif,2,".")
     # Next lines increment p (by random step up to stride) to a prime not dividing M
     if p > threshold && p < threshold+stride
@@ -163,11 +163,10 @@ function _is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEl
     end
     ZZmodP = Nemo.Native.GF(p; cached = false, check = false)
     map_entries!(ZZmodP, A_mod_p, A)
-    det_mod_p = _det(A_mod_p)
-    if det_mod_p > p/2
-      det_mod_p -= p
-    end
-    if abs(det_mod_p) != 1 || det_mod_m != det_mod_p
+    det_mod_p = _det(A_mod_p) # type is UInt
+    @vprintln(:UnimodVerif,3, "p=$(p)  det_mod_p=$(det_mod_p)")
+    verified_mod_p = (det_mod_m == 1) ? (det_mod_p == 1) : (det_mod_p == p-1)
+    if !verified_mod_p
       return false  # obviously not unimodular
     end
     mul!(M, M, p)
