@@ -53,7 +53,6 @@ function is_unimodular(A::ZZMatrix; algorithm=:auto)
   # If so, then delegate the complete check to is_unimodular_given_det_mod_m
   @req  is_square(A)  "Matrix must be square"
   @req (algorithm in [:auto, :CRT, :pauderis_storjohann])  "algorithm must be one of [:CRT, :pauderis_storjohann, :auto]"
-  end
   # Deal with two trivial cases
   if nrows(A) == 0
     return true
