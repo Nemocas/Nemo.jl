@@ -185,6 +185,10 @@ function ==(x::QQPolyRingElem, y::QQPolyRingElem)
   return @ccall libflint.fmpq_poly_equal(x::Ref{QQPolyRingElem}, y::Ref{QQPolyRingElem})::Bool
 end
 
+function isone(x::QQPolyRingElem)
+  return Bool(@ccall libflint.fmpq_poly_is_one(x::Ref{QQPolyRingElem})::Cint)
+end
+
 ###############################################################################
 #
 #   Ad hoc comparisons
@@ -260,14 +264,20 @@ end
 
 function shift_left(x::QQPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
-  z = parent(x)()
+  return shift_left!(parent(x)(), x, len)
+end
+
+function shift_left!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, len::Int)
   @ccall libflint.fmpq_poly_shift_left(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, len::Int)::Nothing
   return z
 end
 
 function shift_right(x::QQPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
-  z = parent(x)()
+  return shift_right!(parent(x)(), x, len)
+end
+
+function shift_right!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, len::Int)
   @ccall libflint.fmpq_poly_shift_right(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, len::Int)::Nothing
   return z
 end
