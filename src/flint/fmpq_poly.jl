@@ -277,7 +277,7 @@ function shift_right(x::QQPolyRingElem, len::Int)
   return shift_right!(parent(x)(), x, len)
 end
 
-function shift_right!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, len::Int)
+function shift_right!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, len::Int)
   @ccall libflint.fmpq_poly_shift_right(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, len::Int)::Nothing
   return z
 end
