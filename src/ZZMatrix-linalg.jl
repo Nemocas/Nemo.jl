@@ -234,7 +234,7 @@ end
 # Seems to be faster than the CRT prototype (not incl. here)
 # VERBOSITY via :UnimodVerif
 function _is_unimodular_Pauderis_Storjohann_Hensel(A::ZZMatrix)
-###  @assert  is_square(A)
+  @assert  is_square(A)
   n = nrows(A)
   m, B0, k = _PSH_init(A)
 
