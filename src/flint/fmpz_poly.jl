@@ -64,7 +64,10 @@ end
 
 normalise(f::ZZPolyRingElem, ::Int) = degree(f) + 1
 
-set_length!(f::ZZPolyRingElem, ::Int) = nothing
+function set_length!(x::ZZPolyRingElem, n::Int)
+  @ccall libflint._fmpz_poly_set_length(x::Ref{ZZPolyRingElem}, n::Int)::Nothing
+  return x
+end
 
 ###############################################################################
 #
@@ -181,6 +184,10 @@ function ==(x::ZZPolyRingElem, y::ZZPolyRingElem)
   return @ccall libflint.fmpz_poly_equal(x::Ref{ZZPolyRingElem}, y::Ref{ZZPolyRingElem})::Bool
 end
 
+function isone(x::ZZPolyRingElem)
+  return Bool(@ccall libflint.fmpz_poly_is_one(x::Ref{ZZPolyRingElem})::Cint)
+end
+
 ###############################################################################
 #
 #   Ad hoc comparisons
@@ -256,14 +263,20 @@ end
 
 function shift_left(x::ZZPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
-  z = parent(x)()
+  return shift_left!(parent(x)(), x, len)
+end
+
+function shift_left!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, len::Int)
   @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, len::Int)::Nothing
   return z
 end
 
 function shift_right(x::ZZPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
-  z = parent(x)()
+  return shift_right!(parent(x)(), x, len)
+end
+
+function shift_right!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, len::Int)
   @ccall libflint.fmpz_poly_shift_right(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, len::Int)::Nothing
   return z
 end
