@@ -18,7 +18,7 @@
 #######################################################
 
 function _det(a::fpMatrix)
-##??WHY??  a.r < 10 && return lift(det(a))
+  a.r < 9 && return det(a).data  # inspired by FLINT source code
   #_det avoids a copy: det is computed destructively
   r = ccall((:_nmod_mat_det, Nemo.libflint), UInt, (Ref{fpMatrix}, ), a)
   return r
