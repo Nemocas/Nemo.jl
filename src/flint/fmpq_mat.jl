@@ -108,6 +108,8 @@ number_of_columns(a::QQMatrix) = a.c
 
 iszero(a::QQMatrix) = @ccall libflint.fmpq_mat_is_zero(a::Ref{QQMatrix})::Bool
 
+isone(a::QQMatrix) = @ccall libflint.fmpq_mat_is_one(a::Ref{QQMatrix})::Bool
+
 @inline function is_zero_entry(A::QQMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(A, i, j)
   GC.@preserve A begin
@@ -116,7 +118,21 @@ iszero(a::QQMatrix) = @ccall libflint.fmpq_mat_is_zero(a::Ref{QQMatrix})::Bool
   end
 end
 
-isone(a::QQMatrix) = @ccall libflint.fmpq_mat_is_one(a::Ref{QQMatrix})::Bool
+@inline function is_positive_entry(A::QQMatrix, i::Int, j::Int)
+  @boundscheck _checkbounds(A, i, j)
+  GC.@preserve A begin
+    m = mat_entry_ptr(A, i, j)
+    return is_positive(m)
+  end
+end
+
+@inline function is_negative_entry(A::QQMatrix, i::Int, j::Int)
+  @boundscheck _checkbounds(A, i, j)
+  GC.@preserve A begin
+    m = mat_entry_ptr(A, i, j)
+    return is_negative(m)
+  end
+end
 
 function deepcopy_internal(d::QQMatrix, dict::IdDict)
   z = QQMatrix(d)

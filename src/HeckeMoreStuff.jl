@@ -182,21 +182,6 @@ function Base.hash(f::zzModMPolyRingElem, h::UInt)
   return UInt(1) # TODO: enhance or throw error
 end
 
-function AbstractAlgebra.map_coefficients(F::fpField, f::QQMPolyRingElem; parent=polynomial_ring(F, nvars(parent(f)), cached=false)[1])
-  dF = denominator(f)
-  d = F(dF)
-  if iszero(d)
-    error("Denominator divisible by p!")
-  end
-  m = inv(d)
-  ctx = MPolyBuildCtx(parent)
-  for x in zip(coefficients(f), exponent_vectors(f))
-    el = numerator(x[1] * dF)
-    push_term!(ctx, F(el) * m, x[2])
-  end
-  return finish(ctx)
-end
-
 function tdivpow2!(B::ZZMatrix, t::Int)
   @ccall libflint.fmpz_mat_scalar_tdiv_q_2exp(B::Ref{ZZMatrix}, B::Ref{ZZMatrix}, t::Cint)::Nothing
 end

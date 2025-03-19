@@ -160,6 +160,16 @@ end
 
 ###############################################################################
 #
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::Nemo.QQiField)
+  return rand_bits(R, rand(0:200))
+end
+
+###############################################################################
+#
 #   Basic manipulation
 #
 ###############################################################################
@@ -356,26 +366,6 @@ end
 
 function *(a::QQiFieldElem, b::QQiFieldElem)
   return mul!(QQiFieldElem(), a, b)
-end
-
-function addmul!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem, t::QQiFieldElem)
-  mul!(t, a, b)
-  add!(z, z, t)
-  return z
-end
-
-function addmul!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem)
-  return addmul!(z, a, b, QQiFieldElem())
-end
-
-function submul!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem, t::QQiFieldElem)
-  mul!(t, a, b)
-  sub!(z, z, t)
-  return z
-end
-
-function submul!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem)
-  return submul!(z, a, b, QQiFieldElem())
 end
 
 ###############################################################################

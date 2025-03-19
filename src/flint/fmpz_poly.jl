@@ -64,7 +64,10 @@ end
 
 normalise(f::ZZPolyRingElem, ::Int) = degree(f) + 1
 
-set_length!(f::ZZPolyRingElem, ::Int) = nothing
+function set_length!(x::ZZPolyRingElem, n::Int)
+  @ccall libflint._fmpz_poly_set_length(x::Ref{ZZPolyRingElem}, n::Int)::Nothing
+  return x
+end
 
 ###############################################################################
 #
@@ -158,11 +161,16 @@ end
 #
 ###############################################################################
 
-function ^(x::ZZPolyRingElem, y::Int)
-  y < 0 && throw(DomainError(y, "Exponent must be non-negative"))
-  z = parent(x)()
-  @ccall libflint.fmpz_poly_pow(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Int)::Nothing
-  return z
+# Cannot use IntegerUnion here to avoid ambiguity.
+
+function ^(x::ZZPolyRingElem, n::Int)
+  is_negative(n) && throw(DomainError(n, "Exponent must be non-negative"))
+  return pow!(parent(x)(), x, n)
+end
+
+function ^(x::ZZPolyRingElem, n::ZZRingElem)
+  is_negative(n) && throw(DomainError(n, "Exponent must be non-negative"))
+  return pow!(parent(x)(), x, n)
 end
 
 ###############################################################################
@@ -174,6 +182,10 @@ end
 function ==(x::ZZPolyRingElem, y::ZZPolyRingElem)
   check_parent(x, y)
   return @ccall libflint.fmpz_poly_equal(x::Ref{ZZPolyRingElem}, y::Ref{ZZPolyRingElem})::Bool
+end
+
+function isone(x::ZZPolyRingElem)
+  return Bool(@ccall libflint.fmpz_poly_is_one(x::Ref{ZZPolyRingElem})::Cint)
 end
 
 ###############################################################################
@@ -235,7 +247,10 @@ end
 
 function reverse(x::ZZPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Index must be non-negative"))
-  z = parent(x)()
+  return reverse!(parent(x)(), x, len)
+end
+
+function reverse!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, len::Int)
   @ccall libflint.fmpz_poly_reverse(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, len::Int)::Nothing
   return z
 end
@@ -248,14 +263,20 @@ end
 
 function shift_left(x::ZZPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
-  z = parent(x)()
+  return shift_left!(parent(x)(), x, len)
+end
+
+function shift_left!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, len::Int)
   @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, len::Int)::Nothing
   return z
 end
 
 function shift_right(x::ZZPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
-  z = parent(x)()
+  return shift_right!(parent(x)(), x, len)
+end
+
+function shift_right!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, len::Int)
   @ccall libflint.fmpz_poly_shift_right(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, len::Int)::Nothing
   return z
 end
@@ -888,6 +909,51 @@ end
 mul!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::Integer) = mul!(z, x, flintify(y))
 
 mul!(z::ZZPolyRingElemOrPtr, x::IntegerUnionOrPtr, y::ZZPolyRingElemOrPtr) = mul!(z, y, x)
+
+#
+
+function addmul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_poly_scalar_addmul_fmpz(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem}, b::Ref{ZZRingElem})::Nothing
+  return z
+end
+
+function addmul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::Int)
+  @ccall libflint.fmpz_poly_scalar_addmul_si(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem}, b::Int)::Nothing
+  return z
+end
+
+function addmul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::UInt)
+  @ccall libflint.fmpz_poly_scalar_addmul_ui(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem}, b::UInt)::Nothing
+  return z
+end
+
+addmul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::Integer) = addmul!(z, a, flintify(b))
+addmul!(z::ZZPolyRingElemOrPtr, a::IntegerUnionOrPtr, b::ZZPolyRingElemOrPtr) = addmul!(z, b, a)
+
+# ignore fourth argument
+addmul!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::IntegerUnionOrPtr, ::ZZPolyRingElemOrPtr) = addmul!(z, x, y)
+addmul!(z::ZZPolyRingElemOrPtr, x::IntegerUnionOrPtr, y::ZZPolyRingElemOrPtr, ::ZZPolyRingElemOrPtr) = addmul!(z, x, y)
+
+#
+
+function submul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_poly_scalar_submul_fmpz(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem}, b::Ref{ZZRingElem})::Nothing
+  return z
+end
+
+submul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::Integer) = addmul!(z, a, ZZRingElem(b))
+submul!(z::ZZPolyRingElemOrPtr, a::IntegerUnionOrPtr, b::ZZPolyRingElemOrPtr) = addmul!(z, b, a)
+
+# ignore fourth argument
+submul!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::IntegerUnionOrPtr, ::ZZPolyRingElemOrPtr) = submul!(z, x, y)
+submul!(z::ZZPolyRingElemOrPtr, x::IntegerUnionOrPtr, y::ZZPolyRingElemOrPtr, ::ZZPolyRingElemOrPtr) = submul!(z, x, y)
+
+#
+
+function pow!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, e::IntegerUnion)
+  @ccall libflint.fmpz_poly_pow(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, UInt(e)::UInt)::Nothing
+  return z
+end
 
 ###############################################################################
 #

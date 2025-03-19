@@ -1,11 +1,7 @@
 import Nemo: AbstractAlgebra.PrettyPrinting
 
-function test_elem(R::QQField)
-  return rand_bits(ZZ, rand(0:100))//rand_bits(ZZ, rand(1:100))
-end
-
 @testset "QQFieldElem.conformance_tests" begin
-  test_Field_interface_recursive(QQ)
+  ConformanceTests.test_Field_interface_recursive(QQ)
 end
 
 @testset "QQFieldElem.issingletontype" begin

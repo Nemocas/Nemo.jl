@@ -54,6 +54,11 @@ end
 
 length(x::T) where T <: Zmodn_poly = x.length
 
+function set_length!(x::T, n::Int) where {T <: Zmodn_poly}
+  @ccall libflint._nmod_poly_set_length(x::Ref{T}, n::Int)::Nothing
+  return x
+end
+
 degree(x::T) where T <: Zmodn_poly = @ccall libflint.nmod_poly_degree(x::Ref{T})::Int
 
 function coeff(x::T, n::Int) where T <: Zmodn_poly
@@ -339,7 +344,10 @@ end
 
 function reverse(x::T, len::Int) where T <: Zmodn_poly
   len < 0 && throw(DomainError(len, "Index must be non-negative"))
-  z = parent(x)()
+  return reverse!(parent(x)(), x, len)
+end
+
+function reverse!(z::T, x::T, len::Int) where T <: Zmodn_poly
   @ccall libflint.nmod_poly_reverse(z::Ref{T}, x::Ref{T}, len::Int)::Nothing
   return z
 end

@@ -109,6 +109,7 @@ import Base: Rational
 import Base: real
 import Base: rem
 import Base: reverse
+import Base: reverse!
 import Base: round
 import Base: setindex!
 import Base: show
@@ -433,11 +434,14 @@ include("Rings.jl")
 
 include("matrix.jl")
 include("poly.jl")
+include("ZZMatrix-linalg.jl")
 
 include("Infinity.jl")
 
 include("HeckeMiscFiniteField.jl")
 include("HeckeMoreStuff.jl")
+
+include("UnivPoly.jl")
 
 # More functionality for Julia types
 include("julia/Integer.jl")

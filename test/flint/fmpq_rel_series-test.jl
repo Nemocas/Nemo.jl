@@ -1,6 +1,6 @@
 @testset "QQRelPowerSeriesRingElem.conformance_tests" begin
   R, x = power_series_ring(QQ, 30, "x")
-  test_Ring_interface(R)
+  ConformanceTests.test_Ring_interface(R)
 end
 
 @testset "QQRelPowerSeriesRingElem.types" begin

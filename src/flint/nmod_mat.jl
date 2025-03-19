@@ -315,6 +315,7 @@ end
 ################################################################################
 
 function ^(x::T, y::UInt) where T <: Zmodn_mat
+  nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
   z = similar(x)
   @ccall libflint.nmod_mat_pow(z::Ref{T}, x::Ref{T}, y::UInt)::Nothing
   return z
@@ -501,13 +502,10 @@ end
 
 function lu!(P::Perm, x::T) where T <: Zmodn_mat
   P.d .-= 1
-
   rank = Int(@ccall libflint.nmod_mat_lu(P.d::Ptr{Int}, x::Ref{T}, 0::Cint)::Cint)
-
   P.d .+= 1
 
-  # flint does x == PLU instead of Px == LU (docs are wrong)
-  inv!(P)
+  inv!(P) # FLINT does PLU = x instead of Px = LU
 
   return rank
 end

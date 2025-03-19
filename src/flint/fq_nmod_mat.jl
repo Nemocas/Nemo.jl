@@ -399,13 +399,10 @@ end
 
 function lu!(P::Perm, x::fqPolyRepMatrix)
   P.d .-= 1
-
   rank = Int(@ccall libflint.fq_nmod_mat_lu(P.d::Ptr{Int}, x::Ref{fqPolyRepMatrix}, 0::Cint, base_ring(x)::Ref{fqPolyRepField})::Cint)
-
   P.d .+= 1
 
-  # flint does x == PLU instead of Px == LU (docs are wrong)
-  inv!(P)
+  inv!(P) # FLINT does PLU = x instead of Px = LU
 
   return rank
 end

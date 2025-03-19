@@ -257,7 +257,10 @@ end
 
 function reverse(x::FqPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Index must be non-negative"))
-  z = parent(x)()
+  return reverse!(parent(x)(), x, len)
+end
+
+function reverse!(z::FqPolyRingElem, x::FqPolyRingElem, len::Int)
   @ccall libflint.fq_default_poly_reverse(z::Ref{FqPolyRingElem}, x::Ref{FqPolyRingElem}, len::Int, base_ring(parent(x))::Ref{FqField})::Nothing
   return z
 end
@@ -415,12 +418,7 @@ function powermod(x::FqPolyRingElem, n::ZZRingElem, y::FqPolyRingElem)
     end
     n = -n
   end
-  # https://github.com/flintlib/flint2/pull/1261
-  if _fq_default_ctx_type(base_ring(parent(x))) == 4
-    @ccall libflint.nmod_poly_powmod_fmpz_binexp(z::Ref{FqPolyRingElem}, x::Ref{FqPolyRingElem}, n::Ref{ZZRingElem}, y::Ref{FqPolyRingElem})::Nothing
-  else
-    @ccall libflint.fq_default_poly_powmod_fmpz_binexp(z::Ref{FqPolyRingElem}, x::Ref{FqPolyRingElem}, n::Ref{ZZRingElem}, y::Ref{FqPolyRingElem}, base_ring(parent(x))::Ref{FqField})::Nothing
-  end
+  @ccall libflint.fq_default_poly_powmod_fmpz_binexp(z::Ref{FqPolyRingElem}, x::Ref{FqPolyRingElem}, n::Ref{ZZRingElem}, y::Ref{FqPolyRingElem}, base_ring(parent(x))::Ref{FqField})::Nothing
   return z
 end
 

@@ -130,10 +130,6 @@ end
   end
 end
 
-function test_elem(R::Nemo.QQiField)
-  return rand_bits(R, rand(0:200))
-end
-
 @testset "QQiFieldElem.conformance_tests" begin
-  test_Field_interface(QQi)
+  ConformanceTests.test_Field_interface(QQi)
 end

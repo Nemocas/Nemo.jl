@@ -1,11 +1,7 @@
 import Nemo: AbstractAlgebra.PrettyPrinting
 
-function test_elem(R::ZZRing)
-  return rand_bits(ZZ, rand(0:100))
-end
-
 @testset "ZZRingElem.conformance_tests" begin
-  test_Ring_interface_recursive(ZZ)
+  ConformanceTests.test_Ring_interface_recursive(ZZ)
 end
 
 @testset "ZZRingElem.issingletontype" begin
@@ -540,7 +536,7 @@ end
   @test isone(a^0) && isone(a^ZZRingElem(0))
 
   a = ZZRingElem(2)
-  @test_throws InexactError a^(a^200)
+  @test_throws ErrorException a^(a^200)
 
   for a in ZZRingElem.(-5:5)
     for e = -5:-1
