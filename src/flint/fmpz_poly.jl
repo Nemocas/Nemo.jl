@@ -64,7 +64,10 @@ end
 
 normalise(f::ZZPolyRingElem, ::Int) = degree(f) + 1
 
-set_length!(f::ZZPolyRingElem, ::Int) = nothing
+function set_length!(x::ZZPolyRingElem, n::Int)
+  @ccall libflint._fmpz_poly_set_length(x::Ref{ZZPolyRingElem}, n::Int)::Nothing
+  return x
+end
 
 ###############################################################################
 #
