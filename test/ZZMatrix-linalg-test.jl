@@ -28,7 +28,7 @@ end
   end
 end
 
-@testset "Ex-bugs" begin
+@testset "Verify bugfixes" begin
   # bugs (!wrong result!) introduced when moving to ZZMatrix-linalg
   # Smallest failing random example I managed to find:
   A = matrix(ZZ, [-80 187 -31 -136 -109 -113 -101 106 112 168;
