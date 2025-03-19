@@ -35,7 +35,7 @@ end
     is_unimodular(A::ZZMatrix)
     is_unimodular(A::ZZMatrix; algorithm=:auto)
 
-Determine whether square ZZMatrix `A` is unimodular, i.e. whether `abs(det(A)) == 1`.
+Determine whether a square matrix `A` is unimodular, i.e. whether `abs(det(A)) == 1`.
 The method used is either that of Pauderis--Storjohann or using CRT;
 the choice is made based on cost estimates for the two approaches.
 
