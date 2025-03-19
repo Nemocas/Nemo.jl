@@ -54,6 +54,11 @@ end
 
 length(x::T) where T <: Zmodn_poly = x.length
 
+function set_length!(x::T, n::Int) where {T <: Zmodn_poly}
+  @ccall libflint._nmod_poly_set_length(x::Ref{T}, n::Int)::Nothing
+  return x
+end
+
 degree(x::T) where T <: Zmodn_poly = @ccall libflint.nmod_poly_degree(x::Ref{T})::Int
 
 function coeff(x::T, n::Int) where T <: Zmodn_poly
