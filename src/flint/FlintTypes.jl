@@ -5279,6 +5279,19 @@ else
   end
 end
 
+# done right
+
+struct ZZRingElemDR
+  ptr::Ptr{ZZRingElem}
+  data #= can be anything where ptr points to (fmpz, fmpz_mat, fmpz_poly, ...) =#
+
+  ZZRingElemDR(x::ZZRingElem) = new(convert(Ptr{ZZRingElem}, pointer_from_objref(x)), x)
+  
+  ZZRingElemDR(x::ZZMatrix, i, j) = new(mat_entry_ptr(x, i, j), x)
+
+  ZZRingElemDR(x::ZZPolyRingElem, i) = new(x.coeffs + i * sizeof(Ptr{Nothing}), x)
+end
+
 ################################################################################
 #
 #   Type unions
@@ -5367,7 +5380,7 @@ const FlintMPolyUnion = Union{ZZMPolyRingElem, QQMPolyRingElem, zzModMPolyRingEl
                               fqPolyRepMPolyRingElem, FpMPolyRingElem}
 
 
-const ZZRingElemOrPtr = Union{ZZRingElem, Ref{ZZRingElem}, Ptr{ZZRingElem}}
+const ZZRingElemOrPtr = Union{ZZRingElem, Ref{ZZRingElem}, Ptr{ZZRingElem}, ZZRingElemDR}
 const QQFieldElemOrPtr = Union{QQFieldElem, Ref{QQFieldElem}, Ptr{QQFieldElem}}
 const zzModRingElemOrPtr = Union{zzModRingElem, Ref{zzModRingElem}, Ptr{zzModRingElem}}
 const ZZModRingElemOrPtr = Union{ZZModRingElem, Ref{ZZModRingElem}, Ptr{ZZModRingElem}}
@@ -5487,4 +5500,5 @@ for base in keys(base_rings), suffix in keys(constructions)
   name = Symbol(String(base)*String(suffix))
   Core.eval(parentmodule(DocstringInfo), :(Core.@doc $d $name))
 end
+
 end

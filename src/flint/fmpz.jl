@@ -64,6 +64,15 @@ is_domain_type(::Type{ZZRingElem}) = true
 data(a::ZZRingElem) = a.d
 data(a::Ref{ZZRingElem}) = a[].d
 data(a::Ptr{ZZRingElem}) = unsafe_load(reinterpret(Ptr{Int}, a))
+data(a::ZZRingElemDR) = data(a.ptr)
+
+Base.cconvert(::Type{Ref{ZZRingElem}}, a::ZZRingElemDR) = a.ptr
+
+function ZZRingElem(a::ZZRingElemDR) 
+  b = ZZRingElem()
+  @ccall libflint.fmpz_set(b::Ref{ZZRingElem}, a::Ref{ZZRingElem})::Bool
+  return b 
+end
 
 ###############################################################################
 #
@@ -311,6 +320,8 @@ string(x::ZZRingElem) = dec(x)
 
 show(io::IO, x::ZZRingElem) = print(io, string(x))
 
+show(io::IO, x::ZZRingElemDR) = print(io, ZZRingElem(x))
+
 function show(io::IO, a::ZZRing)
   # deliberately no @show_name or @show_special here as this is a singleton type
   if is_terse(io)
@@ -334,7 +345,7 @@ canonical_unit(x::ZZRingElem) = x < 0 ? ZZRingElem(-1) : ZZRingElem(1)
 #
 ###############################################################################
 
-function -(x::ZZRingElem)
+function -(x::Union{ZZRingElem, ZZRingElemDR})
   z = ZZRingElem()
   neg!(z, x)
   return z
