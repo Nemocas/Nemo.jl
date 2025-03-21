@@ -62,6 +62,11 @@ begin
           f = gen(S, i)
           @test is_gen(f)
           @test !is_gen(f + 1)
+          @test is_gen(f, i)
+          @test !is_gen(f + 1, i)
+          if i > 1
+            @test !is_gen(f, i - 1)
+          end
         end
       end
     end
