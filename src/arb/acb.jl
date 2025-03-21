@@ -74,6 +74,9 @@ function canonical_unit(x::AcbFieldElem)
 end
 
 # TODO: implement hash
+function hash(a::AcbFieldElem, h::UInt)
+  return h
+end
 
 characteristic(::AcbField) = 0
 
