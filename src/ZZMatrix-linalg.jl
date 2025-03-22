@@ -538,9 +538,9 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
               lhs = Ap*nump
               rhs = Bp*k(den)
             else
-              map_entries!(Ap, k, D.A)
-              map_entries!(Bp, k, _B)
-              map_entries!(nump, k, num)
+              map_entries!(k, Ap, D.A)
+              map_entries!(k, Bp, _B)
+              map_entries!(k, nump, num)
               mul!(lhs, Ap, nump)
               mul!(rhs, Bp, k(den))
             end
