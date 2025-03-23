@@ -3767,7 +3767,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
   entries::Ptr{QQFieldElem}
   r::Int
   c::Int
-  rows::Ptr{Ptr{QQFieldElem}}
+  stride::Int
   view_parent
 
   # MatElem interface
@@ -3807,7 +3807,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
   entries::Ptr{ZZRingElem}
   r::Int
   c::Int
-  rows::Ptr{Ptr{ZZRingElem}}
+  stride::Int
   view_parent
 
   # MatElem interface
@@ -3845,7 +3845,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
   entries::Ptr{UInt}
   r::Int                  # Int
   c::Int                  # Int
-  rows::Ptr{Ptr{UInt}}
+  stride::Int
   n::UInt                # mp_limb_t / Culong
   ninv::UInt             # mp_limb_t / Culong
   norm::UInt             # mp_limb_t / Culong
@@ -3991,7 +3991,7 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
   entries::Ptr{ZZRingElem}
   r::Int
   c::Int
-  rows::Ptr{Ptr{ZZRingElem}}
+  stride::Int
   # end flint struct
 
   base_ring::ZZModRing
@@ -4137,7 +4137,7 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
   entries::Ptr{ZZRingElem}
   r::Int
   c::Int
-  rows::Ptr{Ptr{ZZRingElem}}
+  stride::Int
   # end flint struct
 
   base_ring::FpField
@@ -4237,7 +4237,7 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
   entries::Ptr{UInt}
   r::Int                  # Int
   c::Int                  # Int
-  rows::Ptr{Ptr{UInt}}
+  stride::Int
   n::UInt                # mp_limb_t / Culong
   ninv::UInt             # mp_limb_t / Culong
   norm::UInt             # mp_limb_t / Culong
@@ -4806,7 +4806,7 @@ mutable struct FqPolyRepMatrix <: MatElem{FqPolyRepFieldElem}
   entries::Ptr{FqPolyRepFieldElem}
   r::Int
   c::Int
-  rows::Ptr{Ptr{FqPolyRepFieldElem}}
+  stride::Int
   base_ring::FqPolyRepField
   view_parent
 
@@ -4883,7 +4883,7 @@ mutable struct fqPolyRepMatrix <: MatElem{fqPolyRepFieldElem}
   entries::Ptr{fqPolyRepFieldElem}
   r::Int
   c::Int
-  rows::Ptr{Ptr{fqPolyRepFieldElem}}
+  stride::Int
   base_ring::fqPolyRepField
   view_parent
 
