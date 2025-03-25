@@ -114,23 +114,13 @@ isequal(a::FqMatrix, b::FqMatrix) = ==(a, b)
 
 function transpose(a::FqMatrix)
   z = similar(a, ncols(a), nrows(a))
-  _fq_ctx_type = _fq_default_ctx_type(base_ring(a))
-  if _fq_ctx_type == _FQ_DEFAULT_NMOD
-    @ccall libflint.nmod_mat_transpose(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
-    return z
-  elseif _fq_ctx_type == _FQ_DEFAULT_FMPZ_NMOD
-    @ccall libflint.fmpz_mod_mat_transpose(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
-    return z
-  end
-  # There is no flint functionality for the other cases
-  t = base_ring(a)()
-  for i in 1:nrows(a)
-    for j in 1:ncols(a)
-      getindex!(t, a, i, j)
-      z[j, i] = t
-    end
-  end
+  @ccall libflint.fq_default_mat_transpose(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
   return z
+end
+
+function transpose!(a::FqMatrix)
+  !is_square(a) && error("Matrix must be a square matrix")
+  @ccall libflint.fq_default_mat_transpose(a::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
 end
 
 ###############################################################################
