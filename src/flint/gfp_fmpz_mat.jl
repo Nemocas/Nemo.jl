@@ -24,7 +24,7 @@ function getindex!(v::FpFieldElem, a::FpMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   GC.@preserve a begin
     z = mat_entry_ptr(a, i, j)
-    @ccall libflint.fmpz_mod_set_fmpz(v.data::Ref{ZZRingElem}, z::Ptr{ZZRingElem}, base_ring(a)::Ref{FpField})::Nothing
+    @ccall libflint.fmpz_mod_set_fmpz(v.data::Ref{ZZRingElemRaw}, z::Ptr{ZZRingElem}, base_ring(a)::Ref{FpField})::Nothing
   end
   return v
 end
@@ -32,7 +32,7 @@ end
 # return plain ZZRingElem, no bounds checking
 @inline function getindex_raw(a::FpMatrix, i::Int, j::Int)
   u = ZZRingElem()
-  @ccall libflint.fmpz_mod_mat_get_entry(u::Ref{ZZRingElem}, a::Ref{FpMatrix}, (i - 1)::Int, (j - 1)::Int, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_mat_get_entry(u::Ref{ZZRingElemRaw}, a::Ref{FpMatrix}, (i - 1)::Int, (j - 1)::Int, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return u
 end
 
@@ -59,7 +59,7 @@ end
 
 # as per setindex! but no reduction mod n and no bounds checking
 @inline function setindex_raw!(a::FpMatrix, u::ZZRingElem, i::Int, j::Int)
-  @ccall libflint.fmpz_mod_mat_set_entry(a::Ref{FpMatrix}, (i - 1)::Int, (j - 1)::Int, u::Ref{ZZRingElem}, C_NULL::Ref{Nothing})::Nothing # ctx is not needed here
+  @ccall libflint.fmpz_mod_mat_set_entry(a::Ref{FpMatrix}, (i - 1)::Int, (j - 1)::Int, u::Ref{ZZRingElemRaw}, C_NULL::Ref{Nothing})::Nothing # ctx is not needed here
 end
 
 function setindex!(a::FpMatrix, b::FpMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
@@ -354,4 +354,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::FpMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(ZZRingElem)
+mat_entry_ptr(A::FpMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(ZZRingElemRaw)

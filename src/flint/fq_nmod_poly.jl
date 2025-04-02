@@ -429,7 +429,7 @@ function powermod(x::fqPolyRepPolyRingElem, n::ZZRingElem, y::fqPolyRepPolyRingE
     n = -n
   end
 
-  @ccall libflint.fq_nmod_poly_powmod_fmpz_binexp(z::Ref{fqPolyRepPolyRingElem}, x::Ref{fqPolyRepPolyRingElem}, n::Ref{ZZRingElem}, y::Ref{fqPolyRepPolyRingElem}, base_ring(parent(x))::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_poly_powmod_fmpz_binexp(z::Ref{fqPolyRepPolyRingElem}, x::Ref{fqPolyRepPolyRingElem}, n::Ref{ZZRingElemRaw}, y::Ref{fqPolyRepPolyRingElem}, base_ring(parent(x))::Ref{fqPolyRepField})::Nothing
   return z
 end
 
@@ -648,7 +648,7 @@ function setcoeff!(z::fqPolyRepPolyRingElem, n::Int, x::fqPolyRepFieldElem)
 end
 
 function setcoeff!(z::fqPolyRepPolyRingElem, n::Int, x::ZZRingElem)
-  @ccall libflint.fq_nmod_poly_set_coeff_fmpz(z::Ref{fqPolyRepPolyRingElem}, n::Int, x::Ref{ZZRingElem}, base_ring(parent(z))::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_poly_set_coeff_fmpz(z::Ref{fqPolyRepPolyRingElem}, n::Int, x::Ref{ZZRingElemRaw}, base_ring(parent(z))::Ref{fqPolyRepField})::Nothing
   return z
 end
 

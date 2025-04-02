@@ -234,7 +234,7 @@ Returns `true` if the ball $x$ contains the given integer value, otherwise
 return `false`.
 """
 function contains(x::ArbFieldElem, y::ZZRingElem)
-  r = @ccall libflint.arb_contains_fmpz(x::Ref{ArbFieldElem}, y::Ref{ZZRingElem})::Cint
+  r = @ccall libflint.arb_contains_fmpz(x::Ref{ArbFieldElem}, y::Ref{ZZRingElemRaw})::Cint
   return Bool(r)
 end
 
@@ -669,7 +669,7 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
     function ($f)(x::ArbFieldElem, y::ZZRingElem)
       z = parent(x)()
       ccall(($("arb_"*s*"_fmpz"), libflint), Nothing,
-            (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}, Int),
+            (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElemRaw}, Int),
             z, x, y, parent(x).prec)
       return z
     end
@@ -705,7 +705,7 @@ end
 
 function -(x::ArbFieldElem, y::ZZRingElem)
   z = parent(x)()
-  @ccall libflint.arb_sub_fmpz(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Ref{ZZRingElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.arb_sub_fmpz(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Ref{ZZRingElemRaw}, parent(x).prec::Int)::Nothing
   return z
 end
 
@@ -748,7 +748,7 @@ end
 
 function //(x::ArbFieldElem, y::ZZRingElem)
   z = parent(x)()
-  @ccall libflint.arb_div_fmpz(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Ref{ZZRingElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.arb_div_fmpz(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Ref{ZZRingElemRaw}, parent(x).prec::Int)::Nothing
   return z
 end
 
@@ -780,7 +780,7 @@ end
 
 function ^(x::ArbFieldElem, y::ZZRingElem)
   z = parent(x)()
-  @ccall libflint.arb_pow_fmpz(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Ref{ZZRingElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.arb_pow_fmpz(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Ref{ZZRingElemRaw}, parent(x).prec::Int)::Nothing
   return z
 end
 
@@ -874,7 +874,7 @@ end
 
 function ldexp(x::ArbFieldElem, y::ZZRingElem)
   z = parent(x)()
-  @ccall libflint.arb_mul_2exp_fmpz(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.arb_mul_2exp_fmpz(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -906,7 +906,7 @@ integer.
 """
 function unique_integer(x::ArbFieldElem)
   z = ZZRingElem()
-  unique = @ccall libflint.arb_get_unique_fmpz(z::Ref{ZZRingElem}, x::Ref{ArbFieldElem})::Int
+  unique = @ccall libflint.arb_get_unique_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{ArbFieldElem})::Int
   return (unique != 0, z)
 end
 
@@ -1484,7 +1484,7 @@ Return the $n$-th Fibonacci number in the given Arb field.
 """
 function fibonacci(n::ZZRingElem, r::ArbField)
   z = r()
-  @ccall libflint.arb_fib_fmpz(z::Ref{ArbFieldElem}, n::Ref{ZZRingElem}, r.prec::Int)::Nothing
+  @ccall libflint.arb_fib_fmpz(z::Ref{ArbFieldElem}, n::Ref{ZZRingElemRaw}, r.prec::Int)::Nothing
   return z
 end
 
@@ -1508,7 +1508,7 @@ Return the Gamma function evaluated at $x$ in the given Arb field.
 """
 function gamma(x::ZZRingElem, r::ArbField)
   z = r()
-  @ccall libflint.arb_gamma_fmpz(z::Ref{ArbFieldElem}, x::Ref{ZZRingElem}, r.prec::Int)::Nothing
+  @ccall libflint.arb_gamma_fmpz(z::Ref{ArbFieldElem}, x::Ref{ZZRingElemRaw}, r.prec::Int)::Nothing
   return z
 end
 
@@ -1672,7 +1672,7 @@ Return the Bell number $B_n$ as an element of $r$.
 """
 function bell(n::ZZRingElem, r::ArbField)
   z = r()
-  @ccall libflint.arb_bell_fmpz(z::Ref{ArbFieldElem}, n::Ref{ZZRingElem}, r.prec::Int)::Nothing
+  @ccall libflint.arb_bell_fmpz(z::Ref{ArbFieldElem}, n::Ref{ZZRingElemRaw}, r.prec::Int)::Nothing
   return z
 end
 
@@ -1690,7 +1690,7 @@ Return the number of partitions $p(n)$ as an element of $r$.
 """
 function numpart(n::ZZRingElem, r::ArbField)
   z = r()
-  @ccall libflint.arb_partitions_fmpz(z::Ref{ArbFieldElem}, n::Ref{ZZRingElem}, r.prec::Int)::Nothing
+  @ccall libflint.arb_partitions_fmpz(z::Ref{ArbFieldElem}, n::Ref{ZZRingElemRaw}, r.prec::Int)::Nothing
   return z
 end
 
@@ -1836,7 +1836,7 @@ function simplest_rational_inside(x::ArbFieldElem)
   b = ZZRingElem()
   e = ZZRingElem()
 
-  @ccall libflint.arb_get_interval_fmpz_2exp(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, e::Ref{ZZRingElem}, x::Ref{ArbFieldElem})::Nothing
+  @ccall libflint.arb_get_interval_fmpz_2exp(a::Ref{ZZRingElemRaw}, b::Ref{ZZRingElemRaw}, e::Ref{ZZRingElemRaw}, x::Ref{ArbFieldElem})::Nothing
   !fits(Int, e) && error("Result does not fit into an QQFieldElem")
   _e = Int(e)
   if e >= 0
@@ -1881,7 +1881,7 @@ end
 
 function addmul!(z::ArbFieldElem, x::ArbFieldElem, y::ZZRingElem)
   q = max(bits(z), bits(x))
-  @ccall libflint.arb_addmul_fmpz(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Ref{ZZRingElem}, q::Int)::Nothing
+  @ccall libflint.arb_addmul_fmpz(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Ref{ZZRingElemRaw}, q::Int)::Nothing
   return z
 end
 
@@ -1909,11 +1909,11 @@ function _arb_set(x::ArbFieldElemOrPtr, y::Union{Int,UInt,Float64}, p::Int)
 end
 
 function _arb_set(x::ArbFieldElemOrPtr, y::ZZRingElem)
-  @ccall libflint.arb_set_fmpz(x::Ref{ArbFieldElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.arb_set_fmpz(x::Ref{ArbFieldElem}, y::Ref{ZZRingElemRaw})::Nothing
 end
 
 function _arb_set(x::ArbFieldElemOrPtr, y::ZZRingElem, p::Int)
-  @ccall libflint.arb_set_round_fmpz(x::Ref{ArbFieldElem}, y::Ref{ZZRingElem}, p::Int)::Nothing
+  @ccall libflint.arb_set_round_fmpz(x::Ref{ArbFieldElem}, y::Ref{ZZRingElemRaw}, p::Int)::Nothing
 end
 
 function _arb_set(x::ArbFieldElemOrPtr, y::QQFieldElem, p::Int)

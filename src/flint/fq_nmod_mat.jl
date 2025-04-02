@@ -50,7 +50,7 @@ end
   @boundscheck _checkbounds(a, i, j)
   GC.@preserve a begin
     el = mat_entry_ptr(a, i, j)
-    @ccall libflint.fq_nmod_set_fmpz(el::Ptr{fqPolyRepFieldElem}, u::Ref{ZZRingElem}, base_ring(a)::Ref{fqPolyRepField})::Nothing
+    @ccall libflint.fq_nmod_set_fmpz(el::Ptr{fqPolyRepFieldElem}, u::Ref{ZZRingElemRaw}, base_ring(a)::Ref{fqPolyRepField})::Nothing
   end
 end
 

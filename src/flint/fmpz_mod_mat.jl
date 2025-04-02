@@ -23,14 +23,14 @@ is_zero_initialized(::Type{ZZModMatrix}) = true
 @inline function getindex(a::T, i::Int, j::Int) where T <: Zmod_fmpz_mat
   @boundscheck _checkbounds(a, i, j)
   u = ZZRingElem()
-  @ccall libflint.fmpz_mod_mat_get_entry(u::Ref{ZZRingElem}, a::Ref{T}, (i - 1)::Int, (j - 1)::Int, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_mat_get_entry(u::Ref{ZZRingElemRaw}, a::Ref{T}, (i - 1)::Int, (j - 1)::Int, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return ZZModRingElem(u, base_ring(a)) # no reduction needed
 end
 
 # as above, but as a plain ZZRingElem, no bounds checking
 function getindex_raw(a::T, i::Int, j::Int) where T <: Zmod_fmpz_mat
   u = ZZRingElem()
-  @ccall libflint.fmpz_mod_mat_get_entry(u::Ref{ZZRingElem}, a::Ref{T}, (i - 1)::Int, (j - 1)::Int, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_mat_get_entry(u::Ref{ZZRingElemRaw}, a::Ref{T}, (i - 1)::Int, (j - 1)::Int, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return u
 end
 
@@ -52,7 +52,7 @@ end
 
 # as per setindex! but no reduction mod n and no bounds checking
 @inline function setindex_raw!(a::T, u::ZZRingElem, i::Int, j::Int) where T <: Zmod_fmpz_mat
-  @ccall libflint.fmpz_mod_mat_set_entry(a::Ref{T}, (i - 1)::Int, (j - 1)::Int, u::Ref{ZZRingElem}, C_NULL::Ref{Nothing})::Nothing # ctx is not needed here
+  @ccall libflint.fmpz_mod_mat_set_entry(a::Ref{T}, (i - 1)::Int, (j - 1)::Int, u::Ref{ZZRingElemRaw}, C_NULL::Ref{Nothing})::Nothing # ctx is not needed here
 end
 
 function setindex!(a::ZZModMatrix, b::ZZModMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
@@ -209,15 +209,15 @@ function add!(a::T, b::T, c::T) where T <: Zmod_fmpz_mat
   return a
 end
 
-function mul!(z::Vector{ZZRingElem}, a::T, b::Vector{ZZRingElem}) where T <: Zmod_fmpz_mat
-  @ccall libflint.fmpz_mod_mat_mul_fmpz_vec_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ref{T}, b::Ptr{Ref{ZZRingElem}}, length(b)::Int, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
-end
-
-function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::T) where T <: Zmod_fmpz_mat
-  @ccall libflint.fmpz_mod_mat_fmpz_vec_mul_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ptr{Ref{ZZRingElem}}, length(a)::Int, b::Ref{T}, base_ring(b).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
-end
+#function mul!(z::Vector{ZZRingElem}, a::T, b::Vector{ZZRingElem}) where T <: Zmod_fmpz_mat
+#  @ccall libflint.fmpz_mod_mat_mul_fmpz_vec_ptr(z::Ptr{Ref{ZZRingElemRaw}}, a::Ref{T}, b::Ptr{Ref{ZZRingElemRaw}}, length(b)::Int, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+#  return z
+#end
+#
+#function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::T) where T <: Zmod_fmpz_mat
+#  @ccall libflint.fmpz_mod_mat_fmpz_vec_mul_ptr(z::Ptr{Ref{ZZRingElemRaw}}, a::Ptr{Ref{ZZRingElemRaw}}, length(a)::Int, b::Ref{T}, base_ring(b).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+#  return z
+#end
 
 function Generic.add_one!(a::ZZModMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
@@ -244,7 +244,7 @@ end
 
 function *(x::T, y::ZZRingElem) where T <: Zmod_fmpz_mat
   z = similar(x)
-  @ccall libflint.fmpz_mod_mat_scalar_mul_fmpz(z::Ref{T}, x::Ref{T}, y::Ref{ZZRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_mat_scalar_mul_fmpz(z::Ref{T}, x::Ref{T}, y::Ref{ZZRingElemRaw}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
@@ -342,7 +342,7 @@ function tr(a::T) where T <: Zmod_fmpz_mat
   !is_square(a) && error("Matrix must be a square matrix")
   R = base_ring(a)
   r = ZZRingElem()
-  @ccall libflint.fmpz_mod_mat_trace(r::Ref{ZZRingElem}, a::Ref{T}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_mat_trace(r::Ref{ZZRingElemRaw}, a::Ref{T}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return elem_type(R)(r, R)
 end
 
@@ -355,7 +355,7 @@ end
 function det(a::ZZModMatrix)
   !is_square(a) && error("Matrix must be a square matrix")
   z = ZZRingElem()
-  r = @ccall libflint.fmpz_mod_mat_det(z::Ref{ZZRingElem}, a::Ref{ZZModMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  r = @ccall libflint.fmpz_mod_mat_det(z::Ref{ZZRingElemRaw}, a::Ref{ZZModMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return base_ring(a)(z)
 end
 
@@ -684,4 +684,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::ZZModMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(ZZRingElem)
+mat_entry_ptr(A::ZZModMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(ZZRingElemRaw)

@@ -48,7 +48,7 @@ end
 function coeff(x::T, n::Int) where {T <: Zmodn_fmpz_poly}
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   z = ZZRingElem()
-  @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(z::Ref{ZZRingElem}, x::Ref{T}, n::Int, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{T}, n::Int, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return base_ring(x)(z)
 end
 
@@ -155,7 +155,7 @@ end
 
 function *(x::ZZModPolyRingElem, y::ZZRingElem)
   z = parent(x)()
-  @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(z::Ref{ZZModPolyRingElem}, x::Ref{ZZModPolyRingElem}, y::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(z::Ref{ZZModPolyRingElem}, x::Ref{ZZModPolyRingElem}, y::Ref{ZZRingElemRaw}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
@@ -182,7 +182,7 @@ end
 
 function +(x::ZZModPolyRingElem, y::ZZRingElem)
   z = parent(x)()
-  @ccall libflint.fmpz_mod_poly_add_fmpz(z::Ref{ZZModPolyRingElem}, x::Ref{ZZModPolyRingElem}, y::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_add_fmpz(z::Ref{ZZModPolyRingElem}, x::Ref{ZZModPolyRingElem}, y::Ref{ZZRingElemRaw}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
@@ -213,13 +213,13 @@ end
 
 function -(x::ZZModPolyRingElem, y::ZZRingElem)
   z = parent(x)()
-  @ccall libflint.fmpz_mod_poly_sub_fmpz(z::Ref{ZZModPolyRingElem}, x::Ref{ZZModPolyRingElem}, y::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_sub_fmpz(z::Ref{ZZModPolyRingElem}, x::Ref{ZZModPolyRingElem}, y::Ref{ZZRingElemRaw}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
 function -(x::ZZRingElem, y::ZZModPolyRingElem)
   z = parent(y)()
-  @ccall libflint.fmpz_mod_poly_fmpz_sub(z::Ref{ZZModPolyRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZModPolyRingElem}, y.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_fmpz_sub(z::Ref{ZZModPolyRingElem}, x::Ref{ZZRingElemRaw}, y::Ref{ZZModPolyRingElem}, y.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
@@ -278,7 +278,7 @@ function ==(x::ZZModPolyRingElem, y::ZZModRingElem)
     return false
   elseif length(x) == 1
     u = ZZRingElem()
-    @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(u::Ref{ZZRingElem}, x::Ref{ZZModPolyRingElem}, 0::Int, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+    @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(u::Ref{ZZRingElemRaw}, x::Ref{ZZModPolyRingElem}, 0::Int, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
     return u == y
   else
     return iszero(y)
@@ -363,7 +363,7 @@ function divexact(x::T, y::T; check::Bool=true) where {T <: Zmodn_fmpz_poly}
   d = ZZRingElem()
   q = parent(x)()
   r = parent(x)()
-  @ccall libflint.fmpz_mod_poly_divrem_f(d::Ref{ZZRingElem}, q::Ref{T}, r::Ref{T}, x::Ref{T}, y::Ref{T}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_divrem_f(d::Ref{ZZRingElemRaw}, q::Ref{T}, r::Ref{T}, x::Ref{T}, y::Ref{T}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   _is_one_or_throw(d, y)
   return q
 end
@@ -380,21 +380,21 @@ function divexact(x::ZZModPolyRingElem, y::ZZModRingElem; check::Bool=true)
   base_ring(x) != parent(y) && error("Elements must have same parent")
   iszero(y) && throw(DivideError())
   q = parent(x)()
-  @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(q::Ref{ZZModPolyRingElem}, x::Ref{ZZModPolyRingElem}, y.data::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(q::Ref{ZZModPolyRingElem}, x::Ref{ZZModPolyRingElem}, y.data::Ref{ZZRingElemRaw}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return q
 end
 
 function divexact(x::T, y::ZZRingElem; check::Bool=true) where {T <: Zmodn_fmpz_poly}
   iszero(y) && throw(DivideError())
   q = parent(x)()
-  @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(q::Ref{T}, x::Ref{T}, y::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(q::Ref{T}, x::Ref{T}, y::Ref{ZZRingElemRaw}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return q
 end
 
 function divexact(x::T, y::Int; check::Bool=true) where {T <: Zmodn_fmpz_poly}
   y == 0 && throw(DivideError())
   q = parent(x)()
-  @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(q::Ref{T}, x::Ref{T}, ZZRingElem(y)::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(q::Ref{T}, x::Ref{T}, ZZRingElem(y)::Ref{ZZRingElemRaw}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return q
 end
 
@@ -410,7 +410,7 @@ function Base.divrem(x::T, y::T) where {T <: Zmodn_fmpz_poly}
   q = parent(x)()
   r = parent(x)()
   d = ZZRingElem()
-  @ccall libflint.fmpz_mod_poly_divrem_f(d::Ref{ZZRingElem}, q::Ref{T}, r::Ref{T}, x::Ref{T}, y::Ref{T}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_divrem_f(d::Ref{ZZRingElemRaw}, q::Ref{T}, r::Ref{T}, x::Ref{T}, y::Ref{T}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   _is_one_or_throw(d, y)
   return q, r
 end
@@ -464,7 +464,7 @@ end
 function AbstractAlgebra.gcd_basecase(x::ZZModPolyRingElem, y::ZZModPolyRingElem)
   z = parent(x)()
   f = ZZRingElem()
-  @ccall libflint.fmpz_mod_poly_gcd_euclidean_f(f::Ref{ZZRingElem}, z::Ref{ZZModPolyRingElem}, x::Ref{ZZModPolyRingElem}, y::Ref{ZZModPolyRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_gcd_euclidean_f(f::Ref{ZZRingElemRaw}, z::Ref{ZZModPolyRingElem}, x::Ref{ZZModPolyRingElem}, y::Ref{ZZModPolyRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   _is_one_or_throw(f, y)
   return z
 end
@@ -475,7 +475,7 @@ function AbstractAlgebra.gcdx_basecase(x::ZZModPolyRingElem, y::ZZModPolyRingEle
   s = parent(x)()
   t = parent(x)()
   f = ZZRingElem()
-  @ccall libflint.fmpz_mod_poly_xgcd_euclidean_f(f::Ref{ZZRingElem}, g::Ref{ZZModPolyRingElem}, s::Ref{ZZModPolyRingElem}, t::Ref{ZZModPolyRingElem}, x::Ref{ZZModPolyRingElem}, y::Ref{ZZModPolyRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_xgcd_euclidean_f(f::Ref{ZZRingElemRaw}, g::Ref{ZZModPolyRingElem}, s::Ref{ZZModPolyRingElem}, t::Ref{ZZModPolyRingElem}, x::Ref{ZZModPolyRingElem}, y::Ref{ZZModPolyRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   _is_one_or_throw(f, y)
   return g, s, t
 end
@@ -486,7 +486,7 @@ function AbstractAlgebra.gcdinv_basecase(x::ZZModPolyRingElem, y::ZZModPolyRingE
   g = parent(x)()
   s = parent(x)()
   f = ZZRingElem()
-  @ccall libflint.fmpz_mod_poly_gcdinv_euclidean_f(f::Ref{ZZRingElem}, g::Ref{ZZModPolyRingElem}, s::Ref{ZZModPolyRingElem}, x::Ref{ZZModPolyRingElem}, y::Ref{ZZModPolyRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_gcdinv_euclidean_f(f::Ref{ZZRingElemRaw}, g::Ref{ZZModPolyRingElem}, s::Ref{ZZModPolyRingElem}, x::Ref{ZZModPolyRingElem}, y::Ref{ZZModPolyRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   _is_one_or_throw(f, y)
   return g, s
 end
@@ -550,7 +550,7 @@ function powermod(x::T, e::ZZRingElem, y::T) where {T <: Zmodn_fmpz_poly}
     e = -e
   end
 
-  @ccall libflint.fmpz_mod_poly_powmod_fmpz_binexp(z::Ref{T}, x::Ref{T}, e::Ref{ZZRingElem}, y::Ref{T}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_powmod_fmpz_binexp(z::Ref{T}, x::Ref{T}, e::Ref{ZZRingElemRaw}, y::Ref{T}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
@@ -565,7 +565,7 @@ function resultant(x::T, y::T) where {T <: Zmodn_fmpz_poly}
   z = parent(x)()
   !is_probable_prime(modulus(x)) && error("Modulus not prime in resultant")
   r = ZZRingElem()
-  @ccall libflint.fmpz_mod_poly_resultant(r::Ref{ZZRingElem}, x::Ref{T}, y::Ref{T}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_resultant(r::Ref{ZZRingElemRaw}, x::Ref{T}, y::Ref{T}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return base_ring(x)(r)
 end
 
@@ -578,7 +578,7 @@ end
 function evaluate(x::ZZModPolyRingElem, y::ZZModRingElem)
   base_ring(x) != parent(y) && error("Elements must have same parent")
   z = ZZRingElem()
-  @ccall libflint.fmpz_mod_poly_evaluate_fmpz(z::Ref{ZZRingElem}, x::Ref{ZZModPolyRingElem}, y.data::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_evaluate_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{ZZModPolyRingElem}, y.data::Ref{ZZRingElemRaw}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return parent(y)(z)
 end
 
@@ -744,7 +744,7 @@ function roots(a::ZZModPolyRingElem)
     @ccall libflint.fmpz_mod_poly_roots(fac::Ref{fmpz_mod_poly_factor}, a::Ref{ZZModPolyRingElem}, 0::Cint, n::Ref{fmpz_mod_ctx_struct})::UInt
   else
     nfac = fmpz_factor()
-    @ccall libflint.fmpz_factor(nfac::Ref{fmpz_factor}, R.base_ring.n::Ref{ZZRingElem})::Nothing
+    @ccall libflint.fmpz_factor(nfac::Ref{fmpz_factor}, R.base_ring.n::Ref{ZZRingElemRaw})::Nothing
     @ccall libflint.fmpz_mod_poly_roots_factored(fac::Ref{fmpz_mod_poly_factor}, a::Ref{ZZModPolyRingElem}, 0::Cint, nfac::Ref{fmpz_factor}, n::Ref{fmpz_mod_ctx_struct})::UInt
   end
   f = R()
@@ -795,7 +795,7 @@ function setcoeff!(x::T, n::Int, y::Int) where {T <: Zmodn_fmpz_poly}
 end
 
 function setcoeff!(x::T, n::Int, y::ZZRingElem) where {T <: Zmodn_fmpz_poly}
-  @ccall libflint.fmpz_mod_poly_set_coeff_fmpz(x::Ref{T}, n::Int, y::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_set_coeff_fmpz(x::Ref{T}, n::Int, y::Ref{ZZRingElemRaw}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return x
 end
 

@@ -131,7 +131,7 @@ for (etype, rtype, ftype, ctype) in (
       n = length(a)
       (i < 1 || i > n) && error("Index must be between 1 and $(length(a))")
       z = ZZRingElem()
-      @ccall libflint.fmpz_mod_mpoly_get_term_coeff_fmpz(z::Ref{ZZRingElem}, a::Ref{($etype)}, (i - 1)::Int, parent(a)::Ref{($rtype)})::UInt
+      @ccall libflint.fmpz_mod_mpoly_get_term_coeff_fmpz(z::Ref{ZZRingElemRaw}, a::Ref{($etype)}, (i - 1)::Int, parent(a)::Ref{($rtype)})::UInt
       return base_ring(parent(a))(z)
     end
 
@@ -139,7 +139,7 @@ for (etype, rtype, ftype, ctype) in (
       check_parent(a, b)
       !isone(length(b)) && error("Second argument must be a monomial")
       z = ZZRingElem()
-      @ccall libflint.fmpz_mod_mpoly_get_coeff_fmpz_monomial(z::Ref{ZZRingElem}, a::Ref{($etype)}, b::Ref{($etype)}, parent(a)::Ref{($rtype)})::UInt
+      @ccall libflint.fmpz_mod_mpoly_get_coeff_fmpz_monomial(z::Ref{ZZRingElemRaw}, a::Ref{($etype)}, b::Ref{($etype)}, parent(a)::Ref{($rtype)})::UInt
       return base_ring(parent(a))(z)
     end
 
@@ -174,7 +174,7 @@ for (etype, rtype, ftype, ctype) in (
       n = nvars(parent(a))
       (i <= 0 || i > n) && error("Index must be between 1 and $n")
       d = ZZRingElem()
-      @ccall libflint.fmpz_mod_mpoly_degree_fmpz(d::Ref{ZZRingElem}, a::Ref{($etype)}, (i - 1)::Int, parent(a)::Ref{($rtype)})::Nothing
+      @ccall libflint.fmpz_mod_mpoly_degree_fmpz(d::Ref{ZZRingElemRaw}, a::Ref{($etype)}, (i - 1)::Int, parent(a)::Ref{($rtype)})::Nothing
       return d
     end
 
@@ -200,7 +200,7 @@ for (etype, rtype, ftype, ctype) in (
       for i in 1:n
         degs[i] = ZZRingElem()
       end
-      @ccall libflint.fmpz_mod_mpoly_degrees_fmpz(degs::Ptr{Ref{ZZRingElem}}, a::Ref{($etype)}, parent(a)::Ref{($rtype)})::Nothing
+      @ccall libflint.fmpz_mod_mpoly_degrees_fmpz(degs::Ptr{Ref{ZZRingElemRaw}}, a::Ref{($etype)}, parent(a)::Ref{($rtype)})::Nothing
       return degs
     end
 
@@ -221,7 +221,7 @@ for (etype, rtype, ftype, ctype) in (
     # Total degree as an ZZRingElem
     function total_degree_fmpz(a::($etype))
       d = ZZRingElem()
-      @ccall libflint.fmpz_mod_mpoly_total_degree_fmpz(d::Ref{ZZRingElem}, a::Ref{($etype)}, parent(a)::Ref{($rtype)})::Nothing
+      @ccall libflint.fmpz_mod_mpoly_total_degree_fmpz(d::Ref{ZZRingElemRaw}, a::Ref{($etype)}, parent(a)::Ref{($rtype)})::Nothing
       return d
     end
 
@@ -293,7 +293,7 @@ for (etype, rtype, ftype, ctype) in (
 
     function +(a::($etype), b::ZZRingElem)
       z = parent(a)()
-      @ccall libflint.fmpz_mod_mpoly_add_fmpz(z::Ref{($etype)}, a::Ref{($etype)}, b::Ref{ZZRingElem}, parent(a)::Ref{($rtype)})::Nothing
+      @ccall libflint.fmpz_mod_mpoly_add_fmpz(z::Ref{($etype)}, a::Ref{($etype)}, b::Ref{ZZRingElemRaw}, parent(a)::Ref{($rtype)})::Nothing
       return z
     end
 
@@ -319,7 +319,7 @@ for (etype, rtype, ftype, ctype) in (
 
     function -(a::($etype), b::ZZRingElem)
       z = parent(a)()
-      @ccall libflint.fmpz_mod_mpoly_sub_fmpz(z::Ref{($etype)}, a::Ref{($etype)}, b::Ref{ZZRingElem}, parent(a)::Ref{($rtype)})::Nothing
+      @ccall libflint.fmpz_mod_mpoly_sub_fmpz(z::Ref{($etype)}, a::Ref{($etype)}, b::Ref{ZZRingElemRaw}, parent(a)::Ref{($rtype)})::Nothing
       return z
     end
 
@@ -345,7 +345,7 @@ for (etype, rtype, ftype, ctype) in (
 
     function *(a::($etype), b::ZZRingElem)
       z = parent(a)()
-      @ccall libflint.fmpz_mod_mpoly_scalar_mul_fmpz(z::Ref{($etype)}, a::Ref{($etype)}, b::Ref{ZZRingElem}, parent(a)::Ref{($rtype)})::Nothing
+      @ccall libflint.fmpz_mod_mpoly_scalar_mul_fmpz(z::Ref{($etype)}, a::Ref{($etype)}, b::Ref{ZZRingElemRaw}, parent(a)::Ref{($rtype)})::Nothing
       return z
     end
 
@@ -414,7 +414,7 @@ for (etype, rtype, ftype, ctype) in (
         F.fac[f] = @ccall libflint.fmpz_mod_mpoly_factor_get_exp_si(fac::Ref{($ftype)}, i::Int, R::Ref{($rtype)})::Int
       end
       c = ZZRingElem()
-      @ccall libflint.fmpz_mod_mpoly_factor_get_constant_fmpz(c::Ref{ZZRingElem}, fac::Ref{($ftype)})::UInt
+      @ccall libflint.fmpz_mod_mpoly_factor_get_constant_fmpz(c::Ref{ZZRingElemRaw}, fac::Ref{($ftype)})::UInt
       F.unit = R(c)
       return F
     end
@@ -477,7 +477,7 @@ for (etype, rtype, ftype, ctype) in (
     ###############################################################################
 
     function ==(a::($etype), b::($ctype))
-      return Bool(@ccall libflint.fmpz_mod_mpoly_equal_fmpz(a::Ref{($etype)}, data(b)::Ref{ZZRingElem}, a.parent::Ref{($rtype)})::Cint)
+      return Bool(@ccall libflint.fmpz_mod_mpoly_equal_fmpz(a::Ref{($etype)}, data(b)::Ref{ZZRingElemRaw}, a.parent::Ref{($rtype)})::Cint)
     end
 
     ==(a::($ctype), b::($etype)) = b == a
@@ -656,7 +656,7 @@ for (etype, rtype, ftype, ctype) in (
       if n > length(a)
         @ccall libflint.fmpz_mod_mpoly_resize(a::Ref{($etype)}, n::Int, a.parent::Ref{($rtype)})::Nothing
       end
-      @ccall libflint.fmpz_mod_mpoly_set_term_coeff_fmpz(a::Ref{($etype)}, (n - 1)::Int, data(c)::Ref{ZZRingElem}, a.parent::Ref{($rtype)})::Nothing
+      @ccall libflint.fmpz_mod_mpoly_set_term_coeff_fmpz(a::Ref{($etype)}, (n - 1)::Int, data(c)::Ref{ZZRingElemRaw}, a.parent::Ref{($rtype)})::Nothing
       return a
     end
 
@@ -681,7 +681,7 @@ for (etype, rtype, ftype, ctype) in (
     end
 
     function pow!(z::($etype), a::($etype), n::ZZRingElem)
-      ok = Bool(@ccall libflint.fmpz_mod_mpoly_pow_fmpz(z::Ref{($etype)}, a::Ref{($etype)}, n::Ref{ZZRingElem}, parent(a)::Ref{($rtype)})::Cint)
+      ok = Bool(@ccall libflint.fmpz_mod_mpoly_pow_fmpz(z::Ref{($etype)}, a::Ref{($etype)}, n::Ref{ZZRingElemRaw}, parent(a)::Ref{($rtype)})::Cint)
       if !ok
         error("unable to compute power")
       end
@@ -715,7 +715,7 @@ for (etype, rtype, ftype, ctype) in (
     end
 
     function exponent_vector!(z::Vector{ZZRingElem}, a::($etype), i::Int)
-      @ccall libflint.fmpz_mod_mpoly_get_term_exp_fmpz(z::Ptr{Ref{ZZRingElem}}, a::Ref{($etype)}, (i - 1)::Int, parent(a)::Ref{($rtype)})::Nothing
+      @ccall libflint.fmpz_mod_mpoly_get_term_exp_fmpz(z::Ptr{Ref{ZZRingElemRaw}}, a::Ref{($etype)}, (i - 1)::Int, parent(a)::Ref{($rtype)})::Nothing
       return z
     end
 
@@ -765,7 +765,7 @@ for (etype, rtype, ftype, ctype) in (
     # Return zero if there is no such term
     function coeff(a::($etype), exps::Vector{UInt})
       z = ZZRingElem()
-      @ccall libflint.fmpz_mod_mpoly_get_coeff_fmpz_ui(z::Ref{ZZRingElem}, a::Ref{($etype)}, exps::Ptr{UInt}, parent(a)::Ref{($rtype)})::UInt
+      @ccall libflint.fmpz_mod_mpoly_get_coeff_fmpz_ui(z::Ref{ZZRingElemRaw}, a::Ref{($etype)}, exps::Ptr{UInt}, parent(a)::Ref{($rtype)})::UInt
       return base_ring(parent(a))(z)
     end
 
@@ -773,21 +773,21 @@ for (etype, rtype, ftype, ctype) in (
     # Return zero if there is no such term
     function coeff(a::($etype), exps::Vector{Int})
       z = ZZRingElem()
-      @ccall libflint.fmpz_mod_mpoly_get_coeff_fmpz_ui(z::Ref{ZZRingElem}, a::Ref{($etype)}, exps::Ptr{Int}, parent(a)::Ref{($rtype)})::UInt
+      @ccall libflint.fmpz_mod_mpoly_get_coeff_fmpz_ui(z::Ref{ZZRingElemRaw}, a::Ref{($etype)}, exps::Ptr{Int}, parent(a)::Ref{($rtype)})::UInt
       return base_ring(parent(a))(z)
     end
 
     # Set the coefficient of the term with the given exponent vector to the
     # given ZZRingElem. Removal of a zero term is performed.
     function setcoeff!(a::($etype), exps::Vector{UInt}, b::($ctype))
-      @ccall libflint.fmpz_mod_mpoly_set_coeff_fmpz_ui(a::Ref{($etype)}, data(b)::Ref{ZZRingElem}, exps::Ptr{UInt}, parent(a)::Ref{($rtype)})::Nothing
+      @ccall libflint.fmpz_mod_mpoly_set_coeff_fmpz_ui(a::Ref{($etype)}, data(b)::Ref{ZZRingElemRaw}, exps::Ptr{UInt}, parent(a)::Ref{($rtype)})::Nothing
       return a
     end
 
     # Set the coefficient of the term with the given exponent vector to the
     # given ZZRingElem. Removal of a zero term is performed.
     function setcoeff!(a::($etype), exps::Vector{Int}, b::($ctype))
-      @ccall libflint.fmpz_mod_mpoly_set_coeff_fmpz_ui(a::Ref{($etype)}, data(b)::Ref{ZZRingElem}, exps::Ptr{Int}, parent(a)::Ref{($rtype)})::Nothing
+      @ccall libflint.fmpz_mod_mpoly_set_coeff_fmpz_ui(a::Ref{($etype)}, data(b)::Ref{ZZRingElemRaw}, exps::Ptr{Int}, parent(a)::Ref{($rtype)})::Nothing
       return a
     end
 

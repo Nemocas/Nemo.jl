@@ -497,7 +497,7 @@ function (R::fpPolyRing)()
 end
 
 function (R::fpPolyRing)(x::ZZRingElem)
-  r = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, R.n::UInt)::UInt
+  r = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElemRaw}, R.n::UInt)::UInt
   z = fpPolyRingElem(R.n, r)
   z.parent = R
   return z

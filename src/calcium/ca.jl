@@ -385,7 +385,7 @@ end
 function +(a::CalciumFieldElem, b::ZZRingElem)
   C = a.parent
   r = C()
-  @ccall libflint.ca_add_fmpz(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{ZZRingElem}, C::Ref{CalciumField})::Nothing
+  @ccall libflint.ca_add_fmpz(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{ZZRingElemRaw}, C::Ref{CalciumField})::Nothing
   check_special(r)
   return r
 end
@@ -425,7 +425,7 @@ end
 function -(a::CalciumFieldElem, b::ZZRingElem)
   C = a.parent
   r = C()
-  @ccall libflint.ca_sub_fmpz(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{ZZRingElem}, C::Ref{CalciumField})::Nothing
+  @ccall libflint.ca_sub_fmpz(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{ZZRingElemRaw}, C::Ref{CalciumField})::Nothing
   check_special(r)
   return r
 end
@@ -443,7 +443,7 @@ end
 function -(a::ZZRingElem, b::CalciumFieldElem)
   C = b.parent
   r = C()
-  @ccall libflint.ca_fmpz_sub(r::Ref{CalciumFieldElem}, a::Ref{ZZRingElem}, b::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
+  @ccall libflint.ca_fmpz_sub(r::Ref{CalciumFieldElem}, a::Ref{ZZRingElemRaw}, b::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
   return r
 end
@@ -470,7 +470,7 @@ end
 function *(a::CalciumFieldElem, b::ZZRingElem)
   C = a.parent
   r = C()
-  @ccall libflint.ca_mul_fmpz(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{ZZRingElem}, C::Ref{CalciumField})::Nothing
+  @ccall libflint.ca_mul_fmpz(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{ZZRingElemRaw}, C::Ref{CalciumField})::Nothing
   check_special(r)
   return r
 end
@@ -532,7 +532,7 @@ end
 function //(a::CalciumFieldElem, b::ZZRingElem)
   C = a.parent
   r = C()
-  @ccall libflint.ca_div_fmpz(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{ZZRingElem}, C::Ref{CalciumField})::Nothing
+  @ccall libflint.ca_div_fmpz(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{ZZRingElemRaw}, C::Ref{CalciumField})::Nothing
   check_special(r)
   return r
 end
@@ -558,7 +558,7 @@ end
 function //(a::ZZRingElem, b::CalciumFieldElem)
   C = b.parent
   r = C()
-  @ccall libflint.ca_fmpz_div(r::Ref{CalciumFieldElem}, a::Ref{ZZRingElem}, b::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
+  @ccall libflint.ca_fmpz_div(r::Ref{CalciumFieldElem}, a::Ref{ZZRingElemRaw}, b::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
   return r
 end
@@ -608,7 +608,7 @@ end
 function ^(a::CalciumFieldElem, b::ZZRingElem)
   C = a.parent
   r = C()
-  @ccall libflint.ca_pow_fmpz(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{ZZRingElem}, C::Ref{CalciumField})::Nothing
+  @ccall libflint.ca_pow_fmpz(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{ZZRingElemRaw}, C::Ref{CalciumField})::Nothing
   check_special(r)
   return r
 end
@@ -1219,7 +1219,7 @@ end
 function ZZRingElem(a::CalciumFieldElem)
   C = a.parent
   res = ZZRingElem()
-  ok = Bool(@ccall libflint.ca_get_fmpz(res::Ref{ZZRingElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint)
+  ok = Bool(@ccall libflint.ca_get_fmpz(res::Ref{ZZRingElemRaw}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint)
   !ok && error("unable to convert to an integer")
   return res
 end
@@ -1356,7 +1356,7 @@ end
 
 function (C::CalciumField)(v::ZZRingElem)
   z = CalciumFieldElem(C)
-  @ccall libflint.ca_set_fmpz(z::Ref{CalciumFieldElem}, v::Ref{ZZRingElem}, C::Ref{CalciumField})::Nothing
+  @ccall libflint.ca_set_fmpz(z::Ref{CalciumFieldElem}, v::Ref{ZZRingElemRaw}, C::Ref{CalciumField})::Nothing
   return z
 end
 

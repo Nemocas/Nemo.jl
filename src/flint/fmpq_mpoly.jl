@@ -91,7 +91,7 @@ end
 
 function denominator(a::QQMPolyRingElem)
   c = ZZRingElem()
-  @ccall libflint.fmpq_mpoly_get_denominator(c::Ref{ZZRingElem}, a::Ref{QQMPolyRingElem}, parent(a)::Ref{QQMPolyRing})::Nothing
+  @ccall libflint.fmpq_mpoly_get_denominator(c::Ref{ZZRingElemRaw}, a::Ref{QQMPolyRingElem}, parent(a)::Ref{QQMPolyRing})::Nothing
   return c
 end
 
@@ -153,7 +153,7 @@ function degree_fmpz(a::QQMPolyRingElem, i::Int)
   n = nvars(parent(a))
   (i <= 0 || i > n) && error("Index must be between 1 and $n")
   d = ZZRingElem()
-  @ccall libflint.fmpq_mpoly_degree_fmpz(d::Ref{ZZRingElem}, a::Ref{QQMPolyRingElem}, (i - 1)::Int, a.parent::Ref{QQMPolyRing})::Nothing
+  @ccall libflint.fmpq_mpoly_degree_fmpz(d::Ref{ZZRingElemRaw}, a::Ref{QQMPolyRingElem}, (i - 1)::Int, a.parent::Ref{QQMPolyRing})::Nothing
   return d
 end
 
@@ -180,7 +180,7 @@ function degrees_fmpz(a::QQMPolyRingElem)
   for i in 1:n
     degs[i] = ZZRingElem()
   end
-  @ccall libflint.fmpq_mpoly_degrees_fmpz(degs::Ptr{Ref{ZZRingElem}}, a::Ref{QQMPolyRingElem}, a.parent::Ref{QQMPolyRing})::Nothing
+  @ccall libflint.fmpq_mpoly_degrees_fmpz(degs::Ptr{Ref{ZZRingElemRaw}}, a::Ref{QQMPolyRingElem}, a.parent::Ref{QQMPolyRing})::Nothing
   return degs
 end
 
@@ -202,7 +202,7 @@ end
 # Total degree as an ZZRingElem
 function total_degree_fmpz(a::QQMPolyRingElem)
   d = ZZRingElem()
-  @ccall libflint.fmpq_mpoly_total_degree_fmpz(d::Ref{ZZRingElem}, a::Ref{QQMPolyRingElem}, a.parent::Ref{QQMPolyRing})::Nothing
+  @ccall libflint.fmpq_mpoly_total_degree_fmpz(d::Ref{ZZRingElemRaw}, a::Ref{QQMPolyRingElem}, a.parent::Ref{QQMPolyRing})::Nothing
   return d
 end
 
@@ -419,7 +419,7 @@ end
 ==(a::QQFieldElem, b::QQMPolyRingElem) = b == a
 
 function ==(a::QQMPolyRingElem, b::ZZRingElem)
-  return Bool(@ccall libflint.fmpq_mpoly_equal_fmpz(a::Ref{QQMPolyRingElem}, b::Ref{ZZRingElem}, a.parent::Ref{QQMPolyRing})::Cint)
+  return Bool(@ccall libflint.fmpq_mpoly_equal_fmpz(a::Ref{QQMPolyRingElem}, b::Ref{ZZRingElemRaw}, a.parent::Ref{QQMPolyRing})::Cint)
 end
 
 ==(a::ZZRingElem, b::QQMPolyRingElem) = b == a
@@ -663,7 +663,7 @@ function set!(z::QQMPolyRingElem, a::QQFieldElemOrPtr)
 end
 
 function set!(z::QQMPolyRingElem, a::ZZRingElemOrPtr)
-  @ccall libflint.fmpq_mpoly_set_fmpz(z::Ref{QQMPolyRingElem}, a::Ref{ZZRingElem}, parent(z)::Ref{QQMPolyRing})::Nothing
+  @ccall libflint.fmpq_mpoly_set_fmpz(z::Ref{QQMPolyRingElem}, a::Ref{ZZRingElemRaw}, parent(z)::Ref{QQMPolyRing})::Nothing
   return z
 end
 
@@ -696,7 +696,7 @@ function sub!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::QQMPolyRingElem)
   return a
 end
 
-for (jT, cN, cT) in ((QQFieldElem, :fmpq, Ref{QQFieldElem}), (ZZRingElem, :fmpz, Ref{ZZRingElem}),
+for (jT, cN, cT) in ((QQFieldElem, :fmpq, Ref{QQFieldElem}), (ZZRingElem, :fmpz, Ref{ZZRingElemRaw}),
                      (Int, :si, Int), (UInt, :ui, UInt))
   @eval begin
     function add!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::($jT))
@@ -746,7 +746,7 @@ function mul!(a::ZZMPolyRingElem, b::QQMPolyRingElem, c::IntegerUnion)
     x = mul!(x, _content_ptr(b), c)
     bp = _zpoly_ptr(b)
     xp = _num_ptr(x)
-    @ccall libflint.fmpz_mpoly_scalar_mul_fmpz(a::Ref{ZZMPolyRingElem}, bp::Ref{ZZMPolyRingElem}, xp::Ref{ZZRingElem}, parent(a)::Ref{ZZMPolyRing})::Nothing
+    @ccall libflint.fmpz_mpoly_scalar_mul_fmpz(a::Ref{ZZMPolyRingElem}, bp::Ref{ZZMPolyRingElem}, xp::Ref{ZZRingElemRaw}, parent(a)::Ref{ZZMPolyRing})::Nothing
   end
   return a
 end
@@ -795,7 +795,7 @@ function pow!(z::QQMPolyRingElem, a::QQMPolyRingElem, n::Integer)
 end
 
 function pow!(z::QQMPolyRingElem, a::QQMPolyRingElem, n::ZZRingElemOrPtr)
-  ok = Bool(@ccall libflint.fmpq_mpoly_pow_fmpz(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, n::Ref{ZZRingElem}, parent(a)::Ref{QQMPolyRing})::Cint)
+  ok = Bool(@ccall libflint.fmpq_mpoly_pow_fmpz(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, n::Ref{ZZRingElemRaw}, parent(a)::Ref{QQMPolyRing})::Cint)
   if !ok
     error("unable to compute power")
   end
@@ -829,7 +829,7 @@ function exponent_vector!(z::Vector{UInt}, a::QQMPolyRingElem, i::Int)
 end
 
 function exponent_vector!(z::Vector{ZZRingElem}, a::QQMPolyRingElem, i::Int)
-  @ccall libflint.fmpq_mpoly_get_term_exp_fmpz(z::Ptr{Ref{ZZRingElem}}, a::Ref{QQMPolyRingElem}, (i - 1)::Int, parent(a)::Ref{QQMPolyRing})::Nothing
+  @ccall libflint.fmpq_mpoly_get_term_exp_fmpz(z::Ptr{Ref{ZZRingElemRaw}}, a::Ref{QQMPolyRingElem}, (i - 1)::Int, parent(a)::Ref{QQMPolyRing})::Nothing
   return z
 end
 
@@ -969,7 +969,7 @@ function _push_term!(z::QQMPolyRingElem, c::QQFieldElem, exp::Vector{Int})
 end
 
 function _push_term!(z::QQMPolyRingElem, c::ZZRingElem, exp::Vector{Int})
-  @ccall libflint.fmpq_mpoly_push_term_fmpz_ui(z::Ref{QQMPolyRingElem}, c::Ref{ZZRingElem}, exp::Ptr{UInt}, parent(z)::Ref{QQMPolyRing})::Nothing
+  @ccall libflint.fmpq_mpoly_push_term_fmpz_ui(z::Ref{QQMPolyRingElem}, c::Ref{ZZRingElemRaw}, exp::Ptr{UInt}, parent(z)::Ref{QQMPolyRing})::Nothing
   return z
 end
 

@@ -87,7 +87,7 @@ end
 
 function order(a::fqPolyRepField)
   d = ZZRingElem()
-  @ccall libflint.fq_nmod_ctx_order(d::Ref{ZZRingElem}, a::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_ctx_order(d::Ref{ZZRingElemRaw}, a::Ref{fqPolyRepField})::Nothing
   return d
 end
 
@@ -202,7 +202,7 @@ end
 
 function *(x::ZZRingElem, y::fqPolyRepFieldElem)
   z = parent(y)()
-  @ccall libflint.fq_nmod_mul_fmpz(z::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, x::Ref{ZZRingElem}, y.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_mul_fmpz(z::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, x::Ref{ZZRingElemRaw}, y.parent::Ref{fqPolyRepField})::Nothing
   return z
 end
 
@@ -246,7 +246,7 @@ function ^(x::fqPolyRepFieldElem, y::ZZRingElem)
     y = -y
   end
   z = parent(x)()
-  @ccall libflint.fq_nmod_pow(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{ZZRingElem}, x.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_pow(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{ZZRingElemRaw}, x.parent::Ref{fqPolyRepField})::Nothing
   return z
 end
 
@@ -357,13 +357,13 @@ end
 
 function tr(x::fqPolyRepFieldElem)
   z = ZZRingElem()
-  @ccall libflint.fq_nmod_trace(z::Ref{ZZRingElem}, x::Ref{fqPolyRepFieldElem}, x.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_trace(z::Ref{ZZRingElemRaw}, x::Ref{fqPolyRepFieldElem}, x.parent::Ref{fqPolyRepField})::Nothing
   return parent(x)(z)
 end
 
 function norm(x::fqPolyRepFieldElem)
   z = ZZRingElem()
-  @ccall libflint.fq_nmod_norm(z::Ref{ZZRingElem}, x::Ref{fqPolyRepFieldElem}, x.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_norm(z::Ref{ZZRingElemRaw}, x::Ref{fqPolyRepFieldElem}, x.parent::Ref{fqPolyRepField})::Nothing
   return parent(x)(z)
 end
 
@@ -424,7 +424,7 @@ function set!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElemOrPtr)
 end
 
 function set!(z::fqPolyRepFieldElem, x::ZZRingElemOrPtr)
-  @ccall libflint.fq_nmod_set_fmpz(z::Ref{fqPolyRepFieldElem}, x::Ref{ZZRingElem}, parent(z)::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_set_fmpz(z::Ref{fqPolyRepFieldElem}, x::Ref{ZZRingElemRaw}, parent(z)::Ref{fqPolyRepField})::Nothing
 end
 
 function set!(z::fqPolyRepFieldElem, x::Int)
@@ -523,7 +523,7 @@ function Base.iterate(F::Union{fqPolyRepField,FqPolyRepField}, coeffs::Vector)
     if F isa fqPolyRepField
       @ccall libflint.nmod_poly_set_coeff_ui(elt::Ref{fqPolyRepFieldElem}, (d - 1)::Int, coeffs[d]::UInt)::Nothing
     else
-      @ccall libflint.fmpz_poly_set_coeff_fmpz(elt::Ref{FqPolyRepFieldElem}, (d - 1)::Int, coeffs[d]::Ref{ZZRingElem})::Nothing
+      @ccall libflint.fmpz_poly_set_coeff_fmpz(elt::Ref{FqPolyRepFieldElem}, (d - 1)::Int, coeffs[d]::Ref{ZZRingElemRaw})::Nothing
     end
   end
   elt, coeffs

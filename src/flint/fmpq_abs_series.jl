@@ -243,7 +243,7 @@ end
 function *(x::ZZRingElem, y::QQAbsPowerSeriesRingElem)
   z = parent(y)()
   z.prec = y.prec
-  @ccall libflint.fmpq_poly_scalar_mul_fmpz(z::Ref{QQAbsPowerSeriesRingElem}, y::Ref{QQAbsPowerSeriesRingElem}, x::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpq_poly_scalar_mul_fmpz(z::Ref{QQAbsPowerSeriesRingElem}, y::Ref{QQAbsPowerSeriesRingElem}, x::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -447,7 +447,7 @@ function divexact(x::QQAbsPowerSeriesRingElem, y::ZZRingElem; check::Bool=true)
   iszero(y) && throw(DivideError())
   z = parent(x)()
   z.prec = x.prec
-  @ccall libflint.fmpq_poly_scalar_div_fmpz(z::Ref{QQAbsPowerSeriesRingElem}, x::Ref{QQAbsPowerSeriesRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpq_poly_scalar_div_fmpz(z::Ref{QQAbsPowerSeriesRingElem}, x::Ref{QQAbsPowerSeriesRingElem}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 

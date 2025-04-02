@@ -81,7 +81,7 @@ parent_type(::Type{QadicFieldElem}) = QadicField
 
 function _prime(R::QadicField, n::Int = 1)
   z = ZZRingElem()
-  @ccall libflint.padic_ctx_pow_ui(z::Ref{ZZRingElem}, n::UInt, R::Ref{QadicField})::Nothing
+  @ccall libflint.padic_ctx_pow_ui(z::Ref{ZZRingElemRaw}, n::UInt, R::Ref{QadicField})::Nothing
   return z
 end
 
@@ -123,7 +123,7 @@ Return the prime $p$ for the given $q$-adic field.
 """
 function prime(R::QadicField)
   z = ZZRingElem()
-  @ccall libflint.padic_ctx_pow_ui(z::Ref{ZZRingElem}, 1::UInt, R::Ref{QadicField})::Nothing
+  @ccall libflint.padic_ctx_pow_ui(z::Ref{ZZRingElemRaw}, 1::UInt, R::Ref{QadicField})::Nothing
   return z
 end
 
@@ -419,7 +419,7 @@ function ^(a::QadicFieldElem, n::ZZRingElem)
     z = QadicFieldElem(a.N + (Int(n) - 1)*valuation(a))
   end
   z.parent = ctx
-  @ccall libflint.qadic_pow(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, n::Ref{ZZRingElem}, ctx::Ref{QadicField})::Nothing
+  @ccall libflint.qadic_pow(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, n::Ref{ZZRingElemRaw}, ctx::Ref{QadicField})::Nothing
   return z
 end
 
@@ -711,7 +711,7 @@ function (R::QadicField)(n::ZZRingElem; precision::Int=precision(R))
     N = valuation(n, p)
   end
   z = QadicFieldElem(N + precision)
-  @ccall libflint.padic_poly_set_fmpz(z::Ref{QadicFieldElem}, n::Ref{ZZRingElem}, R::Ref{QadicField})::Nothing
+  @ccall libflint.padic_poly_set_fmpz(z::Ref{QadicFieldElem}, n::Ref{ZZRingElemRaw}, R::Ref{QadicField})::Nothing
   z.parent = R
   return z
 end

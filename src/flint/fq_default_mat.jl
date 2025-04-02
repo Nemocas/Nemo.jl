@@ -43,7 +43,7 @@ end
 
 @inline function setindex!(a::FqMatrix, u::ZZRingElem, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
-  @ccall libflint.fq_default_mat_entry_set_fmpz(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int, u::Ref{ZZRingElem}, base_ring(a)::Ref{FqField})::Nothing
+  @ccall libflint.fq_default_mat_entry_set_fmpz(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int, u::Ref{ZZRingElemRaw}, base_ring(a)::Ref{FqField})::Nothing
   nothing
 end
 

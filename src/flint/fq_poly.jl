@@ -429,7 +429,7 @@ function powermod(x::FqPolyRepPolyRingElem, n::ZZRingElem, y::FqPolyRepPolyRingE
     n = -n
   end
 
-  @ccall libflint.fq_poly_powmod_fmpz_binexp(z::Ref{FqPolyRepPolyRingElem}, x::Ref{FqPolyRepPolyRingElem}, n::Ref{ZZRingElem}, y::Ref{FqPolyRepPolyRingElem}, base_ring(parent(x))::Ref{FqPolyRepField})::Nothing
+  @ccall libflint.fq_poly_powmod_fmpz_binexp(z::Ref{FqPolyRepPolyRingElem}, x::Ref{FqPolyRepPolyRingElem}, n::Ref{ZZRingElemRaw}, y::Ref{FqPolyRepPolyRingElem}, base_ring(parent(x))::Ref{FqPolyRepField})::Nothing
   return z
 end
 

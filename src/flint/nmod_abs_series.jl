@@ -250,7 +250,7 @@ for (etype, rtype, mtype, brtype) in (
 
     function *(x::ZZRingElem, y::($etype))
       R = base_ring(y)
-      xmod = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, R.n::UInt)::UInt
+      xmod = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElemRaw}, R.n::UInt)::UInt
       return R(xmod)*y
     end
 
@@ -383,7 +383,7 @@ for (etype, rtype, mtype, brtype) in (
 
     function ==(x::($etype), y::ZZRingElem)
       R = base_ring(x)
-      ymod = @ccall libflint.fmpz_fdiv_ui(y::Ref{ZZRingElem}, modulus(x)::UInt)::UInt
+      ymod = @ccall libflint.fmpz_fdiv_ui(y::Ref{ZZRingElemRaw}, modulus(x)::UInt)::UInt
       return x == R(ymod)
     end
 

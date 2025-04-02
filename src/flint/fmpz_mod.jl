@@ -67,7 +67,7 @@ end
 
 function _reduce(a::ZZRingElem, ctx::fmpz_mod_ctx_struct)
   b = ZZRingElem()
-  @ccall libflint.fmpz_mod_set_fmpz(b::Ref{ZZRingElem}, a::Ref{ZZRingElem}, ctx::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_set_fmpz(b::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw}, ctx::Ref{fmpz_mod_ctx_struct})::Nothing
   return b
 end
 
@@ -171,7 +171,7 @@ function *(x::ZZModRingElem, y::ZZModRingElem)
   check_parent(x, y)
   R = parent(x)
   d = ZZRingElem()
-  @ccall libflint.fmpz_mod_mul(d::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_mul(d::Ref{ZZRingElemRaw}, x.data::Ref{ZZRingElemRaw}, y.data::Ref{ZZRingElemRaw}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return ZZModRingElem(d, R)
 end
 
@@ -259,7 +259,7 @@ function inv(x::ZZModRingElem)
   end
   s = ZZRingElem()
   g = ZZRingElem()
-  @ccall libflint.fmpz_gcdinv(g::Ref{ZZRingElem}, s::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_gcdinv(g::Ref{ZZRingElemRaw}, s::Ref{ZZRingElemRaw}, x.data::Ref{ZZRingElemRaw}, R.n::Ref{ZZRingElemRaw})::Nothing
   g != 1 && error("Impossible inverse in ", R)
   return ZZModRingElem(s, R)
 end
@@ -295,7 +295,7 @@ function divides(a::ZZModRingElem, b::ZZModRingElem)
   end
   ub = divexact(B, gb)
   b1 = ZZRingElem()
-  @ccall libflint.fmpz_invmod(b1::Ref{ZZRingElem}, ub::Ref{ZZRingElem}, divexact(m, gb)::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_invmod(b1::Ref{ZZRingElemRaw}, ub::Ref{ZZRingElemRaw}, divexact(m, gb)::Ref{ZZRingElemRaw})::Nothing
   rr = R(q)*b1
   return true, rr
 end
@@ -388,13 +388,13 @@ end
 
 function mul!(z::ZZModRingElem, x::ZZModRingElem, y::ZZModRingElem)
   R = parent(z)
-  @ccall libflint.fmpz_mod_mul(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_mul(z.data::Ref{ZZRingElemRaw}, x.data::Ref{ZZRingElemRaw}, y.data::Ref{ZZRingElemRaw}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
 function add!(z::ZZModRingElem, x::ZZModRingElem, y::ZZModRingElem)
   R = parent(z)
-  @ccall libflint.fmpz_mod_add(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_add(z.data::Ref{ZZRingElemRaw}, x.data::Ref{ZZRingElemRaw}, y.data::Ref{ZZRingElemRaw}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
@@ -402,13 +402,13 @@ end
 
 function pow!(z::ZZModRingElem, x::ZZModRingElem, n::Integer)
   R = parent(z)
-  @ccall libflint.fmpz_mod_pow_ui(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, n::UInt, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_pow_ui(z.data::Ref{ZZRingElemRaw}, x.data::Ref{ZZRingElemRaw}, n::UInt, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
 function pow!(z::ZZModRingElem, x::ZZModRingElem, n::ZZRingElemOrPtr)
   R = parent(z)
-  ok = Bool(@ccall libflint.fmpz_mod_pow_fmpz(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, n::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Cint)
+  ok = Bool(@ccall libflint.fmpz_mod_pow_fmpz(z.data::Ref{ZZRingElemRaw}, x.data::Ref{ZZRingElemRaw}, n::Ref{ZZRingElemRaw}, R.ninv::Ref{fmpz_mod_ctx_struct})::Cint)
   if !ok
     error("not invertible")
   end
@@ -487,7 +487,7 @@ end
 
 function (R::ZZModRing)(a::ZZRingElem)
   d = ZZRingElem()
-  @ccall libflint.fmpz_mod(d::Ref{ZZRingElem}, a::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_mod(d::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw}, R.n::Ref{ZZRingElemRaw})::Nothing
   return ZZModRingElem(d, R)
 end
 

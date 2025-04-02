@@ -16,7 +16,7 @@ end
 @testset "arf.hecke_semantics" begin
   x = Nemo.arf_struct(0, 0, 0, 0)
   y = ZZRingElem(3)^100
-  @ccall Nemo.libflint.arf_set_fmpz(x::Ref{Nemo.arf_struct}, y::Ref{ZZRingElem})::Nothing
+  @ccall Nemo.libflint.arf_set_fmpz(x::Ref{Nemo.arf_struct}, y::Ref{Nemo.ZZRingElemRaw})::Nothing
   @ccall Nemo.libflint.arf_clear(x::Ref{Nemo.arf_struct})::Nothing
 end
 

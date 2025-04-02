@@ -32,9 +32,7 @@ length(x::ZZPolyRingElem) = x.length
 
 function coeff(x::ZZPolyRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
-  z = ZZRingElem()
-  @ccall libflint.fmpz_poly_get_coeff_fmpz(z::Ref{ZZRingElem}, x::Ref{ZZPolyRingElem}, n::Int)::Nothing
-  return z
+  return ZZRingElem(x.coeffs + n * sizeof(Ptr{Nothing}), x)
 end
 
 zero(a::ZZPolyRing) = a(0)
@@ -58,7 +56,7 @@ Return the largest of the absolute values of the coefficients of a.
 """
 function height(a::ZZPolyRingElem)
   z = ZZRingElem()
-  @ccall libflint.fmpz_poly_height(z::Ref{ZZRingElem}, a::Ref{ZZPolyRingElem})::Nothing
+  @ccall libflint.fmpz_poly_height(z::Ref{ZZRingElemRaw}, a::Ref{ZZPolyRingElem})::Nothing
   return z
 end
 
@@ -199,8 +197,8 @@ function ==(x::ZZPolyRingElem, y::ZZRingElem)
     return false
   elseif length(x) == 1
     z = ZZRingElem()
-    @ccall libflint.fmpz_poly_get_coeff_fmpz(z::Ref{ZZRingElem}, x::Ref{ZZPolyRingElem}, 0::Int)::Nothing
-    return @ccall libflint.fmpz_equal(z::Ref{ZZRingElem}, y::Ref{ZZRingElem}, 0::Int)::Bool
+    @ccall libflint.fmpz_poly_get_coeff_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{ZZPolyRingElem}, 0::Int)::Nothing
+    return @ccall libflint.fmpz_equal(z::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw}, 0::Int)::Bool
   else
     return iszero(y)
   end
@@ -329,7 +327,7 @@ end
 function divexact(x::ZZPolyRingElem, y::ZZRingElem; check::Bool=true)
   iszero(y) && throw(DivideError())
   z = parent(x)()
-  @ccall libflint.fmpz_poly_scalar_divexact_fmpz(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_poly_scalar_divexact_fmpz(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -393,7 +391,7 @@ end
 
 function content(x::ZZPolyRingElem)
   z = ZZRingElem()
-  @ccall libflint.fmpz_poly_content(z::Ref{ZZRingElem}, x::Ref{ZZPolyRingElem})::Nothing
+  @ccall libflint.fmpz_poly_content(z::Ref{ZZRingElemRaw}, x::Ref{ZZPolyRingElem})::Nothing
   return z
 end
 
@@ -440,7 +438,7 @@ end
 
 function evaluate(x::ZZPolyRingElem, y::ZZRingElem)
   z = ZZRingElem()
-  @ccall libflint.fmpz_poly_evaluate_fmpz(z::Ref{ZZRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_poly_evaluate_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{ZZPolyRingElem}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -480,7 +478,7 @@ end
 function resultant(x::ZZPolyRingElem, y::ZZPolyRingElem)
   check_parent(x, y)
   z = ZZRingElem()
-  @ccall libflint.fmpz_poly_resultant(z::Ref{ZZRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZPolyRingElem})::Nothing
+  @ccall libflint.fmpz_poly_resultant(z::Ref{ZZRingElemRaw}, x::Ref{ZZPolyRingElem}, y::Ref{ZZPolyRingElem})::Nothing
   return z
 end
 
@@ -492,7 +490,7 @@ end
 
 function discriminant(x::ZZPolyRingElem)
   z = ZZRingElem()
-  @ccall libflint.fmpz_poly_discriminant(z::Ref{ZZRingElem}, x::Ref{ZZPolyRingElem})::Nothing
+  @ccall libflint.fmpz_poly_discriminant(z::Ref{ZZRingElemRaw}, x::Ref{ZZPolyRingElem})::Nothing
   return z
 end
 
@@ -517,7 +515,7 @@ function resx(a::ZZPolyRingElem, b::ZZPolyRingElem)
   c2 = content(b)
   x = divexact(a, c1)
   y = divexact(b, c2)
-  @ccall libflint.fmpz_poly_xgcd_modular(z::Ref{ZZRingElem}, u::Ref{ZZPolyRingElem}, v::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZPolyRingElem})::Nothing
+  @ccall libflint.fmpz_poly_xgcd_modular(z::Ref{ZZRingElemRaw}, u::Ref{ZZPolyRingElem}, v::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZPolyRingElem})::Nothing
   r = z*c1^(lenb - 1)*c2^(lena - 1)
   if lenb > 1
     u *= c1^(lenb - 2)*c2^(lena - 1)
@@ -578,8 +576,8 @@ function interpolate(R::ZZPolyRing, x::Vector{ZZRingElem},
   t = ZZRingElem()
 
   for i in 1:length(x)
-    ax[i] = x[i].d
-    ay[i] = y[i].d
+    ax[i] = data(x[i])
+    ay[i] = data(y[i])
   end
 
   @ccall libflint.fmpz_poly_interpolate_fmpz_vec(z::Ref{ZZPolyRingElem}, ax::Ptr{Int}, ay::Ptr{Int}, length(x)::Int)::Nothing
@@ -615,7 +613,7 @@ for (factor_fn, factor_fn_inner, flint_fn) in
                  (Ref{fmpz_poly_factor}, Ref{ZZPolyRingElem}), fac, x)
            res = Dict{ZZPolyRingElem,Int}()
            z = ZZRingElem()
-           @ccall libflint.fmpz_poly_factor_get_fmpz(z::Ref{ZZRingElem}, fac::Ref{fmpz_poly_factor})::Nothing
+           @ccall libflint.fmpz_poly_factor_get_fmpz(z::Ref{ZZRingElemRaw}, fac::Ref{fmpz_poly_factor})::Nothing
            for i in 1:fac.num
              f = parent(x)()
              @ccall libflint.fmpz_poly_factor_get_fmpz_poly(f::Ref{ZZPolyRingElem}, fac::Ref{fmpz_poly_factor}, (i - 1)::Int)::Nothing
@@ -797,7 +795,7 @@ function set!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr)
 end
 
 function set!(z::ZZPolyRingElemOrPtr, a::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_poly_set_fmpz(z::Ref{ZZPolyRingElem}, a::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_poly_set_fmpz(z::Ref{ZZPolyRingElem}, a::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -816,7 +814,7 @@ set!(z::ZZPolyRingElemOrPtr, a::Integer) = set!(z, flintify(a))
 #
 
 function setcoeff!(z::ZZPolyRingElemOrPtr, n::Int, x::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_poly_set_coeff_fmpz(z::Ref{ZZPolyRingElem}, n::Int, x::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_poly_set_coeff_fmpz(z::Ref{ZZPolyRingElem}, n::Int, x::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -840,7 +838,7 @@ function add!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::ZZPolyRingElemO
 end
 
 function add!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_poly_add_fmpz(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_poly_add_fmpz(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -866,7 +864,7 @@ function sub!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::ZZRingElemOrPtr
     # 0 from a zero polynomial; see https://github.com/flintlib/flint/pull/2102
     set!(z, x)
   else
-    @ccall libflint.fmpz_poly_sub_fmpz(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZRingElem})::Nothing
+    @ccall libflint.fmpz_poly_sub_fmpz(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZRingElemRaw})::Nothing
   end
   return z
 end
@@ -877,7 +875,7 @@ function sub!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::Int)
 end
 
 function sub!(z::ZZPolyRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZPolyRingElemOrPtr)
-  @ccall libflint.fmpz_poly_fmpz_sub(z::Ref{ZZPolyRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZPolyRingElem})::Nothing
+  @ccall libflint.fmpz_poly_fmpz_sub(z::Ref{ZZPolyRingElem}, x::Ref{ZZRingElemRaw}, y::Ref{ZZPolyRingElem})::Nothing
   return z
 end
 
@@ -898,7 +896,7 @@ function mul!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::ZZPolyRingElemO
 end
 
 function mul!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_poly_scalar_mul_fmpz(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_poly_scalar_mul_fmpz(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -919,7 +917,7 @@ mul!(z::ZZPolyRingElemOrPtr, x::IntegerUnionOrPtr, y::ZZPolyRingElemOrPtr) = mul
 #
 
 function addmul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_poly_scalar_addmul_fmpz(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem}, b::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_poly_scalar_addmul_fmpz(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem}, b::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -943,7 +941,7 @@ addmul!(z::ZZPolyRingElemOrPtr, x::IntegerUnionOrPtr, y::ZZPolyRingElemOrPtr, ::
 #
 
 function submul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_poly_scalar_submul_fmpz(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem}, b::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_poly_scalar_submul_fmpz(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem}, b::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 

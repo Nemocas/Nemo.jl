@@ -186,8 +186,8 @@ function *(x::T, y::ZZRingElem) where T <: Zmodn_poly
   z = parent(x)()
   t = ZZRingElem()
   tt = UInt(0)
-  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, y::Ref{ZZRingElem}, parent(x).n::UInt)::UInt
-  tt = @ccall libflint.fmpz_get_ui(t::Ref{ZZRingElem})::UInt
+  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw}, parent(x).n::UInt)::UInt
+  tt = @ccall libflint.fmpz_get_ui(t::Ref{ZZRingElemRaw})::UInt
   return x*tt
 end
 
@@ -217,8 +217,8 @@ function +(x::T, y::ZZRingElem) where T <: Zmodn_poly
   z = parent(x)()
   t = ZZRingElem()
   tt = UInt(0)
-  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, y::Ref{ZZRingElem}, parent(x).n::UInt)::UInt
-  tt = @ccall libflint.fmpz_get_ui(t::Ref{ZZRingElem})::UInt
+  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw}, parent(x).n::UInt)::UInt
+  tt = @ccall libflint.fmpz_get_ui(t::Ref{ZZRingElemRaw})::UInt
   return +(x,tt)
 end
 
@@ -248,8 +248,8 @@ function -(x::T, y::ZZRingElem) where T <: Zmodn_poly
   z = parent(x)()
   t = ZZRingElem()
   tt = UInt(0)
-  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, y::Ref{ZZRingElem}, parent(x).n::UInt)::UInt
-  tt = @ccall libflint.fmpz_get_ui(t::Ref{ZZRingElem})::UInt
+  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw}, parent(x).n::UInt)::UInt
+  tt = @ccall libflint.fmpz_get_ui(t::Ref{ZZRingElemRaw})::UInt
   return -(x,tt)
 end
 
@@ -864,7 +864,7 @@ function setcoeff!(x::T, n::Int, y::Int) where T <: Zmodn_poly
 end
 
 function setcoeff!(x::T, n::Int, y::ZZRingElem) where T <: Zmodn_poly
-  r = @ccall libflint.fmpz_fdiv_ui(y::Ref{ZZRingElem}, x.mod_n::UInt)::UInt
+  r = @ccall libflint.fmpz_fdiv_ui(y::Ref{ZZRingElemRaw}, x.mod_n::UInt)::UInt
   setcoeff!(x, n, r)
   return x
 end
@@ -918,7 +918,7 @@ function (R::zzModPolyRing)()
 end
 
 function (R::zzModPolyRing)(x::ZZRingElem)
-  r = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, R.n::UInt)::UInt
+  r = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElemRaw}, R.n::UInt)::UInt
   z = zzModPolyRingElem(R.n, r)
   z.parent = R
   return z

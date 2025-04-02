@@ -61,18 +61,30 @@ is_domain_type(::Type{ZZRingElem}) = true
 #
 ###############################################################################
 
-data(a::ZZRingElem) = a.d
-data(a::Ref{ZZRingElem}) = a[].d
-data(a::Ptr{ZZRingElem}) = unsafe_load(reinterpret(Ptr{Int}, a))
-data(a::ZZRingElemDR) = data(a.ptr)
+data(a::ZZRingElemRaw) = a.d
+data(a::Ref{ZZRingElemRaw}) = a[].d
+data(a::Ptr{ZZRingElemRaw}) = unsafe_load(reinterpret(Ptr{Int}, a))
+data(a::ZZRingElem) = data(a.ptr)
 
-Base.cconvert(::Type{Ref{ZZRingElem}}, a::ZZRingElemDR) = a.ptr
+Base.cconvert(::Type{Ref{ZZRingElemRaw}}, a::ZZRingElem) = a.ptr
 
-function ZZRingElem(a::ZZRingElemDR) 
-  b = ZZRingElem()
-  @ccall libflint.fmpz_set(b::Ref{ZZRingElem}, a::Ref{ZZRingElem})::Bool
-  return b 
-end
+Base.cconvert(::Type{Ref{ZZRingElem}}, a::ZZRingElem) = error("don't do this")
+
+#function ZZRingElemRaw(a::ZZRingElem) 
+#  b = ZZRingElem()
+#  @ccall libflint.fmpz_set(b::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw})::Bool
+#  return b 
+#end
+  
+ZZRingElem(x::ZZMatrix, i, j) = new(mat_entry_ptr(x, i, j), x)
+
+ZZRingElem(x::ZZPolyRingElem, i) = new(x.coeffs + i * sizeof(Ptr{Nothing}), x)
+
+ZZRingElem(x) = ZZRingElem(ZZRingElemRaw(x))
+
+ZZRingElem(x::ZZRingElem) = x
+
+ZZRingElem() = ZZRingElem(ZZRingElemRaw())
 
 ###############################################################################
 #
@@ -236,7 +248,7 @@ is_positive(n::ZZRingElemOrPtr) = sign(Int, n) > 0
 
 Return `true` if $a$ fits into an `Int`, otherwise return `false`.
 """
-fits(::Type{Int}, a::ZZRingElem) = @ccall libflint.fmpz_fits_si(a::Ref{ZZRingElem})::Bool
+fits(::Type{Int}, a::ZZRingElem) = @ccall libflint.fmpz_fits_si(a::Ref{ZZRingElemRaw})::Bool
 
 @doc raw"""
     fits(::Type{UInt}, a::ZZRingElem)
@@ -245,7 +257,7 @@ Return `true` if $a$ fits into a `UInt`, otherwise return `false`.
 """
 @inline function fits(::Type{UInt}, a::ZZRingElem)
   a < 0 && return false
-  return @ccall libflint.fmpz_abs_fits_ui(a::Ref{ZZRingElem})::Bool
+  return @ccall libflint.fmpz_abs_fits_ui(a::Ref{ZZRingElemRaw})::Bool
 end
 
 if Culong !== UInt
@@ -318,9 +330,9 @@ end
 
 string(x::ZZRingElem) = dec(x)
 
-show(io::IO, x::ZZRingElem) = print(io, string(x))
+#show(io::IO, x::ZZRingElemRaw) = print(io, string(x))
 
-show(io::IO, x::ZZRingElemDR) = print(io, ZZRingElem(x))
+show(io::IO, x::ZZRingElem) = print(io, string(x))
 
 function show(io::IO, a::ZZRing)
   # deliberately no @show_name or @show_special here as this is a singleton type
@@ -345,7 +357,7 @@ canonical_unit(x::ZZRingElem) = x < 0 ? ZZRingElem(-1) : ZZRingElem(1)
 #
 ###############################################################################
 
-function -(x::Union{ZZRingElem, ZZRingElemDR})
+function -(x::Union{ZZRingElemRaw, ZZRingElem})
   z = ZZRingElem()
   neg!(z, x)
   return z
@@ -353,13 +365,13 @@ end
 
 function ~(x::ZZRingElem)
   z = ZZRingElem()
-  @ccall libflint.fmpz_complement(z::Ref{ZZRingElem}, x::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_complement(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
 function abs(x::ZZRingElem)
   z = ZZRingElem()
-  @ccall libflint.fmpz_abs(z::Ref{ZZRingElem}, x::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_abs(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -390,7 +402,7 @@ for (fJ, fC) in ((:+, :add), (:-,:sub), (:*, :mul),
     function ($fJ)(x::ZZRingElem, y::ZZRingElem)
       z = ZZRingElem()
       ccall(($(string(:fmpz_, fC)), libflint), Nothing,
-            (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
+            (Ref{ZZRingElemRaw}, Ref{ZZRingElemRaw}, Ref{ZZRingElemRaw}), z, x, y)
       return z
     end
   end
@@ -405,7 +417,7 @@ for (fJ, fC) in ((:fdiv, :fdiv_q), (:cdiv, :cdiv_q), (:tdiv, :tdiv_q),
       iszero(y) && throw(DivideError())
       z = ZZRingElem()
       ccall(($(string(:fmpz_, fC)), libflint), Nothing,
-            (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
+            (Ref{ZZRingElemRaw}, Ref{ZZRingElemRaw}, Ref{ZZRingElemRaw}), z, x, y)
       return z
     end
   end
@@ -417,7 +429,7 @@ end
 function Base.div(x::ZZRingElem, y::ZZRingElem)
   iszero(y) && throw(DivideError())
   z = ZZRingElem()
-  @ccall libflint.fmpz_tdiv_q(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_tdiv_q(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -437,7 +449,7 @@ function divexact(x::ZZRingElem, y::ZZRingElem; check::Bool=true)
 end
 
 function AbstractAlgebra.divides!(z::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
-  res = @ccall libflint.fmpz_divides(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Bool
+  res = @ccall libflint.fmpz_divides(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw})::Bool
   return res, z
 end
 
@@ -503,7 +515,7 @@ function rem(x::ZZRingElem, c::ZZRingElem)
 end
 
 function rem(a::ZZRingElem, b::UInt)
-  return @ccall libflint.fmpz_fdiv_ui(a::Ref{ZZRingElem}, b::UInt)::UInt
+  return @ccall libflint.fmpz_fdiv_ui(a::Ref{ZZRingElemRaw}, b::UInt)::UInt
 end
 
 ###############################################################################
@@ -583,49 +595,49 @@ divexact(x::Integer, y::ZZRingElem; check::Bool=true) = divexact(ZZRingElem(x), 
 function tdivpow2(x::ZZRingElem, c::Int)
   c < 0 && throw(DomainError(c, "Exponent must be non-negative"))
   z = ZZRingElem()
-  @ccall libflint.fmpz_tdiv_q_2exp(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, c::Int)::Nothing
+  @ccall libflint.fmpz_tdiv_q_2exp(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, c::Int)::Nothing
   return z
 end
 
 function fdivpow2(x::ZZRingElem, c::Int)
   c < 0 && throw(DomainError(c, "Exponent must be non-negative"))
   z = ZZRingElem()
-  @ccall libflint.fmpz_fdiv_q_2exp(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, c::Int)::Nothing
+  @ccall libflint.fmpz_fdiv_q_2exp(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, c::Int)::Nothing
   return z
 end
 
 function fmodpow2(x::ZZRingElem, c::Int)
   c < 0 && throw(DomainError(c, "Exponent must be non-negative"))
   z = ZZRingElem()
-  @ccall libflint.fmpz_fdiv_r_2exp(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, c::Int)::Nothing
+  @ccall libflint.fmpz_fdiv_r_2exp(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, c::Int)::Nothing
   return z
 end
 
 function cdivpow2(x::ZZRingElem, c::Int)
   c < 0 && throw(DomainError(c, "Exponent must be non-negative"))
   z = ZZRingElem()
-  @ccall libflint.fmpz_cdiv_q_2exp(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, c::Int)::Nothing
+  @ccall libflint.fmpz_cdiv_q_2exp(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, c::Int)::Nothing
   return z
 end
 
 function tdiv(x::ZZRingElem, c::Int)
   c == 0 && throw(DivideError())
   z = ZZRingElem()
-  @ccall libflint.fmpz_tdiv_q_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, c::Int)::Nothing
+  @ccall libflint.fmpz_tdiv_q_si(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, c::Int)::Nothing
   return z
 end
 
 function fdiv(x::ZZRingElem, c::Int)
   c == 0 && throw(DivideError())
   z = ZZRingElem()
-  @ccall libflint.fmpz_fdiv_q_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, c::Int)::Nothing
+  @ccall libflint.fmpz_fdiv_q_si(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, c::Int)::Nothing
   return z
 end
 
 function cdiv(x::ZZRingElem, c::Int)
   c == 0 && throw(DivideError())
   z = ZZRingElem()
-  @ccall libflint.fmpz_cdiv_q_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, c::Int)::Nothing
+  @ccall libflint.fmpz_cdiv_q_si(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, c::Int)::Nothing
   return z
 end
 
@@ -685,7 +697,7 @@ function tdivrem(x::ZZRingElem, y::ZZRingElem)
   iszero(y) && throw(DivideError())
   z1 = ZZRingElem()
   z2 = ZZRingElem()
-  @ccall libflint.fmpz_tdiv_qr(z1::Ref{ZZRingElem}, z2::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_tdiv_qr(z1::Ref{ZZRingElemRaw}, z2::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw})::Nothing
   z1, z2
 end
 
@@ -693,7 +705,7 @@ function fdivrem(x::ZZRingElem, y::ZZRingElem)
   iszero(y) && throw(DivideError())
   z1 = ZZRingElem()
   z2 = ZZRingElem()
-  @ccall libflint.fmpz_fdiv_qr(z1::Ref{ZZRingElem}, z2::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_fdiv_qr(z1::Ref{ZZRingElemRaw}, z2::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw})::Nothing
   z1, z2
 end
 
@@ -701,7 +713,7 @@ function cdivrem(x::ZZRingElem, y::ZZRingElem)
   iszero(y) && throw(DivideError())
   z1 = ZZRingElem()
   z2 = ZZRingElem()
-  @ccall libflint.fmpz_cdiv_qr(z1::Ref{ZZRingElem}, z2::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_cdiv_qr(z1::Ref{ZZRingElemRaw}, z2::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw})::Nothing
   z1, z2
 end
 
@@ -712,7 +724,7 @@ end
 
 function nfdivrem(a::ZZRingElem, b::ZZRingElem)
   q, r = tdivrem(a, b)
-  c = @ccall libflint.fmpz_cmp2abs(b::Ref{ZZRingElem}, r::Ref{ZZRingElem})::Cint
+  c = @ccall libflint.fmpz_cmp2abs(b::Ref{ZZRingElemRaw}, r::Ref{ZZRingElemRaw})::Cint
   if c <= 0
     if sign(Int, b) != sign(Int, r)
       sub!(q, q, UInt(1))
@@ -727,7 +739,7 @@ end
 
 function ncdivrem(a::ZZRingElem, b::ZZRingElem)
   q, r = tdivrem(a, b)
-  c = @ccall libflint.fmpz_cmp2abs(b::Ref{ZZRingElem}, r::Ref{ZZRingElem})::Cint
+  c = @ccall libflint.fmpz_cmp2abs(b::Ref{ZZRingElemRaw}, r::Ref{ZZRingElemRaw})::Cint
   if c <= 0
     if sign(Int, b) == sign(Int, r)
       add!(q, q, UInt(1))
@@ -744,7 +756,7 @@ function ndivrem(x::ZZRingElem, y::ZZRingElem)
   iszero(y) && throw(DivideError())
   z1 = ZZRingElem()
   z2 = ZZRingElem()
-  @ccall libflint.fmpz_ndiv_qr(z1::Ref{ZZRingElem}, z2::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_ndiv_qr(z1::Ref{ZZRingElemRaw}, z2::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw})::Nothing
   z1, z2
 end
 
@@ -823,7 +835,7 @@ end
 ###############################################################################
 
 function cmp(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
-  Int(@ccall libflint.fmpz_cmp(x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Cint)
+  Int(@ccall libflint.fmpz_cmp(x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw})::Cint)
 end
 
 ==(x::ZZRingElem, y::ZZRingElem) = cmp(x,y) == 0
@@ -833,7 +845,7 @@ end
 <(x::ZZRingElem, y::ZZRingElem) = cmp(x,y) < 0
 
 function cmpabs(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
-  Int(@ccall libflint.fmpz_cmpabs(x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Cint)
+  Int(@ccall libflint.fmpz_cmpabs(x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw})::Cint)
 end
 
 isless(x::ZZRingElem, y::ZZRingElem) = x < y
@@ -859,7 +871,7 @@ end
 ###############################################################################
 
 function cmp(x::ZZRingElemOrPtr, y::Int)
-  Int(@ccall libflint.fmpz_cmp_si(x::Ref{ZZRingElem}, y::Int)::Cint)
+  Int(@ccall libflint.fmpz_cmp_si(x::Ref{ZZRingElemRaw}, y::Int)::Cint)
 end
 
 ==(x::ZZRingElem, y::Int) = cmp(x,y) == 0
@@ -875,7 +887,7 @@ end
 <(x::Int, y::ZZRingElem) = cmp(y,x) > 0
 
 function cmp(x::ZZRingElemOrPtr, y::UInt)
-  Int(@ccall libflint.fmpz_cmp_ui(x::Ref{ZZRingElem}, y::UInt)::Cint)
+  Int(@ccall libflint.fmpz_cmp_ui(x::Ref{ZZRingElemRaw}, y::UInt)::Cint)
 end
 
 ==(x::ZZRingElem, y::UInt) = cmp(x,y) == 0
@@ -905,9 +917,9 @@ end
 
 function cmp(a::BigFloat, b::ZZRingElem)
   if _fmpz_is_small(b)
-    return Int(@ccall :libmpfr.mpfr_cmp_si(a::Ref{BigFloat}, b.d::Int)::Cint)
+    return Int(@ccall :libmpfr.mpfr_cmp_si(a::Ref{BigFloat}, data(b)::Int)::Cint)
   end
-  return Int(@ccall :libmpfr.mpfr_cmp_z(a::Ref{BigFloat}, (unsigned(b.d) << 2)::UInt)::Cint)
+  return Int(@ccall :libmpfr.mpfr_cmp_z(a::Ref{BigFloat}, (data(b) << 2)::UInt)::Cint)
 end
 
 ==(x::ZZRingElem, y::BigFloat) = cmp(y, x) == 0
@@ -936,7 +948,7 @@ function <<(x::ZZRingElem, c::Int)
   c < 0 && throw(DomainError(c, "Exponent must be non-negative"))
   c == 0 && return x
   z = ZZRingElem()
-  @ccall libflint.fmpz_mul_2exp(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, c::Int)::Nothing
+  @ccall libflint.fmpz_mul_2exp(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, c::Int)::Nothing
   return z
 end
 
@@ -949,7 +961,7 @@ function >>(x::ZZRingElem, c::Int)
   c < 0 && throw(DomainError(c, "Exponent must be non-negative"))
   c == 0 && return x
   z = ZZRingElem()
-  @ccall libflint.fmpz_fdiv_q_2exp(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, c::Int)::Nothing
+  @ccall libflint.fmpz_fdiv_q_2exp(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, c::Int)::Nothing
   return z
 end
 
@@ -960,7 +972,7 @@ end
 ###############################################################################
 
 function mod!(r::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
-  @ccall libflint.fmpz_fdiv_r(r::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_fdiv_r(r::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw})::Nothing
   return r
 end
 
@@ -972,7 +984,7 @@ end
 
 function mod(x::ZZRingElem, c::UInt)
   c == 0 && throw(DivideError())
-  @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, c::UInt)::UInt
+  @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElemRaw}, c::UInt)::UInt
 end
 
 function mod_sym(a::ZZRingElem, b::ZZRingElem)
@@ -1000,7 +1012,7 @@ function powermod(x::ZZRingElem, p::ZZRingElem, m::ZZRingElem)
     p = -p
   end
   r = ZZRingElem()
-  @ccall libflint.fmpz_powm(r::Ref{ZZRingElem}, x::Ref{ZZRingElem}, p::Ref{ZZRingElem}, m::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_powm(r::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, p::Ref{ZZRingElemRaw}, m::Ref{ZZRingElemRaw})::Nothing
   return r
 end
 
@@ -1016,7 +1028,7 @@ function powermod(x::ZZRingElem, p::Int, m::ZZRingElem)
     p = -p
   end
   r = ZZRingElem()
-  @ccall libflint.fmpz_powm_ui(r::Ref{ZZRingElem}, x::Ref{ZZRingElem}, p::Int, m::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_powm_ui(r::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, p::Int, m::Ref{ZZRingElemRaw})::Nothing
   return r
 end
 
@@ -1050,7 +1062,7 @@ function invmod(x::ZZRingElem, m::ZZRingElem)
   if isone(m)
     return ZZRingElem(0)
   end
-  if (@ccall libflint.fmpz_invmod(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, m::Ref{ZZRingElem})::Cint) == 0
+  if (@ccall libflint.fmpz_invmod(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, m::Ref{ZZRingElemRaw})::Cint) == 0
     error("Impossible inverse in invmod")
   end
   return z
@@ -1073,7 +1085,7 @@ julia> sqrtmod(ZZ(12), ZZ(13))
 function sqrtmod(x::ZZRingElem, m::ZZRingElem)
   m <= 0 && throw(DomainError(m, "Modulus must be non-negative"))
   z = ZZRingElem()
-  success = @ccall libflint.fmpz_sqrtmod(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, m::Ref{ZZRingElem})::Cint
+  success = @ccall libflint.fmpz_sqrtmod(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, m::Ref{ZZRingElemRaw})::Cint
   if success == 0
     error("no square root exists or modulus is not prime")
   end
@@ -1226,12 +1238,12 @@ julia> flog(ZZ(12), 3)
 function flog(x::ZZRingElem, c::ZZRingElem)
   c <= 0 && throw(DomainError(c, "Base must be non-negative"))
   x <= 0 && throw(DomainError(x, "Argument must be non-negative"))
-  return @ccall libflint.fmpz_flog(x::Ref{ZZRingElem}, c::Ref{ZZRingElem})::Int
+  return @ccall libflint.fmpz_flog(x::Ref{ZZRingElemRaw}, c::Ref{ZZRingElemRaw})::Int
 end
 
 function flog(x::ZZRingElem, c::Int)
   c <= 0 && throw(DomainError(c, "Base must be non-negative"))
-  return @ccall libflint.fmpz_flog_ui(x::Ref{ZZRingElem}, c::Int)::Int
+  return @ccall libflint.fmpz_flog_ui(x::Ref{ZZRingElemRaw}, c::Int)::Int
 end
 
 @doc raw"""
@@ -1254,12 +1266,12 @@ julia> clog(ZZ(12), 3)
 function clog(x::ZZRingElem, c::ZZRingElem)
   c <= 0 && throw(DomainError(c, "Base must be non-negative"))
   x <= 0 && throw(DomainError(x, "Argument must be non-negative"))
-  return @ccall libflint.fmpz_clog(x::Ref{ZZRingElem}, c::Ref{ZZRingElem})::Int
+  return @ccall libflint.fmpz_clog(x::Ref{ZZRingElemRaw}, c::Ref{ZZRingElemRaw})::Int
 end
 
 function clog(x::ZZRingElem, c::Int)
   c <= 0 && throw(DomainError(c, "Base must be non-negative"))
-  return @ccall libflint.fmpz_clog_ui(x::Ref{ZZRingElem}, c::Int)::Int
+  return @ccall libflint.fmpz_clog_ui(x::Ref{ZZRingElemRaw}, c::Int)::Int
 end
 
 ###############################################################################
@@ -1390,7 +1402,7 @@ function gcdx(a::ZZRingElem, b::ZZRingElem)
   d = ZZ()
   x = ZZ()
   y = ZZ()
-  @ccall libflint.fmpz_xgcd_canonical_bezout(d::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_xgcd_canonical_bezout(d::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw}, b::Ref{ZZRingElemRaw})::Nothing
   return d, x, y
 end
 
@@ -1399,7 +1411,7 @@ function gcdinv(a::ZZRingElem, b::ZZRingElem)
   b < a && throw(DomainError((a, b), "First argument must be smaller than second argument"))
   g = ZZRingElem()
   s = ZZRingElem()
-  @ccall libflint.fmpz_gcdinv(g::Ref{ZZRingElem}, s::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_gcdinv(g::Ref{ZZRingElemRaw}, s::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw}, b::Ref{ZZRingElemRaw})::Nothing
   return g, s
 end
 
@@ -1436,7 +1448,7 @@ julia> isqrt(ZZ(13))
 function isqrt(x::ZZRingElem)
   is_negative(x) && throw(DomainError(x, "Argument must be non-negative"))
   z = ZZRingElem()
-  @ccall libflint.fmpz_sqrt(z::Ref{ZZRingElem}, x::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_sqrt(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -1458,7 +1470,7 @@ function isqrtrem(x::ZZRingElem)
   is_negative(x) && throw(DomainError(x, "Argument must be non-negative"))
   s = ZZRingElem()
   r = ZZRingElem()
-  @ccall libflint.fmpz_sqrtrem(s::Ref{ZZRingElem}, r::Ref{ZZRingElem}, x::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_sqrtrem(s::Ref{ZZRingElemRaw}, r::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw})::Nothing
   return s, r
 end
 
@@ -1477,7 +1489,7 @@ function Base.sqrt(x::ZZRingElem; check=true)
   return s
 end
 
-is_square(x::ZZRingElem) = Bool(@ccall libflint.fmpz_is_square(x::Ref{ZZRingElem})::Cint)
+is_square(x::ZZRingElem) = Bool(@ccall libflint.fmpz_is_square(x::Ref{ZZRingElemRaw})::Cint)
 
 function is_square_with_sqrt(x::ZZRingElem)
   if is_negative(x)
@@ -1515,7 +1527,7 @@ function root(x::ZZRingElem, n::Int; check::Bool=true)
   x < 0 && iseven(n) && throw(DomainError((x, n), "Argument `x` must be positive if exponent `n` is even"))
   n <= 0 && throw(DomainError(n, "Exponent must be positive"))
   z = ZZRingElem()
-  res = @ccall libflint.fmpz_root(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, n::Int)::Bool
+  res = @ccall libflint.fmpz_root(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, n::Int)::Bool
   check && !res && error("Not a perfect n-th power (n = $n)")
   return z
 end
@@ -1537,7 +1549,7 @@ function iroot(x::ZZRingElem, n::Int)
   x < 0 && iseven(n) && throw(DomainError((x, n), "Argument `x` must be positive if exponent `n` is even"))
   n <= 0 && throw(DomainError(n, "Exponent must be positive"))
   z = ZZRingElem()
-  @ccall libflint.fmpz_root(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, n::Int)::Bool
+  @ccall libflint.fmpz_root(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, n::Int)::Bool
   return z
 end
 
@@ -1568,11 +1580,11 @@ is_divisible_by_four(n::ZZRingElem) = ((n % UInt) % 4) == 0
 
 function _factor_trial_range(N::ZZRingElem, start::Int = 0, np::Int = 10^5)
   F = fmpz_factor()
-  @ccall libflint.fmpz_factor_trial_range(F::Ref{fmpz_factor}, N::Ref{ZZRingElem}, start::UInt, np::UInt)::Nothing
+  @ccall libflint.fmpz_factor_trial_range(F::Ref{fmpz_factor}, N::Ref{ZZRingElemRaw}, start::UInt, np::UInt)::Nothing
   res = Dict{ZZRingElem, Int}()
   for i in 1:F.num
     z = ZZRingElem()
-    @ccall libflint.fmpz_factor_get_fmpz(z::Ref{ZZRingElem}, F::Ref{fmpz_factor}, (i - 1)::Int)::Nothing
+    @ccall libflint.fmpz_factor_get_fmpz(z::Ref{ZZRingElemRaw}, F::Ref{fmpz_factor}, (i - 1)::Int)::Nothing
     res[z] = unsafe_load(F.exp, i)
   end
   return res, canonical_unit(N)
@@ -1645,7 +1657,7 @@ true
 """
 function is_prime(x::ZZRingElem)
   !is_probable_prime(x) && return false
-  return Bool(@ccall libflint.fmpz_is_prime(x::Ref{ZZRingElem})::Cint)
+  return Bool(@ccall libflint.fmpz_is_prime(x::Ref{ZZRingElemRaw})::Cint)
 end
 
 function is_prime(n::Int)
@@ -1662,7 +1674,7 @@ Return `true` if $x$ is very probably a prime number, otherwise return
 `false`. No counterexamples are known to this test, but it is conjectured
 that infinitely many exist.
 """
-is_probable_prime(x::ZZRingElem) = Bool(@ccall libflint.fmpz_is_probabprime(x::Ref{ZZRingElem})::Cint)
+is_probable_prime(x::ZZRingElem) = Bool(@ccall libflint.fmpz_is_probabprime(x::Ref{ZZRingElemRaw})::Cint)
 
 @doc raw"""
     next_prime(x::ZZRingElem, proved = true)
@@ -1672,7 +1684,7 @@ If a second argument of `false` is specified, the return is only probably prime.
 """
 function next_prime(x::ZZRingElem, proved::Bool = true)
   z = ZZRingElem()
-  @ccall libflint.fmpz_nextprime(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, proved::Cint)::Nothing
+  @ccall libflint.fmpz_nextprime(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, proved::Cint)::Nothing
   return z
 end
 
@@ -1689,7 +1701,7 @@ function next_prime(x::Int, proved::Bool = true)
 end
 
 function remove!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
-  v = @ccall libflint.fmpz_remove(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Clong
+  v = @ccall libflint.fmpz_remove(z::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw}, b::Ref{ZZRingElemRaw})::Clong
   return Int(v), z
 end
 
@@ -1764,7 +1776,7 @@ function divisor_lenstra(n::ZZRingElem, r::ZZRingElem, m::ZZRingElem)
   m <= r && throw(DomainError((m, r), "Modulus must be bigger than residue class"))
   n <= m && throw(DomainError((n, m), "Argument must be bigger than modulus"))
   z = ZZRingElem()
-  if !Bool(@ccall libflint.fmpz_divisor_in_residue_class_lenstra(z::Ref{ZZRingElem}, n::Ref{ZZRingElem}, r::Ref{ZZRingElem}, m::Ref{ZZRingElem})::Cint)
+  if !Bool(@ccall libflint.fmpz_divisor_in_residue_class_lenstra(z::Ref{ZZRingElemRaw}, n::Ref{ZZRingElemRaw}, r::Ref{ZZRingElemRaw}, m::Ref{ZZRingElemRaw})::Cint)
     z = 0
   end
   return z
@@ -1786,7 +1798,7 @@ julia> factorial(ZZ(100))
 function factorial(x::ZZRingElem)
   x < 0 && throw(DomainError(x, "Argument must be non-negative"))
   z = ZZRingElem()
-  @ccall libflint.fmpz_fac_ui(z::Ref{ZZRingElem}, UInt(x)::UInt)::Nothing
+  @ccall libflint.fmpz_fac_ui(z::Ref{ZZRingElemRaw}, UInt(x)::UInt)::Nothing
   return z
 end
 
@@ -1799,7 +1811,7 @@ If $n < 0$ we throw a `DomainError()`.
 function rising_factorial(x::ZZRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Argument must be non-negative"))
   z = ZZRingElem()
-  @ccall libflint.fmpz_rfac_ui(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, UInt(n)::UInt)::Nothing
+  @ccall libflint.fmpz_rfac_ui(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, UInt(n)::UInt)::Nothing
   return z
 end
 
@@ -1824,7 +1836,7 @@ function primorial(x::Int)
     throw(OverflowError("primorial(::Int)"))
   end
   z = ZZRingElem()
-  @ccall libflint.fmpz_primorial(z::Ref{ZZRingElem}, UInt(x)::UInt)::Nothing
+  @ccall libflint.fmpz_primorial(z::Ref{ZZRingElemRaw}, UInt(x)::UInt)::Nothing
   return Int(z)
 end
 
@@ -1837,7 +1849,7 @@ equal to $x$. If $x < 0$ we throw a `DomainError()`.
 function primorial(x::ZZRingElem)
   x < 0 && throw(DomainError(x, "Argument must be non-negative"))
   z = ZZRingElem()
-  @ccall libflint.fmpz_primorial(z::Ref{ZZRingElem}, UInt(x)::UInt)::Nothing
+  @ccall libflint.fmpz_primorial(z::Ref{ZZRingElemRaw}, UInt(x)::UInt)::Nothing
   return z
 end
 
@@ -1853,7 +1865,7 @@ function fibonacci(x::Int)
     throw(OverflowError("fibonacci(::Int)"))
   end
   z = ZZRingElem()
-  @ccall libflint.fmpz_fib_ui(z::Ref{ZZRingElem}, UInt(abs(x))::UInt)::Nothing
+  @ccall libflint.fmpz_fib_ui(z::Ref{ZZRingElemRaw}, UInt(abs(x))::UInt)::Nothing
   return x < 0 ? (iseven(x) ? -Int(z) : Int(z)) : Int(z)
 end
 
@@ -1865,7 +1877,7 @@ $F_{i + 1} = F_i + F_{i - 1}$ for all integers $i$.
 """
 function fibonacci(x::ZZRingElem)
   z = ZZRingElem()
-  @ccall libflint.fmpz_fib_ui(z::Ref{ZZRingElem}, UInt(abs(x))::UInt)::Nothing
+  @ccall libflint.fmpz_fib_ui(z::Ref{ZZRingElemRaw}, UInt(abs(x))::UInt)::Nothing
   return x < 0 ? (iseven(x) ? -z : z) : z
 end
 
@@ -1877,7 +1889,7 @@ Return the Bell number $B_x$.
 function bell(x::Int)
   x < 0 && throw(DomainError(x, "Argument must be non-negative"))
   z = ZZRingElem()
-  @ccall libflint.arith_bell_number(z::Ref{ZZRingElem}, UInt(x)::UInt)::Nothing
+  @ccall libflint.arith_bell_number(z::Ref{ZZRingElemRaw}, UInt(x)::UInt)::Nothing
   return Int(z)
 end
 
@@ -1889,7 +1901,7 @@ Return the Bell number $B_x$.
 function bell(x::ZZRingElem)
   x < 0 && throw(DomainError(x, "Argument must be non-negative"))
   z = ZZRingElem()
-  @ccall libflint.arith_bell_number(z::Ref{ZZRingElem}, UInt(x)::UInt)::Nothing
+  @ccall libflint.arith_bell_number(z::Ref{ZZRingElemRaw}, UInt(x)::UInt)::Nothing
   return z
 end
 
@@ -1897,7 +1909,7 @@ end
 # which has silly gnu problems on windows
 # TODO: fib_ui, pow_ui, fac_ui ditto
 function _binomial!(z::ZZRingElem, n::Culong, k::Culong)
-  @ccall libflint.fmpz_bin_uiui(z::Ref{ZZRingElem}, UInt(n)::UInt, UInt(k)::UInt)::Nothing
+  @ccall libflint.fmpz_bin_uiui(z::Ref{ZZRingElemRaw}, UInt(n)::UInt, UInt(k)::UInt)::Nothing
   return z
 end
 
@@ -1953,7 +1965,7 @@ Return the binomial coefficient $\frac{n!}{(n - k)!k!}$ as an `ZZRingElem`.
 """
 function binomial(n::UInt, k::UInt, ::ZZRing)
   z = ZZRingElem()
-  @ccall libflint.fmpz_bin_uiui(z::Ref{ZZRingElem}, n::UInt, k::UInt)::Nothing
+  @ccall libflint.fmpz_bin_uiui(z::Ref{ZZRingElemRaw}, n::UInt, k::UInt)::Nothing
   return z
 end
 
@@ -1965,7 +1977,7 @@ returned is either $-1$, $0$ or $1$. If $x \leq 0$ we throw a `DomainError()`.
 """
 function moebius_mu(x::ZZRingElem)
   x <= 0 && throw(DomainError(x, "Argument must be positive"))
-  return Int(@ccall libflint.fmpz_moebius_mu(x::Ref{ZZRingElem})::Cint)
+  return Int(@ccall libflint.fmpz_moebius_mu(x::Ref{ZZRingElemRaw})::Cint)
 end
 
 @doc raw"""
@@ -1987,7 +1999,7 @@ function jacobi_symbol(x::ZZRingElem, y::ZZRingElem)
   if x < 0 || x >= y
     x = mod(x, y)
   end
-  return Int(@ccall libflint.fmpz_jacobi(x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Cint)
+  return Int(@ccall libflint.fmpz_jacobi(x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw})::Cint)
 end
 
 jacobi_symbol(x::IntegerUnion, y::IntegerUnion) = jacobi_symbol(ZZ(x), ZZ(y))
@@ -2019,7 +2031,7 @@ function kronecker_symbol(x::Int, y::Int)
 end
 
 function kronecker_symbol(x::ZZRingElem, y::ZZRingElem)
-  return Int(@ccall libflint.fmpz_kronecker(x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Cint)
+  return Int(@ccall libflint.fmpz_kronecker(x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw})::Cint)
 end
 
 @doc raw"""
@@ -2047,7 +2059,7 @@ function divisor_sigma(x::ZZRingElem, y::Int)
   x <= 0 && throw(DomainError(x, "Argument must be positive"))
   y < 0 && throw(DomainError(y, "Power must be non-negative"))
   z = ZZRingElem()
-  @ccall libflint.fmpz_divisor_sigma(z::Ref{ZZRingElem}, UInt(y)::UInt, x::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_divisor_sigma(z::Ref{ZZRingElemRaw}, UInt(y)::UInt, x::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -2075,7 +2087,7 @@ julia> euler_phi(12480)
 function euler_phi(x::ZZRingElem)
   x <= 0 && throw(DomainError(x, "Argument must be positive"))
   z = ZZRingElem()
-  @ccall libflint.fmpz_euler_phi(z::Ref{ZZRingElem}, x::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_euler_phi(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -2106,7 +2118,7 @@ function number_of_partitions(x::Int)
     return 0
   end
   z = ZZRingElem()
-  @ccall libflint.partitions_fmpz_ui(z::Ref{ZZRingElem}, x::UInt)::Nothing
+  @ccall libflint.partitions_fmpz_ui(z::Ref{ZZRingElemRaw}, x::UInt)::Nothing
   return Int(z)
 end
 
@@ -2115,7 +2127,7 @@ function number_of_partitions(x::ZZRingElem)
   if x < 0
     return z
   end
-  @ccall libflint.partitions_fmpz_fmpz(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, 0::Int)::Nothing
+  @ccall libflint.partitions_fmpz_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, 0::Int)::Nothing
   return z
 end
 
@@ -2195,7 +2207,7 @@ julia> base(ZZ(12), 13)
 """
 function base(n::ZZRingElem, b::Integer)
   2 <= b <= 62 || error("invalid base: $b")
-  p = @ccall libflint.fmpz_get_str(C_NULL::Ptr{UInt8}, b::Cint, n::Ref{ZZRingElem})::Ptr{UInt8}
+  p = @ccall libflint.fmpz_get_str(C_NULL::Ptr{UInt8}, b::Cint, n::Ref{ZZRingElemRaw})::Ptr{UInt8}
   s = unsafe_string(p)
   @ccall libflint.flint_free(p::Ptr{UInt8})::Nothing
   return s
@@ -2264,7 +2276,7 @@ julia> nbits(ZZ(12))
 4
 ```
 """
-nbits(x::ZZRingElemOrPtr) = Int(@ccall libflint.fmpz_bits(x::Ref{ZZRingElem})::Culong)
+nbits(x::ZZRingElemOrPtr) = Int(@ccall libflint.fmpz_bits(x::Ref{ZZRingElemRaw})::Culong)
 
 @doc raw"""
     nbits(a::Integer) -> Int
@@ -2293,7 +2305,7 @@ julia> popcount(ZZ(12))
 2
 ```
 """
-popcount(x::ZZRingElem) = Int(@ccall libflint.fmpz_popcnt(x::Ref{ZZRingElem})::UInt)
+popcount(x::ZZRingElem) = Int(@ccall libflint.fmpz_popcnt(x::Ref{ZZRingElemRaw})::UInt)
 
 @doc raw"""
     prevpow2(x::ZZRingElem)
@@ -2323,7 +2335,7 @@ nextpow2(x::ZZRingElem) = x < 0 ? -nextpow2(-x) :
 
 Return the number of trailing zeros in the binary representation of $x$.
 """
-trailing_zeros(x::ZZRingElem) = @ccall libflint.fmpz_val2(x::Ref{ZZRingElem})::Int
+trailing_zeros(x::ZZRingElem) = @ccall libflint.fmpz_val2(x::Ref{ZZRingElemRaw})::Int
 
 ###############################################################################
 #
@@ -2351,7 +2363,7 @@ julia> a
 """
 function clrbit!(x::ZZRingElem, c::Int)
   c < 0 && throw(DomainError(c, "Second argument must be non-negative"))
-  @ccall libflint.fmpz_clrbit(x::Ref{ZZRingElem}, c::UInt)::Nothing
+  @ccall libflint.fmpz_clrbit(x::Ref{ZZRingElemRaw}, c::UInt)::Nothing
 end
 
 @doc raw"""
@@ -2374,7 +2386,7 @@ julia> a
 """
 function setbit!(x::ZZRingElem, c::Int)
   c < 0 && throw(DomainError(c, "Second argument must be non-negative"))
-  @ccall libflint.fmpz_setbit(x::Ref{ZZRingElem}, c::UInt)::Nothing
+  @ccall libflint.fmpz_setbit(x::Ref{ZZRingElemRaw}, c::UInt)::Nothing
 end
 
 @doc raw"""
@@ -2397,7 +2409,7 @@ julia> a
 """
 function combit!(x::ZZRingElem, c::Int)
   c < 0 && throw(DomainError(c, "Second argument must be non-negative"))
-  @ccall libflint.fmpz_combit(x::Ref{ZZRingElem}, c::UInt)::Nothing
+  @ccall libflint.fmpz_combit(x::Ref{ZZRingElemRaw}, c::UInt)::Nothing
 end
 
 @doc raw"""
@@ -2419,7 +2431,7 @@ true
 ```
 """
 function tstbit(x::ZZRingElem, c::Int)
-  return c >= 0 && Bool(@ccall libflint.fmpz_tstbit(x::Ref{ZZRingElem}, c::UInt)::Cint)
+  return c >= 0 && Bool(@ccall libflint.fmpz_tstbit(x::Ref{ZZRingElemRaw}, c::UInt)::Cint)
 end
 
 ###############################################################################
@@ -2429,7 +2441,7 @@ end
 ###############################################################################
 
 function zero!(z::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_zero(z::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_zero(z::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -2438,50 +2450,50 @@ function one!(z::ZZRingElemOrPtr)
 end
 
 function neg!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_neg(z::Ref{ZZRingElem}, a::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_neg(z::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
 function set!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_set(z::Ref{ZZRingElem}, a::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_set(z::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
 function set!(z::ZZRingElemOrPtr, a::Int)
-  @ccall libflint.fmpz_set_si(z::Ref{ZZRingElem}, a::Int)::Nothing
+  @ccall libflint.fmpz_set_si(z::Ref{ZZRingElemRaw}, a::Int)::Nothing
   return z
 end
 
 function set!(z::ZZRingElemOrPtr, a::UInt)
-  @ccall libflint.fmpz_set_ui(z::Ref{ZZRingElem}, a::UInt)::Nothing
+  @ccall libflint.fmpz_set_ui(z::Ref{ZZRingElemRaw}, a::UInt)::Nothing
   return z
 end
 
 set!(z::ZZRingElemOrPtr, a::Integer) = set!(z, flintify(a))
 
 function swap!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_swap(a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_swap(a::Ref{ZZRingElemRaw}, b::Ref{ZZRingElemRaw})::Nothing
 end
 
 #
 
 function add!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_add(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_add(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
 function add!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Int)
-  @ccall libflint.fmpz_add_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Int)::Nothing
+  @ccall libflint.fmpz_add_si(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Int)::Nothing
   return z
 end
 
 function add!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
-  @ccall libflint.fmpz_add_ui(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::UInt)::Nothing
+  @ccall libflint.fmpz_add_ui(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::UInt)::Nothing
   return z
 end
 
 function add!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::Ptr{Int})
-  @ccall libflint.fmpz_add(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ptr{Int})::Nothing
+  @ccall libflint.fmpz_add(a::Ref{ZZRingElemRaw}, b::Ref{ZZRingElemRaw}, c::Ptr{Int})::Nothing
   return a
 end
 
@@ -2491,17 +2503,17 @@ add!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr) = add!(z, y, x)
 #
 
 function sub!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_sub(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_sub(z::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw}, b::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
 function sub!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Int)
-  @ccall libflint.fmpz_sub_si(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Int)::Nothing
+  @ccall libflint.fmpz_sub_si(z::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw}, b::Int)::Nothing
   return z
 end
 
 function sub!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::UInt)
-  @ccall libflint.fmpz_sub_ui(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::UInt)::Nothing
+  @ccall libflint.fmpz_sub_ui(z::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw}, b::UInt)::Nothing
   return z
 end
 
@@ -2511,17 +2523,17 @@ sub!(z::ZZRingElemOrPtr, a::Integer, b::ZZRingElemOrPtr) = neg!(sub!(z, b, a))
 #
 
 function mul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_mul(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_mul(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
 function mul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Int)
-  @ccall libflint.fmpz_mul_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Int)::Nothing
+  @ccall libflint.fmpz_mul_si(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Int)::Nothing
   return z
 end
 
 function mul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
-  @ccall libflint.fmpz_mul_ui(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::UInt)::Nothing
+  @ccall libflint.fmpz_mul_ui(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::UInt)::Nothing
   return z
 end
 
@@ -2529,24 +2541,24 @@ mul!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer) = mul!(z, a, flintify(b
 mul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr) = mul!(z, y, x)
 
 function mul!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::Ptr{Int})
-  @ccall libflint.fmpz_mul(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ptr{Int})::Nothing
+  @ccall libflint.fmpz_mul(a::Ref{ZZRingElemRaw}, b::Ref{ZZRingElemRaw}, c::Ptr{Int})::Nothing
   return a
 end
 
 #
 
 function addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_addmul(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_addmul(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
 function addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Int)
-  @ccall libflint.fmpz_addmul_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Int)::Nothing
+  @ccall libflint.fmpz_addmul_si(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Int)::Nothing
   return z
 end
 
 function addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
-  @ccall libflint.fmpz_addmul_ui(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::UInt)::Nothing
+  @ccall libflint.fmpz_addmul_ui(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::UInt)::Nothing
   return z
 end
 
@@ -2558,17 +2570,17 @@ addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Union{ZZRingElemOrPtr,Integer
 addmul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr, ::ZZRingElemOrPtr) = addmul!(z, x, y)
 
 function submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_submul(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_submul(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
 function submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Int)
-  @ccall libflint.fmpz_submul_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Int)::Nothing
+  @ccall libflint.fmpz_submul_si(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Int)::Nothing
   return z
 end
 
 function submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
-  @ccall libflint.fmpz_submul_ui(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::UInt)::Nothing
+  @ccall libflint.fmpz_submul_ui(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::UInt)::Nothing
   return z
 end
 
@@ -2584,7 +2596,7 @@ submul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr, ::ZZRingElemOrPtr) =
 Return $r = a b + c d$, changing $r$ in-place.
 """
 function fmma!(r::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::ZZRingElemOrPtr, d::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_fmma(r::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ref{ZZRingElem}, d::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_fmma(r::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw}, b::Ref{ZZRingElemRaw}, c::Ref{ZZRingElemRaw}, d::Ref{ZZRingElemRaw})::Nothing
   return r
 end
 
@@ -2594,24 +2606,24 @@ end
 Return $r = a b - c d$, changing $r$ in-place.
 """
 function fmms!(r::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::ZZRingElemOrPtr, d::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_fmms(r::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ref{ZZRingElem}, d::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_fmms(r::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw}, b::Ref{ZZRingElemRaw}, c::Ref{ZZRingElemRaw}, d::Ref{ZZRingElemRaw})::Nothing
   return r
 end
 
 #
 
 function divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_divexact(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_divexact(z::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw}, b::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
 function divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Int)
-  @ccall libflint.fmpz_divexact_si(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Int)::Nothing
+  @ccall libflint.fmpz_divexact_si(z::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw}, b::Int)::Nothing
   return z
 end
 
 function divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::UInt)
-  @ccall libflint.fmpz_divexact_ui(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::UInt)::Nothing
+  @ccall libflint.fmpz_divexact_ui(z::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw}, b::UInt)::Nothing
   return z
 end
 
@@ -2621,29 +2633,29 @@ divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer) = divexact!(z, a, 
 
 function rem!(a::ZZRingElem, b::ZZRingElem, c::ZZRingElem)
   # FIXME: it seems `rem` and `rem!` for `ZZRingElem` do different things?
-  @ccall libflint.fmpz_mod(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_mod(a::Ref{ZZRingElemRaw}, b::Ref{ZZRingElemRaw}, c::Ref{ZZRingElemRaw})::Nothing
   return a
 end
 
 #
 
 function tdiv_q!(a::ZZRingElem, b::ZZRingElem, c::ZZRingElem)
-  ccall((:fmpz_tdiv_q, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), a, b, c)
+  ccall((:fmpz_tdiv_q, Nemo.libflint), Cvoid, (Ref{ZZRingElemRaw}, Ref{ZZRingElemRaw}, Ref{ZZRingElemRaw}), a, b, c)
 end
 
 function shift_right!(a::ZZRingElem, b::ZZRingElem, i::Int)
-  @ccall Nemo.libflint.fmpz_fdiv_q_2exp(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, i::Int)::Nothing
+  @ccall Nemo.libflint.fmpz_fdiv_q_2exp(a::Ref{ZZRingElemRaw}, b::Ref{ZZRingElemRaw}, i::Int)::Nothing
 end
 
 #
 
 function pow!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, n::Integer)
-  @ccall libflint.fmpz_pow_ui(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, UInt(n)::UInt)::Nothing
+  @ccall libflint.fmpz_pow_ui(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, UInt(n)::UInt)::Nothing
   return z
 end
 
 function pow!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, n::ZZRingElemOrPtr)
-  ok = Bool(@ccall libflint.fmpz_pow_fmpz(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, n::Ref{ZZRingElem})::Cint)
+  ok = Bool(@ccall libflint.fmpz_pow_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, n::Ref{ZZRingElemRaw})::Cint)
   if !ok
     error("unable to compute power")
   end
@@ -2653,12 +2665,12 @@ end
 #
 
 function lcm!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_lcm(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_lcm(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
 function gcd!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.fmpz_gcd(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_gcd(z::Ref{ZZRingElemRaw}, x::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -2716,7 +2728,7 @@ function parse(::Type{ZZRingElem}, s::AbstractString, base::Int = 10)
     s2 = string(s)
   end
   z = ZZRingElem()
-  err = @ccall libflint.fmpz_set_str(z::Ref{ZZRingElem}, s2::Ptr{UInt8}, base::Int32)::Int32
+  err = @ccall libflint.fmpz_set_str(z::Ref{ZZRingElemRaw}, s2::Ptr{UInt8}, base::Int32)::Int32
   err == 0 || error("Invalid big integer: $(repr(s))")
   return sgn < 0 ? -z : z
 end
@@ -2745,7 +2757,7 @@ Return a random signed integer whose absolute value has $b$ bits.
 function rand_bits(::ZZRing, b::Int)
   b >= 0 || throw(DomainError(b, "Bit count must be non-negative"))
   z = ZZRingElem()
-  @ccall libflint.fmpz_randbits(z::Ref{ZZRingElem}, _flint_rand_states[Threads.threadid()]::Ref{rand_ctx}, b::Int)::Nothing
+  @ccall libflint.fmpz_randbits(z::Ref{ZZRingElemRaw}, _flint_rand_states[Threads.threadid()]::Ref{rand_ctx}, b::Int)::Nothing
   return z
 end
 
@@ -2758,7 +2770,7 @@ probable prime is required, one can pass `proved=false`.
 function rand_bits_prime(::ZZRing, n::Int, proved::Bool = true)
   n < 2 && throw(DomainError(n, "No primes with that many bits"))
   z = ZZRingElem()
-  @ccall libflint.fmpz_randprime(z::Ref{ZZRingElem}, _flint_rand_states[Threads.threadid()]::Ref{rand_ctx}, n::Int, Cint(proved)::Cint)::Nothing
+  @ccall libflint.fmpz_randprime(z::Ref{ZZRingElemRaw}, _flint_rand_states[Threads.threadid()]::Ref{rand_ctx}, n::Int, Cint(proved)::Cint)::Nothing
   return z
 end
 
@@ -2804,9 +2816,9 @@ function SamplerFmpz(r::StepRange{ZZRingElem, ZZRingElem})
 end
 
 function rand(rng::AbstractRNG, sp::SamplerFmpz)
-  z = ZZRingElem()
+  z = ZZRingElemRaw()
   # this make sure z is backed up by an mpz_t object:
-  @ccall libflint.fmpz_init2(z::Ref{ZZRingElem}, sp.nlimbsmax::UInt)::Nothing
+  @ccall libflint.fmpz_init2(z::Ref{ZZRingElemRaw}, sp.nlimbsmax::UInt)::Nothing
   @assert !_fmpz_is_small(z)
   GC.@preserve z begin
     x = _as_bigint(z)
@@ -2829,6 +2841,7 @@ function rand(rng::AbstractRNG, sp::SamplerFmpz)
     mul!(z, z, sp.step)
   end
   add!(z, z, sp.a)
+  return ZZRingElem(z)
 end
 
 #TODO
@@ -2856,7 +2869,7 @@ function rand(rng::AbstractRNG, a::ZZRingElemUnitRange)
   while true
     s = ZZRingElem(0)
     for i = 1:nl
-      @ccall libflint.fmpz_mul_2exp(s::Ref{ZZRingElem}, s::Ref{ZZRingElem}, c::Int)::Nothing
+      @ccall libflint.fmpz_mul_2exp(s::Ref{ZZRingElemRaw}, s::Ref{ZZRingElemRaw}, c::Int)::Nothing
       add!(s, s, rand(rng, Base.GMP.Limb))
     end
     if high > 0
@@ -2909,13 +2922,13 @@ end
 
 ZZRingElem(s::AbstractString) = parse(ZZRingElem, s)
 
-ZZRingElem(z::Integer) = ZZRingElem(BigInt(z))
+ZZRingElemRaw(z::Integer) = ZZRingElemRaw(BigInt(z))
 
-ZZRingElem(z::Float16) = ZZRingElem(Float64(z))
+ZZRingElemRaw(z::Float16) = ZZRingElemRaw(Float64(z))
 
-ZZRingElem(z::Float32) = ZZRingElem(Float64(z))
+ZZRingElemRaw(z::Float32) = ZZRingElemRaw(Float64(z))
 
-ZZRingElem(z::BigFloat) = ZZRingElem(BigInt(z))
+ZZRingElemRaw(z::BigFloat) = ZZRingElemRaw(BigInt(z))
 
 ###############################################################################
 #
@@ -2927,24 +2940,24 @@ convert(::Type{ZZRingElem}, a::Integer) = ZZRingElem(a)
 
 function (::Type{BigInt})(a::ZZRingElem)
   r = BigInt()
-  @ccall libflint.fmpz_get_mpz(r::Ref{BigInt}, a::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_get_mpz(r::Ref{BigInt}, a::Ref{ZZRingElemRaw})::Nothing
   return r
 end
 
 function (::Type{Int})(a::ZZRingElem)
   (a > typemax(Int) || a < typemin(Int)) && throw(InexactError(:convert, Int, a))
-  return @ccall libflint.fmpz_get_si(a::Ref{ZZRingElem})::Int
+  return @ccall libflint.fmpz_get_si(a::Ref{ZZRingElemRaw})::Int
 end
 
 function (::Type{UInt})(a::ZZRingElem)
   (a > typemax(UInt) || a < 0) && throw(InexactError(:convert, UInt, a))
-  return @ccall libflint.fmpz_get_ui(a::Ref{ZZRingElem})::UInt
+  return @ccall libflint.fmpz_get_ui(a::Ref{ZZRingElemRaw})::UInt
 end
 
 if Culong !== UInt
   function (::Type{Culong})(a::ZZRingElem)
     fits(Culong, a) || throw(InexactError(:convert, Culong, a))
-    return (@ccall libflint.fmpz_get_ui(a::Ref{ZZRingElem})::UInt) % Culong
+    return (@ccall libflint.fmpz_get_ui(a::Ref{ZZRingElemRaw})::UInt) % Culong
   end
 end
 
@@ -2961,7 +2974,7 @@ convert(::Type{T}, a::ZZRingElem) where T <: Integer = T(a)
 
 function (::Type{Float64})(n::ZZRingElem)
   # rounds to zero
-  @ccall libflint.fmpz_get_d(n::Ref{ZZRingElem})::Float64
+  @ccall libflint.fmpz_get_d(n::Ref{ZZRingElemRaw})::Float64
 end
 
 convert(::Type{Float64}, n::ZZRingElem) = Float64(n)
@@ -3001,14 +3014,14 @@ function _ratrec!(n::ZZRingElem, d::ZZRingElem, a::ZZRingElem, b::ZZRingElem, N:
     tdiv_q!(N, b, D)
     shift_right!(N, N, 1)
     if D>N
-      @ccall Nemo.libflint.fmpz_root(N::Ref{ZZRingElem}, b::Ref{ZZRingElem}, 2::Int)::Nothing
+      @ccall Nemo.libflint.fmpz_root(N::Ref{ZZRingElemRaw}, b::Ref{ZZRingElemRaw}, 2::Int)::Nothing
       shift_right!(D, N, 1)
       done = true
     end
 
 #    @assert 2*N*D < b
 
-    fl = ccall((:_fmpq_reconstruct_fmpz_2, Nemo.libflint), Bool, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), n, d, a, b, N, D)
+    fl = ccall((:_fmpq_reconstruct_fmpz_2, Nemo.libflint), Bool, (Ref{ZZRingElemRaw}, Ref{ZZRingElemRaw}, Ref{ZZRingElemRaw}, Ref{ZZRingElemRaw}, Ref{ZZRingElemRaw}, Ref{ZZRingElemRaw}), n, d, a, b, N, D)
 
     if fl && (nbits(n)+nbits(d) < max(k/2, k - 30) || D>N)
       return fl
@@ -3069,7 +3082,7 @@ function _rational_reconstruction(a::ZZRingElem, b::ZZRingElem; error_tolerant::
   else
     res = QQFieldElem()
     a = mod(a, b)
-    fl = ccall((:fmpq_reconstruct_fmpz, libflint), Cint, (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), res, a, b)
+    fl = ccall((:fmpq_reconstruct_fmpz, libflint), Cint, (Ref{QQFieldElem}, Ref{ZZRingElemRaw}, Ref{ZZRingElemRaw}), res, a, b)
     return Bool(fl), numerator(res), denominator(res)
   end
 end
@@ -3083,7 +3096,7 @@ satisfying $x/y \equiv a \bmod b$ or $a \equiv ya \bmod b$.
 function _rational_reconstruction(a::ZZRingElem, b::ZZRingElem, N::ZZRingElem, D::ZZRingElem)
   res = QQFieldElem()
   a = mod(a, b)
-  fl = ccall((:fmpq_reconstruct_fmpz_2, libflint), Cint, (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), res, a, b, N, D)
+  fl = ccall((:fmpq_reconstruct_fmpz_2, libflint), Cint, (Ref{QQFieldElem}, Ref{ZZRingElemRaw}, Ref{ZZRingElemRaw}, Ref{ZZRingElemRaw}, Ref{ZZRingElemRaw}), res, a, b, N, D)
   return Bool(fl), numerator(res), denominator(res)
 end
 
@@ -3098,7 +3111,7 @@ end
 # ex is not guaranteed to be maximal
 function _is_perfect_power(a::ZZRingElem)
   rt = ZZRingElem()
-  ex = @ccall libflint.fmpz_is_perfect_power(rt::Ref{ZZRingElem}, a::Ref{ZZRingElem})::Int
+  ex = @ccall libflint.fmpz_is_perfect_power(rt::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw})::Int
   return rt, ex
 end
 
@@ -3247,9 +3260,9 @@ struct Limbs
     if Nemo._fmpz_is_small(a)
       return new(a, 0, convert(Ptr{UInt}, 0))
     end
-    z = convert(Ptr{Cint}, unsigned(a.d) << 2)
+    z = convert(Ptr{Cint}, unsigned(data(a)) << 2)
     len = unsafe_load(z, 2)
-    d = convert(Ptr{Ptr{UInt}}, unsigned(a.d) << 2) + 2 * sizeof(Cint)
+    d = convert(Ptr{Ptr{UInt}}, unsigned(data(a)) << 2) + 2 * sizeof(Cint)
     p = unsafe_load(d)
     if !MSW
       new(a, -len, p)
@@ -3265,7 +3278,7 @@ end
 
 @inline function getindex(L::Limbs, i::Int)
   if L.len == 0
-    return UInt(abs(L.a.d)) #error???
+    return UInt(abs(data(L.a))) #error???
   end
   @boundscheck @assert i <= abs(L.len)
   return unsafe_load(L.b, i)
@@ -3348,7 +3361,7 @@ Nemo.bits(a::ZZRingElem) = BitsFmpz(a)
 #= wrong order, thus disabled
 
 function getindex(B::BitsFmpz, i::Int)
-return @ccall libflint.fmpz_tstbit(B.L.a::Ref{ZZRingElem}, i::Int)::Int != 0
+return @ccall libflint.fmpz_tstbit(B.L.a::Ref{ZZRingElemRaw}, i::Int)::Int != 0
 end
 =#
 end
@@ -3367,6 +3380,6 @@ using .BitsMod
 # This bypasses the computation of general bounds.
 function resultant(f::ZZPolyRingElem, g::ZZPolyRingElem, d::ZZRingElem, nb::Int)
   z = ZZRingElem()
-  @ccall libflint.fmpz_poly_resultant_modular_div(z::Ref{ZZRingElem}, f::Ref{ZZPolyRingElem}, g::Ref{ZZPolyRingElem}, d::Ref{ZZRingElem}, nb::Int)::Nothing
+  @ccall libflint.fmpz_poly_resultant_modular_div(z::Ref{ZZRingElemRaw}, f::Ref{ZZPolyRingElem}, g::Ref{ZZPolyRingElem}, d::Ref{ZZRingElemRaw}, nb::Int)::Nothing
   return z
 end

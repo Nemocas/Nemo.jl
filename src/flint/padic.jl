@@ -119,7 +119,7 @@ Return the prime $p$ for the given $p$-adic field.
 """
 function prime(R::PadicField, i::Int = 1)
   z = ZZRingElem()
-  @ccall libflint.padic_ctx_pow_ui(z::Ref{ZZRingElem}, i::Int, R::Ref{PadicField})::Nothing
+  @ccall libflint.padic_ctx_pow_ui(z::Ref{ZZRingElemRaw}, i::Int, R::Ref{PadicField})::Nothing
   return z
 end
 
@@ -163,7 +163,7 @@ function lift(R::ZZRing, a::PadicFieldElem)
   if iszero(a)
     return r
   end
-  @ccall libflint.padic_get_fmpz(r::Ref{ZZRingElem}, a::Ref{PadicFieldElem}, ctx::Ref{PadicField})::Nothing
+  @ccall libflint.padic_get_fmpz(r::Ref{ZZRingElemRaw}, a::Ref{PadicFieldElem}, ctx::Ref{PadicField})::Nothing
   return r
 end
 
@@ -534,7 +534,7 @@ function is_square(a::PadicFieldElem)
   end
   R = parent(a)
   u = ZZRingElem()
-  @ccall libflint.padic_get_unit(u::Ref{ZZRingElem}, a::Ref{PadicFieldElem})::Nothing
+  @ccall libflint.padic_get_unit(u::Ref{ZZRingElemRaw}, a::Ref{PadicFieldElem})::Nothing
   p = prime(R)
   if p == 2
     umod = mod(u, 8)
@@ -684,7 +684,7 @@ function (R::PadicField)(n::ZZRingElem; precision::Int=precision(R))
     N, = remove(n, p)
   end
   z = PadicFieldElem(N + precision)
-  @ccall libflint.padic_set_fmpz(z::Ref{PadicFieldElem}, n::Ref{ZZRingElem}, R::Ref{PadicField})::Nothing
+  @ccall libflint.padic_set_fmpz(z::Ref{PadicFieldElem}, n::Ref{ZZRingElemRaw}, R::Ref{PadicField})::Nothing
   z.parent = R
   return z
 end

@@ -560,7 +560,7 @@ function sqr!(z::ZZiRingElem, a::ZZiRingElem, t::ZZiRingElem)
   else
     mul!(z.y, a.x, a.y)
     sub!(z.x, t.x, t.y)
-    @ccall libflint.fmpz_mul_2exp(z.y::Ref{ZZRingElem}, z.y::Ref{ZZRingElem}, 1::UInt)::Nothing
+    @ccall libflint.fmpz_mul_2exp(z.y::Ref{ZZRingElemRaw}, z.y::Ref{ZZRingElemRaw}, 1::UInt)::Nothing
   end
   return z
 end
@@ -664,7 +664,7 @@ end
 
 function smod(a::ZZRingElem, b::ZZRingElem)
   z = ZZRingElem()
-  @ccall libflint.fmpz_smod(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_smod(z::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw}, b::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 

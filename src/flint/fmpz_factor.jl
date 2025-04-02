@@ -7,11 +7,11 @@
 # raw fmpz_factor version
 function _factor(a::ZZRingElem)
   F = fmpz_factor()
-  @ccall libflint.fmpz_factor(F::Ref{fmpz_factor}, a::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_factor(F::Ref{fmpz_factor}, a::Ref{ZZRingElemRaw})::Nothing
   res = Dict{ZZRingElem, Int}()
   for i in 1:F.num
     z = ZZRingElem()
-    @ccall libflint.fmpz_factor_get_fmpz(z::Ref{ZZRingElem}, F::Ref{fmpz_factor}, (i - 1)::Int)::Nothing
+    @ccall libflint.fmpz_factor_get_fmpz(z::Ref{ZZRingElemRaw}, F::Ref{fmpz_factor}, (i - 1)::Int)::Nothing
     res[z] = unsafe_load(F.exp, i)
   end
   return res, canonical_unit(a)
@@ -76,7 +76,7 @@ end
 function _ecm(a::ZZRingElem, B1::UInt, B2::UInt, ncrv::UInt,
     rnd = _flint_rand_states[Threads.threadid()])
   f = ZZRingElem()
-  r = @ccall libflint.fmpz_factor_ecm(f::Ref{ZZRingElem}, ncrv::UInt, B1::UInt, B2::UInt, rnd::Ref{rand_ctx}, a::Ref{ZZRingElem})::Int32
+  r = @ccall libflint.fmpz_factor_ecm(f::Ref{ZZRingElemRaw}, ncrv::UInt, B1::UInt, B2::UInt, rnd::Ref{rand_ctx}, a::Ref{ZZRingElemRaw})::Int32
   return r, f
 end
 
@@ -217,11 +217,11 @@ end
 
 function factor_trial_range(N::ZZRingElem, start::Int=0, np::Int=10^5)
   F = fmpz_factor()
-  @ccall libflint.fmpz_factor_trial_range(F::Ref{fmpz_factor}, N::Ref{ZZRingElem}, start::UInt, np::UInt)::Nothing
+  @ccall libflint.fmpz_factor_trial_range(F::Ref{fmpz_factor}, N::Ref{ZZRingElemRaw}, start::UInt, np::UInt)::Nothing
   res = Dict{ZZRingElem,Int}()
   for i in 1:F.num
     z = ZZRingElem()
-    @ccall libflint.fmpz_factor_get_fmpz(z::Ref{ZZRingElem}, F::Ref{fmpz_factor}, (i - 1)::Int)::Nothing
+    @ccall libflint.fmpz_factor_get_fmpz(z::Ref{ZZRingElemRaw}, F::Ref{fmpz_factor}, (i - 1)::Int)::Nothing
     res[z] = unsafe_load(F.exp, i)
   end
   return res, canonical_unit(N)

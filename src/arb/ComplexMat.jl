@@ -152,7 +152,7 @@ end
 
 function *(x::ComplexMatrix, y::ZZRingElem)
   z = similar(x)
-  @ccall libflint.acb_mat_scalar_mul_fmpz(z::Ref{ComplexMatrix}, x::Ref{ComplexMatrix}, y::Ref{ZZRingElem}, precision(Balls)::Int)::Nothing
+  @ccall libflint.acb_mat_scalar_mul_fmpz(z::Ref{ComplexMatrix}, x::Ref{ComplexMatrix}, y::Ref{ZZRingElemRaw}, precision(Balls)::Int)::Nothing
   return z
 end
 
@@ -410,7 +410,7 @@ end
 
 function divexact(x::ComplexMatrix, y::ZZRingElem; check::Bool=true)
   z = similar(x)
-  @ccall libflint.acb_mat_scalar_div_fmpz(z::Ref{ComplexMatrix}, x::Ref{ComplexMatrix}, y::Ref{ZZRingElem}, precision(Balls)::Int)::Nothing
+  @ccall libflint.acb_mat_scalar_div_fmpz(z::Ref{ComplexMatrix}, x::Ref{ComplexMatrix}, y::Ref{ZZRingElemRaw}, precision(Balls)::Int)::Nothing
   return z
 end
 
