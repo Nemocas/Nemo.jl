@@ -40,7 +40,7 @@ end
 function _coeff(x::FqFieldElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   z = ZZRingElem()
-  @ccall libflint.fq_default_get_coeff_fmpz(z::Ref{ZZRingElem}, x::Ref{FqFieldElem}, n::Int, parent(x)::Ref{FqField})::Nothing
+  @ccall libflint.fq_default_get_coeff_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{FqFieldElem}, n::Int, parent(x)::Ref{FqField})::Nothing
   return z
 end
 
@@ -62,13 +62,13 @@ _is_gen(a::FqFieldElem) = a == _gen(parent(a))
 
 function characteristic(a::FqField)
   d = ZZRingElem()
-  @ccall libflint.fq_default_ctx_prime(d::Ref{ZZRingElem}, a::Ref{FqField})::Nothing
+  @ccall libflint.fq_default_ctx_prime(d::Ref{ZZRingElemRaw}, a::Ref{FqField})::Nothing
   return d
 end
 
 function order(a::FqField)
   d = ZZRingElem()
-  @ccall libflint.fq_default_ctx_order(d::Ref{ZZRingElem}, a::Ref{FqField})::Nothing
+  @ccall libflint.fq_default_ctx_order(d::Ref{ZZRingElemRaw}, a::Ref{FqField})::Nothing
   return d
 end
 
@@ -104,7 +104,7 @@ julia> lift(ZZ, K(3))
 """
 function lift(R::ZZRing, x::FqFieldElem)
   z = R()
-  ok = @ccall libflint.fq_default_get_fmpz(z::Ref{ZZRingElem}, x::Ref{FqFieldElem}, parent(x)::Ref{FqField})::Cint
+  ok = @ccall libflint.fq_default_get_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{FqFieldElem}, parent(x)::Ref{FqField})::Cint
   ok == 0 && error("cannot lift")
   return z
 end
@@ -434,7 +434,7 @@ function ^(x::FqFieldElem, y::ZZRingElem)
     y = -y
   end
   z = parent(x)()
-  @ccall libflint.fq_default_pow(z::Ref{FqFieldElem}, x::Ref{FqFieldElem}, y::Ref{ZZRingElem}, x.parent::Ref{FqField})::Nothing
+  @ccall libflint.fq_default_pow(z::Ref{FqFieldElem}, x::Ref{FqFieldElem}, y::Ref{ZZRingElemRaw}, x.parent::Ref{FqField})::Nothing
   return z
 end
 
@@ -556,13 +556,13 @@ end
 
 function _tr(x::FqFieldElem)
   z = ZZRingElem()
-  @ccall libflint.fq_default_trace(z::Ref{ZZRingElem}, x::Ref{FqFieldElem}, x.parent::Ref{FqField})::Nothing
+  @ccall libflint.fq_default_trace(z::Ref{ZZRingElemRaw}, x::Ref{FqFieldElem}, x.parent::Ref{FqField})::Nothing
   return z
 end
 
 function _norm(x::FqFieldElem)
   z = ZZRingElem()
-  @ccall libflint.fq_default_norm(z::Ref{ZZRingElem}, x::Ref{FqFieldElem}, x.parent::Ref{FqField})::Nothing
+  @ccall libflint.fq_default_norm(z::Ref{ZZRingElemRaw}, x::Ref{FqFieldElem}, x.parent::Ref{FqField})::Nothing
   return z
 end
 
@@ -617,7 +617,7 @@ function set!(z::FqFieldElem, a::UInt)
 end
 
 function set!(z::FqFieldElem, a::ZZRingElemOrPtr)
-  @ccall libflint.fq_default_set_fmpz(z::Ref{FqFieldElem}, a::Ref{ZZRingElem}, parent(z)::Ref{FqField})::Nothing
+  @ccall libflint.fq_default_set_fmpz(z::Ref{FqFieldElem}, a::Ref{ZZRingElemRaw}, parent(z)::Ref{FqField})::Nothing
   z.poly = nothing
   return z
 end
@@ -679,7 +679,7 @@ function mul!(z::FqFieldElem, x::FqFieldElem, y::FqFieldElem)
 end
 
 function mul!(z::FqFieldElem, x::FqFieldElem, y::ZZRingElemOrPtr)
-  @ccall libflint.fq_default_mul_fmpz(z::Ref{FqFieldElem}, x::Ref{FqFieldElem}, y::Ref{ZZRingElem}, x.parent::Ref{FqField})::Nothing
+  @ccall libflint.fq_default_mul_fmpz(z::Ref{FqFieldElem}, x::Ref{FqFieldElem}, y::Ref{ZZRingElemRaw}, x.parent::Ref{FqField})::Nothing
   z.poly = nothing
   return z
 end

@@ -142,7 +142,7 @@ function degree_fmpz(a::fqPolyRepMPolyRingElem, i::Int)
   n = nvars(parent(a))
   !(1 <= i <= n) && error("Index must be between 1 and $n")
   d = ZZRingElem()
-  @ccall libflint.fq_nmod_mpoly_degree_fmpz(d::Ref{ZZRingElem}, a::Ref{fqPolyRepMPolyRingElem}, (i - 1)::Int, a.parent::Ref{fqPolyRepMPolyRing})::Nothing
+  @ccall libflint.fq_nmod_mpoly_degree_fmpz(d::Ref{ZZRingElemRaw}, a::Ref{fqPolyRepMPolyRingElem}, (i - 1)::Int, a.parent::Ref{fqPolyRepMPolyRing})::Nothing
   return d
 end
 
@@ -169,7 +169,7 @@ function degrees_fmpz(a::fqPolyRepMPolyRingElem)
   for i in 1:n
     degs[i] = ZZRingElem()
   end
-  @ccall libflint.fq_nmod_mpoly_degrees_fmpz(degs::Ptr{Ref{ZZRingElem}}, a::Ref{fqPolyRepMPolyRingElem}, a.parent::Ref{fqPolyRepMPolyRing})::Nothing
+  @ccall libflint.fq_nmod_mpoly_degrees_fmpz(degs::Ptr{Ref{ZZRingElemRaw}}, a::Ref{fqPolyRepMPolyRingElem}, a.parent::Ref{fqPolyRepMPolyRing})::Nothing
   return degs
 end
 
@@ -191,7 +191,7 @@ end
 # Total degree as an ZZRingElem
 function total_degree_fmpz(a::fqPolyRepMPolyRingElem)
   d = ZZRingElem()
-  @ccall libflint.fq_nmod_mpoly_total_degree_fmpz(d::Ref{ZZRingElem}, a::Ref{fqPolyRepMPolyRingElem}, a.parent::Ref{fqPolyRepMPolyRing})::Nothing
+  @ccall libflint.fq_nmod_mpoly_total_degree_fmpz(d::Ref{ZZRingElemRaw}, a::Ref{fqPolyRepMPolyRingElem}, a.parent::Ref{fqPolyRepMPolyRing})::Nothing
   return d
 end
 
@@ -285,7 +285,7 @@ end
 function ^(a::fqPolyRepMPolyRingElem, b::ZZRingElem)
   b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
   z = parent(a)()
-  r = @ccall libflint.fq_nmod_mpoly_pow_fmpz(z::Ref{fqPolyRepMPolyRingElem}, a::Ref{fqPolyRepMPolyRingElem}, b::Ref{ZZRingElem}, parent(a)::Ref{fqPolyRepMPolyRing})::Cint
+  r = @ccall libflint.fq_nmod_mpoly_pow_fmpz(z::Ref{fqPolyRepMPolyRingElem}, a::Ref{fqPolyRepMPolyRingElem}, b::Ref{ZZRingElemRaw}, parent(a)::Ref{fqPolyRepMPolyRing})::Cint
   iszero(r) && error("Unable to compute power")
   return z
 end
@@ -696,7 +696,7 @@ function exponent_vector!(z::Vector{UInt}, a::fqPolyRepMPolyRingElem, i::Int)
 end
 
 function exponent_vector!(z::Vector{ZZRingElem}, a::fqPolyRepMPolyRingElem, i::Int)
-  @ccall libflint.fq_nmod_mpoly_get_term_exp_fmpz(z::Ptr{Ref{ZZRingElem}}, a::Ref{fqPolyRepMPolyRingElem}, (i - 1)::Int, parent(a)::Ref{fqPolyRepMPolyRing})::Nothing
+  @ccall libflint.fq_nmod_mpoly_get_term_exp_fmpz(z::Ptr{Ref{ZZRingElemRaw}}, a::Ref{fqPolyRepMPolyRingElem}, (i - 1)::Int, parent(a)::Ref{fqPolyRepMPolyRing})::Nothing
   return z
 end
 

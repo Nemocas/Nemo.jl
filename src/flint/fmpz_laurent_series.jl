@@ -124,7 +124,7 @@ function polcoeff(a::ZZLaurentSeriesRingElem, n::Int)
     return ZZRingElem(0)
   end
   z = ZZRingElem()
-  @ccall libflint.fmpz_poly_get_coeff_fmpz(z::Ref{ZZRingElem}, a::Ref{ZZLaurentSeriesRingElem}, n::Int)::Nothing
+  @ccall libflint.fmpz_poly_get_coeff_fmpz(z::Ref{ZZRingElemRaw}, a::Ref{ZZLaurentSeriesRingElem}, n::Int)::Nothing
   return z
 end
 
@@ -1024,7 +1024,7 @@ function zero!(a::ZZLaurentSeriesRingElem)
 end
 
 function setcoeff!(c::ZZLaurentSeriesRingElem, n::Int, a::ZZRingElem)
-  @ccall libflint.fmpz_poly_set_coeff_fmpz(c::Ref{ZZLaurentSeriesRingElem}, n::Int, a::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_poly_set_coeff_fmpz(c::Ref{ZZLaurentSeriesRingElem}, n::Int, a::Ref{ZZRingElemRaw})::Nothing
   return c
 end
 

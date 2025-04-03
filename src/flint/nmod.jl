@@ -440,7 +440,7 @@ function (R::zzModRing)(a::UInt)
 end
 
 function (R::zzModRing)(a::ZZRingElem)
-  d = @ccall libflint.fmpz_fdiv_ui(a::Ref{ZZRingElem}, R.n::UInt)::UInt
+  d = @ccall libflint.fmpz_fdiv_ui(a::Ref{ZZRingElemRaw}, R.n::UInt)::UInt
   return zzModRingElem(d, R)
 end
 

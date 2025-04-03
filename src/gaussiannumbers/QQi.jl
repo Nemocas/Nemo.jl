@@ -246,7 +246,7 @@ end
 
 function reduce!(z::QQiFieldElem)
   g = ZZRingElem()
-  @ccall libflint.fmpz_gcd3(g::Ref{ZZRingElem}, z.num.x::Ref{ZZRingElem}, z.den::Ref{ZZRingElem}, z.num.y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_gcd3(g::Ref{ZZRingElemRaw}, z.num.x::Ref{ZZRingElemRaw}, z.den::Ref{ZZRingElemRaw}, z.num.y::Ref{ZZRingElemRaw})::Nothing
   if is_negative(z.den)
     neg!(g, g)
   end

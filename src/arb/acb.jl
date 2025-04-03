@@ -231,7 +231,7 @@ for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
     function ($f)(x::AcbFieldElem, y::ZZRingElem)
       z = parent(x)()
       ccall(($("acb_"*s*"_fmpz"), libflint), Nothing,
-            (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ZZRingElem}, Int),
+            (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ZZRingElemRaw}, Int),
             z, x, y, parent(x).prec)
       return z
     end
@@ -279,7 +279,7 @@ end
 
 function -(x::ZZRingElem, y::AcbFieldElem)
   z = parent(y)()
-  @ccall libflint.acb_sub_fmpz(z::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, x::Ref{ZZRingElem}, parent(y).prec::Int)::Nothing
+  @ccall libflint.acb_sub_fmpz(z::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, x::Ref{ZZRingElemRaw}, parent(y).prec::Int)::Nothing
   return neg!(z)
 end
 
@@ -446,13 +446,13 @@ Returns `true` if the box $x$ contains the given integer value, otherwise
 return `false`.
 """
 function contains(x::AcbFieldElem, y::ZZRingElem)
-  r = @ccall libflint.acb_contains_fmpz(x::Ref{AcbFieldElem}, y::Ref{ZZRingElem})::Cint
+  r = @ccall libflint.acb_contains_fmpz(x::Ref{AcbFieldElem}, y::Ref{ZZRingElemRaw})::Cint
   return Bool(r)
 end
 
 function contains(x::AcbFieldElem, y::Int)
   v = ZZRingElem(y)
-  r = @ccall libflint.acb_contains_fmpz(x::Ref{AcbFieldElem}, v::Ref{ZZRingElem})::Cint
+  r = @ccall libflint.acb_contains_fmpz(x::Ref{AcbFieldElem}, v::Ref{ZZRingElemRaw})::Cint
   return Bool(r)
 end
 
@@ -593,7 +593,7 @@ end
 
 function ldexp(x::AcbFieldElem, y::ZZRingElem)
   z = parent(x)()
-  @ccall libflint.acb_mul_2exp_fmpz(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.acb_mul_2exp_fmpz(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -625,7 +625,7 @@ integer.
 """
 function unique_integer(x::AcbFieldElem)
   z = ZZRingElem()
-  unique = @ccall libflint.acb_get_unique_fmpz(z::Ref{ZZRingElem}, x::Ref{AcbFieldElem})::Int
+  unique = @ccall libflint.acb_get_unique_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{AcbFieldElem})::Int
   return (unique != 0, z)
 end
 
@@ -1616,11 +1616,11 @@ function _acb_set(x::AcbFieldElemOrPtr, y::Union{Int,UInt,Float64}, p::Int)
 end
 
 function _acb_set(x::AcbFieldElemOrPtr, y::ZZRingElem)
-  @ccall libflint.acb_set_fmpz(x::Ref{AcbFieldElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.acb_set_fmpz(x::Ref{AcbFieldElem}, y::Ref{ZZRingElemRaw})::Nothing
 end
 
 function _acb_set(x::AcbFieldElemOrPtr, y::ZZRingElem, p::Int)
-  @ccall libflint.acb_set_round_fmpz(x::Ref{AcbFieldElem}, y::Ref{ZZRingElem}, p::Int)::Nothing
+  @ccall libflint.acb_set_round_fmpz(x::Ref{AcbFieldElem}, y::Ref{ZZRingElemRaw}, p::Int)::Nothing
 end
 
 function _acb_set(x::AcbFieldElemOrPtr, y::QQFieldElem, p::Int)

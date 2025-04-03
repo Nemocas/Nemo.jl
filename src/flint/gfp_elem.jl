@@ -417,15 +417,15 @@ function (R::fpField)(a::UInt)
 end
 
 function (R::fpField)(a::ZZRingElem)
-  d = @ccall libflint.fmpz_fdiv_ui(a::Ref{ZZRingElem}, R.n::UInt)::UInt
+  d = @ccall libflint.fmpz_fdiv_ui(a::Ref{ZZRingElemRaw}, R.n::UInt)::UInt
   return fpFieldElem(d, R)
 end
 
 function (R::fpField)(a::QQFieldElem)
   num = numerator(a, false)
   den = denominator(a, false)
-  n = @ccall libflint.fmpz_fdiv_ui(num::Ref{ZZRingElem}, R.n::UInt)::UInt
-  d = @ccall libflint.fmpz_fdiv_ui(den::Ref{ZZRingElem}, R.n::UInt)::UInt
+  n = @ccall libflint.fmpz_fdiv_ui(num::Ref{ZZRingElemRaw}, R.n::UInt)::UInt
+  d = @ccall libflint.fmpz_fdiv_ui(den::Ref{ZZRingElemRaw}, R.n::UInt)::UInt
   V = [UInt(0)]
   g = @ccall libflint.n_gcdinv(V::Ptr{UInt}, d::UInt, R.n::UInt)::UInt
   g != 1 && error("Unable to coerce")

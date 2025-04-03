@@ -609,7 +609,7 @@ function fit!(z::FqRelPowerSeriesRingElem, n::Int)
 end
 
 function setcoeff!(z::FqRelPowerSeriesRingElem, n::Int, x::ZZRingElem)
-  @ccall libflint.fq_default_poly_set_coeff_fmpz(z::Ref{FqRelPowerSeriesRingElem}, n::Int, x::Ref{ZZRingElem}, base_ring(z)::Ref{FqField})::Nothing
+  @ccall libflint.fq_default_poly_set_coeff_fmpz(z::Ref{FqRelPowerSeriesRingElem}, n::Int, x::Ref{ZZRingElemRaw}, base_ring(z)::Ref{FqField})::Nothing
   return z
 end
 

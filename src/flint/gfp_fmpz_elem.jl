@@ -155,7 +155,7 @@ function *(x::FpFieldElem, y::FpFieldElem)
   check_parent(x, y)
   R = parent(x)
   d = ZZRingElem()
-  @ccall libflint.fmpz_mod_mul(d::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_mul(d::Ref{ZZRingElemRaw}, x.data::Ref{ZZRingElemRaw}, y.data::Ref{ZZRingElemRaw}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return FpFieldElem(d, R)
 end
 
@@ -205,14 +205,14 @@ function ^(x::FpFieldElem, y::Int)
     y = -y
   end
   d = ZZRingElem()
-  @ccall libflint.fmpz_mod_pow_ui(d::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y::UInt, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_pow_ui(d::Ref{ZZRingElemRaw}, x.data::Ref{ZZRingElemRaw}, y::UInt, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return FpFieldElem(d, R)
 end
 
 function ^(x::FpFieldElem, y::ZZRingElem)
   R = parent(x)
   z = R()
-  if 0 == @ccall libflint.fmpz_mod_pow_fmpz(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Cint
+  if 0 == @ccall libflint.fmpz_mod_pow_fmpz(z.data::Ref{ZZRingElemRaw}, x.data::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw}, R.ninv::Ref{fmpz_mod_ctx_struct})::Cint
     if iszero(x)
       throw(DivideError())
     else
@@ -262,7 +262,7 @@ function inv(x::FpFieldElem)
   iszero(x) && throw(DivideError())
   s = ZZRingElem()
   g = ZZRingElem()
-  @ccall libflint.fmpz_gcdinv(g::Ref{ZZRingElem}, s::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_gcdinv(g::Ref{ZZRingElemRaw}, s::Ref{ZZRingElemRaw}, x.data::Ref{ZZRingElemRaw}, R.n::Ref{ZZRingElemRaw})::Nothing
   return FpFieldElem(s, R)
 end
 
@@ -301,7 +301,7 @@ function Base.sqrt(a::FpFieldElem; check::Bool=true)
     return zero(R)
   end
   z = ZZRingElem()
-  flag = @ccall libflint.fmpz_sqrtmod(z::Ref{ZZRingElem}, a.data::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Bool
+  flag = @ccall libflint.fmpz_sqrtmod(z::Ref{ZZRingElemRaw}, a.data::Ref{ZZRingElemRaw}, R.n::Ref{ZZRingElemRaw})::Bool
   check && !flag && error("Not a square in sqrt")
   return FpFieldElem(z, R)
 end
@@ -311,7 +311,7 @@ function is_square(a::FpFieldElem)
   if iszero(a) || R.n == 2
     return true
   end
-  r = @ccall libflint.fmpz_jacobi(a.data::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Cint
+  r = @ccall libflint.fmpz_jacobi(a.data::Ref{ZZRingElemRaw}, R.n::Ref{ZZRingElemRaw})::Cint
   return isone(r)
 end
 
@@ -321,7 +321,7 @@ function is_square_with_sqrt(a::FpFieldElem)
     return true, a
   end
   z = ZZRingElem()
-  r = @ccall libflint.fmpz_sqrtmod(z::Ref{ZZRingElem}, a.data::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Cint
+  r = @ccall libflint.fmpz_sqrtmod(z::Ref{ZZRingElemRaw}, a.data::Ref{ZZRingElemRaw}, R.n::Ref{ZZRingElemRaw})::Cint
   if iszero(r)
     return false, zero(R)
   end
@@ -356,15 +356,15 @@ end
 
 function mul!(z::FpFieldElem, x::FpFieldElem, y::FpFieldElem)
   R = parent(z)
-  @ccall libflint.fmpz_mod_mul(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_mul(z.data::Ref{ZZRingElemRaw}, x.data::Ref{ZZRingElemRaw}, y.data::Ref{ZZRingElemRaw}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
 function mul!(z::FpFieldElem, x::FpFieldElem, y::ZZRingElem)
   R = parent(x)
   if z !== x
-    @ccall libflint.fmpz_mod(z.data::Ref{ZZRingElem}, y::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
-    @ccall libflint.fmpz_mod_mul(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, z.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+    @ccall libflint.fmpz_mod(z.data::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw}, R.n::Ref{ZZRingElemRaw})::Nothing
+    @ccall libflint.fmpz_mod_mul(z.data::Ref{ZZRingElemRaw}, x.data::Ref{ZZRingElemRaw}, z.data::Ref{ZZRingElemRaw}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
     return z
   else
     return mul!(z, x, R(y))
@@ -373,7 +373,7 @@ end
 
 function add!(z::FpFieldElem, x::FpFieldElem, y::FpFieldElem)
   R = parent(z)
-  @ccall libflint.fmpz_mod_add(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_add(z.data::Ref{ZZRingElemRaw}, x.data::Ref{ZZRingElemRaw}, y.data::Ref{ZZRingElemRaw}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
@@ -440,7 +440,7 @@ end
 
 function (R::FpField)(a::ZZRingElem)
   d = ZZRingElem()
-  @ccall libflint.fmpz_mod(d::Ref{ZZRingElem}, a::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_mod(d::Ref{ZZRingElemRaw}, a::Ref{ZZRingElemRaw}, R.n::Ref{ZZRingElemRaw})::Nothing
   return FpFieldElem(d, R)
 end
 

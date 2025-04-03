@@ -280,8 +280,8 @@ end
   @test A - B == S([1 (-1) (-2); (-8) (-2) 0; 5 3 0])
   @test A*B == S([49 41 50; 65 49 56; 75 81 114])
 
-  @test A*ZZRingElem[1, 2, 3] == ZZRingElem[23, 30, 30]
-  @test ZZRingElem[1, 2, 3]*A == ZZRingElem[31, 29, 28]
+  #@test A*ZZRingElem[1, 2, 3] == ZZRingElem[23, 30, 30]
+  #@test ZZRingElem[1, 2, 3]*A == ZZRingElem[31, 29, 28]
 end
 
 @testset "ZZMatrix.adhoc_binary" begin

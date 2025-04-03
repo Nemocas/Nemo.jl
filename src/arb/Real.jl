@@ -218,7 +218,7 @@ Returns `true` if the ball $x$ contains the given integer value, otherwise
 return `false`.
 """
 function contains(x::RealFieldElem, y::ZZRingElem)
-  r = @ccall libflint.arb_contains_fmpz(x::Ref{RealFieldElem}, y::Ref{ZZRingElem})::Cint
+  r = @ccall libflint.arb_contains_fmpz(x::Ref{RealFieldElem}, y::Ref{ZZRingElemRaw})::Cint
   return Bool(r)
 end
 
@@ -638,7 +638,7 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
     function ($f)(x::RealFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
       z = RealFieldElem()
       ccall(($("arb_"*s*"_fmpz"), libflint), Nothing,
-            (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{ZZRingElem}, Int),
+            (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{ZZRingElemRaw}, Int),
             z, x, y, prec)
       return z
     end
@@ -674,7 +674,7 @@ end
 
 function -(x::RealFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
   z = RealFieldElem()
-  @ccall libflint.arb_sub_fmpz(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{ZZRingElem}, prec::Int)::Nothing
+  @ccall libflint.arb_sub_fmpz(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{ZZRingElemRaw}, prec::Int)::Nothing
   return z
 end
 
@@ -717,7 +717,7 @@ end
 
 function //(x::RealFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
   z = RealFieldElem()
-  @ccall libflint.arb_div_fmpz(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{ZZRingElem}, prec::Int)::Nothing
+  @ccall libflint.arb_div_fmpz(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{ZZRingElemRaw}, prec::Int)::Nothing
   return z
 end
 
@@ -749,7 +749,7 @@ end
 
 function ^(x::RealFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
   z = RealFieldElem()
-  @ccall libflint.arb_pow_fmpz(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{ZZRingElem}, prec::Int)::Nothing
+  @ccall libflint.arb_pow_fmpz(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{ZZRingElemRaw}, prec::Int)::Nothing
   return z
 end
 
@@ -880,7 +880,7 @@ end
 
 function ldexp(x::RealFieldElem, y::ZZRingElem)
   z = RealFieldElem()
-  @ccall libflint.arb_mul_2exp_fmpz(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.arb_mul_2exp_fmpz(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -912,7 +912,7 @@ integer.
 """
 function unique_integer(x::RealFieldElem)
   z = ZZRingElem()
-  unique = @ccall libflint.arb_get_unique_fmpz(z::Ref{ZZRingElem}, x::Ref{RealFieldElem})::Int
+  unique = @ccall libflint.arb_get_unique_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{RealFieldElem})::Int
   return (unique != 0, z)
 end
 
@@ -1490,7 +1490,7 @@ Return the $n$-th Fibonacci number in the given Arb field.
 """
 function fibonacci(n::ZZRingElem, r::RealField, prec::Int = precision(Balls))
   z = r()
-  @ccall libflint.arb_fib_fmpz(z::Ref{RealFieldElem}, n::Ref{ZZRingElem}, prec::Int)::Nothing
+  @ccall libflint.arb_fib_fmpz(z::Ref{RealFieldElem}, n::Ref{ZZRingElemRaw}, prec::Int)::Nothing
   return z
 end
 
@@ -1514,7 +1514,7 @@ Return the Gamma function evaluated at $x$ in the given Arb field.
 """
 function gamma(x::ZZRingElem, r::RealField, prec::Int = precision(Balls))
   z = r()
-  @ccall libflint.arb_gamma_fmpz(z::Ref{RealFieldElem}, x::Ref{ZZRingElem}, prec::Int)::Nothing
+  @ccall libflint.arb_gamma_fmpz(z::Ref{RealFieldElem}, x::Ref{ZZRingElemRaw}, prec::Int)::Nothing
   return z
 end
 
@@ -1678,7 +1678,7 @@ Return the Bell number $B_n$ as an element of $r$.
 """
 function bell(n::ZZRingElem, r::RealField, prec::Int = precision(Balls))
   z = r()
-  @ccall libflint.arb_bell_fmpz(z::Ref{RealFieldElem}, n::Ref{ZZRingElem}, prec::Int)::Nothing
+  @ccall libflint.arb_bell_fmpz(z::Ref{RealFieldElem}, n::Ref{ZZRingElemRaw}, prec::Int)::Nothing
   return z
 end
 
@@ -1696,7 +1696,7 @@ Return the number of partitions $p(n)$ as an element of $r$.
 """
 function numpart(n::ZZRingElem, r::RealField, prec::Int = precision(Balls))
   z = r()
-  @ccall libflint.arb_partitions_fmpz(z::Ref{RealFieldElem}, n::Ref{ZZRingElem}, prec::Int)::Nothing
+  @ccall libflint.arb_partitions_fmpz(z::Ref{RealFieldElem}, n::Ref{ZZRingElemRaw}, prec::Int)::Nothing
   return z
 end
 
@@ -1842,7 +1842,7 @@ function simplest_rational_inside(x::RealFieldElem)
   b = ZZRingElem()
   e = ZZRingElem()
 
-  @ccall libflint.arb_get_interval_fmpz_2exp(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, e::Ref{ZZRingElem}, x::Ref{RealFieldElem})::Nothing
+  @ccall libflint.arb_get_interval_fmpz_2exp(a::Ref{ZZRingElemRaw}, b::Ref{ZZRingElemRaw}, e::Ref{ZZRingElemRaw}, x::Ref{RealFieldElem})::Nothing
   !fits(Int, e) && error("Result does not fit into an QQFieldElem")
   _e = Int(e)
   if e >= 0
@@ -1909,11 +1909,11 @@ function _arb_set(x::RealFieldElemOrPtr, y::Union{Int,UInt,Float64}, p::Int)
 end
 
 function _arb_set(x::RealFieldElemOrPtr, y::ZZRingElem)
-  @ccall libflint.arb_set_fmpz(x::Ref{RealFieldElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.arb_set_fmpz(x::Ref{RealFieldElem}, y::Ref{ZZRingElemRaw})::Nothing
 end
 
 function _arb_set(x::RealFieldElemOrPtr, y::ZZRingElem, p::Int)
-  @ccall libflint.arb_set_round_fmpz(x::Ref{RealFieldElem}, y::Ref{ZZRingElem}, p::Int)::Nothing
+  @ccall libflint.arb_set_round_fmpz(x::Ref{RealFieldElem}, y::Ref{ZZRingElemRaw}, p::Int)::Nothing
 end
 
 function _arb_set(x::RealFieldElemOrPtr, y::QQFieldElem, p::Int)

@@ -265,7 +265,7 @@ for (etype, rtype, mtype, brtype) in (
       z = parent(y)()
       z.prec = y.prec
       z.val = y.val
-      r = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, modulus(y)::UInt)::UInt
+      r = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElemRaw}, modulus(y)::UInt)::UInt
       @ccall libflint.nmod_poly_scalar_mul_nmod(z::Ref{($etype)}, y::Ref{($etype)}, r::UInt)::Nothing
       renormalize!(z)
       return z
@@ -446,14 +446,14 @@ for (etype, rtype, mtype, brtype) in (
         return false
       elseif pol_length(x) == 1
         if x.val == 0
-          r = @ccall libflint.fmpz_fdiv_ui(y::Ref{ZZRingElem}, modulus(x)::UInt)::UInt
+          r = @ccall libflint.fmpz_fdiv_ui(y::Ref{ZZRingElemRaw}, modulus(x)::UInt)::UInt
           z = @ccall libflint.nmod_poly_get_coeff_ui(x::Ref{($etype)}, 0::Int)::UInt
           return r == z
         else
           return false
         end
       else
-        r = @ccall libflint.fmpz_fdiv_ui(y::Ref{ZZRingElem}, modulus(x)::UInt)::UInt
+        r = @ccall libflint.fmpz_fdiv_ui(y::Ref{ZZRingElemRaw}, modulus(x)::UInt)::UInt
         return r == UInt(0)
       end
     end
@@ -535,7 +535,7 @@ for (etype, rtype, mtype, brtype) in (
       z.prec = x.prec
       z.prec = x.prec
       z.val = x.val
-      r = @ccall libflint.fmpz_fdiv_ui(y::Ref{ZZRingElem}, modulus(x)::UInt)::UInt
+      r = @ccall libflint.fmpz_fdiv_ui(y::Ref{ZZRingElemRaw}, modulus(x)::UInt)::UInt
       rinv = inv(base_ring(x)(r))
       @ccall libflint.nmod_poly_scalar_mul_nmod(z::Ref{($etype)}, x::Ref{($etype)}, data(rinv)::UInt)::Nothing
       return z
@@ -640,7 +640,7 @@ for (etype, rtype, mtype, brtype) in (
     end
 
     function setcoeff!(z::($etype), n::Int, x::ZZRingElem)
-      r = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, modulus(z)::UInt)::UInt
+      r = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElemRaw}, modulus(z)::UInt)::UInt
       @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{($etype)}, n::Int, r::UInt)::Nothing
       return z
     end

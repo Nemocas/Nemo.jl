@@ -220,7 +220,7 @@ for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
     function ($f)(x::ComplexFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
       z = ComplexFieldElem()
       ccall(($("acb_"*s*"_fmpz"), libflint), Nothing,
-            (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ZZRingElem}, Int),
+            (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ZZRingElemRaw}, Int),
             z, x, y, prec)
       return z
     end
@@ -268,7 +268,7 @@ end
 
 function -(x::ZZRingElem, y::ComplexFieldElem)
   z = ComplexFieldElem()
-  @ccall libflint.acb_sub_fmpz(z::Ref{ComplexFieldElem}, y::Ref{ComplexFieldElem}, x::Ref{ZZRingElem}, precision(Balls)::Int)::Nothing
+  @ccall libflint.acb_sub_fmpz(z::Ref{ComplexFieldElem}, y::Ref{ComplexFieldElem}, x::Ref{ZZRingElemRaw}, precision(Balls)::Int)::Nothing
   return neg!(z)
 end
 
@@ -435,13 +435,13 @@ Returns `true` if the box $x$ contains the given integer value, otherwise
 return `false`.
 """
 function contains(x::ComplexFieldElem, y::ZZRingElem)
-  r = @ccall libflint.acb_contains_fmpz(x::Ref{ComplexFieldElem}, y::Ref{ZZRingElem})::Cint
+  r = @ccall libflint.acb_contains_fmpz(x::Ref{ComplexFieldElem}, y::Ref{ZZRingElemRaw})::Cint
   return Bool(r)
 end
 
 function contains(x::ComplexFieldElem, y::Int)
   v = ZZRingElem(y)
-  r = @ccall libflint.acb_contains_fmpz(x::Ref{ComplexFieldElem}, v::Ref{ZZRingElem})::Cint
+  r = @ccall libflint.acb_contains_fmpz(x::Ref{ComplexFieldElem}, v::Ref{ZZRingElemRaw})::Cint
   return Bool(r)
 end
 
@@ -567,7 +567,7 @@ end
 
 function ldexp(x::ComplexFieldElem, y::ZZRingElem)
   z = ComplexFieldElem()
-  @ccall libflint.acb_mul_2exp_fmpz(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.acb_mul_2exp_fmpz(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -599,7 +599,7 @@ integer.
 """
 function unique_integer(x::ComplexFieldElem)
   z = ZZRingElem()
-  unique = @ccall libflint.acb_get_unique_fmpz(z::Ref{ZZRingElem}, x::Ref{ComplexFieldElem})::Int
+  unique = @ccall libflint.acb_get_unique_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{ComplexFieldElem})::Int
   return (unique != 0, z)
 end
 
@@ -1619,11 +1619,11 @@ function _acb_set(x::ComplexFieldElemOrPtr, y::Union{Int,UInt,Float64}, p::Int)
 end
 
 function _acb_set(x::ComplexFieldElemOrPtr, y::ZZRingElem)
-  @ccall libflint.acb_set_fmpz(x::Ref{ComplexFieldElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.acb_set_fmpz(x::Ref{ComplexFieldElem}, y::Ref{ZZRingElemRaw})::Nothing
 end
 
 function _acb_set(x::ComplexFieldElemOrPtr, y::ZZRingElem, p::Int)
-  @ccall libflint.acb_set_round_fmpz(x::Ref{ComplexFieldElem}, y::Ref{ZZRingElem}, p::Int)::Nothing
+  @ccall libflint.acb_set_round_fmpz(x::Ref{ComplexFieldElem}, y::Ref{ZZRingElemRaw}, p::Int)::Nothing
 end
 
 function _acb_set(x::ComplexFieldElemOrPtr, y::QQFieldElem, p::Int)

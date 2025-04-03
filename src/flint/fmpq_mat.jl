@@ -669,12 +669,12 @@ function mul!(z::Vector{QQFieldElem}, a::QQMatrixOrPtr, b::Vector{QQFieldElem})
 end
 
 function mul!(z::Vector{QQFieldElem}, a::Vector{ZZRingElem}, b::QQMatrixOrPtr)
-  @ccall libflint.fmpq_mat_fmpz_vec_mul_ptr(z::Ptr{Ref{QQFieldElem}}, a::Ptr{Ref{ZZRingElem}}, length(a)::Int, b::Ref{QQMatrix})::Nothing
+  @ccall libflint.fmpq_mat_fmpz_vec_mul_ptr(z::Ptr{Ref{QQFieldElem}}, a::Ptr{Ref{ZZRingElemRaw}}, length(a)::Int, b::Ref{QQMatrix})::Nothing
   return z
 end
 
 function mul!(z::Vector{QQFieldElem}, a::QQMatrixOrPtr, b::Vector{ZZRingElem})
-  @ccall libflint.fmpq_mat_mul_fmpz_vec_ptr(z::Ptr{Ref{QQFieldElem}}, a::Ref{QQMatrix}, b::Ptr{Ref{ZZRingElem}}, length(b)::Int)::Nothing
+  @ccall libflint.fmpq_mat_mul_fmpz_vec_ptr(z::Ptr{Ref{QQFieldElem}}, a::Ref{QQMatrix}, b::Ptr{Ref{ZZRingElemRaw}}, length(b)::Int)::Nothing
   return z
 end
 
@@ -687,7 +687,7 @@ function mul!(z::QQMatrixOrPtr, a::QQMatrixOrPtr, b::QQFieldElemOrPtr)
 end
 
 function mul!(z::QQMatrixOrPtr, a::QQMatrixOrPtr, b::ZZRingElemOrPtr)
-  @ccall libflint.fmpq_mat_scalar_mul_fmpz(z::Ref{QQMatrix}, a::Ref{QQMatrix}, b::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpq_mat_scalar_mul_fmpz(z::Ref{QQMatrix}, a::Ref{QQMatrix}, b::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -706,7 +706,7 @@ function divexact!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::QQFieldElemOrPtr)
 end
 
 function divexact!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.fmpq_mat_scalar_div_fmpz(z::Ref{QQMatrix}, x::Ref{QQMatrix}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpq_mat_scalar_div_fmpz(z::Ref{QQMatrix}, x::Ref{QQMatrix}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 

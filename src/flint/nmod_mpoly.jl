@@ -155,7 +155,7 @@ for (etype, rtype, ftype, ctype, utype) in (
       n = nvars(parent(a))
       (i <= 0 || i > n) && error("Index must be between 1 and $n")
       d = ZZRingElem()
-      @ccall libflint.nmod_mpoly_degree_fmpz(d::Ref{ZZRingElem}, a::Ref{($etype)}, (i - 1)::Int, parent(a)::Ref{($rtype)})::Nothing
+      @ccall libflint.nmod_mpoly_degree_fmpz(d::Ref{ZZRingElemRaw}, a::Ref{($etype)}, (i - 1)::Int, parent(a)::Ref{($rtype)})::Nothing
       return d
     end
 
@@ -181,7 +181,7 @@ for (etype, rtype, ftype, ctype, utype) in (
       for i in 1:n
         degs[i] = ZZRingElem()
       end
-      @ccall libflint.nmod_mpoly_degrees_fmpz(degs::Ptr{Ref{ZZRingElem}}, a::Ref{($etype)}, parent(a)::Ref{($rtype)})::Nothing
+      @ccall libflint.nmod_mpoly_degrees_fmpz(degs::Ptr{Ref{ZZRingElemRaw}}, a::Ref{($etype)}, parent(a)::Ref{($rtype)})::Nothing
       return degs
     end
 
@@ -202,7 +202,7 @@ for (etype, rtype, ftype, ctype, utype) in (
     # Total degree as an ZZRingElem
     function total_degree_fmpz(a::($etype))
       d = ZZRingElem()
-      @ccall libflint.nmod_mpoly_total_degree_fmpz(d::Ref{ZZRingElem}, a::Ref{($etype)}, parent(a)::Ref{($rtype)})::Nothing
+      @ccall libflint.nmod_mpoly_total_degree_fmpz(d::Ref{ZZRingElemRaw}, a::Ref{($etype)}, parent(a)::Ref{($rtype)})::Nothing
       return d
     end
 
@@ -332,7 +332,7 @@ for (etype, rtype, ftype, ctype, utype) in (
     function ^(a::($etype), b::ZZRingElem)
       b < 0 && throw(DomainError(b, "Exponent must be non-negative"))
       z = parent(a)()
-      ok = @ccall libflint.nmod_mpoly_pow_fmpz(z::Ref{($etype)}, a::Ref{($etype)}, b::Ref{ZZRingElem}, parent(a)::Ref{($rtype)})::Cint
+      ok = @ccall libflint.nmod_mpoly_pow_fmpz(z::Ref{($etype)}, a::Ref{($etype)}, b::Ref{ZZRingElemRaw}, parent(a)::Ref{($rtype)})::Cint
       !isone(ok) && error("Unable to compute power")
       return z
     end
@@ -743,7 +743,7 @@ for (etype, rtype, ftype, ctype, utype) in (
     end
 
     function exponent_vector!(z::Vector{ZZRingElem}, a::($etype), i::Int)
-      @ccall libflint.nmod_mpoly_get_term_exp_fmpz(z::Ptr{Ref{ZZRingElem}}, a::Ref{($etype)}, (i - 1)::Int, parent(a)::Ref{($rtype)})::Nothing
+      @ccall libflint.nmod_mpoly_get_term_exp_fmpz(z::Ptr{Ref{ZZRingElemRaw}}, a::Ref{($etype)}, (i - 1)::Int, parent(a)::Ref{($rtype)})::Nothing
       return z
     end
 

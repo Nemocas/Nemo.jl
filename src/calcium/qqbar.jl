@@ -58,7 +58,7 @@ end
 
 function QQBarFieldElem(a::ZZRingElem)
   z = QQBarFieldElem()
-  @ccall libflint.qqbar_set_fmpz(z::Ref{QQBarFieldElem}, a::Ref{ZZRingElem})::Nothing
+  @ccall libflint.qqbar_set_fmpz(z::Ref{QQBarFieldElem}, a::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -235,7 +235,7 @@ minimal polynomial of `x`. The result is returned as an `ZZRingElem`.
 function denominator(x::QQBarFieldElem)
   d = degree(x)
   q = ZZRingElem()
-  @ccall libflint.fmpz_poly_get_coeff_fmpz(q::Ref{ZZRingElem}, x::Ref{QQBarFieldElem}, d::Int)::Nothing
+  @ccall libflint.fmpz_poly_get_coeff_fmpz(q::Ref{ZZRingElemRaw}, x::Ref{QQBarFieldElem}, d::Int)::Nothing
   return q
 end
 
@@ -256,7 +256,7 @@ Return the height of the algebraic number `x`. The result is an `ZZRingElem` int
 """
 function height(x::QQBarFieldElem)
   z = ZZRingElem()
-  @ccall libflint.qqbar_height(z::Ref{ZZRingElem}, x::Ref{QQBarFieldElem})::Nothing
+  @ccall libflint.qqbar_height(z::Ref{ZZRingElemRaw}, x::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -399,7 +399,7 @@ end
 function divexact(a::QQBarFieldElem, b::ZZRingElem; check::Bool=true)
   iszero(b) && throw(DivideError())
   z = QQBarFieldElem()
-  @ccall libflint.qqbar_div_fmpz(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Ref{ZZRingElem})::Nothing
+  @ccall libflint.qqbar_div_fmpz(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -420,7 +420,7 @@ end
 function divexact(a::ZZRingElem, b::QQBarFieldElem; check::Bool=true)
   iszero(b) && throw(DivideError())
   z = QQBarFieldElem()
-  @ccall libflint.qqbar_fmpz_div(z::Ref{QQBarFieldElem}, a::Ref{ZZRingElem}, b::Ref{QQBarFieldElem})::Nothing
+  @ccall libflint.qqbar_fmpz_div(z::Ref{QQBarFieldElem}, a::Ref{ZZRingElemRaw}, b::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -696,7 +696,7 @@ end
 
 function floor(::Type{ZZRingElem}, a::QQBarFieldElem)
   z = ZZRingElem()
-  @ccall libflint.qqbar_floor(z::Ref{ZZRingElem}, a::Ref{QQBarFieldElem})::Nothing
+  @ccall libflint.qqbar_floor(z::Ref{ZZRingElemRaw}, a::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -706,7 +706,7 @@ end
 
 function ceil(::Type{ZZRingElem}, a::QQBarFieldElem)
   z = ZZRingElem()
-  @ccall libflint.qqbar_ceil(z::Ref{ZZRingElem}, a::Ref{QQBarFieldElem})::Nothing
+  @ccall libflint.qqbar_ceil(z::Ref{ZZRingElemRaw}, a::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -1273,7 +1273,7 @@ Throws if `a` is not an integer.
 function ZZRingElem(a::QQBarFieldElem)
   !isinteger(a) && throw(DomainError(a, "noninteger algebraic number"))
   z = ZZRingElem()
-  @ccall libflint.qqbar_get_fmpz(z::Ref{ZZRingElem}, a::Ref{QQBarFieldElem})::Nothing
+  @ccall libflint.qqbar_get_fmpz(z::Ref{ZZRingElemRaw}, a::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -1337,7 +1337,7 @@ function add!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::QQFieldElemOrPt
 end
 
 function add!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.qqbar_add_fmpz(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.qqbar_add_fmpz(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -1367,7 +1367,7 @@ function sub!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::QQFieldElemOrPt
 end
 
 function sub!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.qqbar_sub_fmpz(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.qqbar_sub_fmpz(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -1387,7 +1387,7 @@ function sub!(z::QQBarFieldElemOrPtr, x::QQFieldElemOrPtr, y::QQBarFieldElemOrPt
 end
 
 function sub!(z::QQBarFieldElemOrPtr, x::ZZRingElemOrPtr, y::QQBarFieldElemOrPtr)
-  @ccall libflint.qqbar_fmpz_sub(z::Ref{QQBarFieldElemOrPtr}, x::Ref{ZZRingElem}, y::Ref{QQBarFieldElemOrPtr})::Nothing
+  @ccall libflint.qqbar_fmpz_sub(z::Ref{QQBarFieldElemOrPtr}, x::Ref{ZZRingElemRaw}, y::Ref{QQBarFieldElemOrPtr})::Nothing
   return z
 end
 
@@ -1417,7 +1417,7 @@ function mul!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::QQFieldElemOrPt
 end
 
 function mul!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.qqbar_mul_fmpz(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.qqbar_mul_fmpz(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -1443,7 +1443,7 @@ function pow!(z::QQBarFieldElemOrPtr, a::QQBarFieldElemOrPtr, b::QQBarFieldElemO
 end
 
 function pow!(z::QQBarFieldElemOrPtr, a::QQBarFieldElemOrPtr, b::ZZRingElemOrPtr)
-  @ccall libflint.qqbar_pow_fmpz(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Ref{ZZRingElem})::Nothing
+  @ccall libflint.qqbar_pow_fmpz(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem}, b::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 

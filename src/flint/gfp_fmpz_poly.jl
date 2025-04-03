@@ -59,7 +59,7 @@ end
 
 function *(x::FpPolyRingElem, y::ZZRingElem)
   z = parent(x)()
-  @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{ZZRingElemRaw}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
@@ -86,7 +86,7 @@ end
 
 function +(x::FpPolyRingElem, y::ZZRingElem)
   z = parent(x)()
-  @ccall libflint.fmpz_mod_poly_add_fmpz(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_add_fmpz(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{ZZRingElemRaw}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
@@ -117,13 +117,13 @@ end
 
 function -(x::FpPolyRingElem, y::ZZRingElem)
   z = parent(x)()
-  @ccall libflint.fmpz_mod_poly_sub_fmpz(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_sub_fmpz(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{ZZRingElemRaw}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
 function -(x::ZZRingElem, y::FpPolyRingElem)
   z = parent(y)()
-  @ccall libflint.fmpz_mod_poly_fmpz_sub(z::Ref{FpPolyRingElem}, x::Ref{ZZRingElem}, y::Ref{FpPolyRingElem}, y.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_fmpz_sub(z::Ref{FpPolyRingElem}, x::Ref{ZZRingElemRaw}, y::Ref{FpPolyRingElem}, y.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
@@ -153,7 +153,7 @@ function ==(x::FpPolyRingElem, y::FpFieldElem)
     return false
   elseif length(x) == 1 
     u = ZZRingElem()
-    @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(u::Ref{ZZRingElem}, x::Ref{FpPolyRingElem}, 0::Int, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+    @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(u::Ref{ZZRingElemRaw}, x::Ref{FpPolyRingElem}, 0::Int, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
     return u == y
   else
     return iszero(y)
@@ -172,7 +172,7 @@ function divexact(x::FpPolyRingElem, y::FpFieldElem; check::Bool=true)
   base_ring(x) != parent(y) && error("Elements must have same parent")
   iszero(y) && throw(DivideError())
   q = parent(x)()
-  @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(q::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y.data::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(q::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y.data::Ref{ZZRingElemRaw}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return q
 end
 

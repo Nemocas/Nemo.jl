@@ -47,7 +47,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       if len > 0
         c = ZZRingElem()
         while len > 0
-          @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(c::Ref{ZZRingElem}, a::Ref{($etype)}, (len - 1)::Int, a.parent.base_ring.ninv::Ref{($ctype)})::Nothing
+          @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(c::Ref{ZZRingElemRaw}, a::Ref{($etype)}, (len - 1)::Int, a.parent.base_ring.ninv::Ref{($ctype)})::Nothing
           if !iszero(c)
             break
           end
@@ -69,7 +69,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
         return R(0)
       end
       z = ZZRingElem()
-      @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(z::Ref{ZZRingElem}, x::Ref{($etype)}, n::Int, x.parent.base_ring.ninv::Ref{($ctype)})::Nothing
+      @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{($etype)}, n::Int, x.parent.base_ring.ninv::Ref{($ctype)})::Nothing
       return R(z)
     end
 
@@ -266,7 +266,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       z = parent(y)()
       z.prec = y.prec
       z.val = y.val
-      @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(z::Ref{($etype)}, y::Ref{($etype)}, x.data::Ref{ZZRingElem}, y.parent.base_ring.ninv::Ref{($ctype)})::Nothing
+      @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(z::Ref{($etype)}, y::Ref{($etype)}, x.data::Ref{ZZRingElemRaw}, y.parent.base_ring.ninv::Ref{($ctype)})::Nothing
       renormalize!(z)
       return z
     end
@@ -277,7 +277,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       z = parent(y)()
       z.prec = y.prec
       z.val = y.val
-      @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(z::Ref{($etype)}, y::Ref{($etype)}, x::Ref{ZZRingElem}, y.parent.base_ring.ninv::Ref{($ctype)})::Nothing
+      @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(z::Ref{($etype)}, y::Ref{($etype)}, x::Ref{ZZRingElemRaw}, y.parent.base_ring.ninv::Ref{($ctype)})::Nothing
       renormalize!(z)
       return z
     end
@@ -428,8 +428,8 @@ for (etype, rtype, ctype, mtype, brtype) in (
       elseif pol_length(x) == 1
         if x.val == 0
           z = ZZRingElem()
-          @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(z::Ref{ZZRingElem}, x::Ref{($etype)}, 0::Int, x.parent.base_ring.ninv::Ref{($ctype)})::Nothing
-          return Bool(@ccall libflint.fmpz_equal(z::Ref{ZZRingElem}, y.data::Ref{ZZRingElem})::Cint)
+          @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{($etype)}, 0::Int, x.parent.base_ring.ninv::Ref{($ctype)})::Nothing
+          return Bool(@ccall libflint.fmpz_equal(z::Ref{ZZRingElemRaw}, y.data::Ref{ZZRingElemRaw})::Cint)
         else
           return false
         end
@@ -448,9 +448,9 @@ for (etype, rtype, ctype, mtype, brtype) in (
       elseif pol_length(x) == 1
         if x.val == 0
           z = ZZRingElem()
-          @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(z::Ref{ZZRingElem}, x::Ref{($etype)}, 0::Int, x.parent.base_ring.ninv::Ref{($ctype)})::Nothing
+          @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{($etype)}, 0::Int, x.parent.base_ring.ninv::Ref{($ctype)})::Nothing
           r = mod(y, modulus(x))
-          return Bool(@ccall libflint.fmpz_equal(z::Ref{ZZRingElem}, r::Ref{ZZRingElem})::Cint)
+          return Bool(@ccall libflint.fmpz_equal(z::Ref{ZZRingElemRaw}, r::Ref{ZZRingElemRaw})::Cint)
         else
           return false
         end
@@ -505,7 +505,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       z = parent(x)()
       z.prec = x.prec
       z.val = x.val
-      @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(z::Ref{($etype)}, x::Ref{($etype)}, y.data::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{($ctype)})::Nothing
+      @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(z::Ref{($etype)}, x::Ref{($etype)}, y.data::Ref{ZZRingElemRaw}, x.parent.base_ring.ninv::Ref{($ctype)})::Nothing
       return z
     end
 
@@ -516,7 +516,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       z.prec = x.prec
       z.val = x.val
       r = mod(y, modulus(x))
-      @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(z::Ref{($etype)}, x::Ref{($etype)}, r::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{($ctype)})::Nothing
+      @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(z::Ref{($etype)}, x::Ref{($etype)}, r::Ref{ZZRingElemRaw}, x.parent.base_ring.ninv::Ref{($ctype)})::Nothing
       return z
     end
 
@@ -600,12 +600,12 @@ for (etype, rtype, ctype, mtype, brtype) in (
     end
 
     function setcoeff!(z::($etype), n::Int, x::ZZRingElem)
-      @ccall libflint.fmpz_mod_poly_set_coeff_fmpz(z::Ref{($etype)}, n::Int, x::Ref{ZZRingElem}, z.parent.base_ring.ninv::Ref{($ctype)})::Nothing
+      @ccall libflint.fmpz_mod_poly_set_coeff_fmpz(z::Ref{($etype)}, n::Int, x::Ref{ZZRingElemRaw}, z.parent.base_ring.ninv::Ref{($ctype)})::Nothing
       return z
     end
 
     function setcoeff!(z::($etype), n::Int, x::($mtype))
-      @ccall libflint.fmpz_mod_poly_set_coeff_fmpz(z::Ref{($etype)}, n::Int, x.data::Ref{ZZRingElem}, z.parent.base_ring.ninv::Ref{($ctype)})::Nothing
+      @ccall libflint.fmpz_mod_poly_set_coeff_fmpz(z::Ref{($etype)}, n::Int, x.data::Ref{ZZRingElemRaw}, z.parent.base_ring.ninv::Ref{($ctype)})::Nothing
       return z
     end
 

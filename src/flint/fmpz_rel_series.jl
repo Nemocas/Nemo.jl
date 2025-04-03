@@ -39,12 +39,12 @@ max_precision(R::ZZRelPowerSeriesRing) = R.prec_max
 function normalise(a::ZZRelPowerSeriesRingElem, len::Int)
   if len > 0
     c = ZZRingElem()
-    @ccall libflint.fmpz_poly_get_coeff_fmpz(c::Ref{ZZRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, (len - 1)::Int)::Nothing
+    @ccall libflint.fmpz_poly_get_coeff_fmpz(c::Ref{ZZRingElemRaw}, a::Ref{ZZRelPowerSeriesRingElem}, (len - 1)::Int)::Nothing
   end
   while len > 0 && iszero(c)
     len -= 1
     if len > 0
-      @ccall libflint.fmpz_poly_get_coeff_fmpz(c::Ref{ZZRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, (len - 1)::Int)::Nothing
+      @ccall libflint.fmpz_poly_get_coeff_fmpz(c::Ref{ZZRingElemRaw}, a::Ref{ZZRelPowerSeriesRingElem}, (len - 1)::Int)::Nothing
     end
   end
   return len
@@ -59,7 +59,7 @@ function polcoeff(x::ZZRelPowerSeriesRingElem, n::Int)
     return ZZRingElem(0)
   end
   z = ZZRingElem()
-  @ccall libflint.fmpz_poly_get_coeff_fmpz(z::Ref{ZZRingElem}, x::Ref{ZZRelPowerSeriesRingElem}, n::Int)::Nothing
+  @ccall libflint.fmpz_poly_get_coeff_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{ZZRelPowerSeriesRingElem}, n::Int)::Nothing
   return z
 end
 
@@ -260,7 +260,7 @@ function *(x::ZZRingElem, y::ZZRelPowerSeriesRingElem)
   z = parent(y)()
   z.prec = y.prec
   z.val = y.val
-  @ccall libflint.fmpz_poly_scalar_mul_fmpz(z::Ref{ZZRelPowerSeriesRingElem}, y::Ref{ZZRelPowerSeriesRingElem}, x::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_poly_scalar_mul_fmpz(z::Ref{ZZRelPowerSeriesRingElem}, y::Ref{ZZRelPowerSeriesRingElem}, x::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -407,8 +407,8 @@ function ==(x::ZZRelPowerSeriesRingElem, y::ZZRingElem)
   elseif pol_length(x) == 1
     if x.val == 0
       z = ZZRingElem()
-      @ccall libflint.fmpz_poly_get_coeff_fmpz(z::Ref{ZZRingElem}, x::Ref{ZZRelPowerSeriesRingElem}, 0::Int)::Nothing
-      return @ccall libflint.fmpz_equal(z::Ref{ZZRingElem}, y::Ref{ZZRingElem}, 0::Int)::Bool
+      @ccall libflint.fmpz_poly_get_coeff_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{ZZRelPowerSeriesRingElem}, 0::Int)::Nothing
+      return @ccall libflint.fmpz_equal(z::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw}, 0::Int)::Bool
     else
       return false
     end
@@ -472,7 +472,7 @@ function divexact(x::ZZRelPowerSeriesRingElem, y::ZZRingElem; check::Bool=true)
   z.prec = x.prec
   z.prec = x.prec
   z.val = x.val
-  @ccall libflint.fmpz_poly_scalar_divexact_fmpz(z::Ref{ZZRelPowerSeriesRingElem}, x::Ref{ZZRelPowerSeriesRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_poly_scalar_divexact_fmpz(z::Ref{ZZRelPowerSeriesRingElem}, x::Ref{ZZRelPowerSeriesRingElem}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -536,7 +536,7 @@ function fit!(z::ZZRelPowerSeriesRingElem, n::Int)
 end
 
 function setcoeff!(z::ZZRelPowerSeriesRingElem, n::Int, x::ZZRingElem)
-  @ccall libflint.fmpz_poly_set_coeff_fmpz(z::Ref{ZZRelPowerSeriesRingElem}, n::Int, x::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_poly_set_coeff_fmpz(z::Ref{ZZRelPowerSeriesRingElem}, n::Int, x::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 

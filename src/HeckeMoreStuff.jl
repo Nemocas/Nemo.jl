@@ -102,7 +102,7 @@ function roots(f::ZZModPolyRingElem, fac::Fac{ZZRingElem})
   res = fmpz_mod_poly_factor(base_ring(f))
   _fac = fmpz_factor()
   for (p, e) in fac
-    @ccall libflint._fmpz_factor_append(_fac::Ref{fmpz_factor}, p::Ref{ZZRingElem}, UInt(e)::UInt)::Nothing
+    @ccall libflint._fmpz_factor_append(_fac::Ref{fmpz_factor}, p::Ref{ZZRingElemRaw}, UInt(e)::UInt)::Nothing
   end
   @ccall libflint.fmpz_mod_poly_roots_factored(res::Ref{fmpz_mod_poly_factor}, f::Ref{ZZModPolyRingElem}, 1::Cint, _fac::Ref{fmpz_factor}, base_ring(f).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   _res = Tuple{ZZModRingElem,Int}[]
@@ -274,7 +274,7 @@ end
 #Assuming that the denominator of a is one, reduces all the coefficients modulo p
 # non-symmetric (positive) residue system
 function mod!(a::AbsSimpleNumFieldElem, b::ZZRingElem)
-  @ccall libflint.nf_elem_mod_fmpz(a::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_mod_fmpz(a::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElemRaw}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return a
 end
 
@@ -288,7 +288,7 @@ This function returns $b$.
 function numerator(a::AbsSimpleNumFieldElem)
   _one = one(ZZ)
   z = deepcopy(a)
-  @ccall libflint.nf_elem_set_den(z::Ref{AbsSimpleNumFieldElem}, _one::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_set_den(z::Ref{AbsSimpleNumFieldElem}, _one::Ref{ZZRingElemRaw}, a.parent::Ref{AbsSimpleNumField})::Nothing
   return z
 end
 
@@ -354,7 +354,7 @@ function invmod(f::ZZModPolyRingElem, M::ZZModPolyRingElem)
   if !is_unit(f)
     r = parent(f)()
     ff = ZZ()
-    i = @ccall libflint.fmpz_mod_poly_invmod_f(ff::Ref{ZZRingElem}, r::Ref{ZZModPolyRingElem}, f::Ref{ZZModPolyRingElem}, M::Ref{ZZModPolyRingElem}, f.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Int
+    i = @ccall libflint.fmpz_mod_poly_invmod_f(ff::Ref{ZZRingElemRaw}, r::Ref{ZZModPolyRingElem}, f::Ref{ZZModPolyRingElem}, M::Ref{ZZModPolyRingElem}, f.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Int
     if iszero(i)
       error("not yet implemented")
     else

@@ -36,7 +36,7 @@ $a$.
 """
 function denominator(a::QQPolyRingElem)
   z = ZZRingElem()
-  @ccall libflint.fmpq_poly_get_denominator(z::Ref{ZZRingElem}, a::Ref{QQPolyRingElem})::Nothing
+  @ccall libflint.fmpq_poly_get_denominator(z::Ref{ZZRingElemRaw}, a::Ref{QQPolyRingElem})::Nothing
   return z
 end
 
@@ -340,7 +340,7 @@ end
 function divexact(x::QQPolyRingElem, y::ZZRingElem; check::Bool=true)
   iszero(y) && throw(DivideError())
   z = parent(x)()
-  @ccall libflint.fmpq_poly_scalar_div_fmpz(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpq_poly_scalar_div_fmpz(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -412,7 +412,7 @@ end
 
 function evaluate(x::QQPolyRingElem, y::ZZRingElem)
   z = QQFieldElem()
-  @ccall libflint.fmpq_poly_evaluate_fmpz(z::Ref{QQFieldElem}, x::Ref{QQPolyRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpq_poly_evaluate_fmpz(z::Ref{QQFieldElem}, x::Ref{QQPolyRingElem}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -563,7 +563,7 @@ for (factor_fn, factor_fn_inner, flint_fn) in
            ccall(($flint_fn, libflint), Nothing,
                  (Ref{fmpz_poly_factor}, Ref{ZZPolyRingElem}), fac, y)
            z = ZZRingElem()
-           @ccall libflint.fmpz_poly_factor_get_fmpz(z::Ref{ZZRingElem}, fac::Ref{fmpz_poly_factor})::Nothing
+           @ccall libflint.fmpz_poly_factor_get_fmpz(z::Ref{ZZRingElemRaw}, fac::Ref{fmpz_poly_factor})::Nothing
            f = ZZPolyRingElem()
            for i in 1:fac.num
              @ccall libflint.fmpz_poly_factor_get_fmpz_poly(f::Ref{ZZPolyRingElem}, fac::Ref{fmpz_poly_factor}, (i - 1)::Int)::Nothing
@@ -684,7 +684,7 @@ function set!(z::QQPolyRingElemOrPtr, a::QQFieldElemOrPtr)
 end
 
 function set!(z::QQPolyRingElemOrPtr, a::ZZRingElemOrPtr)
-  @ccall libflint.fmpq_poly_set_fmpz(z::Ref{QQPolyRingElem}, a::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpq_poly_set_fmpz(z::Ref{QQPolyRingElem}, a::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -703,7 +703,7 @@ set!(z::QQPolyRingElemOrPtr, a::Union{Integer, Rational}) = set!(z, flintify(a))
 #
 
 function setcoeff!(z::QQPolyRingElemOrPtr, n::Int, x::ZZRingElemOrPtr)
-  @ccall libflint.fmpq_poly_set_coeff_fmpz(z::Ref{QQPolyRingElem}, n::Int, x::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpq_poly_set_coeff_fmpz(z::Ref{QQPolyRingElem}, n::Int, x::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -737,7 +737,7 @@ function add!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::QQFieldElemOrPt
 end
 
 function add!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.fmpq_poly_add_fmpz(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpq_poly_add_fmpz(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -764,7 +764,7 @@ function sub!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::QQFieldElemOrPt
 end
 
 function sub!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.fmpq_poly_sub_fmpz(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpq_poly_sub_fmpz(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -779,7 +779,7 @@ function sub!(z::QQPolyRingElemOrPtr, x::QQFieldElemOrPtr, y::QQPolyRingElemOrPt
 end
 
 function sub!(z::QQPolyRingElemOrPtr, x::ZZRingElemOrPtr, y::QQPolyRingElemOrPtr)
-  @ccall libflint.fmpq_poly_fmpz_sub(z::Ref{QQPolyRingElem}, x::Ref{ZZRingElem}, y::Ref{QQPolyRingElem})::Nothing
+  @ccall libflint.fmpq_poly_fmpz_sub(z::Ref{QQPolyRingElem}, x::Ref{ZZRingElemRaw}, y::Ref{QQPolyRingElem})::Nothing
   return z
 end
 
@@ -805,7 +805,7 @@ function mul!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::QQFieldElemOrPt
 end
 
 function mul!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.fmpq_poly_scalar_mul_fmpz(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpq_poly_scalar_mul_fmpz(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Ref{ZZRingElemRaw})::Nothing
   return z
 end
 
@@ -880,7 +880,7 @@ end
 function fmpq_poly_to_fq_default_poly_raw!(r::FqPolyRingElem, a::QQPolyRingElem, t1::ZZPolyRingElem=ZZPolyRingElem(), t2::ZZRingElem=ZZRingElem())
   @ccall libflint.fmpq_poly_get_numerator(t1::Ref{ZZPolyRingElem}, a::Ref{QQPolyRingElem})::Nothing
   @ccall libflint.fq_default_poly_set_fmpz_poly(r::Ref{FqPolyRingElem}, t1::Ref{ZZPolyRingElem}, base_ring(parent(r))::Ref{FqField})::Nothing
-  @ccall libflint.fmpq_poly_get_denominator(t2::Ref{ZZRingElem}, a::Ref{QQPolyRingElem})::Nothing
+  @ccall libflint.fmpq_poly_get_denominator(t2::Ref{ZZRingElemRaw}, a::Ref{QQPolyRingElem})::Nothing
   if !isone(t2)
     @ccall libflint.fq_default_poly_scalar_div_fq_default(r::Ref{FqPolyRingElem}, r::Ref{FqPolyRingElem}, coefficient_ring(r)(t2)::Ref{FqFieldElem}, coefficient_ring(r)::Ref{FqField})::Nothing
   end
@@ -896,11 +896,11 @@ end
 function fmpq_poly_to_fmpz_mod_poly_raw!(r::ZZModPolyRingElem, a::QQPolyRingElem, t1::ZZPolyRingElem=ZZPolyRingElem(), t2::ZZRingElem=ZZRingElem())
   @ccall libflint.fmpq_poly_get_numerator(t1::Ref{ZZPolyRingElem}, a::Ref{QQPolyRingElem})::Nothing
   @ccall libflint.fmpz_mod_poly_set_fmpz_poly(r::Ref{ZZModPolyRingElem}, t1::Ref{ZZPolyRingElem}, base_ring(parent(r)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  @ccall libflint.fmpq_poly_get_denominator(t2::Ref{ZZRingElem}, a::Ref{QQPolyRingElem})::Nothing
+  @ccall libflint.fmpq_poly_get_denominator(t2::Ref{ZZRingElemRaw}, a::Ref{QQPolyRingElem})::Nothing
   if !isone(t2)
-    res = @ccall libflint.fmpz_invmod(t2::Ref{ZZRingElem}, t2::Ref{ZZRingElem}, modulus(base_ring(r))::Ref{ZZRingElem})::Cint
+    res = @ccall libflint.fmpz_invmod(t2::Ref{ZZRingElemRaw}, t2::Ref{ZZRingElemRaw}, modulus(base_ring(r))::Ref{ZZRingElemRaw})::Cint
     @assert res != 0
-    @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(r::Ref{ZZModPolyRingElem}, r::Ref{ZZModPolyRingElem}, t2::Ref{ZZRingElem}, base_ring(parent(r)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+    @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(r::Ref{ZZModPolyRingElem}, r::Ref{ZZModPolyRingElem}, t2::Ref{ZZRingElemRaw}, base_ring(parent(r)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   end
   return r
 end
@@ -914,11 +914,11 @@ end
 function fmpq_poly_to_gfp_fmpz_poly_raw!(r::FpPolyRingElem, a::QQPolyRingElem, t1::ZZPolyRingElem=ZZPolyRingElem(), t2::ZZRingElem=ZZRingElem())
   @ccall libflint.fmpq_poly_get_numerator(t1::Ref{ZZPolyRingElem}, a::Ref{QQPolyRingElem})::Nothing
   @ccall libflint.fmpz_mod_poly_set_fmpz_poly(r::Ref{FpPolyRingElem}, t1::Ref{ZZPolyRingElem}, base_ring(parent(r)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  @ccall libflint.fmpq_poly_get_denominator(t2::Ref{ZZRingElem}, a::Ref{QQPolyRingElem})::Nothing
+  @ccall libflint.fmpq_poly_get_denominator(t2::Ref{ZZRingElemRaw}, a::Ref{QQPolyRingElem})::Nothing
   if !isone(t2)
-    res = @ccall libflint.fmpz_invmod(t2::Ref{ZZRingElem}, t2::Ref{ZZRingElem}, modulus(base_ring(r))::Ref{ZZRingElem})::Cint
+    res = @ccall libflint.fmpz_invmod(t2::Ref{ZZRingElemRaw}, t2::Ref{ZZRingElemRaw}, modulus(base_ring(r))::Ref{ZZRingElemRaw})::Cint
     @assert res != 0
-    @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(r::Ref{FpPolyRingElem}, r::Ref{FpPolyRingElem}, t2::Ref{ZZRingElem}, base_ring(parent(r)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+    @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(r::Ref{FpPolyRingElem}, r::Ref{FpPolyRingElem}, t2::Ref{ZZRingElemRaw}, base_ring(parent(r)).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   end
   return r
 end
@@ -987,7 +987,7 @@ end
 function (a::QQPolyRing)(b::Vector{ZZRingElem}, copy::Bool=true) 
   x = a()
   for i=1:length(b)
-    @ccall libflint.fmpq_poly_set_coeff_fmpz(x::Ref{QQPolyRingElem}, (i - 1)::Int, b[i]::Ref{ZZRingElem})::Cvoid
+    @ccall libflint.fmpq_poly_set_coeff_fmpz(x::Ref{QQPolyRingElem}, (i - 1)::Int, b[i]::Ref{ZZRingElemRaw})::Cvoid
   end
   return x
 end

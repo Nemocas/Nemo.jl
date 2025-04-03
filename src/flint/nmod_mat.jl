@@ -58,8 +58,8 @@ end
 # as per setindex! but no reduction mod n and no bounds checking
 function setindex_raw!(a::T, u::ZZRingElem, i::Int, j::Int) where T <: Zmodn_mat
   t = ZZRingElem()
-  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, u::Ref{ZZRingElem}, a.n::UInt)::UInt
-  tt = @ccall libflint.fmpz_get_ui(t::Ref{ZZRingElem})::UInt
+  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElemRaw}, u::Ref{ZZRingElemRaw}, a.n::UInt)::UInt
+  tt = @ccall libflint.fmpz_get_ui(t::Ref{ZZRingElemRaw})::UInt
   setindex_raw!(a, tt, i, j)
 end
 
@@ -288,8 +288,8 @@ end
 
 function *(x::T, y::ZZRingElem) where T <: Zmodn_mat
   t = ZZRingElem()
-  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, y::Ref{ZZRingElem}, x.n::UInt)::UInt
-  tt = @ccall libflint.fmpz_get_ui(t::Ref{ZZRingElem})::UInt
+  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElemRaw}, y::Ref{ZZRingElemRaw}, x.n::UInt)::UInt
+  tt = @ccall libflint.fmpz_get_ui(t::Ref{ZZRingElemRaw})::UInt
   return x*tt
 end
 

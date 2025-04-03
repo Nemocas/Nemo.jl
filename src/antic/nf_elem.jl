@@ -92,7 +92,7 @@ end
 
 function num_coeff!(z::ZZRingElem, x::AbsSimpleNumFieldElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
-  @ccall libflint.nf_elem_get_coeff_fmpz(z::Ref{ZZRingElem}, x::Ref{AbsSimpleNumFieldElem}, n::Int, parent(x)::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_get_coeff_fmpz(z::Ref{ZZRingElemRaw}, x::Ref{AbsSimpleNumFieldElem}, n::Int, parent(x)::Ref{AbsSimpleNumField})::Nothing
   return z
 end
 
@@ -160,7 +160,7 @@ field element.
 """
 function denominator(a::AbsSimpleNumFieldElem)
   z = ZZRingElem()
-  @ccall libflint.nf_elem_get_den(z::Ref{ZZRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_get_den(z::Ref{ZZRingElemRaw}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
   return z
 end
 
@@ -168,12 +168,12 @@ function elem_from_mat_row(a::AbsSimpleNumField, b::ZZMatrix, i::Int, d::ZZRingE
   _checkbounds(nrows(b), i) || throw(BoundsError())
   ncols(b) == degree(a) || error("Wrong number of columns")
   z = a()
-  @ccall libflint.nf_elem_set_fmpz_mat_row(z::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZMatrix}, (i - 1)::Int, d::Ref{ZZRingElem}, a::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_set_fmpz_mat_row(z::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZMatrix}, (i - 1)::Int, d::Ref{ZZRingElemRaw}, a::Ref{AbsSimpleNumField})::Nothing
   return z
 end
 
 function elem_to_mat_row!(a::ZZMatrix, i::Int, d::ZZRingElem, b::AbsSimpleNumFieldElem)
-  @ccall libflint.nf_elem_get_fmpz_mat_row(a::Ref{ZZMatrix}, (i - 1)::Int, d::Ref{ZZRingElem}, b::Ref{AbsSimpleNumFieldElem}, b.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_get_fmpz_mat_row(a::Ref{ZZMatrix}, (i - 1)::Int, d::Ref{ZZRingElemRaw}, b::Ref{AbsSimpleNumFieldElem}, b.parent::Ref{AbsSimpleNumField})::Nothing
   nothing
 end
 
@@ -285,7 +285,7 @@ end
 
 function +(a::AbsSimpleNumFieldElem, b::ZZRingElem)
   r = a.parent()
-  @ccall libflint.nf_elem_add_fmpz(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_add_fmpz(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElemRaw}, a.parent::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
@@ -303,7 +303,7 @@ end
 
 function -(a::AbsSimpleNumFieldElem, b::ZZRingElem)
   r = a.parent()
-  @ccall libflint.nf_elem_sub_fmpz(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_sub_fmpz(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElemRaw}, a.parent::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
@@ -321,7 +321,7 @@ end
 
 function -(a::ZZRingElem, b::AbsSimpleNumFieldElem)
   r = b.parent()
-  @ccall libflint.nf_elem_fmpz_sub(r::Ref{AbsSimpleNumFieldElem}, a::Ref{ZZRingElem}, b::Ref{AbsSimpleNumFieldElem}, b.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_fmpz_sub(r::Ref{AbsSimpleNumFieldElem}, a::Ref{ZZRingElemRaw}, b::Ref{AbsSimpleNumFieldElem}, b.parent::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
@@ -357,7 +357,7 @@ end
 
 function *(a::AbsSimpleNumFieldElem, b::ZZRingElem)
   r = a.parent()
-  @ccall libflint.nf_elem_scalar_mul_fmpz(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_scalar_mul_fmpz(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElemRaw}, a.parent::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
@@ -432,7 +432,7 @@ end
 ###############################################################################
 
 function ==(a::AbsSimpleNumFieldElem, b::ZZRingElem)
-  b = @ccall libflint.nf_elem_equal_fmpz(a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Cint
+  b = @ccall libflint.nf_elem_equal_fmpz(a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElemRaw}, a.parent::Ref{AbsSimpleNumField})::Cint
   return Bool(b)
 end
 
@@ -516,7 +516,7 @@ end
 function divexact(a::AbsSimpleNumFieldElem, b::ZZRingElem; check::Bool=true)
   iszero(b) && throw(DivideError())
   r = a.parent()
-  @ccall libflint.nf_elem_scalar_div_fmpz(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_scalar_div_fmpz(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElemRaw}, a.parent::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
@@ -627,7 +627,7 @@ function representation_matrix_q(a::AbsSimpleNumFieldElem)
   K = parent(a)
   z = ZZMatrix(degree(K), degree(K))
   d = ZZRingElem()
-  @ccall libflint.nf_elem_rep_mat_fmpz_mat_den(z::Ref{ZZMatrix}, d::Ref{ZZRingElem}, a::Ref{AbsSimpleNumFieldElem}, K::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_rep_mat_fmpz_mat_den(z::Ref{ZZMatrix}, d::Ref{ZZRingElemRaw}, a::Ref{AbsSimpleNumFieldElem}, K::Ref{AbsSimpleNumField})::Nothing
   return z, d
 end
 
@@ -708,7 +708,7 @@ function add!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::QQFieldElem
 end
 
 function add!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::ZZRingElem)
-  @ccall libflint.nf_elem_add_fmpz(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_add_fmpz(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElemRaw}, a.parent::Ref{AbsSimpleNumField})::Nothing
   return c
 end
 
@@ -730,7 +730,7 @@ function sub!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::QQFieldElem
 end
 
 function sub!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::ZZRingElem)
-  @ccall libflint.nf_elem_sub_fmpz(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_sub_fmpz(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElemRaw}, a.parent::Ref{AbsSimpleNumField})::Nothing
   return c
 end
 
@@ -747,7 +747,7 @@ function sub!(c::AbsSimpleNumFieldElem, a::QQFieldElem, b::AbsSimpleNumFieldElem
 end
 
 function sub!(c::AbsSimpleNumFieldElem, a::ZZRingElem, b::AbsSimpleNumFieldElem)
-  @ccall libflint.nf_elem_fmpz_sub(c::Ref{AbsSimpleNumFieldElem}, a::Ref{ZZRingElem}, b::Ref{AbsSimpleNumFieldElem}, parent(b)::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_fmpz_sub(c::Ref{AbsSimpleNumFieldElem}, a::Ref{ZZRingElemRaw}, b::Ref{AbsSimpleNumFieldElem}, parent(b)::Ref{AbsSimpleNumField})::Nothing
   return c
 end
 
@@ -764,7 +764,7 @@ function mul!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::QQFieldElem
 end
 
 function mul!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::ZZRingElem)
-  @ccall libflint.nf_elem_scalar_mul_fmpz(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_scalar_mul_fmpz(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElemRaw}, a.parent::Ref{AbsSimpleNumField})::Nothing
   return c
 end
 
@@ -781,7 +781,7 @@ function divexact!(z::AbsSimpleNumFieldElem, x::AbsSimpleNumFieldElem, y::Int)
 end
 
 function divexact!(z::AbsSimpleNumFieldElem, x::AbsSimpleNumFieldElem, y::ZZRingElem)
-  @ccall libflint.nf_elem_scalar_div_fmpz(z::Ref{AbsSimpleNumFieldElem}, x::Ref{AbsSimpleNumFieldElem}, y::Ref{ZZRingElem}, parent(x)::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_scalar_div_fmpz(z::Ref{AbsSimpleNumFieldElem}, x::Ref{AbsSimpleNumFieldElem}, y::Ref{ZZRingElemRaw}, parent(x)::Ref{AbsSimpleNumField})::Nothing
   return z
 end
 
@@ -999,7 +999,7 @@ end
 
 function (a::AbsSimpleNumField)(c::ZZRingElem)
   z = AbsSimpleNumFieldElem(a)
-  @ccall libflint.nf_elem_set_fmpz(z::Ref{AbsSimpleNumFieldElem}, c::Ref{ZZRingElem}, a::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_set_fmpz(z::Ref{AbsSimpleNumFieldElem}, c::Ref{ZZRingElemRaw}, a::Ref{AbsSimpleNumField})::Nothing
   return z
 end
 
@@ -1293,7 +1293,7 @@ base_field(::AbsSimpleNumField) = QQ
 ###############################################################################
 
 function mod_sym!(a::AbsSimpleNumFieldElem, b::ZZRingElem)
-  @ccall libflint.nf_elem_smod_fmpz(a::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_smod_fmpz(a::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElemRaw}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return a
 end
 

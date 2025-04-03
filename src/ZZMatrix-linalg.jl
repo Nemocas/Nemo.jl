@@ -317,8 +317,8 @@ function _induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; error_toler
         end
         Nemo.set!(A_ptr, n)
 
-        a_ptr += sizeof(ZZRingElem)
-        A_ptr += sizeof(ZZRingElem)
+        a_ptr += sizeof(ZZRingElemRaw)
+        A_ptr += sizeof(ZZRingElemRaw)
       end
     end
   end
@@ -494,7 +494,7 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
     map_entries!(Nemo.fpField(D.p, false), D.d_mod, d)
 
     Nemo.mul!(D.y_mod, D.Ainv, D.d_mod)
-    ccall((:fmpz_mat_scalar_addmul_nmod_mat_fmpz, Nemo.libflint), Cvoid, (Ref{ZZMatrix}, Ref{fpMatrix}, Ref{ZZRingElem}), D.x, D.y_mod, ppow)
+    ccall((:fmpz_mat_scalar_addmul_nmod_mat_fmpz, Nemo.libflint), Cvoid, (Ref{ZZMatrix}, Ref{fpMatrix}, Ref{ZZRingElemRaw}), D.x, D.y_mod, ppow)
 
     Nemo.mul!(ppow, ppow, D.p)
     
@@ -569,7 +569,7 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
           for j=1:n
             y_ptr = Nemo.mat_entry_ptr(D.y_mod, j, 1)
             addmul!(Ay_ptr, A_ptr, unsafe_load(y_ptr))
-            A_ptr += sizeof(ZZRingElem)
+            A_ptr += sizeof(ZZRingElemRaw)
           end
           sub!(d_ptr, d_ptr, Ay_ptr)
         end
@@ -611,7 +611,7 @@ end
 function induce_crt!(A::ZZMatrix, p::ZZRingElem, B::fpMatrix; signed::Bool = false)
   #the second modulus is implicit in B: B.n
 
-  ccall((:fmpz_mat_CRT_ui, Nemo.libflint), Cvoid, (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{fpMatrix}, Int), A, A, p, B, signed)
+  ccall((:fmpz_mat_CRT_ui, Nemo.libflint), Cvoid, (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElemRaw}, Ref{fpMatrix}, Int), A, A, p, B, signed)
   Nemo.mul!(p, p, B.n)
   return
 end
@@ -755,8 +755,8 @@ function _renorm(U::ZZMatrix, m::ZZRingElem; start::Int = 1, last::Int = nrows(U
 end
 
 
-function mod_sym!(a::Ptr{ZZRingElem}, b::Ptr{ZZRingElem}, c::ZZRingElem, t::ZZRingElem = ZZ(0))
-  ccall((:fmpz_ndiv_qr, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), t, a, b, c)
+function mod_sym!(a::Ptr{ZZRingElemRaw}, b::Ptr{ZZRingElemRaw}, c::ZZRingElem, t::ZZRingElem = ZZ(0))
+  ccall((:fmpz_ndiv_qr, Nemo.libflint), Cvoid, (Ref{ZZRingElemRaw}, Ptr{ZZRingElemRaw}, Ptr{ZZRingElemRaw}, Ref{ZZRingElemRaw}), t, a, b, c)
 end
 
 #add C into A[c:end, :]

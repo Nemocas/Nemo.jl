@@ -70,7 +70,7 @@ end
 
 # dirty: internally in flint an fq_struct is just an fmpz_poly_struct
 function setcoeff!(x::FqPolyRepFieldElem, j::Int, c::ZZRingElem)
-  @ccall libflint.fmpz_poly_set_coeff_fmpz(x::Ref{FqPolyRepFieldElem}, j::Int, c::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_poly_set_coeff_fmpz(x::Ref{FqPolyRepFieldElem}, j::Int, c::Ref{ZZRingElemRaw})::Nothing
 end
 
 function embed_pre_mat(x::FqPolyRepFieldElem, K::FqPolyRepField, M::FpMatrix)

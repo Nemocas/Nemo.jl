@@ -146,7 +146,7 @@ end
 
 function *(x::ArbMatrix, y::ZZRingElem)
   z = similar(x)
-  @ccall libflint.arb_mat_scalar_mul_fmpz(z::Ref{ArbMatrix}, x::Ref{ArbMatrix}, y::Ref{ZZRingElem}, precision(base_ring(x))::Int)::Nothing
+  @ccall libflint.arb_mat_scalar_mul_fmpz(z::Ref{ArbMatrix}, x::Ref{ArbMatrix}, y::Ref{ZZRingElemRaw}, precision(base_ring(x))::Int)::Nothing
   return z
 end
 
@@ -372,7 +372,7 @@ end
 
 function divexact(x::ArbMatrix, y::ZZRingElem; check::Bool=true)
   z = similar(x)
-  @ccall libflint.arb_mat_scalar_div_fmpz(z::Ref{ArbMatrix}, x::Ref{ArbMatrix}, y::Ref{ZZRingElem}, precision(base_ring(x))::Int)::Nothing
+  @ccall libflint.arb_mat_scalar_div_fmpz(z::Ref{ArbMatrix}, x::Ref{ArbMatrix}, y::Ref{ZZRingElemRaw}, precision(base_ring(x))::Int)::Nothing
   return z
 end
 
