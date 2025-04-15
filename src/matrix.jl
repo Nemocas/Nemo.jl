@@ -33,12 +33,12 @@ Base.setindex!(V::MatrixView, z, i::Int) = setindex!(V, ZZ(z), i)
 
 Base.size(V::MatrixView) = (length(V.A), )
 
-function Base.view(x::_MatTypes, r::Int, c::UnitRange{Int})
+function Base.view(x::_MatTypes, r::Int, c::Union{Colon, AbstractUnitRange{Int}})
   A = view(x, r:r, c)
   return MatrixView{typeof(x), elem_type(base_ring(x))}(A)
 end
 
-function Base.view(x::_MatTypes, r::UnitRange{Int}, c::Int)
+function Base.view(x::_MatTypes, r::Union{Colon, AbstractUnitRange{Int}}, c::Int)
   A = view(x, r, c:c)
   return MatrixView{typeof(x), elem_type(base_ring(x))}(A)
 end
