@@ -4,6 +4,16 @@ const _MatTypes = Union{_FieldMatTypes, ZZMatrix, zzModMatrix, ZZModMatrix}
 
 ################################################################################
 #
+#  common functionality for views
+#
+################################################################################
+
+function Base.view(x::_MatTypes, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
+  return Base.view(x, first(r), first(c), last(r), last(c))
+end
+
+################################################################################
+#
 #  Support for view(A, :, i) and view(A, i, :)
 #
 ################################################################################

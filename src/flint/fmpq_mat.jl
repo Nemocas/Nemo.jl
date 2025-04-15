@@ -45,10 +45,6 @@ function Base.view(x::QQMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
   return b
 end
 
-function Base.view(x::QQMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
-  return Base.view(x, first(r), first(c), last(r), last(c))
-end
-
 function _fmpq_mat_window_clear_fn(a::QQMatrix)
   @ccall libflint.fmpq_mat_window_clear(a::Ref{QQMatrix})::Nothing
 end
