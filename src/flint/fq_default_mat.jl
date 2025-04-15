@@ -483,16 +483,6 @@ function _fq_default_mat_window_clear_fn(a::FqMatrix)
   @ccall libflint.fq_default_mat_window_clear(a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
 end
 
-function sub(x::FqMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
-  return deepcopy(Base.view(x, r1, c1, r2, c2))
-end
-
-function sub(x::FqMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
-  return deepcopy(Base.view(x, r, c))
-end
-
-getindex(x::FqMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) = sub(x, r, c)
-
 ################################################################################
 #
 #  Concatenation

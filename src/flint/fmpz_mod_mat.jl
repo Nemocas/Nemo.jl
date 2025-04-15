@@ -503,18 +503,6 @@ function _fmpz_mod_mat_window_clear_fn(a::ZZModMatrix)
   @ccall libflint.fmpz_mod_mat_window_clear(a::Ref{ZZModMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
 end
 
-function sub(x::T, r1::Int, c1::Int, r2::Int, c2::Int) where T <: Zmod_fmpz_mat
-  return deepcopy(Base.view(x, r1, c1, r2, c2))
-end
-
-function sub(x::T, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) where T <: Zmod_fmpz_mat
-  return deepcopy(Base.view(x, r, c))
-end
-
-function getindex(x::T, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) where T <: Zmod_fmpz_mat
-  sub(x, r, c)
-end
-
 ################################################################################
 #
 #  Concatenation
