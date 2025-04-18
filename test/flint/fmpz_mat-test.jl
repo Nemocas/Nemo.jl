@@ -867,6 +867,15 @@ end
   @test reduce(vcat, [A, A]) == vcat(A, A) # -> _vcat
   @test cat(A, A, dims = 2) == vcat(A, A)
   @test_throws ErrorException cat(A, A, dims = 3)
+
+  @test reduce(vcat, [zero_matrix(ZZ, 0, 1), zero_matrix(ZZ, 0, 1)]) == zero_matrix(ZZ, 0, 1)
+  @test reduce(vcat, [zero_matrix(ZZ, 0, 0), zero_matrix(ZZ, 0, 0)]) == zero_matrix(ZZ, 0, 0)
+  @test reduce(vcat, [zero_matrix(ZZ, 1, 1), zero_matrix(ZZ, 0, 1)]) == zero_matrix(ZZ, 1, 1)
+  @test reduce(hcat, [zero_matrix(ZZ, 1, 0), zero_matrix(ZZ, 1, 0)]) == zero_matrix(ZZ, 1, 0)
+  @test reduce(hcat, [zero_matrix(ZZ, 1, 1), zero_matrix(ZZ, 1, 0)]) == zero_matrix(ZZ, 1, 1)
+
+  @test_throws ErrorException reduce(vcat, [ZZ[1 0;], ZZ[1 2 3;]])
+  @test_throws ErrorException reduce(hcat, [ZZ[1 0; 2 3], ZZ[1 2 3;]])
 end
 
 @testset "ZZMatrix.rand" begin

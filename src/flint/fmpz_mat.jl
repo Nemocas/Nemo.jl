@@ -1561,9 +1561,13 @@ function AbstractAlgebra._vcat(A::AbstractVector{ZZMatrix})
   end
 
   M = zero_matrix(ZZ, sum(nrows, A, init = 0), ncols(A[1]))
+
   s = 0
   for N in A
     GC.@preserve M N begin
+      if ncols(N) == 0
+        continue
+      end
       for j in 1:nrows(N)
         M_ptr = mat_entry_ptr(M, s+j, 1)
         N_ptr = mat_entry_ptr(N, j, 1)
@@ -1582,13 +1586,17 @@ end
 
 function AbstractAlgebra._hcat(A::AbstractVector{ZZMatrix})
   if any(x -> nrows(x) != nrows(A[1]), A)
-    error("Matrices must have the same number of columns")
+    error("Matrices must have the same number of rows")
   end
 
   M = zero_matrix(ZZ, nrows(A[1]), sum(ncols, A, init = 0))
+
   s = 0
   for N in A
     GC.@preserve M N begin
+      if ncols(N) == 0
+        continue
+      end
       for j in 1:nrows(N)
         M_ptr = mat_entry_ptr(M, j, s+1)
         N_ptr = mat_entry_ptr(N, j, 1)
