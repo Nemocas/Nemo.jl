@@ -63,24 +63,9 @@ function Base.reshape(x::ZZMatrix, r::Int, c::Int)
   return b
 end
 
-
-function Base.view(x::ZZMatrix, r::UnitRange{Int}, c::UnitRange{Int})
-  return Base.view(x, r.start, c.start, r.stop, c.stop)
-end
-
 function _fmpz_mat_window_clear_fn(a::ZZMatrix)
   @ccall libflint.fmpz_mat_window_clear(a::Ref{ZZMatrix})::Nothing
 end
-
-function sub(x::ZZMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
-  return deepcopy(view(x, r1, c1, r2, c2))
-end
-
-function sub(x::ZZMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
-  return deepcopy(view(x, r, c))
-end
-
-getindex(x::ZZMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) = sub(x, r, c)
 
 ###############################################################################
 #

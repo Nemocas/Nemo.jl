@@ -476,23 +476,9 @@ function Base.view(x::FqPolyRepMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
   return z
 end
 
-function Base.view(x::FqPolyRepMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
-  return Base.view(x, first(r), first(c), last(r), last(c))
-end
-
 function _fq_mat_window_clear_fn(a::FqPolyRepMatrix)
   @ccall libflint.fq_mat_window_clear(a::Ref{FqPolyRepMatrix}, base_ring(a)::Ref{FqPolyRepField})::Nothing
 end
-
-function sub(x::FqPolyRepMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
-  return deepcopy(Base.view(x, r1, c1, r2, c2))
-end
-
-function sub(x::FqPolyRepMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
-  return deepcopy(Base.view(x, r, c))
-end
-
-getindex(x::FqPolyRepMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) = sub(x, r, c)
 
 ################################################################################
 #
