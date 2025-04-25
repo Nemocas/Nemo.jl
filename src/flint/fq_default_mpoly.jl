@@ -459,6 +459,16 @@ function setcoeff!(a::FqMPolyRingElem, n::Int, c::FqFieldElem)
   return a
 end
 
+function setcoeff!(a::FqMPolyRingElem, n::Vector{Int}, c)
+  return setcoeff!(a, n, base_ring(a)(c)::FqFieldElem)
+end
+
+function setcoeff!(a::FqMPolyRingElem, n::Vector{Int}, c::FqFieldElem)
+  Rd = parent(a).data
+  a.data = setcoeff!(a.data, n, _unchecked_coerce(base_ring(Rd), c))
+  return a
+end
+
 function combine_like_terms!(a::FqMPolyRingElem)
   a.data = combine_like_terms!(a.data)
   return a

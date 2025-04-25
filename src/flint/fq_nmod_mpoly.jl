@@ -759,15 +759,15 @@ function coeff(a::fqPolyRepMPolyRingElem, exps::Vector{Int})
 end
 
 # Set the coefficient of the term with the given exponent vector to the
-# given ZZRingElem. Removal of a zero term is performed.
+# given element. Removal of a zero term is performed.
 function setcoeff!(a::fqPolyRepMPolyRingElem, exps::Vector{Int}, b::fqPolyRepFieldElem)
-  @ccall libflint.fq_nmod_mpoly_set_coeff_fq_nmod_ui(a::Ref{fqPolyRepMPolyRingElem}, b::UInt, exps::Ptr{Int}, parent(a)::Ref{fqPolyRepMPolyRing})::Nothing
+  @ccall libflint.fq_nmod_mpoly_set_coeff_fq_nmod_ui(a::Ref{fqPolyRepMPolyRingElem}, b::Ref{fqPolyRepFieldElem}, exps::Ptr{Int}, parent(a)::Ref{fqPolyRepMPolyRing})::Nothing
   return a
 end
 
 # Set the coefficient of the term with the given exponent vector to the
-# given integer. Removal of a zero term is performed.
-setcoeff!(a::fqPolyRepMPolyRingElem, exps::Vector{Int}, b::Union{Integer, zzModRingElem}) =
+# given ring element. Removal of a zero term is performed.
+setcoeff!(a::fqPolyRepMPolyRingElem, exps::Vector{Int}, b::RingElement) =
 setcoeff!(a, exps, base_ring(parent(a))(b))
 
 # Sort the terms according to the ordering. This is only needed if unsafe

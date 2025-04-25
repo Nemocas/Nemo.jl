@@ -243,6 +243,11 @@ end
   @test trailing_coefficient(x) == 1
   @test trailing_coefficient(S(2)) == 2
   @test trailing_coefficient(S()) == 0
+
+  f = zero(S)
+  @test setcoeff!(f, [1, 0], R(1)) == x
+  @test setcoeff!(f, [1, 1], R(3)) == x + 3 * x * y
+  @test setcoeff!(f, [1, 0], 0) == 3 * x * y
 end
 
 @testset "fqPolyRepMPolyRingElem.multivariate_coeff" begin
