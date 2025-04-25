@@ -243,6 +243,14 @@ begin
       @test trailing_coefficient(S(2)) == 2
       @test trailing_coefficient(S()) == 0
     end
+
+    for (R, a) in test_fields
+      S, (x, y, z, w) = polynomial_ring(R, ["x", "y", "z", "w"])
+      f = zero(S)
+      @test setcoeff!(f, [1, 0, 0, 0], R(1)) == x
+      @test setcoeff!(f, [1, 1, 1, 1], R(3)) == x + 3 * x * y* z * w
+      @test setcoeff!(f, [1, 0, 0, 0], 0) == 3 * x * y* z * w
+    end
   end
 
   @testset "FqMPolyRingElem.multivariate_coeff" begin
