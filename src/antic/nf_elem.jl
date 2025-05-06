@@ -234,8 +234,6 @@ function Base.show(io::IO, a::AbsSimpleNumFieldElem)
   print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
-canonical_unit(x::AbsSimpleNumFieldElem) = x
-
 ###############################################################################
 #
 #   Unary operators
