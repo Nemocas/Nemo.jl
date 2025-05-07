@@ -1,7 +1,7 @@
 @testset "BigFloat manipulation" begin
   a = BigFloat(5) / BigFloat(3)
   b = BigFloat(1) / BigFloat(7)
-  def_prec = Base.MPFR.DEFAULT_PRECISION.x
+  def_prec = precision(BigFloat)
   new_prec = 127
 
   @test precision(a) == def_prec
