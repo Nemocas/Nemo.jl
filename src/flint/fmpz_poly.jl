@@ -603,8 +603,7 @@ for (factor_fn, factor_fn_inner, flint_fn) in
 
          function $factor_fn_inner(x::ZZPolyRingElem)
            fac = fmpz_poly_factor()
-           ccall(($flint_fn, libflint), Nothing,
-                 (Ref{fmpz_poly_factor}, Ref{ZZPolyRingElem}), fac, x)
+           @ccall libflint.$flint_fn(fac::Ref{fmpz_poly_factor}, x::Ref{ZZPolyRingElem})::Nothing
            res = Dict{ZZPolyRingElem,Int}()
            z = ZZRingElem()
            @ccall libflint.fmpz_poly_factor_get_fmpz(z::Ref{ZZRingElem}, fac::Ref{fmpz_poly_factor})::Nothing

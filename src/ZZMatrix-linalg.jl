@@ -20,13 +20,13 @@
 function _det(a::fpMatrix)
   a.r < 9 && return det(a).data  # inspired by FLINT source code
   #_det avoids a copy: det is computed destructively
-  r = ccall((:_nmod_mat_det, Nemo.libflint), UInt, (Ref{fpMatrix}, ), a)
+  r = @ccall libflint._nmod_mat_det(a::Ref{fpMatrix})::UInt
   return r
 end
 
 function map_entries!(k::Nemo.fpField, a::fpMatrix, A::ZZMatrix)
-  ccall((:nmod_mat_set_mod, Nemo.libflint), Cvoid, (Ref{fpMatrix}, UInt), a, k.n)
-  ccall((:fmpz_mat_get_nmod_mat, Nemo.libflint), Cvoid, (Ref{fpMatrix}, Ref{ZZMatrix}), a, A)
+  @ccall libflint.nmod_mat_set_mod(a::Ref{fpMatrix}, k.n::UInt)::Cvoid
+  @ccall libflint.fmpz_mat_get_nmod_mat(a::Ref{fpMatrix}, A::Ref{ZZMatrix})::Cvoid
   a.base_ring = k  # exploiting that the internal repr is the indep of char
   return a
 end
@@ -351,7 +351,7 @@ function change_prime!(a::fpMatrix, p::UInt)
 end
 
 function lift!(A::ZZMatrix, a::fpMatrix)
-  ccall((:fmpz_mat_set_nmod_mat, Nemo.libflint), Cvoid, (Ref{ZZMatrix}, Ref{fpMatrix}), A, a)
+  @ccall libflint.fmpz_mat_set_nmod_mat(A::Ref{ZZMatrix}, a::Ref{fpMatrix})::Cvoid
 end
 
 mutable struct DixonCtx
@@ -494,7 +494,7 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
     map_entries!(Nemo.fpField(D.p, false), D.d_mod, d)
 
     Nemo.mul!(D.y_mod, D.Ainv, D.d_mod)
-    ccall((:fmpz_mat_scalar_addmul_nmod_mat_fmpz, Nemo.libflint), Cvoid, (Ref{ZZMatrix}, Ref{fpMatrix}, Ref{ZZRingElem}), D.x, D.y_mod, ppow)
+    @ccall libflint.fmpz_mat_scalar_addmul_nmod_mat_fmpz(D.x::Ref{ZZMatrix}, D.y_mod::Ref{fpMatrix}, ppow::Ref{ZZRingElem})::Cvoid
 
     Nemo.mul!(ppow, ppow, D.p)
     
@@ -611,8 +611,8 @@ end
 function induce_crt!(A::ZZMatrix, p::ZZRingElem, B::fpMatrix; signed::Bool = false)
   #the second modulus is implicit in B: B.n
 
-  ccall((:fmpz_mat_CRT_ui, Nemo.libflint), Cvoid, (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{fpMatrix}, Int), A, A, p, B, signed)
-  Nemo.mul!(p, p, B.n)
+  @ccall libflint.fmpz_mat_CRT_ui(A::Ref{ZZMatrix}, A::Ref{ZZMatrix}, p::Ref{ZZRingElem}, B::Ref{fpMatrix}, signed::Int)::Cvoid
+  mul!(p, p, B.n)
   return
 end
 
@@ -756,7 +756,7 @@ end
 
 
 function mod_sym!(a::Ptr{ZZRingElem}, b::Ptr{ZZRingElem}, c::ZZRingElem, t::ZZRingElem = ZZ(0))
-  ccall((:fmpz_ndiv_qr, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), t, a, b, c)
+  @ccall libflint.fmpz_ndiv_qr(t::Ref{ZZRingElem}, a::Ptr{ZZRingElem}, b::Ptr{ZZRingElem}, c::Ref{ZZRingElem})::Cvoid
 end
 
 #add C into A[c:end, :]

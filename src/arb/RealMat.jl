@@ -604,9 +604,7 @@ for (s,f) in (("add!","arb_mat_add"), ("mul!","arb_mat_mul"),
               ("sub!","arb_mat_sub"))
   @eval begin
     function ($(Symbol(s)))(z::RealMatrix, x::RealMatrix, y::RealMatrix, prec::Int = precision(Balls))
-      ccall(($f, libflint), Nothing,
-            (Ref{RealMatrix}, Ref{RealMatrix}, Ref{RealMatrix}, Int),
-            z, x, y, prec)
+      @ccall libflint.$f(z::Ref{RealMatrix}, x::Ref{RealMatrix}, y::Ref{RealMatrix}, prec::Int)::Nothing
       return z
     end
   end
