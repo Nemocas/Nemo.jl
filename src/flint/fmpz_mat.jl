@@ -1809,7 +1809,7 @@ end
 ###############################################################################
 
 function Base.copy!(A::ZZMatrix, B::ZZMatrix)
-  ccall((:fmpz_mat_set, Nemo.libflint), Cvoid, (Ref{ZZMatrix}, Ref{ZZMatrix}), A, B)
+  @ccall libflint.fmpz_mat_set(A::Ref{ZZMatrix}, B::Ref{ZZMatrix})::Cvoid
 end
 
 function zero!(z::ZZMatrixOrPtr)
@@ -2001,16 +2001,12 @@ function _very_unsafe_convert(::Type{ZZMatrix}, a::Vector{ZZRingElem}, row = tru
 end
 
 function mul!_flint(z::Vector{ZZRingElem}, a::ZZMatrixOrPtr, b::Vector{ZZRingElem})
-  ccall((:fmpz_mat_mul_fmpz_vec_ptr, libflint), Nothing,
-        (Ptr{Ref{ZZRingElem}}, Ref{ZZMatrix}, Ptr{Ref{ZZRingElem}}, Int),
-        z, a, b, length(b))
+  @ccall libflint.fmpz_mat_mul_fmpz_vec_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ref{ZZMatrix}, b::Ptr{Ref{ZZRingElem}}, length(b)::Int)::Nothing
   return z
 end
 
 function mul!_flint(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::ZZMatrixOrPtr)
-  ccall((:fmpz_mat_fmpz_vec_mul_ptr, libflint), Nothing,
-        (Ptr{Ref{ZZRingElem}}, Ptr{Ref{ZZRingElem}}, Int, Ref{ZZMatrix}),
-        z, a, length(a), b)
+  @ccall libflint.fmpz_mat_fmpz_vec_mul_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ptr{Ref{ZZRingElem}}, length(a)::Int, b::Ref{ZZMatrix})::Nothing
   return z
 end
 

@@ -203,8 +203,7 @@ for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (://, "acb_div"), (:-,"acb_sub"), 
   @eval begin
     function ($s)(x::AcbFieldElem, y::AcbFieldElem)
       z = parent(x)()
-      ccall(($f, libflint), Nothing, (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int),
-            z, x, y, parent(x).prec)
+      @ccall libflint.$f(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
       return z
     end
   end
@@ -215,32 +214,25 @@ for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
 
     function ($f)(x::AcbFieldElem, y::UInt)
       z = parent(x)()
-      ccall(($("acb_"*s*"_ui"), libflint), Nothing,
-            (Ref{AcbFieldElem}, Ref{AcbFieldElem}, UInt, Int),
-            z, x, y, parent(x).prec)
+      @ccall libflint.$("acb_$(s)_ui")(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::UInt, parent(x).prec::Int)::Nothing
       return z
     end
 
     function ($f)(x::AcbFieldElem, y::Int)
       z = parent(x)()
-      ccall(($("acb_"*s*"_si"), libflint), Nothing,
-            (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Int, Int), z, x, y, parent(x).prec)
+      @ccall libflint.$("acb_$(s)_si")(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Int, parent(x).prec::Int)::Nothing
       return z
     end
 
     function ($f)(x::AcbFieldElem, y::ZZRingElem)
       z = parent(x)()
-      ccall(($("acb_"*s*"_fmpz"), libflint), Nothing,
-            (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ZZRingElem}, Int),
-            z, x, y, parent(x).prec)
+      @ccall libflint.$("acb_$(s)_fmpz")(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{ZZRingElem}, parent(x).prec::Int)::Nothing
       return z
     end
 
     function ($f)(x::AcbFieldElem, y::ArbFieldElem)
       z = parent(x)()
-      ccall(($("acb_"*s*"_arb"), libflint), Nothing,
-            (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbFieldElem}, Int),
-            z, x, y, parent(x).prec)
+      @ccall libflint.$("acb_$(s)_arb")(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{ArbFieldElem}, parent(x).prec::Int)::Nothing
       return z
     end
   end

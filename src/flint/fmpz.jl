@@ -378,8 +378,7 @@ for (fJ, fC) in ((:+, :add), (:-,:sub), (:*, :mul),
   @eval begin
     function ($fJ)(x::ZZRingElem, y::ZZRingElem)
       z = ZZRingElem()
-      ccall(($(string(:fmpz_, fC)), libflint), Nothing,
-            (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
+      @ccall libflint.$("fmpz_$fC")(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
       return z
     end
   end
@@ -393,8 +392,7 @@ for (fJ, fC) in ((:fdiv, :fdiv_q), (:cdiv, :cdiv_q), (:tdiv, :tdiv_q),
     function ($fJ)(x::ZZRingElem, y::ZZRingElem)
       iszero(y) && throw(DivideError())
       z = ZZRingElem()
-      ccall(($(string(:fmpz_, fC)), libflint), Nothing,
-            (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
+      @ccall libflint.$("fmpz_$fC")(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
       return z
     end
   end
@@ -2617,11 +2615,11 @@ end
 #
 
 function tdiv_q!(a::ZZRingElem, b::ZZRingElem, c::ZZRingElem)
-  ccall((:fmpz_tdiv_q, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), a, b, c)
+  @ccall libflint.fmpz_tdiv_q(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ref{ZZRingElem})::Cvoid
 end
 
 function shift_right!(a::ZZRingElem, b::ZZRingElem, i::Int)
-  @ccall Nemo.libflint.fmpz_fdiv_q_2exp(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, i::Int)::Nothing
+  @ccall libflint.fmpz_fdiv_q_2exp(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, i::Int)::Nothing
 end
 
 #
@@ -2997,7 +2995,7 @@ function _ratrec!(n::ZZRingElem, d::ZZRingElem, a::ZZRingElem, b::ZZRingElem, N:
 
 #    @assert 2*N*D < b
 
-    fl = ccall((:_fmpq_reconstruct_fmpz_2, Nemo.libflint), Bool, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), n, d, a, b, N, D)
+    fl = @ccall libflint._fmpq_reconstruct_fmpz_2(n::Ref{ZZRingElem}, d::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, N::Ref{ZZRingElem}, D::Ref{ZZRingElem})::Bool
 
     if fl && (nbits(n)+nbits(d) < max(k/2, k - 30) || D>N)
       return fl
@@ -3058,7 +3056,7 @@ function _rational_reconstruction(a::ZZRingElem, b::ZZRingElem; error_tolerant::
   else
     res = QQFieldElem()
     a = mod(a, b)
-    fl = ccall((:fmpq_reconstruct_fmpz, libflint), Cint, (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), res, a, b)
+    fl = @ccall libflint.fmpq_reconstruct_fmpz(res::Ref{QQFieldElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Cint
     return Bool(fl), numerator(res), denominator(res)
   end
 end
@@ -3072,7 +3070,7 @@ satisfying $x/y \equiv a \bmod b$ or $a \equiv ya \bmod b$.
 function _rational_reconstruction(a::ZZRingElem, b::ZZRingElem, N::ZZRingElem, D::ZZRingElem)
   res = QQFieldElem()
   a = mod(a, b)
-  fl = ccall((:fmpq_reconstruct_fmpz_2, libflint), Cint, (Ref{QQFieldElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), res, a, b, N, D)
+  fl = @ccall libflint.fmpq_reconstruct_fmpz_2(res::Ref{QQFieldElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, N::Ref{ZZRingElem}, D::Ref{ZZRingElem})::Cint
   return Bool(fl), numerator(res), denominator(res)
 end
 

@@ -192,8 +192,7 @@ for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (://, "acb_div"), (:-,"acb_sub"), 
   @eval begin
     function ($s)(x::ComplexFieldElem, y::ComplexFieldElem, prec::Int = precision(Balls))
       z = ComplexFieldElem()
-      ccall(($f, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int),
-            z, x, y, prec)
+      @ccall libflint.$f(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{ComplexFieldElem}, prec::Int)::Nothing
       return z
     end
   end
@@ -204,32 +203,25 @@ for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
 
     function ($f)(x::ComplexFieldElem, y::UInt, prec::Int = precision(Balls))
       z = ComplexFieldElem()
-      ccall(($("acb_"*s*"_ui"), libflint), Nothing,
-            (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, UInt, Int),
-            z, x, y, prec)
+      @ccall libflint.$("acb_"*s*"_ui")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::UInt, prec::Int)::Nothing
       return z
     end
 
     function ($f)(x::ComplexFieldElem, y::Int, prec::Int = precision(Balls))
       z = ComplexFieldElem()
-      ccall(($("acb_"*s*"_si"), libflint), Nothing,
-            (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int, Int), z, x, y, prec)
+      @ccall libflint.$("acb_"*s*"_si")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Int, prec::Int)::Nothing
       return z
     end
 
     function ($f)(x::ComplexFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
       z = ComplexFieldElem()
-      ccall(($("acb_"*s*"_fmpz"), libflint), Nothing,
-            (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ZZRingElem}, Int),
-            z, x, y, prec)
+      @ccall libflint.$("acb_"*s*"_fmpz")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{ZZRingElem}, prec::Int)::Nothing
       return z
     end
 
     function ($f)(x::ComplexFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
       z = ComplexFieldElem()
-      ccall(($("acb_"*s*"_arb"), libflint), Nothing,
-            (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{RealFieldElem}, Int),
-            z, x, y, prec)
+      @ccall libflint.$("acb_"*s*"_arb")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{RealFieldElem}, prec::Int)::Nothing
       return z
     end
   end
