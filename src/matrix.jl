@@ -9,11 +9,11 @@ const _MatTypes = Union{_FieldMatTypes, ZZMatrix, zzModMatrix, ZZModMatrix}
 ################################################################################
 
 function Base.view(x::_MatTypes, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
-  return Base.view(x, first(r), first(c), last(r), last(c))
+  return _view_window(x, first(r), first(c), last(r), last(c))
 end
 
 function sub(x::_MatTypes, r1::Int, c1::Int, r2::Int, c2::Int)
-  return deepcopy(view(x, r1, c1, r2, c2))
+  return deepcopy(view(x, r1:r2, c1:c2))
 end
 
 function sub(x::_MatTypes, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})

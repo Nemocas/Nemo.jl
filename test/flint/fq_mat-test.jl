@@ -776,27 +776,27 @@ end
 
   b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
 
-  t = view(a, 1, 1, 3, 3)
+  t = view(a, 1:3, 1:3)
 
   @test t == a
 
-  @test view(a, 1, 1, 3, 3) == view(a, 1:3, 1:3)
-  @test view(a, 1, 1, 3, 3) == sub(a, 1, 1, 3, 3)
-  @test view(a, 1, 1, 3, 3) == sub(a, 1:3, 1:3)
+  @test view(a, 1:3, 1:3) == view(a, 1:3, 1:3)
+  @test view(a, 1:3, 1:3) == sub(a, 1, 1, 3, 3)
+  @test view(a, 1:3, 1:3) == sub(a, 1:3, 1:3)
 
-  t = view(a, 1, 1, 2, 2)
+  t = view(a, 1:2, 1:2)
 
   @test t == F17[1 2; 3 2]
 
-  t = view(a, 2, 2, 3, 2)
+  t = view(a, 2:3, 2:2)
 
-  @test t == transpose(F17[2 0;])
+  @test t == transpose(F17[2 0])
 
-  @test view(a, 2, 2, 3, 2) == view(a, 2:3,  2:2)
-  @test view(a, 2, 2, 3, 2) == sub(a, 2, 2, 3, 2)
-  @test view(a, 2, 2, 3, 2) == sub(a, 2:3, 2:2)
+  @test view(a, 2:3, 2:2) == view(a, 2:3,  2:2)
+  @test view(a, 2:3, 2:2) == sub(a, 2, 2, 3, 2)
+  @test view(a, 2:3, 2:2) == sub(a, 2:3, 2:2)
 
-  @test_throws BoundsError view(a, 2, 2, 5, 5)
+  @test_throws BoundsError view(a, 3:5, 3:5)
 
   a = 0
   GC.gc()

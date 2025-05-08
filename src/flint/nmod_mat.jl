@@ -555,7 +555,7 @@ end
 #
 ################################################################################
 
-function Base.view(x::zzModMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
+function _view_window(x::zzModMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
 
   _checkrange_or_empty(nrows(x), r1, r2) ||
   Base.throw_boundserror(x, (r1:r2, c1:c2))
