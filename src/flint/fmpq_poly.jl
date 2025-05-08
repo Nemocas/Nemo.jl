@@ -552,8 +552,7 @@ for (factor_fn, factor_fn_inner, flint_fn) in
            y = ZZPolyRingElem()
            @ccall libflint.fmpq_poly_get_numerator(y::Ref{ZZPolyRingElem}, x::Ref{QQPolyRingElem})::Nothing
            fac = fmpz_poly_factor()
-           ccall(($flint_fn, libflint), Nothing,
-                 (Ref{fmpz_poly_factor}, Ref{ZZPolyRingElem}), fac, y)
+           @ccall libflint.$flint_fn(fac::Ref{fmpz_poly_factor}, y::Ref{ZZPolyRingElem})::Nothing
            z = ZZRingElem()
            @ccall libflint.fmpz_poly_factor_get_fmpz(z::Ref{ZZRingElem}, fac::Ref{fmpz_poly_factor})::Nothing
            f = ZZPolyRingElem()

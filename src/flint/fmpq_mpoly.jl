@@ -700,30 +700,22 @@ for (jT, cN, cT) in ((QQFieldElem, :fmpq, Ref{QQFieldElem}), (ZZRingElem, :fmpz,
                      (Int, :si, Int), (UInt, :ui, UInt))
   @eval begin
     function add!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::($jT))
-      ccall(($(string(:fmpq_mpoly_add_, cN)), libflint), Nothing,
-            (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
-            a, b, c, parent(a))
+      @ccall libflint.$("fmpq_mpoly_add_$cN")(a::Ref{QQMPolyRingElem}, b::Ref{QQMPolyRingElem}, c::$cT, parent(a)::Ref{QQMPolyRing})::Nothing
       return a
     end
 
     function sub!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::($jT))
-      ccall(($(string(:fmpq_mpoly_sub_, cN)), libflint), Nothing,
-            (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
-            a, b, c, parent(a))
+      @ccall libflint.$("fmpq_mpoly_sub_$cN")(a::Ref{QQMPolyRingElem}, b::Ref{QQMPolyRingElem}, c::$cT, parent(a)::Ref{QQMPolyRing})::Nothing
       return a
     end
 
     function mul!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::($jT))
-      ccall(($(string(:fmpq_mpoly_scalar_mul_, cN)), libflint), Nothing,
-            (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
-            a, b, c, parent(a))
+      @ccall libflint.$("fmpq_mpoly_scalar_mul_$cN")(a::Ref{QQMPolyRingElem}, b::Ref{QQMPolyRingElem}, c::$cT, parent(a)::Ref{QQMPolyRing})::Nothing
       return a
     end
 
     function divexact!(a::QQMPolyRingElem, b::QQMPolyRingElem, c::($jT))
-      ccall(($(string(:fmpq_mpoly_scalar_div_, cN)), libflint), Nothing,
-            (Ref{QQMPolyRingElem}, Ref{QQMPolyRingElem}, ($cT), Ref{QQMPolyRing}),
-            a, b, c, parent(b))
+      @ccall libflint.$("fmpq_mpoly_scalar_div_$cN")(a::Ref{QQMPolyRingElem}, b::Ref{QQMPolyRingElem}, c::$cT, parent(b)::Ref{QQMPolyRing})::Nothing
       return a
     end
   end
