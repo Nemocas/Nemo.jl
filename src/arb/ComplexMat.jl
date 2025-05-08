@@ -69,6 +69,7 @@ setindex!(x::ComplexMatrix, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) 
 setindex!(x, map(QQFieldElem, y), r, c)
 
 function one(x::ComplexMatrixSpace)
+  check_square(x)
   return one!(x())
 end
 
