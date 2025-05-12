@@ -57,6 +57,7 @@ Base.@propagate_inbounds setindex!(x::RealMatrix, y::Rational{T},
 setindex!(x, ZZRingElem(y), r, c)
 
 function one(x::RealMatrixSpace)
+  check_square(x)
   return one!(x())
 end
 
