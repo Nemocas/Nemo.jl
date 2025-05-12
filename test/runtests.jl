@@ -22,17 +22,18 @@ end
 @everywhere using Test
 @everywhere using InteractiveUtils: @which
 @everywhere import Nemo.AbstractAlgebra
-@everywhere const ring_to_mat = Dict(ZZ                         => ZZMatrix,
-                         QQ                         => QQMatrix,
-                         residue_ring(ZZ, 9)[1]          => zzModMatrix,
-                         GF(5)                           => fpMatrix,
-                         finite_field(3, 2, "b")[1]      => fqPolyRepMatrix,
-                         finite_field(ZZRingElem(3), 2, "b")[1] => FqPolyRepMatrix,
-                         ArbField()                      => ArbMatrix,
-                         AcbField()                      => AcbMatrix,
-                         RealField()                     => RealMatrix,
-                         ComplexField()                  => ComplexMatrix,
-                        )
+@everywhere const example_rings = [
+                          ZZ,
+                          QQ,
+                          residue_ring(ZZ, 9)[1],
+                          GF(5),
+                          finite_field(3, 2, "b")[1],
+                          finite_field(ZZRingElem(3), 2, "b")[1],
+                          ArbField(),
+                          AcbField(),
+                          RealField(),
+                          ComplexField(),
+                        ]
 
 @everywhere include("rand.jl")
 include("Nemo-test.jl")
