@@ -163,6 +163,7 @@ function hash_integer(a::ZZRingElem, h::UInt)
 end
 
 function hash(a::ZZRingElem, h::UInt)
+  _fmpz_is_small(a) && return Base.hash(data(a), h)
   return hash_integer(a, h)
 end
 
