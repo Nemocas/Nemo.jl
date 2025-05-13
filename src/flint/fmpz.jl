@@ -163,7 +163,9 @@ function hash_integer(a::ZZRingElem, h::UInt)
 end
 
 function hash(a::ZZRingElem, h::UInt)
-  _fmpz_is_small(a) && return Base.hash(data(a), h)
+  @static if VERSION >= v"1.13.0-DEV.570" # TODO: remove the condition and instead always run the _is_small shortcut in a future breaking release of Nemo
+    _fmpz_is_small(a) && return Base.hash(data(a), h)
+  end
   return hash_integer(a, h)
 end
 
