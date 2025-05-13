@@ -179,7 +179,7 @@ norm(x::ZZRingElem) = abs(x)
 number_field(::ZZRing) = QQ
 
 function Base.hash(f::zzModMPolyRingElem, h::UInt)
-  return UInt(1) # TODO: enhance or throw error
+  return h # TODO: enhance or throw error
 end
 
 function tdivpow2!(B::ZZMatrix, t::Int)

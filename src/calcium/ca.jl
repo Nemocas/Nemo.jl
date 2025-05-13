@@ -60,7 +60,7 @@ end
 #
 ###############################################################################
 
-# todo: implement nontrivial hash functions on C
+# TODO: implement nontrivial hash functions on C
 function Base.hash(a::CalciumFieldElem, h::UInt)
   return h
 end
