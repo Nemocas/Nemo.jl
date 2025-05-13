@@ -23,16 +23,22 @@ end
 @everywhere using InteractiveUtils: @which
 @everywhere import Nemo.AbstractAlgebra
 @everywhere const example_rings = [
-                          ZZ,
-                          QQ,
-                          residue_ring(ZZ, 9)[1],
-                          GF(5),
-                          finite_field(3, 2, "b")[1],
-                          finite_field(ZZRingElem(3), 2, "b")[1],
-                          ArbField(),
-                          AcbField(),
-                          RealField(),
-                          ComplexField(),
+                          ZZ,                                           # ZZRing
+                          QQ,                                           # QQField  
+                          residue_ring(ZZ, 9)[1],                       # zzModRing
+                          residue_ring(ZZ, ZZ(9))[1],                   # ZZModRing
+                          Native.GF(5),                                 # fpField
+                          Native.GF(ZZ(5)),                             # FpField
+                          Native.finite_field(3, 2, "b")[1],            # fqPolyRepField
+                          Native.finite_field(ZZRingElem(3), 2, "b")[1],# FqPolyRepField
+                          GF(5),                                        # FqField
+                          GF(ZZ(5)),                                    # FqField
+                          finite_field(3, 2, "b")[1],                   # FqField
+                          finite_field(ZZRingElem(3), 2, "b")[1],       # FqField
+                          ArbField(),                                   # ArbField
+                          AcbField(),                                   # AcbField
+                          RealField(),                                  # RealField
+                          ComplexField(),                               # ComplexField
                         ]
 
 @everywhere include("rand.jl")
