@@ -63,7 +63,10 @@ function canonical_unit(x::ComplexFieldElem)
   return x
 end
 
-# TODO: implement hash
+# TODO: implement better hash
+function hash(a::ComplexFieldElem, h::UInt)
+  return h
+end
 
 characteristic(::ComplexField) = 0
 
