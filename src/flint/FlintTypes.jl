@@ -4954,29 +4954,16 @@ end
 #
 ################################################################################
 
-if NEW_FLINT
-  mutable struct rand_ctx
-    gmp_state::Ptr{Cvoid}
-    randval::UInt
-    randval2::UInt
+mutable struct rand_ctx
+  gmp_state::Ptr{Cvoid}
+  randval::UInt
+  randval2::UInt
 
-    function rand_ctx()
-      a = new()
-      @ccall libflint.flint_rand_init(a::Ref{rand_ctx})::Cvoid
-      finalizer(_rand_ctx_clear_fn, a)
-      return a
-    end
-  end
-else
-  mutable struct rand_ctx
-    data::NTuple{56, Int8}
-
-    function rand_ctx()
-      a = new()
-      @ccall libflint.flint_randinit(a::Ref{rand_ctx})::Cvoid
-      finalizer(_rand_ctx_clear_fn, a)
-      return a
-    end
+  function rand_ctx()
+    a = new()
+    @ccall libflint.flint_rand_init(a::Ref{rand_ctx})::Cvoid
+    finalizer(_rand_ctx_clear_fn, a)
+    return a
   end
 end
 
@@ -5269,14 +5256,8 @@ function _qadic_ctx_clear_fn(a::QadicField)
   @ccall libflint.qadic_ctx_clear(a::Ref{QadicField})::Nothing
 end
 
-if NEW_FLINT
-  function _rand_ctx_clear_fn(a::rand_ctx)
-    @ccall libflint.flint_rand_clear(a::Ref{rand_ctx})::Nothing
-  end
-else
-  function _rand_ctx_clear_fn(a::rand_ctx)
-    @ccall libflint.flint_randclear(a::Ref{rand_ctx})::Nothing
-  end
+function _rand_ctx_clear_fn(a::rand_ctx)
+  @ccall libflint.flint_rand_clear(a::Ref{rand_ctx})::Nothing
 end
 
 ################################################################################
