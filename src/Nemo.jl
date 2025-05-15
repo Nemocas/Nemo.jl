@@ -167,6 +167,7 @@ import AbstractAlgebra: @attributes
 import AbstractAlgebra: @show_name
 import AbstractAlgebra: @show_special
 import AbstractAlgebra: @show_special_elem
+import AbstractAlgebra: AnyInf
 import AbstractAlgebra: check_square
 import AbstractAlgebra: Dedent
 import AbstractAlgebra: div
@@ -436,8 +437,6 @@ include("Rings.jl")
 include("matrix.jl")
 include("poly.jl")
 include("ZZMatrix-linalg.jl")
-
-include("Infinity.jl")
 
 include("HeckeMiscFiniteField.jl")
 include("HeckeMoreStuff.jl")
