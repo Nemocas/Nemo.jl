@@ -98,8 +98,6 @@ testlist = [
   "gaussiannumbers/continued_fraction-test.jl",
 # Native-test.jl
   "Native-test.jl",
-# Infinity-test.jl
-  "Infinity-test.jl",
 # HeckeMiscLocalization-test.jl
   "HeckeMiscLocalization-test.jl",
 # matrix-test.jl

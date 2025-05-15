@@ -313,7 +313,6 @@ export hypergeometric_u
 export hypot
 export imag
 #export induce_rational_reconstruction
-export inf
 export infinity
 export inflate
 export integer_ring
@@ -323,7 +322,6 @@ export interpolate
 export interpolate_barycentric
 export interpolate_fast
 export interpolate_newton
-export IntExt
 export inv
 export invmod
 export iroot
@@ -342,7 +340,6 @@ export is_gen
 export is_hadamard
 export is_hnf
 export is_imaginary
-export is_infinite
 export is_irreducible
 export is_less_abs
 export is_less_abs_imag
@@ -445,7 +442,6 @@ export nbits
 export ncdivrem
 export ndivrem
 export neg!
-export NegInf
 export next_calkin_wilf
 export next_minimal
 export next_prime
@@ -480,7 +476,6 @@ export polygamma
 export polylog
 export polynomial_ring
 export popcount
-export PosInf
 export pow
 export power_series_ring
 export powermod
