@@ -1007,8 +1007,20 @@ function rem!(a::FpPolyRingElem, b::FpPolyRingElem, c::FpPolyRingElem)
   return a
 end
 
+########################################
+#
+# misc infinity changes that need to stay in Nemo (after moving the rest to AA) # TODO: move somewhere sensible
+#
+########################################
+
 Base.isless(::PosInf, ::Union{ZZRingElem,QQFieldElem}) = false
 Base.isless(::Union{ZZRingElem,QQFieldElem}, ::PosInf) = true
 
 Base.isless(::NegInf, ::Union{ZZRingElem,QQFieldElem}) = true
 Base.isless(::Union{ZZRingElem,QQFieldElem}, ::NegInf) = false
+
+Base.:+(::ZZRingElem, inf::AnyInf) = inf
+Base.:+(inf::AnyInf, ::ZZRingElem) = inf
+
+Base.:-(inf::AnyInf, ::ZZRingElem) = inf
+Base.:-(::ZZRingElem, inf::AnyInf) = -inf
