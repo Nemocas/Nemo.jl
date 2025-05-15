@@ -1006,3 +1006,9 @@ function rem!(a::FpPolyRingElem, b::FpPolyRingElem, c::FpPolyRingElem)
   @ccall libflint.fmpz_mod_poly_rem(a::Ref{FpPolyRingElem}, b::Ref{FpPolyRingElem}, c::Ref{FpPolyRingElem}, a.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return a
 end
+
+Base.isless(::PosInf, ::Union{ZZRingElem,QQFieldElem}) = false
+Base.isless(::Union{ZZRingElem,QQFieldElem}, ::PosInf) = true
+
+Base.isless(::NegInf, ::Union{ZZRingElem,QQFieldElem}) = true
+Base.isless(::Union{ZZRingElem,QQFieldElem}, ::NegInf) = false
