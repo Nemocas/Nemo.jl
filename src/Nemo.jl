@@ -437,8 +437,6 @@ include("matrix.jl")
 include("poly.jl")
 include("ZZMatrix-linalg.jl")
 
-include("Infinity.jl")
-
 include("HeckeMiscFiniteField.jl")
 include("HeckeMoreStuff.jl")
 
