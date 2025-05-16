@@ -33,10 +33,10 @@ begin
         @test Nemo.promote_rule(elem_type(S), Int) == elem_type(S)
         @test Nemo.promote_rule(elem_type(S), ZZRingElem) == elem_type(S)
 
-        @test typeof(S) <: FqMPolyRing
+        @test S isa FqMPolyRing
         @test length(@inferred gens(S)) == num_vars
 
-        isa(symbols(S), Vector{Symbol})
+        @test isa(symbols(S), Vector{Symbol})
 
         for j = 1:num_vars
           @test isa(varlist[j], FqMPolyRingElem)

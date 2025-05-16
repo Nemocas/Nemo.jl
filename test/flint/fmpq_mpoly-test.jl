@@ -22,9 +22,9 @@
     @test elem_type(QQMPolyRing) == QQMPolyRingElem
     @test parent_type(QQMPolyRingElem) == QQMPolyRing
 
-    @test typeof(S) <: QQMPolyRing
+    @test S isa QQMPolyRing
 
-    isa(symbols(S), Vector{Symbol})
+    @test isa(symbols(S), Vector{Symbol})
 
     for j = 1:num_vars
       @test isa(varlist[j], QQMPolyRingElem)

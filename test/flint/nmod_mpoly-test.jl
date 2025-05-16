@@ -31,9 +31,9 @@
 
     @test Nemo.promote_rule(elem_type(S), ZZRingElem) == elem_type(S)
 
-    @test typeof(S) <: zzModMPolyRing
+    @test S isa zzModMPolyRing
 
-    isa(symbols(S), Vector{Symbol})
+    @test isa(symbols(S), Vector{Symbol})
 
     for j = 1:num_vars
       @test isa(varlist[j], zzModMPolyRingElem)

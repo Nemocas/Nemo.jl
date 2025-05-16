@@ -29,9 +29,9 @@
     @test elem_type(fpMPolyRing) == fpMPolyRingElem
     @test parent_type(fpMPolyRingElem) == fpMPolyRing
 
-    @test typeof(S) <: fpMPolyRing
+    @test S isa fpMPolyRing
 
-    isa(symbols(S), Vector{Symbol})
+    @test isa(symbols(S), Vector{Symbol})
 
     for j = 1:num_vars
       @test isa(varlist[j], fpMPolyRingElem)
