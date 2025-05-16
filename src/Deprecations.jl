@@ -94,7 +94,11 @@ end
 @deprecate coefficient_ring(k::PadicField) base_field(k)
 @deprecate coefficient_ring(k::QadicField) base_field(k)
 
-# To be deprecated in a future breaking release
-Base.Array(a::ZZMatrix; S::Type{T} = ZZRingElem) where {T} = Matrix{T}(a)
+# Deprecated in 0.50
+import Base: Array, view
 
-Base.view(x::_MatTypes, r1::Int, c1::Int, r2::Int, c2::Int) = _view_window(x, r1, c1, r2, c2)
+@deprecate Array(a::ZZMatrix; S::Type{T} = ZZRingElem) where {T} Matrix{T}(a) false
+
+@deprecate view(x::_MatTypes, r1::Int, c1::Int, r2::Int, c2::Int) _view_window(x, r1, c1, r2, c2) false
+
+# to be deprecated in a future minor release
