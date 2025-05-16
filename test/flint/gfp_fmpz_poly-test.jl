@@ -16,7 +16,7 @@
 
   @test Nemo.promote_rule(elem_type(S), ZZRingElem) == elem_type(S)
 
-  @test typeof(S) <: FpPolyRing
+  @test S isa FpPolyRing
 
   @test isa(x, PolyRingElem{Nemo.FpFieldElem})
 

@@ -6,13 +6,13 @@
   @test elem_type(FqPolyRing) == FqPolyRingElem
   @test parent_type(FqPolyRingElem) == FqPolyRing
 
-  @test typeof(S) <: FqPolyRing
+  @test S isa FqPolyRing
 
   @test isa(y, PolyRingElem)
 
   T, z = polynomial_ring(S, "z")
 
-  @test typeof(T) <: Generic.PolyRing
+  @test T isa Generic.PolyRing
 
   @test isa(z, PolyRingElem)
 
