@@ -20,7 +20,7 @@ coeff_types = [Int8, Int, UInt, BigInt,
   @test parent_type(AcbPolyRingElem) == AcbPolyRing
   @test dense_poly_type(AcbFieldElem) == AcbPolyRingElem
 
-  @test typeof(R) <: AcbPolyRing
+  @test R isa AcbPolyRing
 
   @test isa(x, PolyRingElem)
 

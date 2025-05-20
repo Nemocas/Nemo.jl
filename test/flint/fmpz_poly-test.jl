@@ -12,7 +12,7 @@
   @test parent_type(ZZPolyRingElem) == ZZPolyRing
   @test dense_poly_type(ZZRingElem) == ZZPolyRingElem
 
-  @test typeof(R) <: ZZPolyRing
+  @test R isa ZZPolyRing
 
   @test isa(x, PolyRingElem)
 
