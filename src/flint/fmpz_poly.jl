@@ -463,6 +463,17 @@ function derivative(x::ZZPolyRingElem)
   return z
 end
 
+function derivative(x::ZZPolyRingElem, n::Int)
+  z = parent(x)()
+  @ccall Nemo.libflint.fmpz_poly_nth_derivative(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, n::Int)::Nothing
+  return z
+end
+
+function derivative!(x::ZZPolyRingElem, z::ZZPolyRingElem, n::Int)
+  @ccall Nemo.libflint.fmpz_poly_nth_derivative(x::Ref{ZZPolyRingElem}, z::Ref{ZZPolyRingElem}, n::Int)::Nothing
+  return x
+end
+
 ###############################################################################
 #
 #   Resultant
@@ -552,6 +563,10 @@ function signature(f::ZZPolyRingElem)
   s = Vector{Int}(undef, 1)
   @ccall libflint.fmpz_poly_signature(r::Ptr{Int}, s::Ptr{Int}, f::Ref{ZZPolyRingElem})::Nothing
   return (r[1], s[1])
+end
+
+function n_real_roots(f::ZZPolyRingElem)
+  return @ccall Nemo.libflint.fmpz_poly_num_real_roots_sturm(f::Ref{ZZPolyRingElem})::Cint
 end
 
 ################################################################################
