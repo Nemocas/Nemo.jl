@@ -171,12 +171,16 @@ Base.ceil(::Type{QQFieldElem}, a::QQFieldElem) = QQFieldElem(ceil(ZZRingElem, a)
 
 
 function ceil!(res::ZZRingElem, t::QQFieldElem)
-  @ccall libflint.fmpz_cdiv_q(res::Ref{ZZRingElem}, _num_ptr(t)::Ref{ZZRingElem}, _den_ptr(t)::Ref{ZZRingElem})::Nothing
+  GC.@preserve t begin
+    @ccall libflint.fmpz_cdiv_q(res::Ref{ZZRingElem}, _num_ptr(t)::Ref{ZZRingElem}, _den_ptr(t)::Ref{ZZRingElem})::Nothing
+  end 
   return res
 end
 
 function floor!(res::ZZRingElem, t::QQFieldElem)
-  @ccall libflint.fmpz_fdiv_q(res::Ref{ZZRingElem}, _num_ptr(t)::Ref{ZZRingElem}, _den_ptr(t)::Ref{ZZRingElem})::Nothing
+  GC.@preserve t begin
+    @ccall libflint.fmpz_fdiv_q(res::Ref{ZZRingElem}, _num_ptr(t)::Ref{ZZRingElem}, _den_ptr(t)::Ref{ZZRingElem})::Nothing
+  end 
   return res
 end
 
