@@ -185,7 +185,7 @@ function floor!(res::ZZRingElem, t::QQFieldElem)
 end
 
 Base.ceil(::Type{ZZRingElem}, a::QQFieldElem) = ceil!(ZZRingElem(), a)
-Base.floor(::Type{ZZRingElem}, a::QQFieldElem) = floor!(ZZFieldElem(), a)
+Base.floor(::Type{ZZRingElem}, a::QQFieldElem) = floor!(ZZRingElem(), a)
 
 
 Base.trunc(a::QQFieldElem) = trunc(QQFieldElem, a)
