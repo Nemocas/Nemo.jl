@@ -566,7 +566,7 @@ function signature(f::ZZPolyRingElem)
 end
 
 function n_real_roots(f::ZZPolyRingElem)
-  return @ccall Nemo.libflint.fmpz_poly_num_real_roots_sturm(f::Ref{ZZPolyRingElem})::Cint
+  return @ccall libflint.fmpz_poly_num_real_roots_sturm(f::Ref{ZZPolyRingElem})::Int
 end
 
 ################################################################################
