@@ -469,9 +469,9 @@ function derivative(x::ZZPolyRingElem, n::Int)
   return z
 end
 
-function derivative!(x::ZZPolyRingElem, z::ZZPolyRingElem, n::Int)
-  @ccall Nemo.libflint.fmpz_poly_nth_derivative(x::Ref{ZZPolyRingElem}, z::Ref{ZZPolyRingElem}, n::Int)::Nothing
-  return x
+function derivative!(z::ZZPolyRingElem, x::ZZPolyRingElem, n::Int)
+  @ccall libflint.fmpz_poly_nth_derivative(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, n::Int)::Nothing
+  return z
 end
 
 ###############################################################################
