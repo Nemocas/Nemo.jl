@@ -167,7 +167,7 @@ returned as a rational with denominator $1$.
 """
 Base.ceil(a::QQFieldElem) = ceil(QQFieldElem, a)
 Base.ceil(::Type{QQFieldElem}, a::QQFieldElem) = QQFieldElem(ceil(ZZRingElem, a), 1)
-Base.ceil(::Type{ZZRingElem}, a::QQFieldElem) = cdiv(numerator(a), denominator(a))
+#Base.ceil(::Type{ZZRingElem}, a::QQFieldElem) = cdiv(numerator(a), denominator(a))
 
 
 function ceil!(res::ZZRingElem, t::QQFieldElem)
