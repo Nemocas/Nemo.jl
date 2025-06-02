@@ -465,7 +465,7 @@ end
 
 function derivative(x::ZZPolyRingElem, n::Int)
   z = parent(x)()
-  @ccall Nemo.libflint.fmpz_poly_nth_derivative(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, n::Int)::Nothing
+  z = derivative!(z, x, n)
   return z
 end
 
