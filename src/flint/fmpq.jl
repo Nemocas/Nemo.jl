@@ -157,7 +157,7 @@ returned as a rational with denominator $1$.
 """
 Base.floor(a::QQFieldElem) = floor(QQFieldElem, a)
 Base.floor(::Type{QQFieldElem}, a::QQFieldElem) = QQFieldElem(floor(ZZRingElem, a), 1)
-Base.floor(::Type{ZZRingElem}, a::QQFieldElem) = fdiv(numerator(a), denominator(a))
+#Base.floor(::Type{ZZRingElem}, a::QQFieldElem) = fdiv(numerator(a), denominator(a))
 
 @doc raw"""
     ceil(a::QQFieldElem)
@@ -167,7 +167,26 @@ returned as a rational with denominator $1$.
 """
 Base.ceil(a::QQFieldElem) = ceil(QQFieldElem, a)
 Base.ceil(::Type{QQFieldElem}, a::QQFieldElem) = QQFieldElem(ceil(ZZRingElem, a), 1)
-Base.ceil(::Type{ZZRingElem}, a::QQFieldElem) = cdiv(numerator(a), denominator(a))
+#Base.ceil(::Type{ZZRingElem}, a::QQFieldElem) = cdiv(numerator(a), denominator(a))
+
+
+function ceil!(res::ZZRingElem, t::QQFieldElem)
+  GC.@preserve t begin
+    @ccall libflint.fmpz_cdiv_q(res::Ref{ZZRingElem}, _num_ptr(t)::Ref{ZZRingElem}, _den_ptr(t)::Ref{ZZRingElem})::Nothing
+  end 
+  return res
+end
+
+function floor!(res::ZZRingElem, t::QQFieldElem)
+  GC.@preserve t begin
+    @ccall libflint.fmpz_fdiv_q(res::Ref{ZZRingElem}, _num_ptr(t)::Ref{ZZRingElem}, _den_ptr(t)::Ref{ZZRingElem})::Nothing
+  end 
+  return res
+end
+
+Base.ceil(::Type{ZZRingElem}, a::QQFieldElem) = ceil!(ZZRingElem(), a)
+Base.floor(::Type{ZZRingElem}, a::QQFieldElem) = floor!(ZZRingElem(), a)
+
 
 Base.trunc(a::QQFieldElem) = trunc(QQFieldElem, a)
 Base.trunc(::Type{QQFieldElem}, a::QQFieldElem) = QQFieldElem(trunc(ZZRingElem, a), 1)
