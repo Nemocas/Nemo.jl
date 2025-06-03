@@ -150,9 +150,9 @@ function Base.hash(a::ZZMatrix, h::UInt)
     c = ncols(a)
     h = hash(r, h)
     h = hash(c, h)
-    rowptr = convert(Ptr{Ptr{Int}}, a.rows)
+    entries = convert(Ptr{Int}, a.entries)
     for i in 1:r
-      h = _hash_integer_array(unsafe_load(rowptr, i), c, h)
+      h = _hash_integer_array(entries + (i - 1) * a.stride * sizeof(Int), c, h)
     end
     return xor(h, 0x5c22af6d5986f453%UInt)
   end
@@ -2213,5 +2213,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::ZZMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(ZZRingElem)
-
+mat_entry_ptr(A::ZZMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(ZZRingElem)
