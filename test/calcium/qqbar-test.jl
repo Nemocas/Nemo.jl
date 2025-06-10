@@ -488,3 +488,13 @@ end
     @test z::QQBarFieldElem == x
   end
 end
+
+@testset "QQBarFieldElem.show" begin
+  R = algebraic_closure(QQ)
+  @test sprint(show, one(R)) == "Root 1.00000 of x - 1"
+  @test sprint(show, sqrt(R(-1))) == "Root 1.00000*im of x^2 + 1"
+
+  Ry, y = polynomial_ring(R, :y)
+  f = 2 * y^3 - root(R(5), 3) * y^2 + sqrt(R(-1))
+  @test sprint(show, f) == "(Root 2.00000 of x - 2)*y^3 + (Root -1.70998 of x^3 + 5)*y^2 + (Root 1.00000*im of x^2 + 1)"
+end

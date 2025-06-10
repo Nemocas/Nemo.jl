@@ -84,24 +84,25 @@ end
 #
 ###############################################################################
 
-# todo
-# function expressify(a::QQBarFieldElem; context = nothing)
-# end
+function expressify(a::QQBarFieldElem; context = nothing)
+  R, _ = polynomial_ring(ZZ, :x; cached=false)
+  f = minpoly(R, a)
+  return Expr(:sequence, Expr(:text, "Root "), Expr(:text, _native_string(a)), Expr(:text, " of "), expressify(f))
+end
+@enable_all_show_via_expressify QQBarFieldElem
 
-function native_string(x::QQBarFieldElem)
+function _native_string(x::QQBarFieldElem)
   cstr = @ccall libflint.qqbar_get_str_nd(x::Ref{QQBarFieldElem}, Int(6)::Int)::Ptr{UInt8}
   number = unsafe_string(cstr)
   @ccall libflint.flint_free(cstr::Ptr{UInt8})::Nothing
 
   number = number[1:first(findfirst(" (", number)::UnitRange)-1]
   number = replace(number, "I" => "im")
+  return number
+end
 
-  R, Rx = polynomial_ring(ZZ, "x")
-  polynomial = string(minpoly(R, x))
-  polynomial = replace(polynomial, "*" => "")
-  res = string("Root ", number, " of ", polynomial)
-
-  return res
+function native_string(x::QQBarFieldElem)
+  return sprint(show, x)
 end
 
 function show(io::IO, F::QQBarField)
@@ -114,9 +115,6 @@ function show(io::IO, F::QQBarField)
   end
 end
 
-function show(io::IO, x::QQBarFieldElem)
-  print(io, native_string(x))
-end
 
 ###############################################################################
 #
