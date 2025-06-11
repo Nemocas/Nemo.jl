@@ -89,9 +89,7 @@ end
   @test PrettyPrinting.oneline(R) == "Algebraic closure of rational field"
   @test PrettyPrinting.supercompact(R) == "QQBar"
 
-  a = R(1)
-
-  @test string(a) == "Root 1.00000 of x - 1"
+  @test string(R(1)) == "Root 1.00000 of x - 1"
 
   @test string(-(QQBarFieldElem(10) ^ 20)) == "Root -1.00000e+20 of x + 100000000000000000000"
   @test string(root_of_unity(R, 3)) == "Root -0.500000 + 0.866025*im of x^2 + x + 1"

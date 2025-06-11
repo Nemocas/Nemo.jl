@@ -87,7 +87,9 @@ end
 function expressify(a::QQBarFieldElem; context = nothing)
   R, _ = polynomial_ring(ZZ, :x; cached=false)
   f = minpoly(R, a)
-  return Expr(:sequence, Expr(:text, "Root "), Expr(:text, _native_string(a)), Expr(:text, " of "), expressify(f))
+
+  f_str = replace(string(f), "*" => "")
+  return Expr(:sequence, Expr(:text, "Root "), Expr(:text, _native_string(a)), Expr(:text, " of "), Expr(:text, f_str))
 end
 @enable_all_show_via_expressify QQBarFieldElem
 
