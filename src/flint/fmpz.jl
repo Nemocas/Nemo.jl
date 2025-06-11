@@ -353,6 +353,10 @@ function abs(x::ZZRingElem)
   return z
 end
 
+function abs2(x::ZZRingElem)
+  return x^2
+end
+
 floor(x::ZZRingElem) = x
 ceil(x::ZZRingElem) = x
 trunc(x::ZZRingElem) = x

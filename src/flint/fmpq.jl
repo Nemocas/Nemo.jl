@@ -100,6 +100,10 @@ function abs(a::QQFieldElem)
   return z
 end
 
+function abs2(a::QQFieldElem)
+  return a^2
+end
+
 zero(_::QQField) = QQFieldElem(0)
 
 one(_::QQField) = QQFieldElem(1)

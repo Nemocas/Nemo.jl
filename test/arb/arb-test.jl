@@ -64,8 +64,12 @@ end
   @test_throws ErrorException Int(RR(c))
 
   @test abs(Float64(RR("2.3")) - 2.3) < 1e-10
+  @test abs(abs2(Float64(RR("2.3"))) - 5.29) < 1e-10
   @test setprecision(BigFloat, 1000) do
     abs(BigFloat(ArbField(1000)("2.3")) - BigFloat("2.3")) < 1e-299
+  end
+  @test setprecision(BigFloat, 1000) do
+    abs(abs2(BigFloat(ArbField(1000)("2.3"))) - BigFloat("5.29")) < 1e-299
   end
 
   for T in [Float64, BigFloat]
@@ -213,6 +217,9 @@ end
   @test -RR(3) == RR(-3)
   @test abs(-RR(3)) == 3
   @test abs(RR(3)) == 3
+  @test abs2(-RR(3)) == 9
+  @test abs2(RR(3)) == 9
+  @test abs2(RR(0)) == 0
   @test inv(RR(2)) == RR(0.5)
 end
 
@@ -514,7 +521,7 @@ end
   CC = AcbField(64)
 
   tau = (1 + sqrt(CC(-23)))/2
-  a = abs(modular_weber_f2(tau))^2
+  a = abs2(modular_weber_f2(tau))
   C = lindep([RR(1), a, a^2, a^3, a^4, a^5], 20)
 
   @test C == ZZRingElem[-1, 1, 1, 0, 1, 0]
