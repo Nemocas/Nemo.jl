@@ -149,6 +149,7 @@ end
   @test height_bits(b) == 7
 
   @test abs(a) == ZZRingElem(2)//3
+  @test abs2(a) == ZZRingElem(4)//9
 
   @test sign(QQFieldElem(-2, 3)) == -1
   @test sign(QQFieldElem()) == 0

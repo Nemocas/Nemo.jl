@@ -819,6 +819,17 @@ function abs(a::CalciumFieldElem)
 end
 
 @doc raw"""
+    abs2(a::CalciumFieldElem)
+
+Return the square of the absolute value of `a`.
+"""
+function abs2(a::CalciumFieldElem)
+  a2 = real(a)^2 + imag(a)^2  # ***OR***  a2 = a * conj(a)
+  check_special(a2)
+  return a2
+end
+
+@doc raw"""
     conj(a::CalciumFieldElem; form::Symbol=:default)
 
 Return the complex conjugate of `a`. The optional `form` argument allows
