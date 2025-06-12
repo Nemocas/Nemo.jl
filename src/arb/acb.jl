@@ -1784,16 +1784,18 @@ end
 
 Return a random element in given Acb field.
 
-The `randtype` default is `:urandom` which returns an `AcbFieldElem` contained in
-the closed unit disc.
+The `randtype` default is `:urandom` which generates a random complex
+number with precise real and imaginary parts, uniformly in the unit disk.
 
 The rest of the methods return non-uniformly distributed values in order to
-exercise corner cases. The option `:randtest` will return a finite number, and
-`:randtest_exact` the same but with a zero radius. The option
-`:randtest_precise` return an `ArbFieldElem` with a radius around $2^{-\mathrm{prec}}$
-the magnitude of the midpoint, while `:randtest_wide` return a radius that
-might be big relative to its midpoint. The `:randtest_special`-option might
-return a midpoint and radius whose values are `NaN` or `inf`.
+exercise corner cases.  The type `:randtest` will generate a random
+complex number by generating separate random real and imaginary parts.
+The type `:randtest_precise` generates a random complex number with precise
+real and imaginary parts.
+The type `:randtest_special` generates a random complex number by generating
+separate random real and imaginary parts; it may generate NaNs and infinities.
+The type `:randtest_param` generates a random complex number, with very high
+probability of generating integers and half-integers.
 """
 function rand(r::AcbField; randtype::Symbol=:urandom)
   state = _flint_rand_states[Threads.threadid()]
@@ -1803,14 +1805,12 @@ function rand(r::AcbField; randtype::Symbol=:urandom)
     @ccall libflint.acb_urandom(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int)::Nothing
   elseif randtype == :randtest
     @ccall libflint.acb_randtest(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int, 30::Int)::Nothing
-  elseif randtype == :randtest_exact
-    @ccall libflint.acb_randtest_exact(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int, 30::Int)::Nothing
-  elseif randtype == :randtest_precise
-    @ccall libflint.acb_randtest_precise(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int, 30::Int)::Nothing
-  elseif randtype == :randtest_wide
-    @ccall libflint.acb_randtest_wide(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int, 30::Int)::Nothing
   elseif randtype == :randtest_special
     @ccall libflint.acb_randtest_special(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int, 30::Int)::Nothing
+  elseif randtype == :randtest_precise
+    @ccall libflint.acb_randtest_precise(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int, 30::Int)::Nothing
+  elseif randtype == :randtest_param
+    @ccall libflint.acb_randtest_param(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int, 30::Int)::Nothing
   else
     error("Acb random generation `" * String(randtype) * "` is not defined")
   end
