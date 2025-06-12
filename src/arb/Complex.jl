@@ -1761,3 +1761,48 @@ end
 ################################################################################
 
 # see internal constructor
+
+################################################################################
+#
+#  Random generation
+#
+################################################################################
+
+@doc raw"""
+    rand(r::ComplexField; randtype::Symbol=:urandom)
+
+Return a random element in given Acb field.
+
+The `randtype` default is `:urandom` which return an `AcbFieldElem` contained in
+$[0,1]$.
+
+The rest of the methods return non-uniformly distributed values in order to
+exercise corner cases. The option `:randtest` will return a finite number, and
+`:randtest_exact` the same but with a zero radius. The option
+`:randtest_precise` return an `ArbFieldElem` with a radius around $2^{-\mathrm{prec}}$
+the magnitude of the midpoint, while `:randtest_wide` return a radius that
+might be big relative to its midpoint. The `:randtest_special`-option might
+return a midpoint and radius whose values are `NaN` or `inf`.
+"""
+function rand(r::ComplexField, prec::Int = precision(Balls); randtype::Symbol=:urandom)
+  state = _flint_rand_states[Threads.threadid()]
+  x = r()
+
+  if randtype == :urandom
+    @ccall libflint.acb_urandom(x::Ref{ComplexFieldElem}, state::Ref{rand_ctx}, prec::Int)::Nothing
+  elseif randtype == :randtest
+    @ccall libflint.acb_randtest(x::Ref{ComplexFieldElem}, state::Ref{rand_ctx}, prec::Int, 30::Int)::Nothing
+  elseif randtype == :randtest_exact
+    @ccall libflint.acb_randtest_exact(x::Ref{ComplexFieldElem}, state::Ref{rand_ctx}, prec::Int, 30::Int)::Nothing
+  elseif randtype == :randtest_precise
+    @ccall libflint.acb_randtest_precise(x::Ref{ComplexFieldElem}, state::Ref{rand_ctx}, prec::Int, 30::Int)::Nothing
+  elseif randtype == :randtest_wide
+    @ccall libflint.acb_randtest_wide(x::Ref{ComplexFieldElem}, state::Ref{rand_ctx}, prec::Int, 30::Int)::Nothing
+  elseif randtype == :randtest_special
+    @ccall libflint.acb_randtest_special(x::Ref{ComplexFieldElem}, state::Ref{rand_ctx}, prec::Int, 30::Int)::Nothing
+  else
+    error("Acb random generation `" * String(randtype) * "` is not defined")
+  end
+
+  return x
+end
