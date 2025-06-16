@@ -1772,3 +1772,48 @@ end
 ################################################################################
 
 # see internal constructor
+
+################################################################################
+#
+#  Random generation
+#
+################################################################################
+
+@doc raw"""
+    rand(r::AcbField; randtype::Symbol=:urandom)
+
+Return a random element in given Acb field.
+
+The `randtype` default is `:urandom` which generates a random complex
+number with precise real and imaginary parts, uniformly in the unit disk.
+
+The rest of the methods return non-uniformly distributed values in order to
+exercise corner cases.  The type `:randtest` will generate a random
+complex number by generating separate random real and imaginary parts.
+The type `:randtest_precise` generates a random complex number with precise
+real and imaginary parts.
+The type `:randtest_special` generates a random complex number by generating
+separate random real and imaginary parts; it may generate NaNs and infinities.
+The type `:randtest_param` generates a random complex number, with very high
+probability of generating integers and half-integers.
+"""
+function rand(r::AcbField; randtype::Symbol=:urandom)
+  state = _flint_rand_states[Threads.threadid()]
+  x = r()
+
+  if randtype == :urandom
+    @ccall libflint.acb_urandom(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int)::Nothing
+  elseif randtype == :randtest
+    @ccall libflint.acb_randtest(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int, 30::Int)::Nothing
+  elseif randtype == :randtest_special
+    @ccall libflint.acb_randtest_special(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int, 30::Int)::Nothing
+  elseif randtype == :randtest_precise
+    @ccall libflint.acb_randtest_precise(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int, 30::Int)::Nothing
+  elseif randtype == :randtest_param
+    @ccall libflint.acb_randtest_param(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int, 30::Int)::Nothing
+  else
+    error("Acb random generation `" * String(randtype) * "` is not defined")
+  end
+
+  return x
+end
