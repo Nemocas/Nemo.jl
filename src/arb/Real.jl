@@ -1937,10 +1937,7 @@ function _arb_set(x::RealFieldElemOrPtr, y::BigFloat)
 end
 
 function _arb_set(x::RealFieldElemOrPtr, y::BigFloat, p::Int)
-  m = _mid_ptr(x)
-  r = _rad_ptr(x)
-  @ccall libflint.arf_set_mpfr(m::Ptr{arf_struct}, y::Ref{BigFloat})::Nothing
-  @ccall libflint.mag_zero(r::Ptr{mag_struct})::Nothing
+  _arb_set(x, y)
   @ccall libflint.arb_set_round(x::Ref{RealFieldElem}, x::Ref{RealFieldElem}, p::Int)::Nothing
 end
 
@@ -1960,6 +1957,24 @@ function _arb_set(x::RealFieldElemOrPtr, y::Real, p::Int)
   _arb_set(x, BigFloat(y), p)
 end
 
+function _arb_set(x::RealFieldElemOrPtr, y::Irrational)
+  _arb_set(x, y, precision(Balls))
+end
+
+function _arb_set(x::RealFieldElemOrPtr, y::Irrational, p::Int)
+  if y == pi
+    @ccall libflint.arb_const_pi(x::Ref{RealFieldElem}, p::Int)::Nothing
+  elseif y == MathConstants.e
+    @ccall libflint.arb_const_e(x::Ref{RealFieldElem}, p::Int)::Nothing
+  elseif y == MathConstants.catalan
+    @ccall libflint.arb_const_catalan(x::Ref{RealFieldElem}, p::Int)::Nothing
+  elseif y == MathConstants.eulergamma
+    @ccall libflint.arb_const_euler(x::Ref{RealFieldElem}, p::Int)::Nothing
+  else
+    _arb_set(x, BigFloat(y; precision=p), p)
+  end
+end
+
 ################################################################################
 #
 #  Parent object overloading
@@ -1971,17 +1986,9 @@ end
 (r::RealField)(x::Any, prec::Int) = RealFieldElem(x, prec)
 
 function (r::RealField)(x::Irrational, prec::Int)
-  if x == pi
-    return const_pi(r, prec)
-  elseif x == MathConstants.e
-    return const_e(r, prec)
-  elseif x == MathConstants.catalan
-    return const_catalan(r, prec)
-  elseif x == MathConstants.eulergamma
-    return const_euler(r, prec)
-  else
-    error("constant not supported")
-  end
+  z = r()
+  _arb_set(z, x, prec)
+  return z
 end
 
 (r::RealField)(x::Any; precision::Int = precision(Balls)) = r(x, precision)
