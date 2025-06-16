@@ -463,6 +463,17 @@ function derivative(x::ZZPolyRingElem)
   return z
 end
 
+function derivative(x::ZZPolyRingElem, n::Int)
+  z = parent(x)()
+  z = derivative!(z, x, n)
+  return z
+end
+
+function derivative!(z::ZZPolyRingElem, x::ZZPolyRingElem, n::Int)
+  @ccall libflint.fmpz_poly_nth_derivative(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, n::Int)::Nothing
+  return z
+end
+
 ###############################################################################
 #
 #   Resultant
@@ -552,6 +563,10 @@ function signature(f::ZZPolyRingElem)
   s = Vector{Int}(undef, 1)
   @ccall libflint.fmpz_poly_signature(r::Ptr{Int}, s::Ptr{Int}, f::Ref{ZZPolyRingElem})::Nothing
   return (r[1], s[1])
+end
+
+function n_real_roots(f::ZZPolyRingElem)
+  return @ccall libflint.fmpz_poly_num_real_roots_sturm(f::Ref{ZZPolyRingElem})::Int
 end
 
 ################################################################################
