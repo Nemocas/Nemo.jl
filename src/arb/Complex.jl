@@ -532,10 +532,9 @@ function abs(x::ComplexFieldElem, prec::Int = precision(Balls))
 end
 
 function abs2(x::ComplexFieldElem, prec::Int = precision(Balls))
-  r2 = real(x)^2 + imag(x)^2  # the result, but must adjust precision...
-  z = RealFieldElem()
-  @ccall libflint.arb_add_ui(z::Ref{RealFieldElem}, r2::Ref{RealFieldElem}, 0::UInt, prec::Int)::Nothing # add zero, just to adjust precision
-  return z;
+  set_precision!(Balls, prec) do
+    return real(x)^2 + imag(x)^2
+  end
 end
 
 ################################################################################
