@@ -283,9 +283,9 @@ If `side` is `:right`, the right eigenspace is computed, i.e. vectors $v$ such t
 $Mv = \lambda v$. If `side` is `:left`, the left eigenspace is computed, i.e. vectors
 $v$ such that $vM = \lambda v$.
 """
-function eigenspace(M::MatElem{T}, lambda::T; side::Symbol = :left) where T <: FieldElem
+function eigenspace(M::MatElem{T1}, lambda::T2; side::Symbol = :left) where {T1 <: RingElem, T2 <: RingElem}
   @assert is_square(M)
-  N = deepcopy(M)
+  N = matrix(parent(lambda),M)
   for i = 1:ncols(N)
     N[i, i] -= lambda
   end
@@ -303,7 +303,7 @@ left eigenspaces are computed.
 
 See also `eigenspace`.
 """
-function eigenspaces(M::MatElem{T}; side::Symbol = :left) where T<:FieldElem
+function eigenspaces(M::MatElem{T}; side::Symbol = :left) where T<:RingElem
 
   S = eigenvalues(M)
   L = Dict{elem_type(base_ring(M)), typeof(M)}()
@@ -311,6 +311,16 @@ function eigenspaces(M::MatElem{T}; side::Symbol = :left) where T<:FieldElem
     push!(L, k => vcat(eigenspace(M, k, side = side)))
   end
   return L
+end
+
+function eigenspaces(L::Field, M::MatElem{T}; side::Symbol = :left) where T<:RingElem
+
+  S = eigenvalues(L, M)
+  E_spaces = Dict{elem_type(L), typeof(matrix(L,M))}()  # WASTEFULLY COPIES M
+  for k in S
+    push!(E_spaces, k => vcat(eigenspace(M, k, side = side)))
+  end
+  return E_spaces
 end
 
 ###############################################################################

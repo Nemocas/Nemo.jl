@@ -99,6 +99,25 @@ end
   @test length(E6bm) == 2
   @test issetequal(E6bm, [(ZZ(-1),1), (ZZ(1),2)])
 
+  M_2x2 = matrix(ZZ, [0 1; -1 0])
+  @test length(eigenvalues(M_2x2)) == 0
+  K = algebraic_closure(QQ)
+  lambda1, lambda2 = eigenvalues(K, M_2x2)
+  MK_2x2 = matrix(K, M_2x2)
+  @test length(eigenspaces(MK_2x2)) == 2
+  @test size(eigenspace(MK_2x2, lambda1)) == (1,2)
+
+  @test length(eigenspaces(M_2x2)) == 0
+  @test length(eigenspaces(K, M_2x2)) == 2
+  @test size(eigenspace(M_2x2, lambda1)) == (1,2)
+
+  M_3x3 = matrix(ZZ, [[5, -2, -2],  [2, 1, -2],  [2, -2, 1]])
+  @test length(eigenvalues(M_3x3)) == 2
+  @test length(eigenspaces(M_3x3)) == 2
+  @test size(eigenspace(M_3x3, ZZ(1))) == (1,3)
+  @test size(eigenspace(M, ZZ(2))) == (0,3)
+  @test size(eigenspace(M, ZZ(3))) == (2,3)
+
   # eigenvalues_simple not defined for integer matrices, so not tested.
 end
 
