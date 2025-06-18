@@ -57,7 +57,7 @@ is_unit(a::ZZModRingElem) = a.parent.n == 1 ? iszero(a.data) : isone(gcd(a.data,
 modulus(R::ZZModRing) = R.n
 
 function krull_dim(R::ZZModRing)
-  modulus(R) == 1 && error("Function `krull_dim` gives wrong answers if the base ring is the zero ring.")
+  @req !is_trivial(R) "`krull_dim` is not supported for trivial rings.")
   return is_prime(modulus(R)) ? 0 : 1
 end
 
