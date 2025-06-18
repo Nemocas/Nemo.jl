@@ -209,6 +209,8 @@ one(::Type{ZZRingElem}) = ZZRingElem(1)
 
 zero(::Type{ZZRingElem}) = ZZRingElem(0)
 
+krull_dim(::ZZRing) = 1
+
 @doc raw"""
     sign(a::ZZRingElem)
 

@@ -56,6 +56,11 @@ is_unit(a::ZZModRingElem) = a.parent.n == 1 ? iszero(a.data) : isone(gcd(a.data,
 
 modulus(R::ZZModRing) = R.n
 
+function krull_dim(R::ZZModRing)
+  modulus(R) == 1 && error("Function `krull_dim` gives wrong answers if the base ring is the zero ring.")
+  return is_prime(modulus(R)) ? 0 : 1
+end
+
 characteristic(R::ZZModRing) = modulus(R)
 
 is_trivial(a::ZZModRing) = is_one(modulus(a))  # constructor ensures the modulus is > 0

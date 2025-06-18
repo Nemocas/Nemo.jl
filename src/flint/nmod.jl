@@ -54,6 +54,11 @@ isone(a::zzModRingElem) = (a.parent.n == 1) || (a.data == 1)
 
 modulus(R::zzModRing) = R.n
 
+function krull_dim(R::zzModRing)
+  modulus(R) == 1 && error("Function `krull_dim` gives wrong answers if the base ring is the zero ring.")
+  return is_prime(modulus(R)) ? 0 : 1
+end
+
 characteristic(R::zzModRing) = ZZRingElem(modulus(R))
 
 is_trivial(a::zzModRing) = is_unit(modulus(a))

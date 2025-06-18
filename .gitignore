@@ -1,3 +1,5 @@
 /docs/build/
 Manifest.toml
 .DS_Store
+docs/src/developer/img/types.svg
+docs/src/developer/img/types2.svg

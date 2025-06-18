@@ -389,6 +389,7 @@ export j_invariant
 export jacobi_symbol
 export jacobi_theta
 export kronecker_symbol
+export krull_dim
 export laurent_series_field
 export laurent_series_ring
 export lcm
