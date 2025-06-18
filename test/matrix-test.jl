@@ -115,8 +115,8 @@ end
   @test length(eigenvalues(M_3x3)) == 2
   @test length(eigenspaces(M_3x3)) == 2
   @test size(eigenspace(M_3x3, ZZ(1))) == (1,3)
-  @test size(eigenspace(M, ZZ(2))) == (0,3)
-  @test size(eigenspace(M, ZZ(3))) == (2,3)
+  @test size(eigenspace(M_3x3, ZZ(2))) == (0,3)
+  @test size(eigenspace(M_3x3, ZZ(3))) == (2,3)
 
   # eigenvalues_simple not defined for integer matrices, so not tested.
 end
