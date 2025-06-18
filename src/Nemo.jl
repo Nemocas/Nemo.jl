@@ -180,6 +180,7 @@ import AbstractAlgebra: get_cached!
 import AbstractAlgebra: Group
 import AbstractAlgebra: howell_form!
 import AbstractAlgebra: Indent
+import AbstractAlgebra: is_noetherian
 import AbstractAlgebra: is_terse
 import AbstractAlgebra: is_zero_initialized
 import AbstractAlgebra: krull_dim

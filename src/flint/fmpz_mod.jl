@@ -61,6 +61,8 @@ function krull_dim(R::ZZModRing)
   return is_prime(modulus(R)) ? 0 : 1
 end
 
+is_noetherian(::ZZModRing) = true
+
 characteristic(R::ZZModRing) = modulus(R)
 
 is_trivial(a::ZZModRing) = is_one(modulus(a))  # constructor ensures the modulus is > 0

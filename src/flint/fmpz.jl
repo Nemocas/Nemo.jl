@@ -211,6 +211,8 @@ zero(::Type{ZZRingElem}) = ZZRingElem(0)
 
 krull_dim(::ZZRing) = 1
 
+is_noetherian(::ZZRing) = true
+
 @doc raw"""
     sign(a::ZZRingElem)
 

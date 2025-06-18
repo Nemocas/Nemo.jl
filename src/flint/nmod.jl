@@ -59,6 +59,8 @@ function krull_dim(R::zzModRing)
   return is_prime(modulus(R)) ? 0 : 1
 end
 
+is_noetherian(::zzModRing) = true
+
 characteristic(R::zzModRing) = ZZRingElem(modulus(R))
 
 is_trivial(a::zzModRing) = is_unit(modulus(a))
