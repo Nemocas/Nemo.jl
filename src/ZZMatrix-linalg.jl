@@ -793,6 +793,7 @@ function sub_into!(A::ZZMatrix, C::ZZMatrix, c::Int)
 end
 
 #saves essentially the allocation of A.rows
+#Edit: A.rows no longer exists, not sure if this is still useful
 function view!(A::ZZMatrix, B::ZZMatrix, r::UnitRange{Int}, ::Colon)
   A.entries = B.entries + B.stride * sizeof(ZZRingElem) * (r.start - 1)
   A.r = length(r)

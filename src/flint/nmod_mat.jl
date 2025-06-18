@@ -537,6 +537,7 @@ function lu(x::T, P = SymmetricGroup(nrows(x))) where T <: Zmodn_mat
   return rank, p, L, U
 end
 
+#= does not work anymore as of FLINT 3.3 as the `rows` field no longer exists
 #to support FAST lu!
 function AbstractAlgebra.Strassen.apply!(A::fpMatrix, P::Perm{Int}; offset::Int = 0)
   n = length(P.d)
@@ -548,6 +549,7 @@ function AbstractAlgebra.Strassen.apply!(A::fpMatrix, P::Perm{Int}; offset::Int 
     unsafe_store!(reinterpret(Ptr{Int}, A.rows), t[i], i + offset)
   end
 end
+=#
 
 ################################################################################
 #
