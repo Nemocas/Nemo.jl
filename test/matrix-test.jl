@@ -62,60 +62,75 @@ end
 
 @testset "Eigenvalues of ZZMatrix" begin
   A4 = matrix(ZZ,4,4, [6,-8,9,5,  5,-6,5,0,  0,6,5,4,  -6,8,-1,7])
-  E4 = eigenvalues(A4)
+  E4 = eigenvalues(QQ, A4)
   @test length(E4) == 2
-  @test issetequal(E4, [2,4])
-  E4m = eigenvalues_with_multiplicities(A4)
+  @test issetequal(E4, [QQ(2),QQ(4)])
+  E4m = eigenvalues_with_multiplicities(QQ,A4)
   @test length(E4m) == 2
-  @test issetequal(E4m, [(ZZ(2),1), (ZZ(4),1)])
+  @test issetequal(E4m, [(QQ(2),1), (QQ(4),1)])
 
 
   A5 = matrix(ZZ,5,5, [0,0,1,-1,-1,  -1,-1,1,1,-1,  0,0,1,-1,-1,  -1,1,1,-1,-1,  1,1,-1,-1,1])
-  E5 = eigenvalues(A5)
+  E5 = eigenvalues(QQ,A5)
   @test length(E5) == 3
-  @test issetequal(E5, [0,1,-2])
+  @test issetequal(E5, [QQ(0),QQ(1),QQ(-2)])
 
-  E5m = eigenvalues_with_multiplicities(A5)
+  E5m = eigenvalues_with_multiplicities(QQ,A5)
   @test length(E5m) == 3
-  @test issetequal(E5m, [(ZZ(0),2), (ZZ(1),2), (ZZ(-2),1)])
+  @test issetequal(E5m, [(QQ(0),2), (QQ(1),2), (QQ(-2),1)])
 
 
   A6 = matrix(ZZ,6,6, [0,0,-1,0,1,0,  0,0,0,1,-1,0,  -1,0,0,0,1,0,  0,1,1,1,-1,0,  1,-1,1,1,-1,0,  1,-1,0,0,-1,-1])
-  E6 = eigenvalues(A6)
+  E6 = eigenvalues(QQ,A6)
   @test length(E6) == 2
-  @test issetequal(E6, [1,-1])
+  @test issetequal(E6, [QQ(1),QQ(-1)])
 
-  E6m = eigenvalues_with_multiplicities(A6)
+  E6m = eigenvalues_with_multiplicities(QQ,A6)
   @test length(E6m) == 2
-  @test issetequal(E6m, [(ZZ(-1),2), (ZZ(1),2)])
+  @test issetequal(E6m, [(QQ(-1),2), (QQ(1),2)])
 
 
   A6b = matrix(ZZ,6,6, [0,1,0,-1,1,0,  1,1,-2,0,-2,0,  -1,0,1,1,1,0,  1,-1,2,1,0,0,  1,1,-2,-2,-1,-2,  2,-2,0,2,-2,0])
-  E6b = eigenvalues(A6b)
+  E6b = eigenvalues(QQ,A6b)
   @test length(E6b) == 2
-  @test issetequal(E6b, [1,-1])
+  @test issetequal(E6b, [QQ(1),QQ(-1)])
 
-  E6bm = eigenvalues_with_multiplicities(A6b)
+  E6bm = eigenvalues_with_multiplicities(QQ,A6b)
   @test length(E6bm) == 2
-  @test issetequal(E6bm, [(ZZ(-1),1), (ZZ(1),2)])
+  @test issetequal(E6bm, [(QQ(-1),1), (QQ(1),2)])
 
-  M_2x2 = matrix(ZZ, [0 1; -1 0])
-  @test length(eigenvalues(M_2x2)) == 0
+  # See OSCAR issue #4388 (and subsequent PR #2108)
+  M_2x2 = matrix(ZZ, [0 1; -1 0])  # important here: ZZ is *not* a field
+  @test_throws  ArgumentError  eigenvalues(M_2x2)
+  @test length(eigenvalues(QQ, M_2x2)) == 0
+  @test_throws  ArgumentError  eigenvalues_with_multiplicities(M_2x2)
+  @test  length(eigenvalues_with_multiplicities(QQ,M_2x2)) == 0
+  MQQ_2x2 = change_base_ring(QQ, M_2x2)
+  @test length(eigenvalues(MQQ_2x2)) == 0
+  @test  length(eigenvalues_with_multiplicities(MQQ_2x2)) == 0
   K = algebraic_closure(QQ)
   lambda1, lambda2 = eigenvalues(K, M_2x2)
   MK_2x2 = matrix(K, M_2x2)
-  @test_broken length(eigenvalues(MK_2x2)) == 2
+  @test_broken length(eigenvalues(MK_2x2)) == 2  # requires factor which is outseide Nemo
 
-  @test length(eigenspaces(M_2x2)) == 0
-  @test_broken length(eigenspaces(K, M_2x2)) == 2
+  @test_throws  ArgumentError  eigenspaces(M_2x2)
+  @test  length(eigenspaces(QQ,M_2x2)) == 0
+  @test  length(eigenspaces(MQQ_2x2)) == 0
+  @test_broken length(eigenspaces(K, M_2x2)) == 2 # requires factor which is outseide Nemo
   @test size(eigenspace(M_2x2, lambda1)) == (1,2)
 
   M_3x3 = matrix(ZZ, [[5, -2, -2],  [2, 1, -2],  [2, -2, 1]])
-  @test length(eigenvalues(M_3x3)) == 2
-  @test length(eigenspaces(M_3x3)) == 2
-  @test size(eigenspace(M_3x3, ZZ(1))) == (1,3)
-  @test size(eigenspace(M_3x3, ZZ(2))) == (0,3)
-  @test size(eigenspace(M_3x3, ZZ(3))) == (2,3)
+  MQQ_3x3 = change_base_ring(QQ, M_3x3)
+  @test length(eigenvalues(QQ, M_3x3)) == 2
+  @test length(eigenvalues(MQQ_3x3)) == 2
+  @test length(eigenspaces(QQ, M_3x3)) == 2
+  @test length(eigenspaces(MQQ_3x3)) == 2
+  @test size(eigenspace(M_3x3, QQ(1))) == (1,3)
+  @test size(eigenspace(M_3x3, QQ(2))) == (0,3)
+  @test size(eigenspace(M_3x3, QQ(3))) == (2,3)
+  @test size(eigenspace(MQQ_3x3, 1)) == (1,3)
+  @test size(eigenspace(MQQ_3x3, 2)) == (0,3)
+  @test size(eigenspace(MQQ_3x3, 3)) == (2,3)
 
   # eigenvalues_simple not defined for integer matrices, so not tested.
 end
