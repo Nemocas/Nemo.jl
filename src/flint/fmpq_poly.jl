@@ -532,6 +532,29 @@ end
 
 ################################################################################
 #
+#  Interpolation
+#
+################################################################################
+
+function interpolate(R::QQPolyRing, x::Vector{ZZRingElem},
+    y::Vector{ZZRingElem})
+  z = R()
+
+  ax = Vector{Int}(undef, length(x))
+  ay = Vector{Int}(undef, length(y))
+
+  for i in 1:length(x)
+    ax[i] = x[i].d
+    ay[i] = y[i].d
+  end
+
+  @ccall libflint.fmpq_poly_interpolate_fmpz_vec(z::Ref{QQPolyRingElem}, ax::Ptr{Int}, ay::Ptr{Int}, length(x)::Int)::Nothing
+  return z
+end
+
+
+################################################################################
+#
 #   Factorization
 #
 ################################################################################

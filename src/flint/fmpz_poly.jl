@@ -582,8 +582,6 @@ function interpolate(R::ZZPolyRing, x::Vector{ZZRingElem},
   ax = Vector{Int}(undef, length(x))
   ay = Vector{Int}(undef, length(y))
 
-  t = ZZRingElem()
-
   for i in 1:length(x)
     ax[i] = x[i].d
     ay[i] = y[i].d
