@@ -236,7 +236,7 @@ function eigenvalues(M::MatElem{T}) where T <: RingElem
 end
 
 @doc raw"""
-    eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
+    eigenvalues_with_multiplicities(M::MatElem{T}) where T <: RingElem
 
 Return the eigenvalues of `M` (which lie in `base_ring(M)`) together with their
 algebraic multiplicities as a vector of tuples of (root, multiplicity).
@@ -274,8 +274,8 @@ function eigenvalues_with_multiplicities(L::Field, M::MatElem{T}) where T <: Rin
 end
 
 @doc raw"""
-    eigenspace(M::MatElem{T}, lambda::T; side::Symbol = :left)
-      where T <: FieldElem -> MatElem{T}
+    eigenspace(M::MatElem{T1}, lambda::T2; side::Symbol = :left)
+      where {T1 <: RingElem, T2 <: FieldElem} -> MatElem{T}
 
 Return a matrix whose rows (if `side == :left`) or columns (if `side == :right`)
 give a basis of the eigenspace of $M$ with respect to the eigenvalue $\lambda$.
@@ -285,7 +285,7 @@ $v$ such that $vM = \lambda v$.
 """
 function eigenspace(M::MatElem{T1}, lambda::T2; side::Symbol = :left) where {T1 <: RingElem, T2 <: RingElem}
   @assert is_square(M)
-  N = matrix(parent(lambda),M)
+  N = change_base_ring(parent(lambda),M)
   for i = 1:ncols(N)
     N[i, i] -= lambda
   end
@@ -294,7 +294,7 @@ end
 
 @doc raw"""
     eigenspaces(M::MatElem{T}; side::Symbol = :left)
-      where T <: FieldElem -> Dict{T, MatElem{T}}
+      where T <: RingElem -> Dict{T, MatElem{T}}
 
 Return a dictionary containing the eigenvalues of $M$ as keys and bases for the
 corresponding eigenspaces as values.
@@ -304,7 +304,6 @@ left eigenspaces are computed.
 See also `eigenspace`.
 """
 function eigenspaces(M::MatElem{T}; side::Symbol = :left) where T<:RingElem
-
   S = eigenvalues(M)
   L = Dict{elem_type(base_ring(M)), typeof(M)}()
   for k in S
@@ -313,14 +312,19 @@ function eigenspaces(M::MatElem{T}; side::Symbol = :left) where T<:RingElem
   return L
 end
 
-function eigenspaces(L::Field, M::MatElem{T}; side::Symbol = :left) where T<:RingElem
+@doc raw"""
+    eigenspaces(L::Field, M::MatElem{T}; side::Symbol = :left)
+      where T <: RingElem -> Dict{T, MatElem{T}}
 
-  S = eigenvalues(L, M)
-  E_spaces = Dict{elem_type(L), typeof(matrix(L,M))}()  # WASTEFULLY COPIES M
-  for k in S
-    push!(E_spaces, k => vcat(eigenspace(M, k, side = side)))
-  end
-  return E_spaces
+Return a dictionary containing the eigenvalues of $M$ over the field $L$ as keys
+and bases for the corresponding eigenspaces as values.
+If side is `:right`, the right eigenspaces are computed, if it is `:left` then the
+left eigenspaces are computed.
+
+See also `eigenspace`.
+"""
+function eigenspaces(L::Field, M::MatElem{T}; side::Symbol = :left) where T<:RingElem
+  return eigenspaces(change_base_ring(L, M); side=side)
 end
 
 ###############################################################################

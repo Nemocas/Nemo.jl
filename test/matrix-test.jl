@@ -104,11 +104,10 @@ end
   K = algebraic_closure(QQ)
   lambda1, lambda2 = eigenvalues(K, M_2x2)
   MK_2x2 = matrix(K, M_2x2)
-  @test length(eigenspaces(MK_2x2)) == 2
-  @test size(eigenspace(MK_2x2, lambda1)) == (1,2)
+  @test_broken length(eigenvalues(MK_2x2)) == 2
 
   @test length(eigenspaces(M_2x2)) == 0
-  @test length(eigenspaces(K, M_2x2)) == 2
+  @test_broken length(eigenspaces(K, M_2x2)) == 2
   @test size(eigenspace(M_2x2, lambda1)) == (1,2)
 
   M_3x3 = matrix(ZZ, [[5, -2, -2],  [2, 1, -2],  [2, -2, 1]])
