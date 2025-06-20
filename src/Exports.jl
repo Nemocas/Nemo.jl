@@ -350,6 +350,7 @@ export is_less_root_order
 export is_lower_triangular
 export is_negative
 export is_negative_entry
+export is_noetherian
 export is_nonnegative
 export is_nonpositive
 export is_nonzero
@@ -389,6 +390,7 @@ export j_invariant
 export jacobi_symbol
 export jacobi_theta
 export kronecker_symbol
+export krull_dim
 export laurent_series_field
 export laurent_series_ring
 export lcm

@@ -56,6 +56,13 @@ is_unit(a::ZZModRingElem) = a.parent.n == 1 ? iszero(a.data) : isone(gcd(a.data,
 
 modulus(R::ZZModRing) = R.n
 
+function krull_dim(R::ZZModRing)
+  @req !is_trivial(R) "`krull_dim` is not supported for trivial rings"
+  return is_prime(modulus(R)) ? 0 : 1
+end
+
+is_noetherian(::ZZModRing) = true
+
 characteristic(R::ZZModRing) = modulus(R)
 
 is_trivial(a::ZZModRing) = is_one(modulus(a))  # constructor ensures the modulus is > 0
