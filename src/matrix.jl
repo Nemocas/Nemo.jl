@@ -224,15 +224,23 @@ end
 ################################################################################
 
 @doc raw"""
-    eigenvalues(M::MatElem{T}) where T <: RingElem
+    eigenvalues(M::MatElem{T}) where T <: FieldElem
 
-Return the eigenvalues of `M` which lie in `base_ring(M)`.
+Return the eigenvalues of `M` which lie in the field `base_ring(M)`.
 """
-function eigenvalues(M::MatElem{T}) where T <: RingElem
+function eigenvalues(M::MatElem{T}) where T <: FieldElem
   @assert is_square(M)
   K = base_ring(M)
   f = charpoly(M)
   return roots(f)
+end
+
+# This function just aims to give a helpful error message if the
+# argument matrix is not over a field.  It deliberately has no doc!
+function eigenvalues(::MatElem{T}) where T <: RingElem
+  throw(ArgumentError("Matrix must be over a field"))
+  # Another option would be to convert automatically to a matrix
+  # over the field of fractions/quotients then compute with that.
 end
 
 @doc raw"""
@@ -241,13 +249,19 @@ end
 Return the eigenvalues of `M` (which lie in `base_ring(M)`) together with their
 algebraic multiplicities as a vector of tuples of (root, multiplicity).
 """
-function eigenvalues_with_multiplicities(M::MatElem{T}) where T <: RingElem
+function eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
   @assert is_square(M)
   K = base_ring(M)
   Kx, x = polynomial_ring(K, "x", cached = false)
   f = charpoly(Kx, M)
   r = roots(f)
   return [ (a, valuation(f, x - a)) for a in r ]
+end
+
+# This function just aims to give a helpful error message if the
+# argument matrix is not over a field.  It deliberately has no doc!
+function eigenvalues_with_multiplicities(::MatElem{T}) where T <: RingElem
+  throw(ArgumentError("Matrix must be over a field"))
 end
 
 @doc raw"""
@@ -274,8 +288,8 @@ function eigenvalues_with_multiplicities(L::Field, M::MatElem{T}) where T <: Rin
 end
 
 @doc raw"""
-    eigenspace(M::MatElem{T}, lambda::T; side::Symbol = :left)
-      where T <: FieldElem -> MatElem{T}
+    eigenspace(M::MatElem{T1}, lambda::T2; side::Symbol = :left)
+      where {T1 <: RingElem, T2 <: FieldElem} -> MatElem{T}
 
 Return a matrix whose rows (if `side == :left`) or columns (if `side == :right`)
 give a basis of the eigenspace of $M$ with respect to the eigenvalue $\lambda$.
@@ -283,13 +297,38 @@ If `side` is `:right`, the right eigenspace is computed, i.e. vectors $v$ such t
 $Mv = \lambda v$. If `side` is `:left`, the left eigenspace is computed, i.e. vectors
 $v$ such that $vM = \lambda v$.
 """
-function eigenspace(M::MatElem{T}, lambda::T; side::Symbol = :left) where T <: FieldElem
+function eigenspace(M::MatElem{T1}, lambda::T2; side::Symbol = :left) where {T1 <: RingElem, T2 <: FieldElem}
   @assert is_square(M)
-  N = deepcopy(M)
+  N = change_base_ring(parent(lambda),M)
   for i = 1:ncols(N)
     N[i, i] -= lambda
   end
   return kernel(N, side = side)
+end
+
+@doc raw"""
+    eigenspace(M::MatElem{T}, lambda::Integer; side::Symbol = :left)
+      where {T <: FieldElem} -> MatElem{T}
+
+Return a matrix whose rows (if `side == :left`) or columns (if `side == :right`)
+give a basis of the eigenspace of $M$ with respect to the eigenvalue $\lambda$.
+If `side` is `:right`, the right eigenspace is computed, i.e. vectors $v$ such that
+$Mv = \lambda v$. If `side` is `:left`, the left eigenspace is computed, i.e. vectors
+$v$ such that $vM = \lambda v$.
+"""
+function eigenspace(M::MatElem{T}, lambda::Integer; side::Symbol = :left) where {T <: FieldElem}
+  @assert is_square(M)
+  N = deepcopy(M)
+  for i = 1:ncols(M)
+    N[i, i] -= lambda  # lambda automatically promoted
+  end
+  return kernel(N, side = side)
+end
+
+# This function just aims to give a helpful error message if the
+# argument matrix is not over a field.  It deliberately has no doc!
+function eigenspace(::MatElem{T}, ::Integer; side::Symbol = :left) where {T <: RingElem}
+  throw(ArgumentError("Matrix must be over a field"))
 end
 
 @doc raw"""
@@ -304,13 +343,33 @@ left eigenspaces are computed.
 See also `eigenspace`.
 """
 function eigenspaces(M::MatElem{T}; side::Symbol = :left) where T<:FieldElem
-
   S = eigenvalues(M)
   L = Dict{elem_type(base_ring(M)), typeof(M)}()
   for k in S
     push!(L, k => vcat(eigenspace(M, k, side = side)))
   end
   return L
+end
+
+# This function just aims to give a helpful error message if the
+# argument matrix is not over a field.  It deliberately has no doc!
+function eigenspaces(::MatElem{T}; side::Symbol = :left) where T<:RingElem
+  throw(ArgumentError("Matrix must be over a field"))
+end
+
+@doc raw"""
+    eigenspaces(L::Field, M::MatElem{T}; side::Symbol = :left)
+      where T <: RingElem -> Dict{T, MatElem{T}}
+
+Return a dictionary containing the eigenvalues of $M$ over the field $L$ as keys
+and bases for the corresponding eigenspaces as values.
+If side is `:right`, the right eigenspaces are computed, if it is `:left` then the
+left eigenspaces are computed.
+
+See also `eigenspace`.
+"""
+function eigenspaces(L::Field, M::MatElem{T}; side::Symbol = :left) where T<:RingElem
+  return eigenspaces(change_base_ring(L, M); side=side)
 end
 
 ###############################################################################
