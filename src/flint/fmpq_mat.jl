@@ -137,9 +137,9 @@ function Base.hash(a::QQMatrix, h::UInt)
     c = ncols(a)
     h = hash(r, h)
     h = hash(c, h)
-    rowptr = convert(Ptr{Ptr{Int}}, a.rows)
+    entries = convert(Ptr{Int}, a.entries)
     for i in 1:r
-      h = _hash_integer_array(unsafe_load(rowptr, i), 2*c, h)
+      h = _hash_integer_array(entries + (i - 1) * a.stride * sizeof(Int), 2 * c, h)
     end
     return xor(h, 0xb591d5c795885682%UInt)
   end
@@ -808,7 +808,7 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::QQMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(QQFieldElem)
+mat_entry_ptr(A::QQMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(QQFieldElem)
 
 ################################################################################
 #

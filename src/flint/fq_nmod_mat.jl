@@ -629,4 +629,4 @@ end
 #   norm :: Int
 # The `parent` member of struct fqPolyRepFieldElem is not replicated in each
 # struct member, so we cannot simply use `sizeof(fqPolyRepFieldElem)`.
-mat_entry_ptr(A::fqPolyRepMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*(sizeof(Ptr)+5*sizeof(Int))
+mat_entry_ptr(A::fqPolyRepMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * (sizeof(Ptr) + 5 * sizeof(Int))
