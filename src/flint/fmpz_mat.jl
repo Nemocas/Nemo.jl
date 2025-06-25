@@ -150,9 +150,9 @@ function Base.hash(a::ZZMatrix, h::UInt)
     c = ncols(a)
     h = hash(r, h)
     h = hash(c, h)
-    rowptr = convert(Ptr{Ptr{Int}}, a.rows)
+    entries = convert(Ptr{Int}, a.entries)
     for i in 1:r
-      h = _hash_integer_array(unsafe_load(rowptr, i), c, h)
+      h = _hash_integer_array(entries + (i - 1) * a.stride * sizeof(Int), c, h)
     end
     return xor(h, 0x5c22af6d5986f453%UInt)
   end
@@ -1984,20 +1984,18 @@ function _very_unsafe_convert(::Type{ZZMatrix}, a::Vector{ZZRingElem}, row = tru
   Me = zeros(Int, length(a))
   M.entries = reinterpret(Ptr{ZZRingElem}, pointer(Me))
   if row
-    Mep = [pointer(Me)]
-    M.rows = reinterpret(Ptr{Ptr{ZZRingElem}}, pointer(Mep))
     M.r = 1
     M.c = length(a)
+    M.stride = M.c
   else
     M.r = length(a)
     M.c = 1
-    Mep = [pointer(Me) + 8*(i - 1) for i in 1:length(a)]
-    M.rows = reinterpret(Ptr{Ptr{ZZRingElem}}, pointer(Mep))
+    M.stride = M.c
   end
   for i in 1:length(a)
     Me[i] = a[i].d
   end
-  return M, Me, Mep
+  return M, Me
 end
 
 function mul!_flint(z::Vector{ZZRingElem}, a::ZZMatrixOrPtr, b::Vector{ZZRingElem})
@@ -2017,9 +2015,9 @@ function mul!(z::Vector{ZZRingElem}, a::ZZMatrixOrPtr, b::Vector{ZZRingElem})
   end
 
   GC.@preserve z b begin
-    bb, dk1, dk2 = _very_unsafe_convert(ZZMatrix, b, false)
-    zz, dk3, dk4 = _very_unsafe_convert(ZZMatrix, z, false)
-    GC.@preserve dk1 dk2 dk3 dk4 begin
+    bb, dk1 = _very_unsafe_convert(ZZMatrix, b, false)
+    zz, dk3 = _very_unsafe_convert(ZZMatrix, z, false)
+    GC.@preserve dk1 dk3 begin
       mul!(zz, a, bb)
       for i in 1:length(z)
         z[i].d = unsafe_load(zz.entries, i).d
@@ -2035,9 +2033,9 @@ function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::ZZMatrixOrPtr)
     return mul!_flint(z, a, b)
   end
   GC.@preserve z a begin
-    aa, dk1, dk2 = _very_unsafe_convert(ZZMatrix, a)
-    zz, dk3, dk4 = _very_unsafe_convert(ZZMatrix, z)
-    GC.@preserve dk1 dk2 dk3 dk4 begin
+    aa, dk1 = _very_unsafe_convert(ZZMatrix, a)
+    zz, dk3 = _very_unsafe_convert(ZZMatrix, z)
+    GC.@preserve dk1 dk3 begin
       mul!(zz, aa, b)
       for i in 1:length(z)
         z[i].d = unsafe_load(zz.entries, i).d
@@ -2213,5 +2211,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::ZZMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(ZZRingElem)
-
+mat_entry_ptr(A::ZZMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(ZZRingElem)
