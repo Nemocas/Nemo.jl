@@ -205,7 +205,7 @@ end
 
   a = matrix(QQ, 4, 4, [-1//2 ZZRingElem(2)^100 3 -4; 5 -1//2 ZZRingElem(2)^100 6; 7 5 -1//2 8; 9 10 11 12])
   @test hash(a, UInt(5)) == hash(deepcopy(a), UInt(5))
-  @test hash(view(a, 1,1, 2,2)) == hash(view(a, 1,1, 2,2))
+  @test hash(view(a, 1:2, 1:2)) == hash(view(a, 1:2, 1:2))
 
   C = QQ[1 2 3; 4 5 6; 7 8 9]
   C[3, :] = QQ[7 7 7]
@@ -226,7 +226,7 @@ end
 
   A = S([1 2 3; 4 5 6; 7 8 9])
 
-  B = @inferred view(A, 1, 1, 2, 2)
+  B = @inferred view(A, 1:2, 1:2)
 
   @test typeof(B) == QQMatrix
   @test B == matrix_space(QQ, 2, 2)([1 2; 4 5])

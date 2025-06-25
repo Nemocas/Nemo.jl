@@ -1,6 +1,10 @@
 testlist = [
 # Aqua.jl
   "Aqua.jl",
+# Julia extensions
+  "julia/Float-test.jl",
+  "julia/Integer-test.jl",
+  "julia/Rational-test.jl",
 # Fields-test.jl
   "flint/fmpq-test.jl",
   "flint/gfp-test.jl",
@@ -94,8 +98,6 @@ testlist = [
   "gaussiannumbers/continued_fraction-test.jl",
 # Native-test.jl
   "Native-test.jl",
-# Infinity-test.jl
-  "Infinity-test.jl",
 # HeckeMiscLocalization-test.jl
   "HeckeMiscLocalization-test.jl",
 # matrix-test.jl

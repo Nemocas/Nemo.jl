@@ -3767,7 +3767,7 @@ mutable struct QQMatrix <: MatElem{QQFieldElem}
   entries::Ptr{QQFieldElem}
   r::Int
   c::Int
-  rows::Ptr{Ptr{QQFieldElem}}
+  stride::Int
   view_parent
 
   # MatElem interface
@@ -3807,7 +3807,7 @@ mutable struct ZZMatrix <: MatElem{ZZRingElem}
   entries::Ptr{ZZRingElem}
   r::Int
   c::Int
-  rows::Ptr{Ptr{ZZRingElem}}
+  stride::Int
   view_parent
 
   # MatElem interface
@@ -3845,7 +3845,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
   entries::Ptr{UInt}
   r::Int                  # Int
   c::Int                  # Int
-  rows::Ptr{Ptr{UInt}}
+  stride::Int
   n::UInt                # mp_limb_t / Culong
   ninv::UInt             # mp_limb_t / Culong
   norm::UInt             # mp_limb_t / Culong
@@ -3877,7 +3877,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
         u[i+m] = z.entries + (i-1)*c*8
       end
       z.view_parent = u
-      z.rows = z.entries + m*8
+      z.stride = c
       z.r = r
       z.c = c
       @ccall libflint.nmod_mat_set_mod(z::Ref{zzModMatrix}, n::UInt)::Nothing
@@ -3991,7 +3991,7 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
   entries::Ptr{ZZRingElem}
   r::Int
   c::Int
-  rows::Ptr{Ptr{ZZRingElem}}
+  stride::Int
   # end flint struct
 
   base_ring::ZZModRing
@@ -4137,7 +4137,7 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
   entries::Ptr{ZZRingElem}
   r::Int
   c::Int
-  rows::Ptr{Ptr{ZZRingElem}}
+  stride::Int
   # end flint struct
 
   base_ring::FpField
@@ -4237,7 +4237,7 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
   entries::Ptr{UInt}
   r::Int                  # Int
   c::Int                  # Int
-  rows::Ptr{Ptr{UInt}}
+  stride::Int
   n::UInt                # mp_limb_t / Culong
   ninv::UInt             # mp_limb_t / Culong
   norm::UInt             # mp_limb_t / Culong
@@ -4269,7 +4269,7 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
         u[i+m] = z.entries + (i-1)*c*8
       end
       z.view_parent = u
-      z.rows = z.entries + m*8
+      z.stride = c
       z.r = r
       z.c = c
       @ccall libflint.nmod_mat_set_mod(z::Ref{fpMatrix}, n::UInt)::Nothing
@@ -4806,7 +4806,7 @@ mutable struct FqPolyRepMatrix <: MatElem{FqPolyRepFieldElem}
   entries::Ptr{FqPolyRepFieldElem}
   r::Int
   c::Int
-  rows::Ptr{Ptr{FqPolyRepFieldElem}}
+  stride::Int
   base_ring::FqPolyRepField
   view_parent
 
@@ -4883,7 +4883,7 @@ mutable struct fqPolyRepMatrix <: MatElem{fqPolyRepFieldElem}
   entries::Ptr{fqPolyRepFieldElem}
   r::Int
   c::Int
-  rows::Ptr{Ptr{fqPolyRepFieldElem}}
+  stride::Int
   base_ring::fqPolyRepField
   view_parent
 
@@ -4954,29 +4954,16 @@ end
 #
 ################################################################################
 
-if NEW_FLINT
-  mutable struct rand_ctx
-    gmp_state::Ptr{Cvoid}
-    randval::UInt
-    randval2::UInt
+mutable struct rand_ctx
+  gmp_state::Ptr{Cvoid}
+  randval::UInt
+  randval2::UInt
 
-    function rand_ctx()
-      a = new()
-      @ccall libflint.flint_rand_init(a::Ref{rand_ctx})::Cvoid
-      finalizer(_rand_ctx_clear_fn, a)
-      return a
-    end
-  end
-else
-  mutable struct rand_ctx
-    data::NTuple{56, Int8}
-
-    function rand_ctx()
-      a = new()
-      @ccall libflint.flint_randinit(a::Ref{rand_ctx})::Cvoid
-      finalizer(_rand_ctx_clear_fn, a)
-      return a
-    end
+  function rand_ctx()
+    a = new()
+    @ccall libflint.flint_rand_init(a::Ref{rand_ctx})::Cvoid
+    finalizer(_rand_ctx_clear_fn, a)
+    return a
   end
 end
 
@@ -5269,14 +5256,8 @@ function _qadic_ctx_clear_fn(a::QadicField)
   @ccall libflint.qadic_ctx_clear(a::Ref{QadicField})::Nothing
 end
 
-if NEW_FLINT
-  function _rand_ctx_clear_fn(a::rand_ctx)
-    @ccall libflint.flint_rand_clear(a::Ref{rand_ctx})::Nothing
-  end
-else
-  function _rand_ctx_clear_fn(a::rand_ctx)
-    @ccall libflint.flint_randclear(a::Ref{rand_ctx})::Nothing
-  end
+function _rand_ctx_clear_fn(a::rand_ctx)
+  @ccall libflint.flint_rand_clear(a::Ref{rand_ctx})::Nothing
 end
 
 ################################################################################

@@ -157,7 +157,7 @@ returned as a rational with denominator $1$.
 """
 Base.floor(a::QQFieldElem) = floor(QQFieldElem, a)
 Base.floor(::Type{QQFieldElem}, a::QQFieldElem) = QQFieldElem(floor(ZZRingElem, a), 1)
-Base.floor(::Type{ZZRingElem}, a::QQFieldElem) = fdiv(numerator(a), denominator(a))
+#Base.floor(::Type{ZZRingElem}, a::QQFieldElem) = fdiv(numerator(a), denominator(a))
 
 @doc raw"""
     ceil(a::QQFieldElem)
@@ -167,7 +167,26 @@ returned as a rational with denominator $1$.
 """
 Base.ceil(a::QQFieldElem) = ceil(QQFieldElem, a)
 Base.ceil(::Type{QQFieldElem}, a::QQFieldElem) = QQFieldElem(ceil(ZZRingElem, a), 1)
-Base.ceil(::Type{ZZRingElem}, a::QQFieldElem) = cdiv(numerator(a), denominator(a))
+#Base.ceil(::Type{ZZRingElem}, a::QQFieldElem) = cdiv(numerator(a), denominator(a))
+
+
+function ceil!(res::ZZRingElem, t::QQFieldElem)
+  GC.@preserve t begin
+    @ccall libflint.fmpz_cdiv_q(res::Ref{ZZRingElem}, _num_ptr(t)::Ref{ZZRingElem}, _den_ptr(t)::Ref{ZZRingElem})::Nothing
+  end 
+  return res
+end
+
+function floor!(res::ZZRingElem, t::QQFieldElem)
+  GC.@preserve t begin
+    @ccall libflint.fmpz_fdiv_q(res::Ref{ZZRingElem}, _num_ptr(t)::Ref{ZZRingElem}, _den_ptr(t)::Ref{ZZRingElem})::Nothing
+  end 
+  return res
+end
+
+Base.ceil(::Type{ZZRingElem}, a::QQFieldElem) = ceil!(ZZRingElem(), a)
+Base.floor(::Type{ZZRingElem}, a::QQFieldElem) = floor!(ZZRingElem(), a)
+
 
 Base.trunc(a::QQFieldElem) = trunc(QQFieldElem, a)
 Base.trunc(::Type{QQFieldElem}, a::QQFieldElem) = QQFieldElem(trunc(ZZRingElem, a), 1)
@@ -213,14 +232,6 @@ Base.round(::Type{T}, a::QQFieldElem) where T <: RingElement =  round(T, a, Roun
 
 
 nbits(a::QQFieldElem) = nbits(numerator(a)) + nbits(denominator(a))
-
-###############################################################################
-#
-#   Canonicalisation
-#
-###############################################################################
-
-canonical_unit(a::QQFieldElem) = a
 
 ###############################################################################
 #
@@ -718,6 +729,8 @@ Attempt to return a rational number $n/d$ such that $0 \leq |n| \leq N$ and $0 <
 such that $2 N D < m$, gcd$(n, d) = 1$, and $a \equiv nd^{-1} \pmod{m}$.
 
 Returns a tuple (`success`, `n/d`), where `success` signals the success of reconstruction.
+
+The behaviour is undefined if $a$ is negative or larger than $m$.
 """
 function reconstruct(a::ZZRingElem, m::ZZRingElem, N::ZZRingElem, D::ZZRingElem)
   c = QQFieldElem()
@@ -730,6 +743,8 @@ end
 
 Same as [`reconstruct`](@ref), but does not throw if reconstruction fails.
 Returns a tuple (`success`, `n/d`), where `success` signals the success of reconstruction.
+
+The behaviour is undefined if $a$ is negative or larger than $m$.
 """
 function unsafe_reconstruct(a::ZZRingElem, m::ZZRingElem)
   c = QQFieldElem()

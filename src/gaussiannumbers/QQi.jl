@@ -255,10 +255,6 @@ function reduce!(z::QQiFieldElem)
   return z
 end
 
-function canonical_unit(a::QQiFieldElem)
-  return a
-end
-
 ###############################################################################
 #
 #   equality

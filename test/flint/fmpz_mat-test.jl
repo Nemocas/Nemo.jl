@@ -177,7 +177,7 @@ end
 
   a = matrix(ZZ, 4, 4, [-1 ZZRingElem(2)^100 3 -4; 5 -1 ZZRingElem(2)^100 6; 7 5 -1 8; 9 10 11 12])
   @test hash(a, UInt(5)) == hash(deepcopy(a), UInt(5))
-  @test hash(view(a, 1,1, 2,2)) == hash(view(a, 2,2, 3,3))
+  @test hash(view(a, 1:2, 1:2)) == hash(view(a, 2:3, 2:3))
 
   C = ZZ[1 2 3; 4 5 6; 7 8 9]
   C[3, :] = ZZ[7 7 7]
@@ -198,7 +198,7 @@ end
 
   A = S([1 2 3; 4 5 6; 7 8 9])
 
-  B = @inferred view(A, 1, 1, 2, 2)
+  B = @inferred view(A, 1:2, 1:2)
 
   @test typeof(B) == ZZMatrix
   @test B == matrix_space(ZZ, 2, 2)([1 2; 4 5])
@@ -867,6 +867,15 @@ end
   @test reduce(vcat, [A, A]) == vcat(A, A) # -> _vcat
   @test cat(A, A, dims = 2) == vcat(A, A)
   @test_throws ErrorException cat(A, A, dims = 3)
+
+  @test reduce(vcat, [zero_matrix(ZZ, 0, 1), zero_matrix(ZZ, 0, 1)]) == zero_matrix(ZZ, 0, 1)
+  @test reduce(vcat, [zero_matrix(ZZ, 0, 0), zero_matrix(ZZ, 0, 0)]) == zero_matrix(ZZ, 0, 0)
+  @test reduce(vcat, [zero_matrix(ZZ, 1, 1), zero_matrix(ZZ, 0, 1)]) == zero_matrix(ZZ, 1, 1)
+  @test reduce(hcat, [zero_matrix(ZZ, 1, 0), zero_matrix(ZZ, 1, 0)]) == zero_matrix(ZZ, 1, 0)
+  @test reduce(hcat, [zero_matrix(ZZ, 1, 1), zero_matrix(ZZ, 1, 0)]) == zero_matrix(ZZ, 1, 1)
+
+  @test_throws ErrorException reduce(vcat, [ZZ[1 0;], ZZ[1 2 3;]])
+  @test_throws ErrorException reduce(hcat, [ZZ[1 0; 2 3], ZZ[1 2 3;]])
 end
 
 @testset "ZZMatrix.rand" begin

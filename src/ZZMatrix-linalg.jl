@@ -18,15 +18,15 @@
 #######################################################
 
 function _det(a::fpMatrix)
-  a.r < 10 && return lift(det(a))
+  a.r < 9 && return det(a).data  # inspired by FLINT source code
   #_det avoids a copy: det is computed destructively
-  r = ccall((:_nmod_mat_det, Nemo.libflint), UInt, (Ref{fpMatrix}, ), a)
+  r = @ccall libflint._nmod_mat_det(a::Ref{fpMatrix})::UInt
   return r
 end
 
 function map_entries!(k::Nemo.fpField, a::fpMatrix, A::ZZMatrix)
-  ccall((:nmod_mat_set_mod, Nemo.libflint), Cvoid, (Ref{fpMatrix}, UInt), a, k.n)
-  ccall((:fmpz_mat_get_nmod_mat, Nemo.libflint), Cvoid, (Ref{fpMatrix}, Ref{ZZMatrix}), a, A)
+  @ccall libflint.nmod_mat_set_mod(a::Ref{fpMatrix}, k.n::UInt)::Cvoid
+  @ccall libflint.fmpz_mat_get_nmod_mat(a::Ref{fpMatrix}, A::Ref{ZZMatrix})::Cvoid
   a.base_ring = k  # exploiting that the internal repr is the indep of char
   return a
 end
@@ -35,7 +35,7 @@ end
     is_unimodular(A::ZZMatrix)
     is_unimodular(A::ZZMatrix; algorithm=:auto)
 
-Determine whether `A` is unimodular, i.e. whether `abs(det(A)) == 1`.
+Determine whether a square matrix `A` is unimodular, i.e. whether `abs(det(A)) == 1`.
 The method used is either that of Pauderis--Storjohann or using CRT;
 the choice is made based on cost estimates for the two approaches.
 
@@ -51,12 +51,8 @@ function is_unimodular(A::ZZMatrix; algorithm=:auto)
   # Call this function when no extra info about the matrix is available.
   # It does a preliminary check that det(A) is +/-1 modulo roughly 2^100.
   # If so, then delegate the complete check to is_unimodular_given_det_mod_m
-  if !is_square(A)
-    throw(ArgumentError("Matrix must be square"))
-  end
-  if !(algorithm in [:auto, :CRT, :pauderis_storjohann])
-    throw(ArgumentError("algorithm must be one of [:CRT, :pauderis_storjohann, :auto]"))
-  end
+  @req  is_square(A)  "Matrix must be square"
+  @req (algorithm in [:auto, :CRT, :pauderis_storjohann])  "algorithm must be one of [:CRT, :pauderis_storjohann, :auto]"
   # Deal with two trivial cases
   if nrows(A) == 0
     return true
@@ -76,19 +72,20 @@ function is_unimodular(A::ZZMatrix; algorithm=:auto)
     p = next_prime(p + rand(1:2^10), false) # increment by a random step to a prime
     ZZmodP = Nemo.Native.GF(p; cached = false, check = false)
     map_entries!(ZZmodP, A_mod_p, A)
-    @vtime :UnimodVerif 2  det_mod_p = Int(_det(A_mod_p))
-    p2 = p>>1
-    if det_mod_p > p2
-      det_mod_p -= p
-    end
-    if abs(det_mod_p) != 1
+    @vtime :UnimodVerif 2  det_mod_p = _det(A_mod_p)
+    if det_mod_p != 1 && det_mod_p != p-1
       return false  # obviously not unimodular
     end
-    if det_mod_m != 0 && det_mod_m != det_mod_p
+    if det_mod_m == 0 # first iteration: so just set the value of det_mod_m
+      det_mod_m = (det_mod_p == 1) ? 1 : -1;
+    elseif det_mod_m == 1
+      if det_mod_p != 1
+        return false  # obviously not unimodular
+      end
+    elseif det_mod_p == 1 # we know that here det_mod_m == -1
       return false  # obviously not unimodular
     end
-    det_mod_m = det_mod_p
-    mul!(M, M, p)
+    M = mul!(M, p)
   end
   return _is_unimodular_given_det_mod_m(A, det_mod_m, M; algorithm)
 end #function
@@ -108,7 +105,7 @@ function _is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEl
   # Deal with two trivial cases -- does this make sense here???
   nrows(A) == 0 && return true
   nrows(A) == 1 && return (abs(A[1,1]) == 1)
-  @vprintln(:UnimodVerif,1,"is_unimodular_given_det_mod_m starting")
+  @vprintln(:UnimodVerif,1,"is_unimodular_given_det_mod_m starting; det_mod_m=$(det_mod_m)")
   if algorithm == :pauderis_storjohann
     @vprintln(:UnimodVerif,1,"User specified Pauderis_Storjohann --> delegating")
     return _is_unimodular_Pauderis_Storjohann_Hensel(A)
@@ -117,7 +114,7 @@ function _is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEl
   Hrow = hadamard_bound2(A)
   Hcol = hadamard_bound2(transpose(A))
   DetBoundSq = min(Hrow, Hcol)
-  Hbits = 1+div(nbits(DetBoundSq),2)
+  Hbits = 1+div(1+nbits(DetBoundSq),2)
   @vprintln(:UnimodVerif,1,"Hadamard bound in bits $(Hbits)")
   if algorithm == :auto
     # Estimate whether better to "climb out" with CRT or use Pauderis-Storjohann
@@ -146,7 +143,7 @@ function _is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEl
   # in CRT loop start with 22 bit primes; if we reach threshold (empirical), jump to much larger primes.
   p = 2^21; stride = 2^10; threshold = 5000000;
   A_mod_p = zero_matrix(Nemo.Native.GF(2), nrows(A), ncols(A))
-  while nbits(M) < Hbits
+  while nbits(M) <= Hbits
     @vprint(:UnimodVerif,2,".")
     # Next lines increment p (by random step up to stride) to a prime not dividing M
     if p > threshold && p < threshold+stride
@@ -163,14 +160,13 @@ function _is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEl
     end
     ZZmodP = Nemo.Native.GF(p; cached = false, check = false)
     map_entries!(ZZmodP, A_mod_p, A)
-    det_mod_p = _det(A_mod_p)
-    if det_mod_p > p/2
-      det_mod_p -= p
-    end
-    if abs(det_mod_p) != 1 || det_mod_m != det_mod_p
+    det_mod_p = _det(A_mod_p) # type is UInt
+    @vprintln(:UnimodVerif,3, "p=$(p)  det_mod_p=$(det_mod_p)")
+    verified_mod_p = (det_mod_m == 1) ? (det_mod_p == 1) : (det_mod_p == p-1)
+    if !verified_mod_p
       return false  # obviously not unimodular
     end
-    mul!(M, M, p)
+    M = mul!(M, p)
   end
   return true
 end
@@ -180,16 +176,14 @@ end
 #TODO: Hensel is slower than CRT if modulus is small(ish)
 
 function _PSH_init(A::ZZMatrix)
-  #computes a 
+  #computes 3 things:
   # modulus (X) in the paper
-  # the inverse of A mod x
+  # the inverse of A mod X
   # the exponent target for the lifting.
 
   n = nrows(A)
-  @assert ncols(A) == n
-
   EntrySize = maximum(abs, A)
-  entry_size_bits = maximum(nbits, A)
+  entry_size_bits = nbits(EntrySize)
   e = max(16, 2+ceil(Int, 2*log2(n)+entry_size_bits))
   ModulusLWB = ZZ(2)^e
   @vprintln(:UnimodVerif,1,"ModulusLWB is 2^$(e)")
@@ -240,6 +234,7 @@ end
 # Seems to be faster than the CRT prototype (not incl. here)
 # VERBOSITY via :UnimodVerif
 function _is_unimodular_Pauderis_Storjohann_Hensel(A::ZZMatrix)
+  @assert  is_square(A)
   n = nrows(A)
   m, B0, k = _PSH_init(A)
 
@@ -257,6 +252,7 @@ function _is_unimodular_Pauderis_Storjohann_Hensel(A::ZZMatrix)
   #mul! for ZZModMatrix is mul, followed by reduce.
   #thus the code is not using ZZModMatrices at all...
 
+  # Two workspace matrices to avoid repeated alloc/dealloc
   R_bar = zero_matrix(ZZ, n, n)
   M = zero_matrix(ZZ, n, n)
 
@@ -266,8 +262,8 @@ function _is_unimodular_Pauderis_Storjohann_Hensel(A::ZZMatrix)
 
     mul!(R_bar, R, R)
     #Next 3 lines do:  M = lift(B0_modm*MatModM(R_bar));
-    mod_sym!(R_bar, m)
-    mul!(M, B0, R_bar)
+    mod_sym!(M, R_bar, m)
+    mul!(M, B0, M)
     mod_sym!(M, m)
     # Next 3 lines do: R = (R_bar - A*M)/m; but with less memory allocation
     mul!(R, A, M)
@@ -282,7 +278,17 @@ end
 
 #adaptive rational_reconstruction: if solution is unbalanced with
 #denominator smaller than numerator
-function induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; ErrorTolerant ::Bool = false)
+@doc raw"""
+    _induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = true) -> Bool, ZZMatrix, ZZRingElem
+
+Apply rational reconstruction to all entries in the matrix `a` in the attempt
+to find `D` (over ZZ) and `n` (in ZZ) such that `an - D` is divisible by `b`.
+Should be used mainly if a common denominator is expected as `rational_reconstrucion`
+  is called for each entry in `a` and the denominators are accumulated.
+"""
+function _induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = false)
+  @req !error_tolerant || !unbalanced "only one of `error_tolerant` and `unbalanced` can be used at a time"
+
   A = similar(a)
 
   T = ZZRingElem(Val(:raw))
@@ -299,7 +305,11 @@ function induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; ErrorToleran
         Nemo.set!(T, a_ptr)
         Nemo.mul!(T, T, D)
         Nemo.mod!(T, T, b)
-        fl = ratrec!(n, d, T, b, bN, bD)
+        if unbalanced
+          fl = _ratrec!(n, d, T, b, bN, bD)
+        else
+          fl, n, d = _rational_reconstruction(T, b; error_tolerant)
+        end
         fl || return fl, A, D
         if !isone(d)
           mul!(D, D, d)
@@ -321,44 +331,27 @@ function induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; ErrorToleran
   return true, A, D
 end
 
-#output sensitive rational_reconstruction, in particular if
-#numerator is larger than den 
-function ratrec!(n::ZZRingElem, d::ZZRingElem, a::ZZRingElem, b::ZZRingElem, N::ZZRingElem = ZZ(), D::ZZRingElem= ZZ())
-  k = nbits(b)
-  l = 1
-  set!(N, b)
-  set!(D, 2)
+@doc raw"""
+    _induce_rational_reconstruction_nosplit(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = true) -> Bool, QQMatrix
 
-#  @assert 0<a<b
-  done = false
-  while !done && D <= N
-    Nemo.mul!(D, D, D)
-    tdiv_q!(N, b, D)
-    shift_right!(N, N, 1)
-    if D>N
-      @ccall Nemo.libflint.fmpz_root(N::Ref{ZZRingElem}, b::Ref{ZZRingElem}, 2::Int)::Nothing
-      shift_right!(D, N, 1)
-      done = true
-    end
+Apply rational reconstruction to all entries in the matrix `a` in the attempt
+to find `D` (over QQ) such that `a - D` is divisible by `b`.
 
-#    @assert 2*N*D < b
-
-    fl = ccall((:_fmpq_reconstruct_fmpz_2, Nemo.libflint), Bool, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), n, d, a, b, N, D)
-
-    if fl && (nbits(n)+nbits(d) < k - 30 || D>N)
-      return fl
-    end
-    l += 1
-  end
-  return false
+See also [`rational_reconstruction`](@ref) for an explanation of the parameters
+  and [`induce_rational_reconstruction`](@ref) for a version returing the numerator matrix and the denominator seperately.
+"""
+function _induce_rational_reconstruction_nosplit(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = false)
+  fl, n, d = _induce_rational_reconstruction( a, b; error_tolerant, unbalanced)
+  D = matrix(QQ, n)*QQ(ZZ(1), d)
+  return fl, D
 end
-
+ 
 function change_prime!(a::fpMatrix, p::UInt)
   @ccall libflint.nmod_mat_set_mod(a::Ref{fpMatrix}, p::UInt)::Nothing
 end
 
 function lift!(A::ZZMatrix, a::fpMatrix)
-  ccall((:fmpz_mat_set_nmod_mat, Nemo.libflint), Cvoid, (Ref{ZZMatrix}, Ref{fpMatrix}), A, a)
+  @ccall libflint.fmpz_mat_set_nmod_mat(A::Ref{ZZMatrix}, a::Ref{fpMatrix})::Cvoid
 end
 
 mutable struct DixonCtx
@@ -501,7 +494,7 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
     map_entries!(Nemo.fpField(D.p, false), D.d_mod, d)
 
     Nemo.mul!(D.y_mod, D.Ainv, D.d_mod)
-    ccall((:fmpz_mat_scalar_addmul_nmod_mat_fmpz, Nemo.libflint), Cvoid, (Ref{ZZMatrix}, Ref{fpMatrix}, Ref{ZZRingElem}), D.x, D.y_mod, ppow)
+    @ccall libflint.fmpz_mat_scalar_addmul_nmod_mat_fmpz(D.x::Ref{ZZMatrix}, D.y_mod::Ref{fpMatrix}, ppow::Ref{ZZRingElem})::Cvoid
 
     Nemo.mul!(ppow, ppow, D.p)
     
@@ -516,7 +509,7 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
       nexti = ceil(Int,(i*1.4)) + 1;
       #TODO: maybe col by col? to stop doing cols that are already there?
       #main use currently is 1 col anyway
-      fl, num, den = induce_rational_reconstruction(D.x, ppow)
+      fl, num, den = _induce_rational_reconstruction(D.x, ppow; unbalanced = true)
 
       if fl
 #        @show fl = (D.A*num == den*_B)
@@ -545,9 +538,9 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
               lhs = Ap*nump
               rhs = Bp*k(den)
             else
-              map_entries!(Ap, k, D.A)
-              map_entries!(Bp, k, _B)
-              map_entries!(nump, k, num)
+              map_entries!(k, Ap, D.A)
+              map_entries!(k, Bp, _B)
+              map_entries!(k, nump, num)
               mul!(lhs, Ap, nump)
               mul!(rhs, Bp, k(den))
             end
@@ -596,7 +589,7 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
     end
     divexact!(d, d, ZZ(D.p))
   end
-  fl, num, den = induce_rational_reconstruction(D.x, ppow)
+  fl, num, den = _induce_rational_reconstruction(D.x, ppow; unbalanced = true)
   @assert fl
 
   if side == :right
@@ -618,8 +611,8 @@ end
 function induce_crt!(A::ZZMatrix, p::ZZRingElem, B::fpMatrix; signed::Bool = false)
   #the second modulus is implicit in B: B.n
 
-  ccall((:fmpz_mat_CRT_ui, Nemo.libflint), Cvoid, (Ref{ZZMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{fpMatrix}, Int), A, A, p, B, signed)
-  Nemo.mul!(p, p, B.n)
+  @ccall libflint.fmpz_mat_CRT_ui(A::Ref{ZZMatrix}, A::Ref{ZZMatrix}, p::Ref{ZZRingElem}, B::Ref{fpMatrix}, signed::Int)::Cvoid
+  mul!(p, p, B.n)
   return
 end
 
@@ -763,7 +756,7 @@ end
 
 
 function mod_sym!(a::Ptr{ZZRingElem}, b::Ptr{ZZRingElem}, c::ZZRingElem, t::ZZRingElem = ZZ(0))
-  ccall((:fmpz_ndiv_qr, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ptr{ZZRingElem}, Ptr{ZZRingElem}, Ref{ZZRingElem}), t, a, b, c)
+  @ccall libflint.fmpz_ndiv_qr(t::Ref{ZZRingElem}, a::Ptr{ZZRingElem}, b::Ptr{ZZRingElem}, c::Ref{ZZRingElem})::Cvoid
 end
 
 #add C into A[c:end, :]
@@ -800,13 +793,12 @@ function sub_into!(A::ZZMatrix, C::ZZMatrix, c::Int)
 end
 
 #saves essentially the allocation of A.rows
+#Edit: A.rows no longer exists, not sure if this is still useful
 function view!(A::ZZMatrix, B::ZZMatrix, r::UnitRange{Int}, ::Colon)
+  A.entries = B.entries + B.stride * sizeof(ZZRingElem) * (r.start - 1)
   A.r = length(r)
   A.c = B.c
-  A.entries = B.entries
-  for i=1:A.r
-    unsafe_store!(A.rows, unsafe_load(B.rows, r.start+i-1), i)# + 8*(c.start -1))
-  end
+  A.stride = B.stride
   A.view_parent = (B, )
   return A
 end
@@ -879,7 +871,7 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
 
   if is_zero(R)
     mu = vcat([_to_base!(t, m) for t = allV]...)
-    tau = induce_rational_reconstruction(mu, m)
+    tau = _induce_rational_reconstruction(mu, m; unbalanced = true)
     @assert tau[1]
     GC.enable(GC_d)
     return tau[2], tau[3]
@@ -939,11 +931,11 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
 
     mex = m^(2*ex)
     mu = vcat([_to_base!(t[:, 1:1], m) for t = allV]...)
-    tau = induce_rational_reconstruction(mu, mex)
+    tau = _induce_rational_reconstruction(mu, mex; unbalanced = true)
     if tau[1]
       GC.enable(true)
       mu = vcat([_to_base!(deepcopy(t), m) for t = allV]...)
-      tau = induce_rational_reconstruction(mu, mex)
+      tau = _induce_rational_reconstruction(mu, mex; unbalanced = true)
       if tau[1]
         GC.enable(GC_d)
         return tau[2], tau[3]
@@ -953,7 +945,7 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
     end
   end
   mu = vcat([_to_base!(t, m) for t = allV]...)
-  tau = induce_rational_reconstruction(mu, mex)
+  tau = _induce_rational_reconstruction(mu, mex; unbalanced = true)
   @assert tau[1]
   GC.enable(GC_d)
   return tau[2], tau[3]

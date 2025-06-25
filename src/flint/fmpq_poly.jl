@@ -103,14 +103,6 @@ end
 
 ###############################################################################
 #
-#   Canonicalisation
-#
-###############################################################################
-
-canonical_unit(a::QQPolyRingElem) = canonical_unit(leading_coefficient(a))
-
-###############################################################################
-#
 #   Unary operations
 #
 ###############################################################################
@@ -183,6 +175,10 @@ end
 function ==(x::QQPolyRingElem, y::QQPolyRingElem)
   check_parent(x, y)
   return @ccall libflint.fmpq_poly_equal(x::Ref{QQPolyRingElem}, y::Ref{QQPolyRingElem})::Bool
+end
+
+function isone(x::QQPolyRingElem)
+  return Bool(@ccall libflint.fmpq_poly_is_one(x::Ref{QQPolyRingElem})::Cint)
 end
 
 ###############################################################################
@@ -260,14 +256,20 @@ end
 
 function shift_left(x::QQPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
-  z = parent(x)()
+  return shift_left!(parent(x)(), x, len)
+end
+
+function shift_left!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, len::Int)
   @ccall libflint.fmpq_poly_shift_left(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, len::Int)::Nothing
   return z
 end
 
 function shift_right(x::QQPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
-  z = parent(x)()
+  return shift_right!(parent(x)(), x, len)
+end
+
+function shift_right!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, len::Int)
   @ccall libflint.fmpq_poly_shift_right(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, len::Int)::Nothing
   return z
 end
@@ -550,8 +552,7 @@ for (factor_fn, factor_fn_inner, flint_fn) in
            y = ZZPolyRingElem()
            @ccall libflint.fmpq_poly_get_numerator(y::Ref{ZZPolyRingElem}, x::Ref{QQPolyRingElem})::Nothing
            fac = fmpz_poly_factor()
-           ccall(($flint_fn, libflint), Nothing,
-                 (Ref{fmpz_poly_factor}, Ref{ZZPolyRingElem}), fac, y)
+           @ccall libflint.$flint_fn(fac::Ref{fmpz_poly_factor}, y::Ref{ZZPolyRingElem})::Nothing
            z = ZZRingElem()
            @ccall libflint.fmpz_poly_factor_get_fmpz(z::Ref{ZZRingElem}, fac::Ref{fmpz_poly_factor})::Nothing
            f = ZZPolyRingElem()

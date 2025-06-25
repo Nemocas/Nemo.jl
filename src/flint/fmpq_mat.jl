@@ -22,7 +22,7 @@ is_zero_initialized(::Type{QQMatrix}) = true
 #
 ###############################################################################
 
-function Base.view(x::QQMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
+function _view_window(x::QQMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
   _checkrange_or_empty(nrows(x), r1, r2) ||
   Base.throw_boundserror(x, (r1:r2, c1:c2))
 
@@ -45,23 +45,9 @@ function Base.view(x::QQMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
   return b
 end
 
-function Base.view(x::QQMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
-  return Base.view(x, first(r), first(c), last(r), last(c))
-end
-
 function _fmpq_mat_window_clear_fn(a::QQMatrix)
   @ccall libflint.fmpq_mat_window_clear(a::Ref{QQMatrix})::Nothing
 end
-
-function sub(x::QQMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
-  return deepcopy(view(x, r1, c1, r2, c2))
-end
-
-function sub(x::QQMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
-  return deepcopy(view(x, r, c))
-end
-
-getindex(x::QQMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) = sub(x, r, c)
 
 ###############################################################################
 #
@@ -151,27 +137,13 @@ function Base.hash(a::QQMatrix, h::UInt)
     c = ncols(a)
     h = hash(r, h)
     h = hash(c, h)
-    rowptr = convert(Ptr{Ptr{Int}}, a.rows)
+    entries = convert(Ptr{Int}, a.entries)
     for i in 1:r
-      h = _hash_integer_array(unsafe_load(rowptr, i), 2*c, h)
+      h = _hash_integer_array(entries + (i - 1) * a.stride * sizeof(Int), 2 * c, h)
     end
     return xor(h, 0xb591d5c795885682%UInt)
   end
 end
-
-###############################################################################
-#
-#   Canonicalisation
-#
-###############################################################################
-
-canonical_unit(a::QQMatrix) = canonical_unit(a[1, 1])
-
-###############################################################################
-#
-#   AbstractString I/O
-#
-###############################################################################
 
 ###############################################################################
 #
@@ -836,7 +808,7 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::QQMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(QQFieldElem)
+mat_entry_ptr(A::QQMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(QQFieldElem)
 
 ################################################################################
 #

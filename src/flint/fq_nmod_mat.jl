@@ -76,8 +76,8 @@ number_of_columns(a::fqPolyRepMatrix) = a.c
 base_ring(a::fqPolyRepMatrix) = a.base_ring
 
 function one(a::fqPolyRepMatrixSpace)
-  (nrows(a) != ncols(a)) && error("Matrices must be square")
-  return a(one(base_ring(a)))
+  check_square(a)
+  return one!(a())
 end
 
 function iszero(a::fqPolyRepMatrix)
@@ -440,7 +440,7 @@ end
 #
 ################################################################################
 
-function Base.view(x::fqPolyRepMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
+function _view_window(x::fqPolyRepMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
 
   _checkrange_or_empty(nrows(x), r1, r2) ||
   Base.throw_boundserror(x, (r1:r2, c1:c2))
@@ -465,23 +465,9 @@ function Base.view(x::fqPolyRepMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
   return z
 end
 
-function Base.view(x::fqPolyRepMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
-  return Base.view(x, first(r), first(c), last(r), last(c))
-end
-
 function _fq_nmod_mat_window_clear_fn(a::fqPolyRepMatrix)
   @ccall libflint.fq_nmod_mat_window_clear(a::Ref{fqPolyRepMatrix}, base_ring(a)::Ref{fqPolyRepField})::Nothing
 end
-
-function sub(x::fqPolyRepMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
-  return deepcopy(Base.view(x, r1, c1, r2, c2))
-end
-
-function sub(x::fqPolyRepMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
-  return deepcopy(Base.view(x, r, c))
-end
-
-getindex(x::fqPolyRepMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) = sub(x, r, c)
 
 ################################################################################
 #
@@ -643,4 +629,4 @@ end
 #   norm :: Int
 # The `parent` member of struct fqPolyRepFieldElem is not replicated in each
 # struct member, so we cannot simply use `sizeof(fqPolyRepFieldElem)`.
-mat_entry_ptr(A::fqPolyRepMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*(sizeof(Ptr)+5*sizeof(Int))
+mat_entry_ptr(A::fqPolyRepMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * (sizeof(Ptr) + 5 * sizeof(Int))

@@ -86,7 +86,7 @@ number_of_columns(a::T) where T <: Zmodn_mat = a.c
 base_ring(a::T) where T <: Zmodn_mat = a.base_ring
 
 function one(a::zzModMatrixSpace)
-  (nrows(a) != ncols(a)) && error("Matrices must be square")
+  check_square(a)
   return one!(a())
 end
 
@@ -537,6 +537,7 @@ function lu(x::T, P = SymmetricGroup(nrows(x))) where T <: Zmodn_mat
   return rank, p, L, U
 end
 
+#= does not work anymore as of FLINT 3.3 as the `rows` field no longer exists
 #to support FAST lu!
 function AbstractAlgebra.Strassen.apply!(A::fpMatrix, P::Perm{Int}; offset::Int = 0)
   n = length(P.d)
@@ -548,6 +549,7 @@ function AbstractAlgebra.Strassen.apply!(A::fpMatrix, P::Perm{Int}; offset::Int 
     unsafe_store!(reinterpret(Ptr{Int}, A.rows), t[i], i + offset)
   end
 end
+=#
 
 ################################################################################
 #
@@ -555,7 +557,7 @@ end
 #
 ################################################################################
 
-function Base.view(x::zzModMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
+function _view_window(x::zzModMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
 
   _checkrange_or_empty(nrows(x), r1, r2) ||
   Base.throw_boundserror(x, (r1:r2, c1:c2))
@@ -580,24 +582,8 @@ function Base.view(x::zzModMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
   return z
 end
 
-function Base.view(x::T, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) where T <: Zmodn_mat
-  return Base.view(x, first(r), first(c), last(r), last(c))
-end
-
 function _nmod_mat_window_clear_fn(a::zzModMatrix)
   @ccall libflint.nmod_mat_window_clear(a::Ref{zzModMatrix})::Nothing
-end
-
-function sub(x::T, r1::Int, c1::Int, r2::Int, c2::Int) where T <: Zmodn_mat
-  return deepcopy(Base.view(x, r1, c1, r2, c2))
-end
-
-function sub(x::T, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) where T <: Zmodn_mat
-  return deepcopy(Base.view(x, r, c))
-end
-
-function getindex(x::T, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) where T <: Zmodn_mat
-  sub(x, r, c)
 end
 
 ################################################################################
@@ -766,4 +752,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::Zmodn_mat, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(UInt)
+mat_entry_ptr(A::Zmodn_mat, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(UInt)

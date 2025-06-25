@@ -7,8 +7,6 @@ module Nemo
 
 import AbstractAlgebra
 
-import Libdl
-
 using Random: Random, AbstractRNG, SamplerTrivial
 import Random: rand!
 
@@ -167,6 +165,8 @@ import AbstractAlgebra: @attributes
 import AbstractAlgebra: @show_name
 import AbstractAlgebra: @show_special
 import AbstractAlgebra: @show_special_elem
+import AbstractAlgebra: AnyInf
+import AbstractAlgebra: check_square
 import AbstractAlgebra: Dedent
 import AbstractAlgebra: div
 import AbstractAlgebra: divrem
@@ -180,8 +180,10 @@ import AbstractAlgebra: get_cached!
 import AbstractAlgebra: Group
 import AbstractAlgebra: howell_form!
 import AbstractAlgebra: Indent
+import AbstractAlgebra: is_noetherian
 import AbstractAlgebra: is_terse
 import AbstractAlgebra: is_zero_initialized
+import AbstractAlgebra: krull_dim
 import AbstractAlgebra: Lowercase
 import AbstractAlgebra: LowercaseOff
 import AbstractAlgebra: Module
@@ -215,13 +217,6 @@ const pkgdir = realpath(joinpath(dirname(@__DIR__)))
 function flint_abort()
   error("Problem in the FLINT-Subsystem")
 end
-
-const NEW_FLINT =
-      let ptr = Libdl.dlopen(libflint)
-        v = Libdl.dlsym(ptr, :flint_rand_init; throw_error = false) !== nothing
-        Libdl.dlclose(ptr)
-        v
-      end
 
 ################################################################################
 #
@@ -436,8 +431,6 @@ include("matrix.jl")
 include("poly.jl")
 include("ZZMatrix-linalg.jl")
 
-include("Infinity.jl")
-
 include("HeckeMiscFiniteField.jl")
 include("HeckeMoreStuff.jl")
 
@@ -529,25 +522,15 @@ end
 
 Random.seed!(a::rand_ctx, s::Nothing=nothing) = Random.seed!(a, rand(UInt128))
 
-if NEW_FLINT
-  flint_randseed!(a::rand_ctx, seed1::UInt, seed2::UInt) =
-  @ccall libflint.flint_rand_set_seed(a::Ref{rand_ctx}, seed1::UInt, seed2::UInt)::Cvoid
+flint_randseed!(a::rand_ctx, seed1::UInt, seed2::UInt) =
+@ccall libflint.flint_rand_set_seed(a::Ref{rand_ctx}, seed1::UInt, seed2::UInt)::Cvoid
 
-  function flint_gmp_randseed!(a::rand_ctx, seed::BigInt)
-    if a.gmp_state == C_NULL
-      # gmp_state needs to be initialised
-      @ccall libflint._flint_rand_init_gmp_state(a::Ref{rand_ctx})::Cvoid
-    end
-    @ccall :libgmp.__gmp_randseed(a.gmp_state::Ptr{Cvoid}, seed::Ref{BigInt})::Cvoid
+function flint_gmp_randseed!(a::rand_ctx, seed::BigInt)
+  if a.gmp_state == C_NULL
+    # gmp_state needs to be initialised
+    @ccall libflint._flint_rand_init_gmp_state(a::Ref{rand_ctx})::Cvoid
   end
-else
-  flint_randseed!(a::rand_ctx, seed1::UInt, seed2::UInt) =
-  @ccall libflint.flint_randseed(a::Ref{rand_ctx}, seed1::UInt, seed2::UInt)::Cvoid
-
-  function flint_gmp_randseed!(a::rand_ctx, seed::BigInt)
-    @ccall libflint._flint_rand_init_gmp(a::Ref{rand_ctx})::Cvoid
-    @ccall :libgmp.__gmp_randseed(a::Ref{rand_ctx}, seed::Ref{BigInt})::Cvoid # gmp_state is the first field of flint_rand_s
-  end
+  @ccall :libgmp.__gmp_randseed(a.gmp_state::Ptr{Cvoid}, seed::Ref{BigInt})::Cvoid
 end
 
 ################################################################################

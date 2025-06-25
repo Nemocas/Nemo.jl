@@ -64,7 +64,10 @@ end
 
 normalise(f::ZZPolyRingElem, ::Int) = degree(f) + 1
 
-set_length!(f::ZZPolyRingElem, ::Int) = nothing
+function set_length!(x::ZZPolyRingElem, n::Int)
+  @ccall libflint._fmpz_poly_set_length(x::Ref{ZZPolyRingElem}, n::Int)::Nothing
+  return x
+end
 
 ###############################################################################
 #
@@ -96,14 +99,6 @@ function polynomial(R::ZZRing, arr::Vector{T}, var::VarName=:x; cached::Bool=tru
   z.parent = ZZPolyRing(R, Symbol(var), cached)
   return z
 end
-
-###############################################################################
-#
-#   Canonicalisation
-#
-###############################################################################
-
-canonical_unit(a::ZZPolyRingElem) = canonical_unit(leading_coefficient(a))
 
 ###############################################################################
 #
@@ -181,6 +176,10 @@ function ==(x::ZZPolyRingElem, y::ZZPolyRingElem)
   return @ccall libflint.fmpz_poly_equal(x::Ref{ZZPolyRingElem}, y::Ref{ZZPolyRingElem})::Bool
 end
 
+function isone(x::ZZPolyRingElem)
+  return Bool(@ccall libflint.fmpz_poly_is_one(x::Ref{ZZPolyRingElem})::Cint)
+end
+
 ###############################################################################
 #
 #   Ad hoc comparisons
@@ -256,14 +255,20 @@ end
 
 function shift_left(x::ZZPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
-  z = parent(x)()
+  return shift_left!(parent(x)(), x, len)
+end
+
+function shift_left!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, len::Int)
   @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, len::Int)::Nothing
   return z
 end
 
 function shift_right(x::ZZPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
-  z = parent(x)()
+  return shift_right!(parent(x)(), x, len)
+end
+
+function shift_right!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, len::Int)
   @ccall libflint.fmpz_poly_shift_right(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, len::Int)::Nothing
   return z
 end
@@ -458,6 +463,17 @@ function derivative(x::ZZPolyRingElem)
   return z
 end
 
+function derivative(x::ZZPolyRingElem, n::Int)
+  z = parent(x)()
+  z = derivative!(z, x, n)
+  return z
+end
+
+function derivative!(z::ZZPolyRingElem, x::ZZPolyRingElem, n::Int)
+  @ccall libflint.fmpz_poly_nth_derivative(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, n::Int)::Nothing
+  return z
+end
+
 ###############################################################################
 #
 #   Resultant
@@ -549,6 +565,10 @@ function signature(f::ZZPolyRingElem)
   return (r[1], s[1])
 end
 
+function n_real_roots(f::ZZPolyRingElem)
+  return @ccall libflint.fmpz_poly_num_real_roots_sturm(f::Ref{ZZPolyRingElem})::Int
+end
+
 ################################################################################
 #
 #  Interpolation
@@ -598,8 +618,7 @@ for (factor_fn, factor_fn_inner, flint_fn) in
 
          function $factor_fn_inner(x::ZZPolyRingElem)
            fac = fmpz_poly_factor()
-           ccall(($flint_fn, libflint), Nothing,
-                 (Ref{fmpz_poly_factor}, Ref{ZZPolyRingElem}), fac, x)
+           @ccall libflint.$flint_fn(fac::Ref{fmpz_poly_factor}, x::Ref{ZZPolyRingElem})::Nothing
            res = Dict{ZZPolyRingElem,Int}()
            z = ZZRingElem()
            @ccall libflint.fmpz_poly_factor_get_fmpz(z::Ref{ZZRingElem}, fac::Ref{fmpz_poly_factor})::Nothing
@@ -848,13 +867,7 @@ function sub!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::ZZPolyRingElemO
 end
 
 function sub!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::ZZRingElemOrPtr)
-  if is_zero(y)
-    # HACK HACK HACK: workaround a crash in fmpz_poly_sub_fmpz when subtracting
-    # 0 from a zero polynomial; see https://github.com/flintlib/flint/pull/2102
-    set!(z, x)
-  else
-    @ccall libflint.fmpz_poly_sub_fmpz(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZRingElem})::Nothing
-  end
+  @ccall libflint.fmpz_poly_sub_fmpz(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZRingElem})::Nothing
   return z
 end
 

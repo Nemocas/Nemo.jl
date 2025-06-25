@@ -31,8 +31,6 @@ zero(R::ArbField) = R(0)
 
 one(R::ArbField) = R(1)
 
-# TODO: Add hash (and document under ArbFieldElem basic functionality)
-
 @doc raw"""
     accuracy_bits(x::ArbFieldElem)
 
@@ -105,9 +103,7 @@ for (b, f) in ((RoundingMode{:Down}, :arb_get_lbound_arf),
   @eval begin
     function _arb_get_arf(x::ArbFieldElem, ::$b)
       t = arf_struct()
-      ccall(($(string(f)), libflint), Nothing,
-            (Ref{arf_struct}, Ref{ArbFieldElem}, Int),
-            t, x, parent(x).prec)
+      @ccall libflint.$f(t::Ref{arf_struct}, x::Ref{ArbFieldElem}, parent(x).prec::Int)::Nothing
       return t
     end
   end
@@ -628,8 +624,7 @@ for (s,f) in ((:+,"arb_add"), (:*,"arb_mul"), (://, "arb_div"), (:-,"arb_sub"))
   @eval begin
     function ($s)(x::ArbFieldElem, y::ArbFieldElem)
       z = parent(x)()
-      ccall(($f, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int),
-            z, x, y, parent(x).prec)
+      @ccall libflint.$f(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Ref{ArbFieldElem}, parent(x).prec::Int)::Nothing
       return z
     end
   end
@@ -639,9 +634,7 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
   @eval begin
     #function ($f)(x::ArbFieldElem, y::arf)
     #  z = parent(x)()
-    #  ccall(($("arb_"*s*"_arf"), libflint), Nothing,
-    #              (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{arf}, Int),
-    #              z, x, y, parent(x).prec)
+    #  @ccall libflint.$("arb_$(s)_arf")(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Ref{arf}, parent(x).prec::Int)::Nothing
     #  return z
     #end
 
@@ -649,9 +642,7 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
 
     function ($f)(x::ArbFieldElem, y::UInt)
       z = parent(x)()
-      ccall(($("arb_"*s*"_ui"), libflint), Nothing,
-            (Ref{ArbFieldElem}, Ref{ArbFieldElem}, UInt, Int),
-            z, x, y, parent(x).prec)
+      @ccall libflint.$("arb_$(s)_ui")(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::UInt, parent(x).prec::Int)::Nothing
       return z
     end
 
@@ -659,8 +650,7 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
 
     function ($f)(x::ArbFieldElem, y::Int)
       z = parent(x)()
-      ccall(($("arb_"*s*"_si"), libflint), Nothing,
-            (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int, Int), z, x, y, parent(x).prec)
+      @ccall libflint.$("arb_$(s)_si")(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Int, parent(x).prec::Int)::Nothing
       return z
     end
 
@@ -668,9 +658,7 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
 
     function ($f)(x::ArbFieldElem, y::ZZRingElem)
       z = parent(x)()
-      ccall(($("arb_"*s*"_fmpz"), libflint), Nothing,
-            (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ZZRingElem}, Int),
-            z, x, y, parent(x).prec)
+      @ccall libflint.$("arb_$(s)_fmpz")(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Ref{ZZRingElem}, parent(x).prec::Int)::Nothing
       return z
     end
 
@@ -1872,8 +1860,7 @@ for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
               ("sub!","arb_sub"))
   @eval begin
     function ($(Symbol(s)))(z::ArbFieldElem, x::ArbFieldElem, y::ArbFieldElem)
-      ccall(($f, libflint), Nothing, (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbFieldElem}, Int),
-            z, x, y, parent(x).prec)
+      @ccall libflint.$f(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Ref{ArbFieldElem}, parent(x).prec::Int)::Nothing
       return z
     end
   end

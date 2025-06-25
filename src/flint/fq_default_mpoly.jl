@@ -38,6 +38,10 @@ function is_gen(a::FqMPolyRingElem)
   return is_gen(a.data)
 end
 
+function is_gen(a::FqMPolyRingElem, i::Int)
+  return is_gen(a.data, i)
+end
+
 function deepcopy_internal(a::FqMPolyRingElem, dict::IdDict)
   return FqMPolyRingElem(parent(a), deepcopy_internal(a.data, dict))
 end
@@ -450,6 +454,16 @@ function mul!(a::FqMPolyRingElem, b::FqMPolyRingElem, c::FqMPolyRingElem)
 end
 
 function setcoeff!(a::FqMPolyRingElem, n::Int, c::FqFieldElem)
+  Rd = parent(a).data
+  a.data = setcoeff!(a.data, n, _unchecked_coerce(base_ring(Rd), c))
+  return a
+end
+
+function setcoeff!(a::FqMPolyRingElem, n::Vector{Int}, c)
+  return setcoeff!(a, n, base_ring(a)(c)::FqFieldElem)
+end
+
+function setcoeff!(a::FqMPolyRingElem, n::Vector{Int}, c::FqFieldElem)
   Rd = parent(a).data
   a.data = setcoeff!(a.data, n, _unchecked_coerce(base_ring(Rd), c))
   return a

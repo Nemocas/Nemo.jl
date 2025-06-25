@@ -78,7 +78,7 @@ number_of_columns(a::T) where T <: Zmod_fmpz_mat = a.c
 base_ring(a::T) where T <: Zmod_fmpz_mat = a.base_ring
 
 function one(a::ZZModMatrixSpace)
-  (nrows(a) != ncols(a)) && error("Matrices must be square")
+  check_square(a)
   return one!(a())
 end
 
@@ -207,16 +207,6 @@ end
 function add!(a::T, b::T, c::T) where T <: Zmod_fmpz_mat
   @ccall libflint.fmpz_mod_mat_add(a::Ref{T}, b::Ref{T}, c::Ref{T}, base_ring(b).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return a
-end
-
-function mul!(z::Vector{ZZRingElem}, a::T, b::Vector{ZZRingElem}) where T <: Zmod_fmpz_mat
-  @ccall libflint.fmpz_mod_mat_mul_fmpz_vec_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ref{T}, b::Ptr{Ref{ZZRingElem}}, length(b)::Int, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
-end
-
-function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::T) where T <: Zmod_fmpz_mat
-  @ccall libflint.fmpz_mod_mat_fmpz_vec_mul_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ptr{Ref{ZZRingElem}}, length(a)::Int, b::Ref{T}, base_ring(b).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
 end
 
 function Generic.add_one!(a::ZZModMatrix, i::Int, j::Int)
@@ -482,7 +472,7 @@ end
 #
 ################################################################################
 
-function Base.view(x::ZZModMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
+function _view_window(x::ZZModMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
 
   _checkrange_or_empty(nrows(x), r1, r2) ||
   Base.throw_boundserror(x, (r1:r2, c1:c2))
@@ -507,24 +497,8 @@ function Base.view(x::ZZModMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
   return z
 end
 
-function Base.view(x::T, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) where T <: Zmod_fmpz_mat
-  return Base.view(x, first(r), first(c), last(r), last(c))
-end
-
 function _fmpz_mod_mat_window_clear_fn(a::ZZModMatrix)
   @ccall libflint.fmpz_mod_mat_window_clear(a::Ref{ZZModMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-end
-
-function sub(x::T, r1::Int, c1::Int, r2::Int, c2::Int) where T <: Zmod_fmpz_mat
-  return deepcopy(Base.view(x, r1, c1, r2, c2))
-end
-
-function sub(x::T, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) where T <: Zmod_fmpz_mat
-  return deepcopy(Base.view(x, r, c))
-end
-
-function getindex(x::T, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) where T <: Zmod_fmpz_mat
-  sub(x, r, c)
 end
 
 ################################################################################
@@ -682,4 +656,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::ZZModMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(ZZRingElem)
+mat_entry_ptr(A::ZZModMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(ZZRingElem)

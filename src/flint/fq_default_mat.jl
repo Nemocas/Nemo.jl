@@ -73,8 +73,8 @@ end
 base_ring(a::FqMatrix) = a.base_ring
 
 function one(a::FqMatrixSpace)
-  (nrows(a) != ncols(a)) && error("Matrices must be square")
-  return a(one(base_ring(a)))
+  check_square(a)
+  return one!(a())
 end
 
 function iszero(a::FqMatrix)
@@ -454,7 +454,7 @@ end
 #
 ################################################################################
 
-function Base.view(x::FqMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
+function _view_window(x::FqMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
 
   _checkrange_or_empty(nrows(x), r1, r2) ||
   Base.throw_boundserror(x, (r1:r2, c1:c2))
@@ -479,23 +479,9 @@ function Base.view(x::FqMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
   return z
 end
 
-function Base.view(x::FqMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
-  return Base.view(x, first(r), first(c), last(r), last(c))
-end
-
 function _fq_default_mat_window_clear_fn(a::FqMatrix)
   @ccall libflint.fq_default_mat_window_clear(a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
 end
-
-function sub(x::FqMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
-  return deepcopy(Base.view(x, r1, c1, r2, c2))
-end
-
-function sub(x::FqMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
-  return deepcopy(Base.view(x, r, c))
-end
-
-getindex(x::FqMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) = sub(x, r, c)
 
 ################################################################################
 #

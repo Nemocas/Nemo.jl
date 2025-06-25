@@ -85,15 +85,8 @@ number_of_columns(a::FpMatrix) = a.c
 base_ring(a::FpMatrix) = a.base_ring
 
 function one(a::FpMatrixSpace)
-  (nrows(a) != ncols(a)) && error("Matrices must be square")
-  z = a()
-  @ccall libflint.fmpz_mod_mat_one(z::Ref{FpMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
-end
-
-function iszero(a::FpMatrix)
-  r = @ccall libflint.fmpz_mod_mat_is_zero(a::Ref{FpMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Cint
-  return Bool(r)
+  check_square(a)
+  return one!(a())
 end
 
 @inline function is_zero_entry(A::FpMatrix, i::Int, j::Int)
@@ -138,7 +131,7 @@ end
 #
 ################################################################################
 
-function Base.view(x::FpMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
+function _view_window(x::FpMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
 
   _checkrange_or_empty(nrows(x), r1, r2) ||
   Base.throw_boundserror(x, (r1:r2, c1:c2))
@@ -354,4 +347,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::FpMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(ZZRingElem)
+mat_entry_ptr(A::FpMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(ZZRingElem)

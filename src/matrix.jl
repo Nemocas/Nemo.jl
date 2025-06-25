@@ -4,6 +4,26 @@ const _MatTypes = Union{_FieldMatTypes, ZZMatrix, zzModMatrix, ZZModMatrix}
 
 ################################################################################
 #
+#  common functionality for views
+#
+################################################################################
+
+function Base.view(x::_MatTypes, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
+  return _view_window(x, first(r), first(c), last(r), last(c))
+end
+
+function sub(x::_MatTypes, r1::Int, c1::Int, r2::Int, c2::Int)
+  return deepcopy(view(x, r1:r2, c1:c2))
+end
+
+function sub(x::_MatTypes, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
+  return deepcopy(view(x, r, c))
+end
+
+getindex(x::_MatTypes, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) = sub(x, r, c)
+
+################################################################################
+#
 #  Support for view(A, :, i) and view(A, i, :)
 #
 ################################################################################
@@ -23,12 +43,12 @@ Base.setindex!(V::MatrixView, z, i::Int) = setindex!(V, ZZ(z), i)
 
 Base.size(V::MatrixView) = (length(V.A), )
 
-function Base.view(x::_MatTypes, r::Int, c::UnitRange{Int})
+function Base.view(x::_MatTypes, r::Int, c::Union{Colon, AbstractUnitRange{Int}})
   A = view(x, r:r, c)
   return MatrixView{typeof(x), elem_type(base_ring(x))}(A)
 end
 
-function Base.view(x::_MatTypes, r::UnitRange{Int}, c::Int)
+function Base.view(x::_MatTypes, r::Union{Colon, AbstractUnitRange{Int}}, c::Int)
   A = view(x, r, c:c)
   return MatrixView{typeof(x), elem_type(base_ring(x))}(A)
 end

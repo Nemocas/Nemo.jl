@@ -28,7 +28,7 @@ function _checkrange_or_empty(l::Int, start::Int, stop::Int)
    _checkbounds(l, stop))
 end
 
-function Base.view(x::ZZMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
+function _view_window(x::ZZMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
 
   _checkrange_or_empty(nrows(x), r1, r2) ||
   Base.throw_boundserror(x, (r1:r2, c1:c2))
@@ -63,24 +63,9 @@ function Base.reshape(x::ZZMatrix, r::Int, c::Int)
   return b
 end
 
-
-function Base.view(x::ZZMatrix, r::UnitRange{Int}, c::UnitRange{Int})
-  return Base.view(x, r.start, c.start, r.stop, c.stop)
-end
-
 function _fmpz_mat_window_clear_fn(a::ZZMatrix)
   @ccall libflint.fmpz_mat_window_clear(a::Ref{ZZMatrix})::Nothing
 end
-
-function sub(x::ZZMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
-  return deepcopy(view(x, r1, c1, r2, c2))
-end
-
-function sub(x::ZZMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
-  return deepcopy(view(x, r, c))
-end
-
-getindex(x::ZZMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) = sub(x, r, c)
 
 ###############################################################################
 #
@@ -165,27 +150,13 @@ function Base.hash(a::ZZMatrix, h::UInt)
     c = ncols(a)
     h = hash(r, h)
     h = hash(c, h)
-    rowptr = convert(Ptr{Ptr{Int}}, a.rows)
+    entries = convert(Ptr{Int}, a.entries)
     for i in 1:r
-      h = _hash_integer_array(unsafe_load(rowptr, i), c, h)
+      h = _hash_integer_array(entries + (i - 1) * a.stride * sizeof(Int), c, h)
     end
     return xor(h, 0x5c22af6d5986f453%UInt)
   end
 end
-
-###############################################################################
-#
-#   Canonicalisation
-#
-###############################################################################
-
-canonical_unit(a::ZZMatrix) = canonical_unit(a[1, 1])
-
-###############################################################################
-#
-#   AbstractString I/O
-#
-###############################################################################
 
 ###############################################################################
 #
@@ -1561,9 +1532,13 @@ function AbstractAlgebra._vcat(A::AbstractVector{ZZMatrix})
   end
 
   M = zero_matrix(ZZ, sum(nrows, A, init = 0), ncols(A[1]))
+
   s = 0
   for N in A
     GC.@preserve M N begin
+      if ncols(N) == 0
+        continue
+      end
       for j in 1:nrows(N)
         M_ptr = mat_entry_ptr(M, s+j, 1)
         N_ptr = mat_entry_ptr(N, j, 1)
@@ -1582,13 +1557,17 @@ end
 
 function AbstractAlgebra._hcat(A::AbstractVector{ZZMatrix})
   if any(x -> nrows(x) != nrows(A[1]), A)
-    error("Matrices must have the same number of columns")
+    error("Matrices must have the same number of rows")
   end
 
   M = zero_matrix(ZZ, nrows(A[1]), sum(ncols, A, init = 0))
+
   s = 0
   for N in A
     GC.@preserve M N begin
+      if ncols(N) == 0
+        continue
+      end
       for j in 1:nrows(N)
         M_ptr = mat_entry_ptr(M, j, s+1)
         N_ptr = mat_entry_ptr(N, j, 1)
@@ -1830,7 +1809,7 @@ end
 ###############################################################################
 
 function Base.copy!(A::ZZMatrix, B::ZZMatrix)
-  ccall((:fmpz_mat_set, Nemo.libflint), Cvoid, (Ref{ZZMatrix}, Ref{ZZMatrix}), A, B)
+  @ccall libflint.fmpz_mat_set(A::Ref{ZZMatrix}, B::Ref{ZZMatrix})::Cvoid
 end
 
 function zero!(z::ZZMatrixOrPtr)
@@ -2005,33 +1984,27 @@ function _very_unsafe_convert(::Type{ZZMatrix}, a::Vector{ZZRingElem}, row = tru
   Me = zeros(Int, length(a))
   M.entries = reinterpret(Ptr{ZZRingElem}, pointer(Me))
   if row
-    Mep = [pointer(Me)]
-    M.rows = reinterpret(Ptr{Ptr{ZZRingElem}}, pointer(Mep))
     M.r = 1
     M.c = length(a)
+    M.stride = M.c
   else
     M.r = length(a)
     M.c = 1
-    Mep = [pointer(Me) + 8*(i - 1) for i in 1:length(a)]
-    M.rows = reinterpret(Ptr{Ptr{ZZRingElem}}, pointer(Mep))
+    M.stride = M.c
   end
   for i in 1:length(a)
     Me[i] = a[i].d
   end
-  return M, Me, Mep
+  return M, Me
 end
 
 function mul!_flint(z::Vector{ZZRingElem}, a::ZZMatrixOrPtr, b::Vector{ZZRingElem})
-  ccall((:fmpz_mat_mul_fmpz_vec_ptr, libflint), Nothing,
-        (Ptr{Ref{ZZRingElem}}, Ref{ZZMatrix}, Ptr{Ref{ZZRingElem}}, Int),
-        z, a, b, length(b))
+  @ccall libflint.fmpz_mat_mul_fmpz_vec_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ref{ZZMatrix}, b::Ptr{Ref{ZZRingElem}}, length(b)::Int)::Nothing
   return z
 end
 
 function mul!_flint(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::ZZMatrixOrPtr)
-  ccall((:fmpz_mat_fmpz_vec_mul_ptr, libflint), Nothing,
-        (Ptr{Ref{ZZRingElem}}, Ptr{Ref{ZZRingElem}}, Int, Ref{ZZMatrix}),
-        z, a, length(a), b)
+  @ccall libflint.fmpz_mat_fmpz_vec_mul_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ptr{Ref{ZZRingElem}}, length(a)::Int, b::Ref{ZZMatrix})::Nothing
   return z
 end
 
@@ -2042,9 +2015,9 @@ function mul!(z::Vector{ZZRingElem}, a::ZZMatrixOrPtr, b::Vector{ZZRingElem})
   end
 
   GC.@preserve z b begin
-    bb, dk1, dk2 = _very_unsafe_convert(ZZMatrix, b, false)
-    zz, dk3, dk4 = _very_unsafe_convert(ZZMatrix, z, false)
-    GC.@preserve dk1 dk2 dk3 dk4 begin
+    bb, dk1 = _very_unsafe_convert(ZZMatrix, b, false)
+    zz, dk3 = _very_unsafe_convert(ZZMatrix, z, false)
+    GC.@preserve dk1 dk3 begin
       mul!(zz, a, bb)
       for i in 1:length(z)
         z[i].d = unsafe_load(zz.entries, i).d
@@ -2060,9 +2033,9 @@ function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::ZZMatrixOrPtr)
     return mul!_flint(z, a, b)
   end
   GC.@preserve z a begin
-    aa, dk1, dk2 = _very_unsafe_convert(ZZMatrix, a)
-    zz, dk3, dk4 = _very_unsafe_convert(ZZMatrix, z)
-    GC.@preserve dk1 dk2 dk3 dk4 begin
+    aa, dk1 = _very_unsafe_convert(ZZMatrix, a)
+    zz, dk3 = _very_unsafe_convert(ZZMatrix, z)
+    GC.@preserve dk1 dk3 begin
       mul!(zz, aa, b)
       for i in 1:length(z)
         z[i].d = unsafe_load(zz.entries, i).d
@@ -2238,5 +2211,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::ZZMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(ZZRingElem)
-
+mat_entry_ptr(A::ZZMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(ZZRingElem)

@@ -35,6 +35,11 @@ end
 
 length(x::T) where {T <: Zmodn_fmpz_poly} = x.length
 
+function set_length!(x::T, n::Int) where {T <: Zmodn_fmpz_poly}
+  @ccall libflint._fmpz_mod_poly_set_length(x::Ref{T}, n::Int)::Nothing
+  return x
+end
+
 function degree(x::T) where {T <: Zmodn_fmpz_poly}
   return x.length - 1
   #   return @ccall libflint.fmpz_mod_poly_degree(x::Ref{T}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Int
@@ -98,14 +103,6 @@ function polynomial(R::ZZModRing, arr::Vector{T}, var::VarName=:x; cached::Bool=
   z.parent = ZZModPolyRing(R, Symbol(var), cached)
   return z
 end
-
-################################################################################
-#
-#  Canonicalization
-#
-################################################################################
-
-canonical_unit(a::Zmodn_fmpz_poly) = canonical_unit(leading_coefficient(a))
 
 ################################################################################
 #

@@ -18,7 +18,7 @@
 
   T, z = polynomial_ring(S, "z")
 
-  @test typeof(T) <: Generic.PolyRing
+  @test T isa Generic.PolyRing
 
   @test isa(z, PolyRingElem)
 

@@ -33,10 +33,10 @@ begin
         @test Nemo.promote_rule(elem_type(S), Int) == elem_type(S)
         @test Nemo.promote_rule(elem_type(S), ZZRingElem) == elem_type(S)
 
-        @test typeof(S) <: FqMPolyRing
+        @test S isa FqMPolyRing
         @test length(@inferred gens(S)) == num_vars
 
-        isa(symbols(S), Vector{Symbol})
+        @test isa(symbols(S), Vector{Symbol})
 
         for j = 1:num_vars
           @test isa(varlist[j], FqMPolyRingElem)
@@ -62,6 +62,11 @@ begin
           f = gen(S, i)
           @test is_gen(f)
           @test !is_gen(f + 1)
+          @test is_gen(f, i)
+          @test !is_gen(f + 1, i)
+          if i > 1
+            @test !is_gen(f, i - 1)
+          end
         end
       end
     end
@@ -237,6 +242,14 @@ begin
       @test trailing_coefficient(x) == 1
       @test trailing_coefficient(S(2)) == 2
       @test trailing_coefficient(S()) == 0
+    end
+
+    for (R, a) in test_fields
+      S, (x, y, z, w) = polynomial_ring(R, ["x", "y", "z", "w"])
+      f = zero(S)
+      @test setcoeff!(f, [1, 0, 0, 0], R(1)) == x
+      @test setcoeff!(f, [1, 1, 1, 1], R(3)) == x + 3 * x * y* z * w
+      @test setcoeff!(f, [1, 0, 0, 0], 0) == 3 * x * y* z * w
     end
   end
 
