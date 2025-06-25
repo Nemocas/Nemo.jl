@@ -424,11 +424,11 @@ end
 
   g = f^1000
 
-  @test g == matrix_space(Z17, 3, 3)([1 2 2; 2 13 12; 2 12 15])
+  @test g == matrix(Z17, [1 2 2; 2 13 12; 2 12 15])
 
   g = f^ZZ(1000)
 
-  @test g == matrix_space(Z17, 3, 3)([1 2 2; 2 13 12; 2 12 15])
+  @test g == matrix(Z17, [1 2 2; 2 13 12; 2 12 15])
 
   @test_throws ErrorException f^(ZZ(2)^1000)
 end
