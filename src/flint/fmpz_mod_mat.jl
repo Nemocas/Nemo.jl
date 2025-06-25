@@ -264,7 +264,7 @@ function ^(x::T, y::Int) where {T<:Zmod_fmpz_mat}
     y = -y
   end
   z = similar(x)
-  @ccall libflint.fmpz_mod_mat_pow_ui(z::Ref{T}, x::Ref{T}, y::Int)::Nothing
+  @ccall libflint.fmpz_mod_mat_pow_ui(z::Ref{T}, x::Ref{T}, y::Int, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
