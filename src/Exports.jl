@@ -470,6 +470,7 @@ export padic_field
 export PadicField
 export PadicFieldElem
 export parent
+export partial_fractions
 export Partition
 export Perm
 export polygamma
