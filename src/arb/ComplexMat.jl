@@ -69,6 +69,7 @@ setindex!(x::ComplexMatrix, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) 
 setindex!(x, map(QQFieldElem, y), r, c)
 
 function one(x::ComplexMatrixSpace)
+  check_square(x)
   return one!(x())
 end
 
@@ -484,7 +485,7 @@ function lu!(P::Perm, z::ComplexMatrix, x::ComplexMatrix)
   r = @ccall libflint.acb_mat_lu(P.d::Ptr{Int}, z::Ref{ComplexMatrix}, x::Ref{ComplexMatrix}, precision(Balls)::Int)::Cint
   r == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
-  inv!(P)
+  inv!(P) # FLINT does PLU = x instead of Px = LU
   return min(nrows(x), ncols(x))
 end
 
@@ -658,9 +659,7 @@ for (s,f) in (("add!","acb_mat_add"), ("mul!","acb_mat_mul"),
               ("sub!","acb_mat_sub"))
   @eval begin
     function ($(Symbol(s)))(z::ComplexMatrix, x::ComplexMatrix, y::ComplexMatrix, prec::Int = precision(Balls))
-      ccall(($f, libflint), Nothing,
-            (Ref{ComplexMatrix}, Ref{ComplexMatrix}, Ref{ComplexMatrix}, Int),
-            z, x, y, prec)
+      @ccall libflint.$f(z::Ref{ComplexMatrix}, x::Ref{ComplexMatrix}, y::Ref{ComplexMatrix}, prec::Int)::Nothing
       return z
     end
   end

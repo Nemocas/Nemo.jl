@@ -365,19 +365,20 @@ for (etype, rtype, ftype, ctype) in (
     #
     ###############################################################################
 
-    function ^(a::($etype), b::Int)
-      b >= 0 || throw(DomainError(b, "Exponent must be non-negative"))
-      z = parent(a)()
-      @ccall libflint.fmpz_mod_mpoly_pow_ui(z::Ref{($etype)}, a::Ref{($etype)}, UInt(b)::UInt, parent(a)::Ref{($rtype)})::Nothing
-      return z
+    # Cannot use IntegerUnion here to avoid ambiguity.
+
+    function ^(a::($etype), n::Int)
+      if is_negative(n)
+        throw(DomainError(n, "Exponent must be non-negative"))
+      end
+      return pow!(parent(a)(), a, n)
     end
 
-    function ^(a::($etype), b::ZZRingElem)
-      b >= 0 || throw(DomainError(b, "Exponent must be non-negative"))
-      z = parent(a)()
-      ok = @ccall libflint.fmpz_mod_mpoly_pow_fmpz(z::Ref{($etype)}, a::Ref{($etype)}, b::Ref{ZZRingElem}, parent(a)::Ref{($rtype)})::Cint
-      iszero(ok) && error("Unable to compute power")
-      return z
+    function ^(a::($etype), n::ZZRingElem)
+      if is_negative(n)
+        throw(DomainError(n, "Exponent must be non-negative"))
+      end
+      return pow!(parent(a)(), a, n)
     end
 
     ################################################################################
@@ -672,6 +673,19 @@ for (etype, rtype, ftype, ctype) in (
     function combine_like_terms!(a::($etype))
       @ccall libflint.fmpz_mod_mpoly_combine_like_terms(a::Ref{($etype)}, a.parent::Ref{($rtype)})::Nothing
       return a
+    end
+
+    function pow!(z::($etype), a::($etype), n::Integer)
+      @ccall libflint.fmpz_mod_mpoly_pow_ui(z::Ref{($etype)}, a::Ref{($etype)}, UInt(n)::UInt, parent(a)::Ref{($rtype)})::Nothing
+      return z
+    end
+
+    function pow!(z::($etype), a::($etype), n::ZZRingElem)
+      ok = Bool(@ccall libflint.fmpz_mod_mpoly_pow_fmpz(z::Ref{($etype)}, a::Ref{($etype)}, n::Ref{ZZRingElem}, parent(a)::Ref{($rtype)})::Cint)
+      if !ok
+        error("unable to compute power")
+      end
+      return z
     end
 
     ###############################################################################

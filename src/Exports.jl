@@ -312,7 +312,7 @@ export hypergeometric_2f1
 export hypergeometric_u
 export hypot
 export imag
-export inf
+#export induce_rational_reconstruction
 export infinity
 export inflate
 export integer_ring
@@ -322,7 +322,6 @@ export interpolate
 export interpolate_barycentric
 export interpolate_fast
 export interpolate_newton
-export IntExt
 export inv
 export invmod
 export iroot
@@ -341,7 +340,6 @@ export is_gen
 export is_hadamard
 export is_hnf
 export is_imaginary
-export is_infinite
 export is_irreducible
 export is_less_abs
 export is_less_abs_imag
@@ -351,6 +349,8 @@ export is_less_real
 export is_less_root_order
 export is_lower_triangular
 export is_negative
+export is_negative_entry
+export is_noetherian
 export is_nonnegative
 export is_nonpositive
 export is_nonzero
@@ -390,6 +390,7 @@ export j_invariant
 export jacobi_symbol
 export jacobi_theta
 export kronecker_symbol
+export krull_dim
 export laurent_series_field
 export laurent_series_ring
 export lcm
@@ -443,7 +444,6 @@ export nbits
 export ncdivrem
 export ndivrem
 export neg!
-export NegInf
 export next_calkin_wilf
 export next_minimal
 export next_prime
@@ -478,7 +478,6 @@ export polygamma
 export polylog
 export polynomial_ring
 export popcount
-export PosInf
 export pow
 export power_series_ring
 export powermod
@@ -518,6 +517,7 @@ export rand_bits_prime
 export rank
 export Rational
 export rational_field
+#export rational_reconstruction
 export real
 export RealField
 export RealFieldElem

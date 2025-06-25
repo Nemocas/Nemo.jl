@@ -111,17 +111,12 @@ end
   end
 end
 
-@testset "ZZMatrix.is_zero_entry" begin
-  M = matrix(ZZ, [1 2 3;4 0 6;0 8 9])
-  for i in 1:3, j in 1:3
+@testset "ZZMatrix.is_(zero/positive/negative)_entry" begin
+  M = matrix(ZZ, [1 2 -3 0; -4 -999 100 3; 0 0 2 -2])
+  for i in 1:nrows(M), j in 1:ncols(M)
     @test is_zero_entry(M, i, j) == is_zero(M[i, j])
-  end
-end
-
-@testset "ZZMatrix.is_positive_entry" begin
-  M = matrix(ZZ, [1 2 3;-4 0 6;0 8 9])
-  for i in 1:3, j in 1:3
     @test is_positive_entry(M, i, j) == is_positive(M[i, j])
+    @test is_negative_entry(M, i, j) == is_negative(M[i, j])
   end
 end
 
@@ -182,7 +177,7 @@ end
 
   a = matrix(ZZ, 4, 4, [-1 ZZRingElem(2)^100 3 -4; 5 -1 ZZRingElem(2)^100 6; 7 5 -1 8; 9 10 11 12])
   @test hash(a, UInt(5)) == hash(deepcopy(a), UInt(5))
-  @test hash(view(a, 1,1, 2,2)) == hash(view(a, 2,2, 3,3))
+  @test hash(view(a, 1:2, 1:2)) == hash(view(a, 2:3, 2:3))
 
   C = ZZ[1 2 3; 4 5 6; 7 8 9]
   C[3, :] = ZZ[7 7 7]
@@ -203,7 +198,7 @@ end
 
   A = S([1 2 3; 4 5 6; 7 8 9])
 
-  B = @inferred view(A, 1, 1, 2, 2)
+  B = @inferred view(A, 1:2, 1:2)
 
   @test typeof(B) == ZZMatrix
   @test B == matrix_space(ZZ, 2, 2)([1 2; 4 5])
@@ -612,6 +607,37 @@ end
   B = gram(A)
   lll_gram!(B)
   @test B == lll_gram(gram(A))
+
+  # Semidefinite cases
+  A = ZZ[17070 17380 -4930 5840 28160;
+         17380 17975 -5135 6015 28835;
+         -4930 -5135 1485 -1715 -8155;
+         5840 6015 -1715 2015 9675;
+         28160 28835 -8155 9675 46705]
+  G = lll_gram(A)
+  GG =  ZZ[5  0  0 0 0;
+           0 10  0 0 0;
+           0  0 10 0 0;
+           0  0  0 0 0;
+           0  0  0 0 0]
+  @test G == GG
+  @test lll_gram(-A) == -GG
+
+  G, T = lll_gram_with_transform(A)
+  @test T * A * transpose(T) == G
+  G, T = lll_gram_with_transform(-A)
+  @test T * (-A) * transpose(T) == G
+
+  A = zero_matrix(ZZ, 0, 0)
+  G, T = lll_gram_with_transform(A)
+  @test T * A * transpose(T) == G
+  G = lll_gram(A)
+  @test G == A
+
+  @test_throws ArgumentError lll_gram(ZZ[1 0])
+  @test_throws ArgumentError lll_gram_with_transform(ZZ[1 0])
+  @test_throws ArgumentError lll_gram(ZZ[1 0; 1 1])
+  @test_throws ArgumentError lll_gram_with_transform(ZZ[1 0; 1 1])
 end
 
 @testset "ZZMatrix.nullspace" begin
@@ -841,6 +867,15 @@ end
   @test reduce(vcat, [A, A]) == vcat(A, A) # -> _vcat
   @test cat(A, A, dims = 2) == vcat(A, A)
   @test_throws ErrorException cat(A, A, dims = 3)
+
+  @test reduce(vcat, [zero_matrix(ZZ, 0, 1), zero_matrix(ZZ, 0, 1)]) == zero_matrix(ZZ, 0, 1)
+  @test reduce(vcat, [zero_matrix(ZZ, 0, 0), zero_matrix(ZZ, 0, 0)]) == zero_matrix(ZZ, 0, 0)
+  @test reduce(vcat, [zero_matrix(ZZ, 1, 1), zero_matrix(ZZ, 0, 1)]) == zero_matrix(ZZ, 1, 1)
+  @test reduce(hcat, [zero_matrix(ZZ, 1, 0), zero_matrix(ZZ, 1, 0)]) == zero_matrix(ZZ, 1, 0)
+  @test reduce(hcat, [zero_matrix(ZZ, 1, 1), zero_matrix(ZZ, 1, 0)]) == zero_matrix(ZZ, 1, 1)
+
+  @test_throws ErrorException reduce(vcat, [ZZ[1 0;], ZZ[1 2 3;]])
+  @test_throws ErrorException reduce(hcat, [ZZ[1 0; 2 3], ZZ[1 2 3;]])
 end
 
 @testset "ZZMatrix.rand" begin

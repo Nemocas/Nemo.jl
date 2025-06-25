@@ -14,13 +14,13 @@
   @test parent_type(fqPolyRepPolyRingElem) == fqPolyRepPolyRing
   @test dense_poly_type(fqPolyRepFieldElem) == fqPolyRepPolyRingElem
 
-  @test typeof(S) <: fqPolyRepPolyRing
+  @test S isa fqPolyRepPolyRing
 
   @test isa(y, PolyRingElem)
 
   T, z = polynomial_ring(S, "z")
 
-  @test typeof(T) <: Generic.PolyRing
+  @test T isa Generic.PolyRing
 
   @test isa(z, PolyRingElem)
 

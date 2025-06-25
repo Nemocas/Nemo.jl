@@ -76,8 +76,8 @@ number_of_columns(a::FqPolyRepMatrix) = a.c
 base_ring(a::FqPolyRepMatrix) = a.base_ring
 
 function one(a::FqPolyRepMatrixSpace)
-  (nrows(a) != ncols(a)) && error("Matrices must be square")
-  return a(one(base_ring(a)))
+  check_square(a)
+  return one!(a())
 end
 
 function iszero(a::FqPolyRepMatrix)
@@ -410,13 +410,10 @@ end
 
 function lu!(P::Perm, x::FqPolyRepMatrix)
   P.d .-= 1
-
   rank = Int(@ccall libflint.fq_mat_lu(P.d::Ptr{Int}, x::Ref{FqPolyRepMatrix}, 0::Cint, base_ring(x)::Ref{FqPolyRepField})::Cint)
-
   P.d .+= 1
 
-  # flint does x == PLU instead of Px == LU (docs are wrong)
-  inv!(P)
+  inv!(P) # FLINT does PLU = x instead of Px = LU
 
   return rank
 end
@@ -454,7 +451,7 @@ end
 #
 ################################################################################
 
-function Base.view(x::FqPolyRepMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
+function _view_window(x::FqPolyRepMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
 
   _checkrange_or_empty(nrows(x), r1, r2) ||
   Base.throw_boundserror(x, (r1:r2, c1:c2))
@@ -479,23 +476,9 @@ function Base.view(x::FqPolyRepMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
   return z
 end
 
-function Base.view(x::FqPolyRepMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
-  return Base.view(x, first(r), first(c), last(r), last(c))
-end
-
 function _fq_mat_window_clear_fn(a::FqPolyRepMatrix)
   @ccall libflint.fq_mat_window_clear(a::Ref{FqPolyRepMatrix}, base_ring(a)::Ref{FqPolyRepField})::Nothing
 end
-
-function sub(x::FqPolyRepMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
-  return deepcopy(Base.view(x, r1, c1, r2, c2))
-end
-
-function sub(x::FqPolyRepMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
-  return deepcopy(Base.view(x, r, c))
-end
-
-getindex(x::FqPolyRepMatrix, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) = sub(x, r, c)
 
 ################################################################################
 #
@@ -654,4 +637,4 @@ end
 #   length :: Int
 # The `parent` member of struct FqPolyRepFieldElem is not replicated in each
 # struct member, so we cannot use `sizeof(FqPolyRepFieldElem)`.
-mat_entry_ptr(A::FqPolyRepMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*(sizeof(Ptr)+2*sizeof(Int))
+mat_entry_ptr(A::FqPolyRepMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * (sizeof(Ptr) + 2 * sizeof(Int))

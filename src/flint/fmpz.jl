@@ -163,6 +163,7 @@ function hash_integer(a::ZZRingElem, h::UInt)
 end
 
 function hash(a::ZZRingElem, h::UInt)
+  _fmpz_is_small(a) && return Base.hash(data(a), h)
   return hash_integer(a, h)
 end
 
@@ -207,6 +208,10 @@ zero(::ZZRing) = ZZRingElem(0)
 one(::Type{ZZRingElem}) = ZZRingElem(1)
 
 zero(::Type{ZZRingElem}) = ZZRingElem(0)
+
+krull_dim(::ZZRing) = 1
+
+is_noetherian(::ZZRing) = true
 
 @doc raw"""
     sign(a::ZZRingElem)
@@ -378,8 +383,7 @@ for (fJ, fC) in ((:+, :add), (:-,:sub), (:*, :mul),
   @eval begin
     function ($fJ)(x::ZZRingElem, y::ZZRingElem)
       z = ZZRingElem()
-      ccall(($(string(:fmpz_, fC)), libflint), Nothing,
-            (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
+      @ccall libflint.$("fmpz_$fC")(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
       return z
     end
   end
@@ -393,8 +397,7 @@ for (fJ, fC) in ((:fdiv, :fdiv_q), (:cdiv, :cdiv_q), (:tdiv, :tdiv_q),
     function ($fJ)(x::ZZRingElem, y::ZZRingElem)
       iszero(y) && throw(DivideError())
       z = ZZRingElem()
-      ccall(($(string(:fmpz_, fC)), libflint), Nothing,
-            (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), z, x, y)
+      @ccall libflint.$("fmpz_$fC")(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
       return z
     end
   end
@@ -425,10 +428,14 @@ function divexact(x::ZZRingElem, y::ZZRingElem; check::Bool=true)
   return z
 end
 
-function divides(x::ZZRingElem, y::ZZRingElem)
-  z = ZZRingElem()
+function AbstractAlgebra.divides!(z::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
   res = @ccall libflint.fmpz_divides(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Bool
   return res, z
+end
+
+function AbstractAlgebra.divides(x::ZZRingElem, y::ZZRingElem)
+  z = ZZRingElem()
+  return divides!(z, x, y)
 end
 
 divides(x::ZZRingElem, y::Integer) = divides(x, ZZRingElem(y))
@@ -497,32 +504,18 @@ end
 #
 ###############################################################################
 
-+(a::ZZRingElem, b::Int) = add!(ZZRingElem(), a, b)
-+(a::Int, b::ZZRingElem) = b + a
+for T in (Int, UInt, Integer)
+  @eval begin
+    +(a::ZZRingElem, b::$T) = add!(ZZRingElem(), a, b)
+    +(a::$T, b::ZZRingElem) = add!(ZZRingElem(), a, b)
 
-+(a::ZZRingElem, b::UInt) = add!(ZZRingElem(), a, b)
-+(a::UInt, b::ZZRingElem) = b + a
+    -(a::ZZRingElem, b::$T) = sub!(ZZRingElem(), a, b)
+    -(a::$T, b::ZZRingElem) = sub!(ZZRingElem(), a, b)
 
-+(a::ZZRingElem, b::Integer) = a + flintify(b)
-+(a::Integer, b::ZZRingElem) = flintify(a) + b
-
--(a::ZZRingElem, b::Int) = sub!(ZZRingElem(), a, b)
--(a::Int, b::ZZRingElem) = neg!(b - a)
-
--(a::ZZRingElem, b::UInt) = sub!(ZZRingElem(), a, b)
--(a::UInt, b::ZZRingElem) = neg!(b - a)
-
--(a::ZZRingElem, b::Integer) = a - flintify(b)
--(a::Integer, b::ZZRingElem) = flintify(a) - b
-
-*(a::ZZRingElem, b::Int) = mul!(ZZRingElem(), a, b)
-*(a::Int, b::ZZRingElem) = b * a
-
-*(a::ZZRingElem, b::UInt) = mul!(ZZRingElem(), a, b)
-*(a::UInt, b::ZZRingElem) = b * a
-
-*(a::ZZRingElem, b::Integer) = a*flintify(b)
-*(a::Integer, b::ZZRingElem) = flintify(a)*b
+    *(a::ZZRingElem, b::$T) = mul!(ZZRingElem(), a, b)
+    *(a::$T, b::ZZRingElem) = mul!(ZZRingElem(), a, b)
+  end
+end
 
 *(a::ZZRingElem, b::AbstractFloat) = BigInt(a) * b
 *(a::AbstractFloat, b::ZZRingElem) = a * BigInt(b)
@@ -769,20 +762,26 @@ end
 #
 ###############################################################################
 
-function ^(x::ZZRingElem, y::Union{Int, UInt, ZZRingElem})
-  if isone(x) || iszero(y)
-    one(x)
-  elseif x == -1
-    isodd(y) ? deepcopy(x) : one(x)
-  elseif y < 0
+# Cannot use IntegerUnion here to avoid ambiguity.
+
+function ^(x::ZZRingElem, y::Int)
+  if is_negative(y)
+    if abs(x) == 1
+      return isodd(y) ? deepcopy(x) : one(x)
+    end
     throw(DomainError(y, "Exponent must be non-negative"))
-  elseif isone(y)
-    deepcopy(x)
-  else
-    z = ZZRingElem()
-    @ccall libflint.fmpz_pow_ui(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, UInt(y)::UInt)::Nothing
-    z
   end
+  return pow!(ZZRingElem(), x, y)
+end
+
+function ^(x::ZZRingElem, y::ZZRingElem)
+  if is_negative(y)
+    if abs(x) == 1
+      return isodd(y) ? deepcopy(x) : one(x)
+    end
+    throw(DomainError(y, "Exponent must be non-negative"))
+  end
+  return pow!(ZZRingElem(), x, y)
 end
 
 ###############################################################################
@@ -791,9 +790,9 @@ end
 #
 ###############################################################################
 
-^(a::T, n::IntegerUnion) where {T<:RingElem} = _generic_power(a, n)
+^(a::T, n::ZZRingElem) where {T<:RingElem} = _generic_power(a, n)
 
-function _generic_power(a, n::IntegerUnion)
+function _generic_power(a, n::ZZRingElem)
   fits(Int, n) && return a^Int(n)
   if is_negative(n)
     a = inv(a)
@@ -2548,6 +2547,7 @@ addmul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr) = addmul!(z, y, x)
 
 # ignore fourth argument
 addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Union{ZZRingElemOrPtr,Integer}, ::ZZRingElemOrPtr) = addmul!(z, x, y)
+addmul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr, ::ZZRingElemOrPtr) = addmul!(z, x, y)
 
 function submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   @ccall libflint.fmpz_submul(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
@@ -2568,6 +2568,7 @@ submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Integer) = submul!(z, x, flin
 
 # ignore fourth argument
 submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Union{ZZRingElemOrPtr,Integer}, ::ZZRingElemOrPtr) = submul!(z, x, y)
+submul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr, ::ZZRingElemOrPtr) = submul!(z, x, y)
 
 @doc raw"""
     fmma!(r::ZZRingElem, a::ZZRingElem, b::ZZRingElem, c::ZZRingElem, d::ZZRingElem)
@@ -2618,10 +2619,30 @@ end
 
 #
 
-function pow!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer)
-  @ccall libflint.fmpz_pow_ui(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, UInt(b)::UInt)::Nothing
+function tdiv_q!(a::ZZRingElem, b::ZZRingElem, c::ZZRingElem)
+  @ccall libflint.fmpz_tdiv_q(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ref{ZZRingElem})::Cvoid
+end
+
+function shift_right!(a::ZZRingElem, b::ZZRingElem, i::Int)
+  @ccall libflint.fmpz_fdiv_q_2exp(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, i::Int)::Nothing
+end
+
+#
+
+function pow!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, n::Integer)
+  @ccall libflint.fmpz_pow_ui(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, UInt(n)::UInt)::Nothing
   return z
 end
+
+function pow!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, n::ZZRingElemOrPtr)
+  ok = Bool(@ccall libflint.fmpz_pow_fmpz(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, n::Ref{ZZRingElem})::Cint)
+  if !ok
+    error("unable to compute power")
+  end
+  return z
+end
+
+#
 
 function lcm!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   @ccall libflint.fmpz_lcm(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
@@ -2864,6 +2885,16 @@ end
 
 ###############################################################################
 #
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::ZZRing)
+  return rand_bits(ZZ, rand(0:100))
+end
+
+###############################################################################
+#
 #   Constructors
 #
 ###############################################################################
@@ -2916,7 +2947,7 @@ end
 (::Type{Int128})(a::ZZRingElem) = Int128(BigInt(a))
 (::Type{UInt128})(a::ZZRingElem) = UInt128(BigInt(a))
 
-Integer(a::ZZRingElem) = BigInt(a)
+Base.Integer(a::ZZRingElem) = BigInt(a)
 
 convert(::Type{T}, a::ZZRingElem) where T <: Integer = T(a)
 
@@ -2943,6 +2974,112 @@ Base.promote_rule(::Type{ZZRingElem}, ::Type{T}) where {T <: Integer} = ZZRingEl
 
 promote_rule(::Type{ZZRingElem}, ::Type{T}) where {T <: Integer} = ZZRingElem
 
+
+#output sensitive rational_reconstruction, in particular if
+#numerator is larger than den 
+#used below in rational_reconstruction and, more seriously, in the 
+#solvers in ZZMatrix-Linalg
+
+function _ratrec!(n::ZZRingElem, d::ZZRingElem, a::ZZRingElem, b::ZZRingElem, N::ZZRingElem = ZZ(), D::ZZRingElem= ZZ())
+  k = nbits(b)
+  l = 1
+  set!(N, b)
+  set!(D, 2)
+
+#  @assert 0<a<b
+  done = false
+  while !done && D <= N
+    Nemo.mul!(D, D, D)
+    tdiv_q!(N, b, D)
+    shift_right!(N, N, 1)
+    if D>N
+      @ccall Nemo.libflint.fmpz_root(N::Ref{ZZRingElem}, b::Ref{ZZRingElem}, 2::Int)::Nothing
+      shift_right!(D, N, 1)
+      done = true
+    end
+
+#    @assert 2*N*D < b
+
+    fl = @ccall libflint._fmpq_reconstruct_fmpz_2(n::Ref{ZZRingElem}, d::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, N::Ref{ZZRingElem}, D::Ref{ZZRingElem})::Bool
+
+    if fl && (nbits(n)+nbits(d) < max(k/2, k - 30) || D>N)
+      return fl
+    end
+    l += 1
+  end
+  return false
+end
+
+#Note: this is not the best (fastest) algorithm, not the most general
+#      signature, not the best (fastest) interface, ....
+#However: for now it works.
+
+@doc raw"""
+    _rational_reconstruction(a::ZZRingElem, b::ZZRingElem)
+    _rational_reconstruction(a::Integer, b::Integer)
+
+Tries to solve $ay=x mod b$ for $x,y < sqrt(b/2)$. If possible, returns
+  (`true`, $x$, $y$) or (`false`, garbage) if not possible.
+
+If `unbalanced` is set to `true`, a solution is accepted if `nbits(x) + nbits(y) + 30 <= nbits(b)` or if the compined size of smaller than half of the modulus - this allows for the numberator or denominator to be much smaller
+than the other one.
+
+By default `y` and `b` have to be coprime for a valid solution. It is
+well known that then the solution is unique.
+
+If `error_tolerant` is set to `true`, then a solution is also accepted if
+`x`, `y` and `b` have a common divisor `g` and if
+  `a(y/g) = (x/g) mod (b/g)` is true and if the combined size is small enough.
+
+The typical application are modular algorithms where
+ - there are finitely many bad primes (ie. the `mod p` datum does
+   not match the global solution modulo `p`)
+ - that cannot be detected
+In this case `g` will be the product of the bad primes.
+
+See also [`reconstruct`](@ref).
+
+"""
+function _rational_reconstruction(a::ZZRingElem, b::ZZRingElem; error_tolerant::Bool = false, unbalanced::Bool = false)
+  @req !error_tolerant || !unbalanced "only one of `error_tolerant` and `unbalanced` can be used at a time"
+
+  if unbalanced
+    n = ZZ()
+    d = ZZ()
+    fl = ratcec!(n, d, a, b)
+    return fl, n, d
+  elseif error_tolerant
+    m = matrix(ZZ, 2, 2, [a, ZZRingElem(1), b, ZZRingElem(0)])
+    lll!(m)
+    x = m[1,1]
+    y = m[1,2]
+    @assert (a*y-x) % b == 0
+    g = gcd(x, y)
+    divexact!(x, g)
+    divexact!(y, g)
+    return nbits(x)+nbits(y)+2*nbits(g) + 20 < nbits(b), x, y
+  else
+    res = QQFieldElem()
+    a = mod(a, b)
+    fl = @ccall libflint.fmpq_reconstruct_fmpz(res::Ref{QQFieldElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Cint
+    return Bool(fl), numerator(res), denominator(res)
+  end
+end
+
+@doc raw"""
+    _rational_reconstruction(a::ZZRingElem, b::ZZRingElem, N::ZZRingElem, D::ZZRingElem) -> Bool, ZZRingElem, ZZRingElem
+
+Given $a$ modulo $b$ and $N>0$, $D>0$ such that $2ND<b$, find $|x|\le N$, $0<y\le D$
+satisfying $x/y \equiv a \bmod b$ or $a \equiv ya \bmod b$.
+"""
+function _rational_reconstruction(a::ZZRingElem, b::ZZRingElem, N::ZZRingElem, D::ZZRingElem)
+  res = QQFieldElem()
+  a = mod(a, b)
+  fl = @ccall libflint.fmpq_reconstruct_fmpz_2(res::Ref{QQFieldElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, N::Ref{ZZRingElem}, D::Ref{ZZRingElem})::Cint
+  return Bool(fl), numerator(res), denominator(res)
+end
+
+
 ###############################################################################
 #
 #  Perfect power detection
@@ -2961,7 +3098,7 @@ end
     is_perfect_power(a::IntegerUnion)
 
 Return whether $a$ is a perfect power, that is, whether $a = m^r$ for some
-integer $m$ and $r > 1$.
+integer $m$ and $r > 1$. Neither $m$ nor $r$ is returned.
 """
 function is_perfect_power(a::ZZRingElem)
   _, ex = _is_perfect_power(a)

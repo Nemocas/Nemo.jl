@@ -87,12 +87,12 @@ Return the sign of $a$ ($-1$, $0$ or $1$) as a fraction.
 """
 sign(a::QQFieldElem) = QQFieldElem(sign(numerator(a)))
 
-sign(::Type{Int}, a::QQFieldElem) = Int(@ccall libflint.fmpq_sgn(a::Ref{QQFieldElem})::Cint)
+sign(::Type{Int}, a::QQFieldElemOrPtr) = Int(@ccall libflint.fmpq_sgn(a::Ref{QQFieldElem})::Cint)
 
 Base.signbit(a::QQFieldElem) = signbit(sign(Int, a))
 
-is_negative(n::QQFieldElem) = sign(Int, n) < 0
-is_positive(n::QQFieldElem) = sign(Int, n) > 0
+is_negative(n::QQFieldElemOrPtr) = sign(Int, n) < 0
+is_positive(n::QQFieldElemOrPtr) = sign(Int, n) > 0
 
 function abs(a::QQFieldElem)
   z = QQFieldElem()
@@ -157,7 +157,7 @@ returned as a rational with denominator $1$.
 """
 Base.floor(a::QQFieldElem) = floor(QQFieldElem, a)
 Base.floor(::Type{QQFieldElem}, a::QQFieldElem) = QQFieldElem(floor(ZZRingElem, a), 1)
-Base.floor(::Type{ZZRingElem}, a::QQFieldElem) = fdiv(numerator(a), denominator(a))
+#Base.floor(::Type{ZZRingElem}, a::QQFieldElem) = fdiv(numerator(a), denominator(a))
 
 @doc raw"""
     ceil(a::QQFieldElem)
@@ -167,7 +167,26 @@ returned as a rational with denominator $1$.
 """
 Base.ceil(a::QQFieldElem) = ceil(QQFieldElem, a)
 Base.ceil(::Type{QQFieldElem}, a::QQFieldElem) = QQFieldElem(ceil(ZZRingElem, a), 1)
-Base.ceil(::Type{ZZRingElem}, a::QQFieldElem) = cdiv(numerator(a), denominator(a))
+#Base.ceil(::Type{ZZRingElem}, a::QQFieldElem) = cdiv(numerator(a), denominator(a))
+
+
+function ceil!(res::ZZRingElem, t::QQFieldElem)
+  GC.@preserve t begin
+    @ccall libflint.fmpz_cdiv_q(res::Ref{ZZRingElem}, _num_ptr(t)::Ref{ZZRingElem}, _den_ptr(t)::Ref{ZZRingElem})::Nothing
+  end 
+  return res
+end
+
+function floor!(res::ZZRingElem, t::QQFieldElem)
+  GC.@preserve t begin
+    @ccall libflint.fmpz_fdiv_q(res::Ref{ZZRingElem}, _num_ptr(t)::Ref{ZZRingElem}, _den_ptr(t)::Ref{ZZRingElem})::Nothing
+  end 
+  return res
+end
+
+Base.ceil(::Type{ZZRingElem}, a::QQFieldElem) = ceil!(ZZRingElem(), a)
+Base.floor(::Type{ZZRingElem}, a::QQFieldElem) = floor!(ZZRingElem(), a)
+
 
 Base.trunc(a::QQFieldElem) = trunc(QQFieldElem, a)
 Base.trunc(::Type{QQFieldElem}, a::QQFieldElem) = QQFieldElem(trunc(ZZRingElem, a), 1)
@@ -213,14 +232,6 @@ Base.round(::Type{T}, a::QQFieldElem) where T <: RingElement =  round(T, a, Roun
 
 
 nbits(a::QQFieldElem) = nbits(numerator(a)) + nbits(denominator(a))
-
-###############################################################################
-#
-#   Canonicalisation
-#
-###############################################################################
-
-canonical_unit(a::QQFieldElem) = a
 
 ###############################################################################
 #
@@ -286,34 +297,14 @@ conj(x::QQFieldElem) = x
 #
 ###############################################################################
 
-for T in (ZZRingElem, Int, UInt)
+for T in (ZZRingElem, Int, UInt, Integer, Rational)
   @eval begin
     +(a::QQFieldElem, b::$T) = add!(QQFieldElem(), a, b)
     +(a::$T, b::QQFieldElem) = add!(QQFieldElem(), a, b)
-  end
-end
 
-+(a::QQFieldElem, b::Integer) = a + flintify(b)
-+(a::Integer, b::QQFieldElem) = b + a
-
-+(a::QQFieldElem, b::Rational{T}) where {T <: Integer} = a + QQFieldElem(b)
-+(a::Rational{T}, b::QQFieldElem) where {T <: Integer} = b + a
-
-for T in (ZZRingElem, Int, UInt)
-  @eval begin
     -(a::QQFieldElem, b::$T) = sub!(QQFieldElem(), a, b)
     -(a::$T, b::QQFieldElem) = sub!(QQFieldElem(), a, b)
-  end
-end
 
--(a::QQFieldElem, b::Integer) = a - flintify(b)
--(a::Integer, b::QQFieldElem) = flintify(a) - b
-
--(a::QQFieldElem, b::Rational{T}) where {T <: Integer} = a - QQFieldElem(b)
--(a::Rational{T}, b::QQFieldElem) where {T <: Integer} = QQFieldElem(a) - b
-
-for T in (ZZRingElem, Int, UInt, Integer, Rational)
-  @eval begin
     *(a::QQFieldElem, b::$T) = mul!(QQFieldElem(), a, b)
     *(a::$T, b::QQFieldElem) = mul!(QQFieldElem(), a, b)
   end
@@ -407,18 +398,16 @@ isless(a::QQFieldElem, b::Float64) = isless(BigFloat(a), b)
 #
 ###############################################################################
 
+# Cannot use IntegerUnion here to avoid ambiguity.
+
 function ^(a::QQFieldElem, b::Int)
-  iszero(a) && b < 0 && throw(DivideError())
-  temp = QQFieldElem()
-  @ccall libflint.fmpq_pow_si(temp::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Int)::Nothing
-  return temp
+  iszero(a) && is_negative(b) && throw(DivideError())
+  return pow!(QQFieldElem(), a, b)
 end
 
-function ^(a::QQFieldElem, k::ZZRingElem)
-  is_zero(a) && return QQFieldElem(is_zero(k) ? 1 : 0)
-  is_one(a) && return QQFieldElem(1)
-  a == -1 && return QQFieldElem(isodd(k) ? -1 : 1)
-  return a^Int(k)
+function ^(a::QQFieldElem, b::ZZRingElem)
+  iszero(a) && is_negative(b) && throw(DivideError())
+  return pow!(QQFieldElem(), a, b)
 end
 
 ###############################################################################
@@ -740,6 +729,8 @@ Attempt to return a rational number $n/d$ such that $0 \leq |n| \leq N$ and $0 <
 such that $2 N D < m$, gcd$(n, d) = 1$, and $a \equiv nd^{-1} \pmod{m}$.
 
 Returns a tuple (`success`, `n/d`), where `success` signals the success of reconstruction.
+
+The behaviour is undefined if $a$ is negative or larger than $m$.
 """
 function reconstruct(a::ZZRingElem, m::ZZRingElem, N::ZZRingElem, D::ZZRingElem)
   c = QQFieldElem()
@@ -752,6 +743,8 @@ end
 
 Same as [`reconstruct`](@ref), but does not throw if reconstruction fails.
 Returns a tuple (`success`, `n/d`), where `success` signals the success of reconstruction.
+
+The behaviour is undefined if $a$ is negative or larger than $m$.
 """
 function unsafe_reconstruct(a::ZZRingElem, m::ZZRingElem)
   c = QQFieldElem()
@@ -1153,10 +1146,16 @@ function addmul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
   return c
 end
 
+# ignore fourth argument
+addmul!(z::QQFieldElemOrPtr, x::QQFieldElemOrPtr, y::QQFieldElemOrPtr, ::QQFieldElemOrPtr) = addmul!(z, x, y)
+
 function submul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
   @ccall libflint.fmpq_submul(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Nothing
   return c
 end
+
+# ignore fourth argument
+submul!(z::QQFieldElemOrPtr, x::QQFieldElemOrPtr, y::QQFieldElemOrPtr, ::QQFieldElemOrPtr) = submul!(z, x, y)
 
 #
 
@@ -1167,6 +1166,21 @@ end
 
 function divexact!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::ZZRingElemOrPtr)
   @ccall libflint.fmpq_div_fmpz(z::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{ZZRingElem})::Nothing
+  return z
+end
+
+#
+
+function pow!(z::QQFieldElemOrPtr, x::QQFieldElemOrPtr, n::Integer)
+  @ccall libflint.fmpq_pow_si(z::Ref{QQFieldElem}, x::Ref{QQFieldElem}, Int(n)::Int)::Nothing
+  return  z
+end
+
+function pow!(z::QQFieldElemOrPtr, x::QQFieldElemOrPtr, n::ZZRingElemOrPtr)
+  ok = Bool(@ccall libflint.fmpq_pow_fmpz(z::Ref{QQFieldElem}, x::Ref{QQFieldElem}, n::Ref{ZZRingElem})::Cint)
+  if !ok
+    error("unable to compute power")
+  end
   return z
 end
 
@@ -1235,6 +1249,16 @@ end
 
 ###############################################################################
 #
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::QQField)
+  return rand_bits(ZZ, rand(0:100))//rand_bits(ZZ, rand(1:100))
+end
+
+###############################################################################
+#
 #   Conversions and promotions
 #
 ###############################################################################
@@ -1285,13 +1309,13 @@ end
 
 @inline __get_rounding_mode() = Base.Rounding.rounding_raw(BigFloat)
 
-function BigFloat(a::QQFieldElem)
+function Base.BigFloat(a::QQFieldElem)
   r = BigFloat(0)
   @ccall libflint.fmpq_get_mpfr(r::Ref{BigFloat}, a::Ref{QQFieldElem}, __get_rounding_mode()::Int32)::Cint
   return r
 end
 
-Float64(a::QQFieldElem) = Float64(BigFloat(a))
+Base.Float64(a::QQFieldElem) = Float64(BigFloat(a))
 
 ###############################################################################
 #

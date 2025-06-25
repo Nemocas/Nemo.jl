@@ -78,7 +78,7 @@ number_of_columns(a::T) where T <: Zmod_fmpz_mat = a.c
 base_ring(a::T) where T <: Zmod_fmpz_mat = a.base_ring
 
 function one(a::ZZModMatrixSpace)
-  (nrows(a) != ncols(a)) && error("Matrices must be square")
+  check_square(a)
   return one!(a())
 end
 
@@ -209,16 +209,6 @@ function add!(a::T, b::T, c::T) where T <: Zmod_fmpz_mat
   return a
 end
 
-function mul!(z::Vector{ZZRingElem}, a::T, b::Vector{ZZRingElem}) where T <: Zmod_fmpz_mat
-  @ccall libflint.fmpz_mod_mat_mul_fmpz_vec_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ref{T}, b::Ptr{Ref{ZZRingElem}}, length(b)::Int, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
-end
-
-function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::T) where T <: Zmod_fmpz_mat
-  @ccall libflint.fmpz_mod_mat_fmpz_vec_mul_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ptr{Ref{ZZRingElem}}, length(a)::Int, b::Ref{T}, base_ring(b).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
-end
-
 function Generic.add_one!(a::ZZModMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   GC.@preserve a begin
@@ -270,6 +260,7 @@ end
 #= Not implemented in FLINT yet
 
 function ^(x::T, y::Int) where T <: Zmod_fmpz_mat
+nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
 if y < 0
 x = inv(x)
 y = -y
@@ -439,49 +430,43 @@ end
 #
 ################################################################################
 
-#= Not implemented in FLINT yet
-
 function lu!(P::Perm, x::T) where T <: Zmod_fmpz_mat
-P.d .-= 1
+  P.d .-= 1
+  rank = Int(@ccall libflint.fmpz_mod_mat_lu(P.d::Ptr{Int}, x::Ref{T}, 0::Cint, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Cint)
+  P.d .+= 1
 
-rank = Int(@ccall libflint.fmpz_mod_mat_lu(P.d::Ptr{Int}, x::Ref{T}, 0::Cint)::Cint)
+  inv!(P) # FLINT does PLU = x instead of Px = LU
 
-P.d .+= 1
-
-# flint does x == PLU instead of Px == LU (docs are wrong)
-inv!(P)
-
-return rank
+  return rank
 end
 
-function lu(x::T, P = SymmetricGroup(nrows(x))) where T <: Zmod_fmpz_mat
-m = nrows(x)
-n = ncols(x)
-P.n != m && error("Permutation does not match matrix")
-p = one(P)
-R = base_ring(x)
-U = deepcopy(x)
+function lu(x::T, P=SymmetricGroup(nrows(x))) where T <: Zmod_fmpz_mat
+  m = nrows(x)
+  n = ncols(x)
+  P.n != m && error("Permutation does not match matrix")
+  p = one(P)
+  R = base_ring(x)
+  U = deepcopy(x)
 
-L = similar(x, m, m)
+  L = similar(x, m, m)
 
-rank = lu!(p, U)
+  rank = lu!(p, U)
 
-for i = 1:m
-for j = 1:n
-if i > j
-L[i, j] = U[i, j]
-U[i, j] = R()
-elseif i == j
-L[i, j] = R(1)
-elseif j <= m
-L[i, j] = R()
-end
-end
-end
-return rank, p, L, U
+  for i in 1:m
+    for j in 1:n
+      if i > j
+        L[i, j] = U[i, j]
+        U[i, j] = R()
+      elseif i == j
+        L[i, j] = R(1)
+      elseif j <= m
+        L[i, j] = R()
+      end
+    end
+  end
+  return rank, p, L, U
 end
 
-=#
 
 ################################################################################
 #
@@ -489,7 +474,7 @@ end
 #
 ################################################################################
 
-function Base.view(x::ZZModMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
+function _view_window(x::ZZModMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
 
   _checkrange_or_empty(nrows(x), r1, r2) ||
   Base.throw_boundserror(x, (r1:r2, c1:c2))
@@ -514,24 +499,8 @@ function Base.view(x::ZZModMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
   return z
 end
 
-function Base.view(x::T, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) where T <: Zmod_fmpz_mat
-  return Base.view(x, first(r), first(c), last(r), last(c))
-end
-
 function _fmpz_mod_mat_window_clear_fn(a::ZZModMatrix)
   @ccall libflint.fmpz_mod_mat_window_clear(a::Ref{ZZModMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-end
-
-function sub(x::T, r1::Int, c1::Int, r2::Int, c2::Int) where T <: Zmod_fmpz_mat
-  return deepcopy(Base.view(x, r1, c1, r2, c2))
-end
-
-function sub(x::T, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) where T <: Zmod_fmpz_mat
-  return deepcopy(Base.view(x, r, c))
-end
-
-function getindex(x::T, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) where T <: Zmod_fmpz_mat
-  sub(x, r, c)
 end
 
 ################################################################################
@@ -689,4 +658,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::ZZModMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(ZZRingElem)
+mat_entry_ptr(A::ZZModMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(ZZRingElem)

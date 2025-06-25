@@ -1,15 +1,15 @@
 @testset "FqFieldElem.conformance_tests" begin
   F1, = finite_field(7, 1)
-  test_Field_interface_recursive(F1)
+  ConformanceTests.test_Field_interface_recursive(F1)
 
   F2, = finite_field(ZZ(18446744073709551629), 1)
-  test_Field_interface_recursive(F2)
+  ConformanceTests.test_Field_interface_recursive(F2)
 
   F3, = finite_field(7, 10) # avoid zech
-  test_Field_interface_recursive(F3)
+  ConformanceTests.test_Field_interface_recursive(F3)
 
   F4, = finite_field(ZZ(18446744073709551629), 4)
-  test_Field_interface_recursive(F4)
+  ConformanceTests.test_Field_interface_recursive(F4)
 end
 
 @testset "FqFieldElem.constructors" begin
@@ -285,10 +285,10 @@ end
 @testset "FqFieldElem.iteration" begin
   for n = [2, 3, 5, 13, 31]
     R, _ = finite_field(ZZRingElem(n), 1, "x")
-    elts = Nemo.AbstractAlgebra.test_iterate(R)
+    elts = ConformanceTests.test_iterate(R)
     @test elts == R.(0:n-1)
     R, _ = finite_field(ZZRingElem(n), rand(2:9), "x")
-    Nemo.AbstractAlgebra.test_iterate(R)
+    ConformanceTests.test_iterate(R)
   end
 end
 

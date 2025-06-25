@@ -71,6 +71,7 @@ setindex!(x::AcbMatrix, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) wher
 setindex!(x, map(QQFieldElem, y), r, c)
 
 function one(x::AcbMatrixSpace)
+  check_square(x)
   return one!(x())
 end
 
@@ -486,7 +487,7 @@ function lu!(P::Perm, z::AcbMatrix, x::AcbMatrix)
   r = @ccall libflint.acb_mat_lu(P.d::Ptr{Int}, z::Ref{AcbMatrix}, x::Ref{AcbMatrix}, precision(base_ring(x))::Int)::Cint
   r == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
-  inv!(P)
+  inv!(P) # FLINT does PLU = x instead of Px = LU
   return nrows(x)
 end
 
@@ -659,9 +660,8 @@ for (s,f) in (("add!","acb_mat_add"), ("mul!","acb_mat_mul"),
               ("sub!","acb_mat_sub"))
   @eval begin
     function ($(Symbol(s)))(z::AcbMatrix, x::AcbMatrix, y::AcbMatrix)
-      ccall(($f, libflint), Nothing,
-            (Ref{AcbMatrix}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
-            z, x, y, precision(base_ring(x)))
+      prec = precision(base_ring(x))
+      @ccall libflint.$f(z::Ref{AcbMatrix}, x::Ref{AcbMatrix}, y::Ref{AcbMatrix}, prec::Int)::Nothing
       return z
     end
   end

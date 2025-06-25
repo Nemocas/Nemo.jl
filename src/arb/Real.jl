@@ -31,8 +31,6 @@ zero(R::RealField) = R(0)
 
 one(R::RealField) = R(1)
 
-# TODO: Add hash (and document under ArbFieldElem basic functionality)
-
 @doc raw"""
     accuracy_bits(x::RealFieldElem)
 
@@ -72,7 +70,7 @@ For `RoundNearest` the return value approximates the midpoint of $x$. For
 `RoundDown` or `RoundUp` the return value is a lower bound or upper bound for
 all values in $x$.
 """
-function Float64(x::RealFieldElem, round::RoundingMode=RoundNearest)
+function Base.Float64(x::RealFieldElem, round::RoundingMode=RoundNearest)
   t = _arb_get_arf(x, round)
   return _arf_get_d(t, round)
 end
@@ -85,7 +83,7 @@ direction specified by $round$. For `RoundNearest` the return value
 approximates the midpoint of $x$. For `RoundDown` or `RoundUp` the return
 value is a lower bound or upper bound for all values in $x$.
 """
-function BigFloat(x::RealFieldElem, round::RoundingMode=RoundNearest)
+function Base.BigFloat(x::RealFieldElem, round::RoundingMode=RoundNearest)
   t = _arb_get_arf(x, round)
   return _arf_get_mpfr(t, round)
 end
@@ -104,9 +102,7 @@ for (b, f) in ((RoundingMode{:Down}, :arb_get_lbound_arf),
   @eval begin
     function _arb_get_arf(x::RealFieldElem, ::$b, prec::Int = precision(Balls))
       t = arf_struct()
-      ccall(($(string(f)), libflint), Nothing,
-            (Ref{arf_struct}, Ref{RealFieldElem}, Int),
-            t, x, prec)
+      @ccall libflint.$f(t::Ref{arf_struct}, x::Ref{RealFieldElem}, prec::Int)::Nothing
       return t
     end
   end
@@ -134,7 +130,7 @@ function ZZRingElem(x::RealFieldElem)
   error("Argument must represent a unique integer")
 end
 
-BigInt(x::RealFieldElem) = BigInt(ZZRingElem(x))
+Base.BigInt(x::RealFieldElem) = BigInt(ZZRingElem(x))
 
 function (::Type{T})(x::RealFieldElem) where {T <: Integer}
   typemin(T) <= x <= typemax(T) ||
@@ -597,8 +593,7 @@ for (s,f) in ((:+,"arb_add"), (:*,"arb_mul"), (://, "arb_div"), (:-,"arb_sub"))
   @eval begin
     function ($s)(x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
       z = RealFieldElem()
-      ccall(($f, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int),
-            z, x, y, prec)
+      @ccall libflint.$f(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{RealFieldElem}, prec::Int)::Nothing
       return z
     end
   end
@@ -608,9 +603,7 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
   @eval begin
     #function ($f)(x::RealFieldElem, y::arf)
     #  z = RealFieldElem()
-    #  ccall(($("arb_"*s*"_arf"), libflint), Nothing,
-    #              (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{arf}, Int),
-    #              z, x, y, precision(Balls))
+    #  @ccall libflint.$("arb_$(s)_arf")(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{arf}, precision(Balls)::Int)::Nothing
     #  return z
     #end
 
@@ -618,9 +611,7 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
 
     function ($f)(x::RealFieldElem, y::UInt, prec::Int = precision(Balls))
       z = RealFieldElem()
-      ccall(($("arb_"*s*"_ui"), libflint), Nothing,
-            (Ref{RealFieldElem}, Ref{RealFieldElem}, UInt, Int),
-            z, x, y, prec)
+      @ccall libflint.$("arb_$(s)_ui")(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::UInt, prec::Int)::Nothing
       return z
     end
 
@@ -628,8 +619,7 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
 
     function ($f)(x::RealFieldElem, y::Int, prec::Int = precision(Balls))
       z = RealFieldElem()
-      ccall(($("arb_"*s*"_si"), libflint), Nothing,
-            (Ref{RealFieldElem}, Ref{RealFieldElem}, Int, Int), z, x, y, prec)
+      @ccall libflint.$("arb_$(s)_si")(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Int, prec::Int)::Nothing
       return z
     end
 
@@ -637,9 +627,7 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
 
     function ($f)(x::RealFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
       z = RealFieldElem()
-      ccall(($("arb_"*s*"_fmpz"), libflint), Nothing,
-            (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{ZZRingElem}, Int),
-            z, x, y, prec)
+      @ccall libflint.$("arb_$(s)_fmpz")(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{ZZRingElem}, prec::Int)::Nothing
       return z
     end
 
@@ -1878,8 +1866,7 @@ for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
               ("sub!","arb_sub"))
   @eval begin
     function ($(Symbol(s)))(z::RealFieldElemOrPtr, x::RealFieldElemOrPtr, y::RealFieldElemOrPtr, prec::Int = precision(Balls))
-      ccall(($f, libflint), Nothing, (Ref{RealFieldElem}, Ref{RealFieldElem}, Ref{RealFieldElem}, Int),
-            z, x, y, prec)
+      @ccall libflint.$f(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{RealFieldElem}, prec::Int)::Nothing
       return z
     end
   end

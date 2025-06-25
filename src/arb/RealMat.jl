@@ -57,6 +57,7 @@ Base.@propagate_inbounds setindex!(x::RealMatrix, y::Rational{T},
 setindex!(x, ZZRingElem(y), r, c)
 
 function one(x::RealMatrixSpace)
+  check_square(x)
   return one!(x())
 end
 
@@ -431,7 +432,7 @@ function lu!(P::Perm, z::RealMatrix, x::RealMatrix)
   r = @ccall libflint.arb_mat_lu(P.d::Ptr{Int}, z::Ref{RealMatrix}, x::Ref{RealMatrix}, precision(Balls)::Int)::Cint
   r == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
-  inv!(P)
+  inv!(P) # FLINT does PLU = x instead of Px = LU
   return min(nrows(x), ncols(x))
 end
 
@@ -604,9 +605,7 @@ for (s,f) in (("add!","arb_mat_add"), ("mul!","arb_mat_mul"),
               ("sub!","arb_mat_sub"))
   @eval begin
     function ($(Symbol(s)))(z::RealMatrix, x::RealMatrix, y::RealMatrix, prec::Int = precision(Balls))
-      ccall(($f, libflint), Nothing,
-            (Ref{RealMatrix}, Ref{RealMatrix}, Ref{RealMatrix}, Int),
-            z, x, y, prec)
+      @ccall libflint.$f(z::Ref{RealMatrix}, x::Ref{RealMatrix}, y::Ref{RealMatrix}, prec::Int)::Nothing
       return z
     end
   end

@@ -228,7 +228,7 @@ end
 
   @test iszero(e)
 
-  @test_throws ErrorException one(matrix_space(Native.GF(ZZ(2)), 1, 2))
+  @test_throws DomainError one(matrix_space(Native.GF(ZZ(2)), 1, 2))
 
   @test is_square(a)
 
@@ -298,10 +298,6 @@ end
 
   d = transpose(a)*a
   @test d == matrix_space(Z17, 4, 4)([11 11 8 7; 11 0 14 6; 8 14 14 5; 7 6 5 5])
-
-  a = matrix(Z17, [1 2; 3 4])
-  @test mul!([ZZRingElem(), ZZRingElem()], a, ZZRingElem[1, 2]) == [Z17(5), Z17(11)]
-  @test mul!([ZZRingElem(), ZZRingElem()], ZZRingElem[1, 2], a) == [Z17(7), Z17(10)]
 end
 
 @testset "FpMatrix.row_col_swapping" begin
@@ -569,35 +565,33 @@ end
 
   b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
 
-  t = view(a, 1, 1, 3, 3)
+  t = view(a, 1:3, 1:3)
 
   @test t == a
 
-  @test view(a, 1, 1, 3, 3) == view(a, 1:3, 1:3)
-  @test view(a, 1, 1, 3, 3) == sub(a, 1, 1, 3, 3)
-  @test view(a, 1, 1, 3, 3) == sub(a, 1:3, 1:3)
+  @test view(a, 1:3, 1:3) == view(a, 1:3, 1:3)
+  @test view(a, 1:3, 1:3) == sub(a, 1, 1, 3, 3)
+  @test view(a, 1:3, 1:3) == sub(a, 1:3, 1:3)
 
-  @test isempty(view(a, 2, 2, 1, 1))
-
-  t = view(a, 1, 1, 2, 2)
+  t = view(a, 1:2, 1:2)
 
   @test t == Z17[1 2; 3 2]
 
-  t = view(a, 2, 2, 3, 2)
+  t = view(a, 2:3, 2:2)
 
   @test t == transpose(Z17[2 0])
 
-  @test view(a, 2, 2, 3, 2) == view(a, 2:3,  2:2)
-  @test view(a, 2, 2, 3, 2) == sub(a, 2, 2, 3, 2)
-  @test view(a, 2, 2, 3, 2) == sub(a, 2:3, 2:2)
+  @test view(a, 2:3, 2:2) == view(a, 2:3,  2:2)
+  @test view(a, 2:3, 2:2) == sub(a, 2, 2, 3, 2)
+  @test view(a, 2:3, 2:2) == sub(a, 2:3, 2:2)
 
-  @test_throws BoundsError view(a, 3, 3, 5, 5)
+  @test_throws BoundsError view(a, 3:5, 3:5)
 
   S = matrix_space(Z17, 3, 3)
 
   A = S([1 2 3; 4 5 6; 7 8 9])
 
-  B = @inferred view(A, 1, 1, 2, 2)
+  B = @inferred view(A, 1:2, 1:2)
 
   @test typeof(B) == FpMatrix
   @test B == matrix_space(Z17, 2, 2)([1 2; 4 5])

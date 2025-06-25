@@ -63,8 +63,6 @@ function canonical_unit(x::ComplexFieldElem)
   return x
 end
 
-# TODO: implement hash
-
 characteristic(::ComplexField) = 0
 
 ################################################################################
@@ -73,17 +71,46 @@ characteristic(::ComplexField) = 0
 #
 ################################################################################
 
-function convert(::Type{ComplexF64}, x::ComplexFieldElem)
+@doc raw"""
+    ComplexF64(x::ComplexFieldElem)
+
+Converts $x$ to a `ComplexF64`, rounded to the nearest.
+The return value approximates the midpoint of the real and imaginary parts of $x$.
+"""
+function Base.ComplexF64(x::ComplexFieldElem)
   GC.@preserve x begin
     re = _real_ptr(x)
     im = _imag_ptr(x)
     t = _mid_ptr(re)
     u = _mid_ptr(im)
-    # 4 == round to nearest
-    v = @ccall libflint.arf_get_d(t::Ptr{arf_struct}, 4::Int)::Float64
-    w = @ccall libflint.arf_get_d(u::Ptr{arf_struct}, 4::Int)::Float64
+    v = @ccall libflint.arf_get_d(t::Ptr{arf_struct}, ARB_RND_NEAR::Int)::Float64
+    w = @ccall libflint.arf_get_d(u::Ptr{arf_struct}, ARB_RND_NEAR::Int)::Float64
   end
   return complex(v, w)
+end
+
+@doc raw"""
+    Float64(x::ComplexFieldElem)
+
+Converts $x$ to a `Float64`, rounded to the nearest.
+The return value approximates the midpoint of the real part of $x$.
+"""
+function Base.Float64(x::ComplexFieldElem)
+  @req isreal(x) "conversion to float must have no imaginary part"
+  GC.@preserve x begin
+    re = _real_ptr(x)
+    t = _mid_ptr(re)
+    v = @ccall libflint.arf_get_d(t::Ptr{arf_struct}, ARB_RND_NEAR::Int)::Float64
+  end
+  return v
+end
+
+function convert(::Type{ComplexF64}, x::ComplexFieldElem)
+  return ComplexF64(x)
+end
+
+function convert(::Type{Float64}, x::ComplexFieldElem)
+  return Float64(x)
 end
 
 ################################################################################
@@ -163,8 +190,7 @@ for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (://, "acb_div"), (:-,"acb_sub"), 
   @eval begin
     function ($s)(x::ComplexFieldElem, y::ComplexFieldElem, prec::Int = precision(Balls))
       z = ComplexFieldElem()
-      ccall(($f, libflint), Nothing, (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int),
-            z, x, y, prec)
+      @ccall libflint.$f(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{ComplexFieldElem}, prec::Int)::Nothing
       return z
     end
   end
@@ -175,32 +201,25 @@ for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
 
     function ($f)(x::ComplexFieldElem, y::UInt, prec::Int = precision(Balls))
       z = ComplexFieldElem()
-      ccall(($("acb_"*s*"_ui"), libflint), Nothing,
-            (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, UInt, Int),
-            z, x, y, prec)
+      @ccall libflint.$("acb_"*s*"_ui")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::UInt, prec::Int)::Nothing
       return z
     end
 
     function ($f)(x::ComplexFieldElem, y::Int, prec::Int = precision(Balls))
       z = ComplexFieldElem()
-      ccall(($("acb_"*s*"_si"), libflint), Nothing,
-            (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Int, Int), z, x, y, prec)
+      @ccall libflint.$("acb_"*s*"_si")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Int, prec::Int)::Nothing
       return z
     end
 
     function ($f)(x::ComplexFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
       z = ComplexFieldElem()
-      ccall(($("acb_"*s*"_fmpz"), libflint), Nothing,
-            (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{ZZRingElem}, Int),
-            z, x, y, prec)
+      @ccall libflint.$("acb_"*s*"_fmpz")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{ZZRingElem}, prec::Int)::Nothing
       return z
     end
 
     function ($f)(x::ComplexFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
       z = ComplexFieldElem()
-      ccall(($("acb_"*s*"_arb"), libflint), Nothing,
-            (Ref{ComplexFieldElem}, Ref{ComplexFieldElem}, Ref{RealFieldElem}, Int),
-            z, x, y, prec)
+      @ccall libflint.$("acb_"*s*"_arb")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{RealFieldElem}, prec::Int)::Nothing
       return z
     end
   end

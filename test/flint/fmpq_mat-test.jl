@@ -147,10 +147,12 @@ end
   end
 end
 
-@testset "QQMatrix.is_zero_entry" begin
-  M = matrix(QQ, [1 2 3;4 0 6;0 8 9])
-  for i in 1:3, j in 1:3
+@testset "QQMatrix.is_(zero/positive/negative)_entry" begin
+  M = matrix(QQ, [1 2 -3 0; -4 -999 100 3; 0 0 2 -2])
+  for i in 1:nrows(M), j in 1:ncols(M)
     @test is_zero_entry(M, i, j) == is_zero(M[i, j])
+    @test is_positive_entry(M, i, j) == is_positive(M[i, j])
+    @test is_negative_entry(M, i, j) == is_negative(M[i, j])
   end
 end
 
@@ -203,7 +205,7 @@ end
 
   a = matrix(QQ, 4, 4, [-1//2 ZZRingElem(2)^100 3 -4; 5 -1//2 ZZRingElem(2)^100 6; 7 5 -1//2 8; 9 10 11 12])
   @test hash(a, UInt(5)) == hash(deepcopy(a), UInt(5))
-  @test hash(view(a, 1,1, 2,2)) == hash(view(a, 1,1, 2,2))
+  @test hash(view(a, 1:2, 1:2)) == hash(view(a, 1:2, 1:2))
 
   C = QQ[1 2 3; 4 5 6; 7 8 9]
   C[3, :] = QQ[7 7 7]
@@ -224,7 +226,7 @@ end
 
   A = S([1 2 3; 4 5 6; 7 8 9])
 
-  B = @inferred view(A, 1, 1, 2, 2)
+  B = @inferred view(A, 1:2, 1:2)
 
   @test typeof(B) == QQMatrix
   @test B == matrix_space(QQ, 2, 2)([1 2; 4 5])

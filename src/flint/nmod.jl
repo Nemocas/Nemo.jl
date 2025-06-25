@@ -54,6 +54,13 @@ isone(a::zzModRingElem) = (a.parent.n == 1) || (a.data == 1)
 
 modulus(R::zzModRing) = R.n
 
+function krull_dim(R::zzModRing)
+  @req !is_trivial(R) "`krull_dim` is not supported for trivial rings"
+  return is_prime(modulus(R)) ? 0 : 1
+end
+
+is_noetherian(::zzModRing) = true
+
 characteristic(R::zzModRing) = ZZRingElem(modulus(R))
 
 is_trivial(a::zzModRing) = is_unit(modulus(a))
@@ -376,6 +383,16 @@ sp[][1](rand(rng, sp[][2]))
 rand(r::Random.AbstractRNG, R::zzModRing, b::AbstractArray) = rand(r, make(R, b))
 
 rand(R::zzModRing, b::AbstractArray) = rand(Random.default_rng(), R, b)
+
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::Nemo.zzModRing)
+  return R(rand(Int))
+end
 
 ###############################################################################
 #

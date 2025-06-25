@@ -52,7 +52,7 @@ function deepcopy_internal(a::fpMatrix, dict::IdDict)
 end
 
 function one(a::fpMatrixSpace)
-  (nrows(a) != ncols(a)) && error("Matrices must be square")
+  check_square(a)
   return one!(a())
 end
 
@@ -146,7 +146,7 @@ end
 #
 ################################################################################
 
-function Base.view(x::fpMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
+function _view_window(x::fpMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
 
   _checkrange_or_empty(nrows(x), r1, r2) ||
   Base.throw_boundserror(x, (r1:r2, c1:c2))
@@ -333,13 +333,10 @@ end
 
 function lu!(P::Perm, x::fpMatrix)
   P.d .-= 1
-
   rank = @ccall libflint.nmod_mat_lu(P.d::Ptr{Int}, x::Ref{fpMatrix}, Cint(false)::Cint)::Int
-
   P.d .+= 1
 
-  # flint does x == PLU instead of Px == LU (docs are wrong)
-  inv!(P)
+  inv!(P) # FLINT does PLU = x instead of Px = LU
 
   return rank
 end

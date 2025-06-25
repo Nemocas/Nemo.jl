@@ -542,7 +542,7 @@ function _fq_field_from_fmpz_mod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   #         (Ref{FqField}, Ref{FqPolyRingElem}, Ptr{Nothing}, Ptr{UInt8}),
   #         #z, f, _K.ninv, string(s))
   #         z, f, pointer_from_objref(K) + 2 * sizeof(Cint), ss)
-  #   finalizer(_FqDefaultFiniteField_clear_fn, z)
+  #   finalizer(_fq_default_ctx_clear_fn, z)
   # end
   _K = _get_raw_type(FpField, K)
   ff = map_coefficients(c -> _K(lift(ZZ, c)), f; cached = false)
@@ -577,7 +577,7 @@ function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   ss = string(s)
   GC.@preserve ss begin
     @ccall libflint.fq_default_ctx_init_modulus_nmod(z::Ref{FqField}, f::Ref{FqPolyRingElem}, ss::Ptr{UInt8})::Nothing
-    finalizer(_FqDefaultFiniteField_clear_fn, z)
+    finalizer(_fq_default_ctx_clear_fn, z)
   end
   z.isabsolute = true
   z.isstandard = true

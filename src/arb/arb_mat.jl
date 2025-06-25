@@ -59,6 +59,7 @@ Base.@propagate_inbounds setindex!(x::ArbMatrix, y::Rational{T},
 setindex!(x, ZZRingElem(y), r, c)
 
 function one(x::ArbMatrixSpace)
+  check_square(x)
   return one!(x())
 end
 
@@ -442,7 +443,7 @@ function lu!(P::Perm, z::ArbMatrix, x::ArbMatrix)
   r = @ccall libflint.arb_mat_lu(P.d::Ptr{Int}, z::Ref{ArbMatrix}, x::Ref{ArbMatrix}, precision(base_ring(x))::Int)::Cint
   r == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
   P.d .+= 1
-  inv!(P)
+  inv!(P) # FLINT does PLU = x instead of Px = LU
   return nrows(x)
 end
 
@@ -627,9 +628,8 @@ for (s,f) in (("add!","arb_mat_add"), ("mul!","arb_mat_mul"),
               ("sub!","arb_mat_sub"))
   @eval begin
     function ($(Symbol(s)))(z::ArbMatrix, x::ArbMatrix, y::ArbMatrix)
-      ccall(($f, libflint), Nothing,
-            (Ref{ArbMatrix}, Ref{ArbMatrix}, Ref{ArbMatrix}, Int),
-            z, x, y, precision(base_ring(x)))
+      prec = precision(base_ring(x))
+      @ccall libflint.f(z::Ref{ArbMatrix}, x::Ref{ArbMatrix}, y::Ref{ArbMatrix}, prec::Int)::Nothing
       return z
     end
   end

@@ -69,7 +69,7 @@ instance of this field, which can be obtained via `algebraic_closure(QQ)`.
 
 ```jldoctest
 julia> K = algebraic_closure(QQ)
-Field of algebraic numbers
+Algebraic closure of rational field
 
 julia> sqrt(K(2))
 Root 1.41421 of x^2 - 2

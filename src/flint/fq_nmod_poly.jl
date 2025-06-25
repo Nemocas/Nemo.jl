@@ -91,14 +91,6 @@ end
 
 ################################################################################
 #
-#   Canonicalisation
-#
-################################################################################
-
-canonical_unit(a::fqPolyRepPolyRingElem) = canonical_unit(leading_coefficient(a))
-
-################################################################################
-#
 #  Unary operations
 #
 ################################################################################
@@ -265,7 +257,10 @@ end
 
 function reverse(x::fqPolyRepPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Index must be non-negative"))
-  z = parent(x)()
+  return reverse!(parent(x)(), x, len)
+end
+
+function reverse!(z::fqPolyRepPolyRingElem, x::fqPolyRepPolyRingElem, len::Int)
   @ccall libflint.fq_nmod_poly_reverse(z::Ref{fqPolyRepPolyRingElem}, x::Ref{fqPolyRepPolyRingElem}, len::Int, base_ring(parent(x))::Ref{fqPolyRepField})::Nothing
   return z
 end

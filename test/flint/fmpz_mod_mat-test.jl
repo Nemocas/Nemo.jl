@@ -227,7 +227,7 @@ end
 
   @test iszero(e)
 
-  @test_throws ErrorException one(matrix_space(residue_ring(ZZ, ZZ(2))[1], 1, 2))
+  @test_throws DomainError one(matrix_space(residue_ring(ZZ, ZZ(2))[1], 1, 2))
 
   @test is_square(a)
 
@@ -744,37 +744,32 @@ end
   @test nrows(K) == 2
 end
 
-#= Not implemented in FLINT yet
-
 @testset "ZZModMatrix.lu" begin
+  Z17, = residue_ring(ZZ, ZZ(17))
+  R = matrix_space(Z17, 3, 3)
+  S = matrix_space(Z17, 3, 4)
 
-Z17, = residue_ring(ZZ, ZZ(17))
-R = matrix_space(Z17, 3, 3)
-S = matrix_space(Z17, 3, 4)
+  a = R([1 2 3; 3 2 1; 0 0 2])
 
-a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
+  b = S([2 1 0 1; 0 0 0 0; 0 1 2 0])
 
-b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+  r, P, l, u = lu(a)
 
-r, P, l, u = lu(a)
+  @test l * u == P * a
 
-@test l*u == P*a
+  r, P, l, u = lu(b)
 
-r, P, l, u = lu(b)
+  @test l * u == S([2 1 0 1; 0 1 2 0; 0 0 0 0])
 
-@test l*u == S([ 2 1 0 1; 0 1 2 0; 0 0 0 0])
+  @test l * u == P * b
 
-@test l*u == P*b
+  c = matrix(Z17, 6, 3, [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1])
 
-c = matrix(Z17, 6, 3, [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1])
+  r, P, l, u = lu(c)
 
-r, P, l, u = lu(c)
-
-@test r == 3
-@test l*u == P*c
+  @test r == 3
+  @test l * u == P * c
 end
-
-=#
 
 @testset "ZZModMatrix.swap_rows" begin
   Z17, = residue_ring(ZZ, ZZ(17))
@@ -800,33 +795,33 @@ end
 
   b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
 
-  t = view(a, 1, 1, 3, 3)
+  t = view(a, 1:3, 1:3)
 
   @test t == a
 
-  @test view(a, 1, 1, 3, 3) == view(a, 1:3, 1:3)
-  @test view(a, 1, 1, 3, 3) == sub(a, 1, 1, 3, 3)
-  @test view(a, 1, 1, 3, 3) == sub(a, 1:3, 1:3)
+  @test view(a, 1:3, 1:3) == view(a, 1:3, 1:3)
+  @test view(a, 1:3, 1:3) == sub(a, 1, 1, 3, 3)
+  @test view(a, 1:3, 1:3) == sub(a, 1:3, 1:3)
 
-  t = view(a, 1, 1, 2, 2)
+  t = view(a, 1:2, 1:2)
 
   @test t == Z17[1 2; 3 2]
 
-  t = view(a, 2, 2, 3, 2)
+  t = view(a, 2:3, 2:2)
 
   @test t == transpose(Z17[2 0])
 
-  @test view(a, 2, 2, 3, 2) == view(a, 2:3,  2:2)
-  @test view(a, 2, 2, 3, 2) == sub(a, 2, 2, 3, 2)
-  @test view(a, 2, 2, 3, 2) == sub(a, 2:3, 2:2)
+  @test view(a, 2:3, 2:2) == view(a, 2:3,  2:2)
+  @test view(a, 2:3, 2:2) == sub(a, 2, 2, 3, 2)
+  @test view(a, 2:3, 2:2) == sub(a, 2:3, 2:2)
 
-  @test_throws BoundsError view(a, 3, 3, 5, 5)
+  @test_throws BoundsError view(a, 3:5, 3:5)
 
   S = matrix_space(Z17, 3, 3)
 
   A = S([1 2 3; 4 5 6; 7 8 9])
 
-  B = @inferred view(A, 1, 1, 2, 2)
+  B = @inferred view(A, 1:2, 1:2)
 
   @test typeof(B) == ZZModMatrix
   @test B == matrix_space(Z17, 2, 2)([1 2; 4 5])

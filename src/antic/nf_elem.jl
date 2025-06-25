@@ -234,8 +234,6 @@ function Base.show(io::IO, a::AbsSimpleNumFieldElem)
   print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
-canonical_unit(x::AbsSimpleNumFieldElem) = x
-
 ###############################################################################
 #
 #   Unary operators
@@ -406,12 +404,11 @@ end
 ###############################################################################
 
 function ^(a::AbsSimpleNumFieldElem, n::Int)
-  r = a.parent()
-  @ccall libflint.nf_elem_pow(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, abs(n)::Int, a.parent::Ref{AbsSimpleNumField})::Nothing
+  z = pow!(parent(a)(), a, abs(n))
   if n < 0
-    r = inv(r)
+    z = inv!(z)
   end
-  return r
+  return z
 end
 
 ###############################################################################
@@ -688,6 +685,13 @@ functions automatically reduce their outputs.
 function reduce!(x::AbsSimpleNumFieldElem)
   @ccall libflint.nf_elem_reduce(x::Ref{AbsSimpleNumFieldElem}, parent(x)::Ref{AbsSimpleNumField})::Nothing
   return x
+end
+
+#
+
+function pow!(z::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, n::Integer)
+  @ccall libflint.nf_elem_pow(z::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, n::UInt, a.parent::Ref{AbsSimpleNumField})::Nothing
+  return z
 end
 
 ###############################################################################
@@ -1050,6 +1054,16 @@ end
 rand(rng::AbstractRNG, K::AbsSimpleNumField, r::AbstractUnitRange{Int}) = rand(rng, make(K, r))
 
 rand(K::AbsSimpleNumField, r) = rand(Random.default_rng(), K, r)
+
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(K::AbsSimpleNumField)
+  return rand(K, -10:10)
+end
 
 ###############################################################################
 #

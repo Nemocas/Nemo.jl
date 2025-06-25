@@ -60,18 +60,10 @@ end
 #
 ###############################################################################
 
-# todo: implement nontrivial hash functions on C
+# TODO: implement nontrivial hash functions on C
 function Base.hash(a::CalciumFieldElem, h::UInt)
   return h
 end
-
-###############################################################################
-#
-#   Canonicalisation
-#
-###############################################################################
-
-canonical_unit(a::CalciumFieldElem) = a
 
 ###############################################################################
 #
@@ -137,6 +129,16 @@ function rand(C::CalciumField; depth::Int, bits::Int,
 
   check_special(x)
   return x
+end
+
+###############################################################################
+#
+#   Conformance test element generation
+#
+###############################################################################
+
+function ConformanceTests.generate_element(R::CalciumField)
+  return rand(R, depth=5, bits=5)
 end
 
 ###############################################################################
