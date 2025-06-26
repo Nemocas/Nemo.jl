@@ -224,23 +224,13 @@ end
 ################################################################################
 
 @doc raw"""
-    eigenvalues(M::MatElem{T}) where T <: FieldElem
+    eigenvalues(M::MatElem{T}) where T <: RingElem
 
 Return the eigenvalues of `M` which lie in the field `base_ring(M)`.
 """
-function eigenvalues(M::MatElem{T}) where T <: FieldElem
+function eigenvalues(M::MatElem{T}) where T <: RingElem
   @assert is_square(M)
-  K = base_ring(M)
-  f = charpoly(M)
-  return roots(f)
-end
-
-# This function just aims to give a helpful error message if the
-# argument matrix is not over a field.  It deliberately has no doc!
-function eigenvalues(::MatElem{T}) where T <: RingElem
-  throw(ArgumentError("Matrix must be over a field"))
-  # Another option would be to convert automatically to a matrix
-  # over the field of fractions/quotients then compute with that.
+  return roots(charpoly(M))
 end
 
 @doc raw"""
@@ -252,7 +242,7 @@ algebraic multiplicities as a vector of tuples of (root, multiplicity).
 function eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
   @assert is_square(M)
   K = base_ring(M)
-  Kx, x = polynomial_ring(K, "x", cached = false)
+  Kx, x = polynomial_ring(K, "x"; cached = false)
   f = charpoly(Kx, M)
   r = roots(f)
   return [ (a, valuation(f, x - a)) for a in r ]
@@ -261,7 +251,7 @@ end
 # This function just aims to give a helpful error message if the
 # argument matrix is not over a field.  It deliberately has no doc!
 function eigenvalues_with_multiplicities(::MatElem{T}) where T <: RingElem
-  throw(ArgumentError("Matrix must be over a field"))
+  throw(ArgumentError("Please specify the field over which to compute (since matrix is not over a field)"))
 end
 
 @doc raw"""
@@ -271,8 +261,7 @@ Return the eigenvalues of `M` over the field `L`.
 """
 function eigenvalues(L::Field, M::MatElem{T}) where T <: RingElem
   @assert is_square(M)
-  M1 = change_base_ring(L, M)
-  return eigenvalues(M1)
+  return roots(L, charpoly(M))
 end
 
 @doc raw"""
@@ -283,8 +272,12 @@ multiplicities as a vector of tuples.
 """
 function eigenvalues_with_multiplicities(L::Field, M::MatElem{T}) where T <: RingElem
   @assert is_square(M)
-  M1 = change_base_ring(L, M)
-  return eigenvalues_with_multiplicities(M1)
+  return eigenvalues_with_multiplicities(change_base_ring(L,M))
+  # 2025-06-26 THE LINES BELOW DO NOT CURRENTLY WORK e.g. if base_ring(M) is GF(5), and L is GF(25)
+  # Lx, x = polynomial_ring(L, "x", cached = false)
+  # f = Lx(charpoly(M))
+  # r = roots(f)
+  # return [ (a, valuation(f, x - a)) for a in r ]
 end
 
 @doc raw"""
@@ -320,7 +313,7 @@ function eigenspace(M::MatElem{T}, lambda::Integer; side::Symbol = :left) where 
   @assert is_square(M)
   N = deepcopy(M)
   for i = 1:ncols(M)
-    N[i, i] -= lambda  # lambda automatically promoted
+    N[i, i] -= lambda  # lambda is automatically promoted
   end
   return kernel(N, side = side)
 end
@@ -328,7 +321,7 @@ end
 # This function just aims to give a helpful error message if the
 # argument matrix is not over a field.  It deliberately has no doc!
 function eigenspace(::MatElem{T}, ::Integer; side::Symbol = :left) where {T <: RingElem}
-  throw(ArgumentError("Matrix must be over a field"))
+  throw(ArgumentError("Please give the eigenvalue as a field element (since matrix is not over a field)"))
 end
 
 @doc raw"""
@@ -344,17 +337,17 @@ See also `eigenspace`.
 """
 function eigenspaces(M::MatElem{T}; side::Symbol = :left) where T<:FieldElem
   S = eigenvalues(M)
-  L = Dict{elem_type(base_ring(M)), typeof(M)}()
-  for k in S
-    push!(L, k => vcat(eigenspace(M, k, side = side)))
+  E = Dict{elem_type(base_ring(M)), typeof(M)}()
+  for lambda in S
+    push!(E, lambda => vcat(eigenspace(M, lambda; side = side)))
   end
-  return L
+  return E
 end
 
 # This function just aims to give a helpful error message if the
 # argument matrix is not over a field.  It deliberately has no doc!
 function eigenspaces(::MatElem{T}; side::Symbol = :left) where T<:RingElem
-  throw(ArgumentError("Matrix must be over a field"))
+  throw(ArgumentError("Please specify the field over which to compute (since matrix is not over a field)"))
 end
 
 @doc raw"""
@@ -369,7 +362,14 @@ left eigenspaces are computed.
 See also `eigenspace`.
 """
 function eigenspaces(L::Field, M::MatElem{T}; side::Symbol = :left) where T<:RingElem
-  return eigenspaces(change_base_ring(L, M); side=side)
+  S = eigenvalues(L,M)
+  M_over_L = change_base_ring(L,M)
+  E = Dict{elem_type(L), typeof(M_over_L)}()
+  for lambda in S
+    push!(E, lambda => vcat(eigenspace(M_over_L, lambda; side = side)))
+  end
+  return E
+###  return eigenspaces(change_base_ring(L, M); side=side)
 end
 
 ###############################################################################

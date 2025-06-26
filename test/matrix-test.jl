@@ -101,7 +101,7 @@ end
 
   # See OSCAR issue #4388 (and subsequent PR #2108)
   M_2x2 = matrix(ZZ, [0 1; -1 0])  # important here: ZZ is *not* a field
-  @test_throws  ArgumentError  eigenvalues(M_2x2)
+  @test length(eigenvalues(M_2x2)) == 0
   @test length(eigenvalues(QQ, M_2x2)) == 0
   @test_throws  ArgumentError  eigenvalues_with_multiplicities(M_2x2)
   @test  length(eigenvalues_with_multiplicities(QQ,M_2x2)) == 0
@@ -111,12 +111,12 @@ end
   K = algebraic_closure(QQ)
   lambda1, lambda2 = eigenvalues(K, M_2x2)
   MK_2x2 = matrix(K, M_2x2)
-  @test_broken length(eigenvalues(MK_2x2)) == 2  # requires factor which is outseide Nemo
+  @test_broken length(eigenvalues(MK_2x2)) == 2  # requires factor which is outside Nemo
 
   @test_throws  ArgumentError  eigenspaces(M_2x2)
   @test  length(eigenspaces(QQ,M_2x2)) == 0
   @test  length(eigenspaces(MQQ_2x2)) == 0
-  @test_broken length(eigenspaces(K, M_2x2)) == 2 # requires factor which is outseide Nemo
+  @test length(eigenspaces(K, M_2x2)) == 2
   @test size(eigenspace(M_2x2, lambda1)) == (1,2)
 
   M_3x3 = matrix(ZZ, [[5, -2, -2],  [2, 1, -2],  [2, -2, 1]])
