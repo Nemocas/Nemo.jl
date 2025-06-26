@@ -2205,23 +2205,23 @@ julia> number_of_digits(ZZ(12), 3)
 3
 ```
 """
-function number_of_digits(x::ZZRingElem, b::Integer)
+function number_of_digits(x::ZZRingElem, b::IntegerUnion)
   number_of_digits(x, base=b)::Int
 end
 
-function number_of_digits(a::ZZRingElem; base::Integer = 10, pad::Integer = 1)
+function number_of_digits(a::ZZRingElem; base::IntegerUnion = 10, pad::Integer = 1)
   iszero(a) && return max(pad, 1)
   return max(pad, 1+flog(abs(a), ZZRingElem(abs(base))))
 end
 
-Base.digits(n::ZZRingElem; base::Integer = 10, pad::Integer = 1) =
+Base.digits(n::ZZRingElem; base::IntegerUnion = 10, pad::Integer = 1) =
 digits(typeof(base), n, base = base, pad = pad)
 
-function Base.digits(T::Type{<:Integer}, n::ZZRingElem; base::Integer = 10, pad::Integer = 1)
+function Base.digits(T::Type{<:IntegerUnion}, n::ZZRingElem; base::IntegerUnion = 10, pad::Integer = 1)
   digits!(zeros(T, ndigits(n, base=base, pad=pad)), n, base=base)
 end
 
-function Base.digits!(a::AbstractVector{T}, n::ZZRingElem; base::Integer = 10) where T<:Integer
+function Base.digits!(a::AbstractVector{T}, n::ZZRingElem; base::T = 10) where T<:IntegerUnion
   2 <= base || throw(DomainError(base, "base must be ≥ 2"))
   Base.hastypemax(T) && abs(base) - 1 > typemax(T) &&
   throw(ArgumentError("type $T too small for base $base"))
