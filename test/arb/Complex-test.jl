@@ -493,6 +493,29 @@ end
   end
 end
 
+@testset "ComplexFieldElem.rand" begin
+  C = ComplexField()
+
+  n = 100
+  for _ in 1:n
+    rnd_default = rand(C)
+    rnd_urandom = rand(C; randtype = :urandom)
+    rnd_randtest = rand(C; randtype = :randtest)
+    rnd_special = rand(C; randtype = :randtest_special)
+    rnd_precise = rand(C; randtype = :randtest_precise)
+    rnd_param = rand(C; randtype = :randtest_param)
+
+    @test abs(rnd_default) <= 1
+    @test abs(rnd_urandom) <= 1
+    @test isfinite(rnd_randtest)
+    @test isfinite(rnd_precise)
+    @test isfinite(rnd_param)
+    @test rnd_special isa ComplexFieldElem
+    @test rnd_param isa ComplexFieldElem
+  end
+end
+
+
 @testset "ComplexFieldElem.integration" begin
   res = Nemo.integrate(CC, x->x,  -1, 1)
   @test contains(res, CC(0))
