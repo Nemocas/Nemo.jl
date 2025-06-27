@@ -226,7 +226,7 @@ end
 @doc raw"""
     eigenvalues(M::MatElem{T}) where T <: RingElem
 
-Return the eigenvalues of `M` which lie in the field `base_ring(M)`.
+Return the eigenvalues of `M` which lie in `base_ring(M)`.
 """
 function eigenvalues(M::MatElem{T}) where T <: RingElem
   @assert is_square(M)
@@ -272,17 +272,15 @@ multiplicities as a vector of tuples.
 """
 function eigenvalues_with_multiplicities(L::Field, M::MatElem{T}) where T <: RingElem
   @assert is_square(M)
-  return eigenvalues_with_multiplicities(change_base_ring(L,M))
-  # 2025-06-26 THE LINES BELOW DO NOT CURRENTLY WORK e.g. if base_ring(M) is GF(5), and L is GF(25)
-  # Lx, x = polynomial_ring(L, "x", cached = false)
-  # f = Lx(charpoly(M))
-  # r = roots(f)
-  # return [ (a, valuation(f, x - a)) for a in r ]
+  f = change_base_ring(L, charpoly(M))
+  r = roots(f)
+  x = gen(parent(f))
+  return [ (a, valuation(f, x - a)) for a in r ]
 end
 
 @doc raw"""
     eigenspace(M::MatElem{T1}, lambda::T2; side::Symbol = :left)
-      where {T1 <: RingElem, T2 <: FieldElem} -> MatElem{T}
+      where {T1 <: RingElem, T2 <: RingElement} -> MatElem{T}
 
 Return a matrix whose rows (if `side == :left`) or columns (if `side == :right`)
 give a basis of the eigenspace of $M$ with respect to the eigenvalue $\lambda$.
@@ -290,39 +288,21 @@ If `side` is `:right`, the right eigenspace is computed, i.e. vectors $v$ such t
 $Mv = \lambda v$. If `side` is `:left`, the left eigenspace is computed, i.e. vectors
 $v$ such that $vM = \lambda v$.
 """
-function eigenspace(M::MatElem{T1}, lambda::T2; side::Symbol = :left) where {T1 <: RingElem, T2 <: FieldElem}
+function eigenspace(M::MatElem{T1}, lambda::T2; side::Symbol = :left) where {T1 <: RingElem, T2 <: RingElement}
   @assert is_square(M)
-  N = change_base_ring(parent(lambda),M)
+  if typeof(lambda) <: Rational
+    lambda = QQ(lambda)
+  end
+  common_parent = parent(zero(base_ring(M))+lambda)
+  isa(common_parent, Field) || throw(ArgumentError("Please give the eigenvalue as a field element (since matrix is not over a field)"))
+  N = change_base_ring(common_parent,M)
   for i = 1:ncols(N)
     N[i, i] -= lambda
   end
   return kernel(N, side = side)
 end
 
-@doc raw"""
-    eigenspace(M::MatElem{T}, lambda::Integer; side::Symbol = :left)
-      where {T <: FieldElem} -> MatElem{T}
 
-Return a matrix whose rows (if `side == :left`) or columns (if `side == :right`)
-give a basis of the eigenspace of $M$ with respect to the eigenvalue $\lambda$.
-If `side` is `:right`, the right eigenspace is computed, i.e. vectors $v$ such that
-$Mv = \lambda v$. If `side` is `:left`, the left eigenspace is computed, i.e. vectors
-$v$ such that $vM = \lambda v$.
-"""
-function eigenspace(M::MatElem{T}, lambda::Integer; side::Symbol = :left) where {T <: FieldElem}
-  @assert is_square(M)
-  N = deepcopy(M)
-  for i = 1:ncols(M)
-    N[i, i] -= lambda  # lambda is automatically promoted
-  end
-  return kernel(N, side = side)
-end
-
-# This function just aims to give a helpful error message if the
-# argument matrix is not over a field.  It deliberately has no doc!
-function eigenspace(::MatElem{T}, ::Integer; side::Symbol = :left) where {T <: RingElem}
-  throw(ArgumentError("Please give the eigenvalue as a field element (since matrix is not over a field)"))
-end
 
 @doc raw"""
     eigenspaces(M::MatElem{T}; side::Symbol = :left)
@@ -369,7 +349,6 @@ function eigenspaces(L::Field, M::MatElem{T}; side::Symbol = :left) where T<:Rin
     push!(E, lambda => vcat(eigenspace(M_over_L, lambda; side = side)))
   end
   return E
-###  return eigenspaces(change_base_ring(L, M); side=side)
 end
 
 ###############################################################################

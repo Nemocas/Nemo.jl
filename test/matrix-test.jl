@@ -125,12 +125,19 @@ end
   @test length(eigenvalues(MQQ_3x3)) == 2
   @test length(eigenspaces(QQ, M_3x3)) == 2
   @test length(eigenspaces(MQQ_3x3)) == 2
+  @test_throws ArgumentError  eigenspace(M_3x3, 1)
+  @test_throws ArgumentError  eigenspace(M_3x3, ZZ(1))
+  @test_throws ArgumentError  eigenspace(M_3x3, 1.0)
+  @test size(eigenspace(M_3x3, 1//1)) == (1,3)
   @test size(eigenspace(M_3x3, QQ(1))) == (1,3)
   @test size(eigenspace(M_3x3, QQ(2))) == (0,3)
   @test size(eigenspace(M_3x3, QQ(3))) == (2,3)
+  @test size(eigenspace(MQQ_3x3, ZZ(1))) == (1,3)
   @test size(eigenspace(MQQ_3x3, 1)) == (1,3)
   @test size(eigenspace(MQQ_3x3, 2)) == (0,3)
   @test size(eigenspace(MQQ_3x3, 3)) == (2,3)
+  @test size(eigenspace(MQQ_3x3, 3//1)) == (2,3)
+  @test size(eigenspace(MQQ_3x3, 3.0)) == (2,3)
 
   # eigenvalues_simple not defined for integer matrices, so not tested.
 end
