@@ -543,6 +543,10 @@ function abs(x::AcbFieldElem)
   return z
 end
 
+function abs2(x::AcbFieldElem)
+  return real(x)^2 + imag(x)^2
+end
+
 ################################################################################
 #
 #  Inversion
