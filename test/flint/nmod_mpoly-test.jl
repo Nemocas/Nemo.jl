@@ -93,6 +93,12 @@
   @test_throws ErrorException push_term!(M, one(RR), zeros(Int, 2))
 end
 
+@testset "zzModMPolyRingElem.trivial_rings"
+  R, = residue_ring(ZZ, 1)
+  S, = polynomial_ring(R, ["x", "y"])
+  @test krull_dim(S) == -inf
+end
+
 @testset "zzModMPolyRingElem.printing" begin
   S, (x, y) = polynomial_ring(residue_ring(ZZ, 23)[1], ["x", "y"])
 

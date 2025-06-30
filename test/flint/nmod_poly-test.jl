@@ -14,6 +14,10 @@
   @test parent_type(zzModPolyRingElem) == zzModPolyRing
   @test dense_poly_type(zzModRingElem) == zzModPolyRingElem
 
+  R2, = residue_ring(ZZ, 1)
+  R2x,  = polynomial_ring(R2, "x")
+  @test krull_dim(R2x) == -inf
+
   S, = residue_ring(ZZ, 19)
   Sy, y = polynomial_ring(R, "y")
 
