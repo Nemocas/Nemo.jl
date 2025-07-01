@@ -57,7 +57,7 @@ is_unit(a::ZZModRingElem) = a.parent.n == 1 ? iszero(a.data) : isone(gcd(a.data,
 modulus(R::ZZModRing) = R.n
 
 function krull_dim(R::ZZModRing)
-  is_trivial(R) && -inf
+  is_trivial(R) && return -inf
   return is_prime(modulus(R)) ? 0 : 1
 end
 
