@@ -93,7 +93,7 @@
   @test_throws ErrorException push_term!(M, one(RR), zeros(Int, 2))
 end
 
-@testset "zzModMPolyRingElem.trivial_rings" begin
+@testset "zzModMPolyRingElem.krull_dim" begin
   R, = residue_ring(ZZ, 1)
   S, = polynomial_ring(R, ["x", "y"])
   @test krull_dim(S) == -inf
