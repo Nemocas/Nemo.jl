@@ -76,7 +76,7 @@ end
   @test string(R()) == "0"
 end
 
-@testst "ZZModRingElem.krull_dim" begin
+@testset "ZZModRingElem.krull_dim" begin
   R, = residue_ring(ZZ, ZZ(1))
   R2, = residue_ring(ZZ, ZZ(10))
 
