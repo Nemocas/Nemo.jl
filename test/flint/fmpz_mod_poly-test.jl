@@ -70,7 +70,7 @@
   @test Rx === polynomial_ring(R, "x")[1]
 
   R, = residue_ring(ZZ, ZZ(1))
-  Rx,  = polynomial_ring(R, "x")
+  Rx, = polynomial_ring(R, "x")
   @test krull_dim(Rx) == -inf
 end
 
