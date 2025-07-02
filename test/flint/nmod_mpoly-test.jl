@@ -104,7 +104,7 @@ end
 
   R, = residue_ring(ZZ, 4)
   S, = polynomial_ring(R, ["x", "y"])
-  @test krull_dim(S) == 3
+  @test krull_dim(S) == 2
 end
 
 @testset "zzModMPolyRingElem.printing" begin

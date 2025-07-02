@@ -109,7 +109,7 @@ end
 
   R2, = residue_ring(ZZ, 4)
   R2x,  = polynomial_ring(R2, "x")
-  @test krull_dim(R2x) == 2    
+  @test krull_dim(R2x) == 1    
 end
 
 @testset "zzModPolyRingElem.manipulation" begin
