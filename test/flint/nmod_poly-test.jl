@@ -14,10 +14,6 @@
   @test parent_type(zzModPolyRingElem) == zzModPolyRing
   @test dense_poly_type(zzModRingElem) == zzModPolyRingElem
 
-  R2, = residue_ring(ZZ, 1)
-  R2x,  = polynomial_ring(R2, "x")
-  @test krull_dim(R2x) == -inf
-
   S, = residue_ring(ZZ, 19)
   Sy, y = polynomial_ring(R, "y")
 
@@ -104,6 +100,16 @@ end
   a = x^3 + x + 1
 
   @test sprint(show, "text/plain", a) == "x^3 + x + 1"
+end
+
+@testset "zzModPolyRingElem.krull_dim" begin
+  R, = residue_ring(ZZ, 1)
+  Rx,  = polynomial_ring(R, "x")
+  @test krull_dim(Rx) == -inf
+
+  R2, = residue_ring(ZZ, 4)
+  R2x,  = polynomial_ring(R2, "x")
+  @test krull_dim(R2x) == 2    
 end
 
 @testset "zzModPolyRingElem.manipulation" begin

@@ -68,6 +68,11 @@
   Rx,  = polynomial_ring(R, "x")
   @test base_ring(Rx) === R
   @test Rx === polynomial_ring(R, "x")[1]
+end
+
+@testset "ZZModPolyRingElem.krull_dim" begin
+  R, = residue_ring(ZZ, ZZRingElem(132), cached = false)
+  Rx,  = polynomial_ring(R, "x")
   @test krull_dim(Rx) == 2
 
   R, = residue_ring(ZZ, ZZ(1))
