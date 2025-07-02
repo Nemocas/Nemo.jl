@@ -97,6 +97,14 @@ end
   R, = residue_ring(ZZ, 1)
   S, = polynomial_ring(R, ["x", "y"])
   @test krull_dim(S) == -inf
+
+  R, = residue_ring(ZZ, 2)
+  S, = polynomial_ring(R, ["x", "y"])
+  @test krull_dim(S) == 2
+
+  R, = residue_ring(ZZ, 4)
+  S, = polynomial_ring(R, ["x", "y"])
+  @test krull_dim(S) == 3
 end
 
 @testset "zzModMPolyRingElem.printing" begin
