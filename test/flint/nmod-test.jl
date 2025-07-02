@@ -3,7 +3,6 @@
   # right, e.g. isone(one(S))==false when S is a univariate polynomial ring
   # over the null ring
   ConformanceTests.test_Ring_interface(residue_ring(ZZ, 1)[1])
-  @test krull_dim(residue_ring(ZZ, 1)[1]) == -inf
   for i in [6, 13, 2^8, 2^16, 2^32, next_prime(2^8), next_prime(2^16), next_prime(2^32)]
     ConformanceTests.test_Ring_interface_recursive(residue_ring(ZZ, i)[1])
   end
@@ -75,6 +74,14 @@ end
 
   @test string(R(3)) == "3"
   @test string(R()) == "0"
+end
+
+@testset "zzModRingElem.krull_dim" begin
+  R, = residue_ring(ZZ, 1)
+  R2, = residue_ring(ZZ, 10)
+
+  @test krull_dim(R) == -inf
+  @test krull_dim(R2) == 0
 end
 
 @testset "zzModRingElem.manipulation" begin

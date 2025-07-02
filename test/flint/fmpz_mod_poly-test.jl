@@ -71,7 +71,7 @@
 end
 
 @testset "ZZModPolyRingElem.krull_dim" begin
-  R, = residue_ring(ZZ, ZZRingElem(132), cached = false)
+  R, = residue_ring(ZZ, ZZRingElem(132))
   Rx,  = polynomial_ring(R, "x")
   @test krull_dim(Rx) == 1
 
