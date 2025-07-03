@@ -94,6 +94,12 @@ end
   @test sprint(show, "text/plain", y + y^2) == "y^2 + y"
 end
 
+@testset "QQPolyRingElem.krull_dim" begin
+  S, y = polynomial_ring(QQ, "y")
+
+  @test krull_dim(S) == 1 
+end
+
 @testset "QQPolyRingElem.manipulation" begin
   S, y = polynomial_ring(QQ, "y")
 

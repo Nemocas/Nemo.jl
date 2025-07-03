@@ -102,6 +102,16 @@ end
   @test sprint(show, "text/plain", a) == "x^3 + x + 1"
 end
 
+@testset "zzModPolyRingElem.krull_dim" begin
+  R, = residue_ring(ZZ, 1)
+  Rx,  = polynomial_ring(R, "x")
+  @test krull_dim(Rx) == -inf
+
+  R2, = residue_ring(ZZ, 4)
+  R2x,  = polynomial_ring(R2, "x")
+  @test krull_dim(R2x) == 1    
+end
+
 @testset "zzModPolyRingElem.manipulation" begin
   R, = residue_ring(ZZ, 17)
   Rx, x = polynomial_ring(R, "x")

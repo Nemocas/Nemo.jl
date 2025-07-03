@@ -58,7 +58,7 @@ modulus(R::ZZModRing) = R.n
 
 function krull_dim(R::ZZModRing)
   is_trivial(R) && return -inf
-  return is_prime(modulus(R)) ? 0 : 1
+  return 0
 end
 
 is_noetherian(::ZZModRing) = true

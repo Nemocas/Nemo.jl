@@ -76,6 +76,14 @@ end
   @test string(R()) == "0"
 end
 
+@testset "ZZModRingElem.krull_dim" begin
+  R, = residue_ring(ZZ, ZZ(1))
+  R2, = residue_ring(ZZ, ZZ(10))
+
+  @test krull_dim(R) == -inf
+  @test krull_dim(R2) == 0
+end
+
 @testset "ZZModRingElem.manipulation" begin
   R, = residue_ring(ZZ, ZZ(13))
 
