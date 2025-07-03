@@ -343,7 +343,6 @@ end
   @test f(ZZ(1)) == R(1)
   x = preimage(f, R(1))
   @test x isa ZZRingElem && x == 1
-  @test krull_dim(R) == 0
 
   R, f = residue_field(ZZ, ZZ(2))
   @test R isa FqField
@@ -352,8 +351,15 @@ end
   @test f(ZZ(1)) == R(1)
   x = preimage(f, R(1))
   @test x isa ZZRingElem && x == 1
-  @test krull_dim(R) == 0
   
+end
+
+@testset "FqFieldElem.krull_dim" begin
+  R, = residue_field(ZZ, 2)
+  @test krull_dim(R) == 0
+
+  F = GF(11, 3)
+  @test krull_dim(F) == 0
 end
 
 @testset "FqFieldElem.is_power" begin
