@@ -241,9 +241,8 @@ algebraic multiplicities as a vector of tuples of (root, multiplicity).
 """
 function eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
   @assert is_square(M)
-  K = base_ring(M)
   f = charpoly(M)
-  x = gen(parent(g))
+  x = gen(parent(f))
   r = roots(f)
   return [ (a, valuation(f, x - a)) for a in r ]
 end
