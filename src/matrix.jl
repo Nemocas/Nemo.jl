@@ -290,7 +290,7 @@ $v$ such that $vM = \lambda v$.
 function eigenspace(M::MatElem{T1}, lambda::T2; side::Symbol = :left) where {T1 <: RingElem, T2 <: RingElement}
   @assert is_square(M)
   if lambda isa Rational
-    lambda = QQ(lambda)
+    return eigenspace(M, QQ(lambda); side)
   end
   common_parent = parent(zero(base_ring(M))+lambda)
   isa(common_parent, Field) || throw(ArgumentError("Please give the eigenvalue as a field element (since matrix is not over a field)"))
@@ -300,8 +300,6 @@ function eigenspace(M::MatElem{T1}, lambda::T2; side::Symbol = :left) where {T1 
   end
   return kernel(N, side = side)
 end
-
-
 
 @doc raw"""
     eigenspaces(M::MatElem{T}; side::Symbol = :left)
@@ -341,7 +339,7 @@ left eigenspaces are computed.
 See also `eigenspace`.
 """
 function eigenspaces(L::Field, M::MatElem{T}; side::Symbol = :left) where T<:RingElem
-  S = eigenvalues(L,M)
+  S = eigenvalues(L, M)
   M_over_L = change_base_ring(L,M)
   E = Dict{elem_type(L), typeof(M_over_L)}()
   for lambda in S
