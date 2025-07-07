@@ -242,8 +242,8 @@ algebraic multiplicities as a vector of tuples of (root, multiplicity).
 function eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
   @assert is_square(M)
   K = base_ring(M)
-  Kx, x = polynomial_ring(K, "x"; cached = false)
-  f = charpoly(Kx, M)
+  f = charpoly(M)
+  x = gen(parent(g))
   r = roots(f)
   return [ (a, valuation(f, x - a)) for a in r ]
 end
@@ -273,7 +273,7 @@ multiplicities as a vector of tuples.
 function eigenvalues_with_multiplicities(L::Field, M::MatElem{T}) where T <: RingElem
   @assert is_square(M)
   f = change_base_ring(L, charpoly(M))
-  r = roots(f)
+  r = roots(L, charpoly(M))
   x = gen(parent(f))
   return [ (a, valuation(f, x - a)) for a in r ]
 end
@@ -290,7 +290,7 @@ $v$ such that $vM = \lambda v$.
 """
 function eigenspace(M::MatElem{T1}, lambda::T2; side::Symbol = :left) where {T1 <: RingElem, T2 <: RingElement}
   @assert is_square(M)
-  if typeof(lambda) <: Rational
+  if lambda isa Rational
     lambda = QQ(lambda)
   end
   common_parent = parent(zero(base_ring(M))+lambda)
