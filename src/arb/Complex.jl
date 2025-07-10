@@ -296,7 +296,7 @@ divexact(x::ComplexFieldElem, y::RealFieldElem; check::Bool=true) = x // y
 /(x::RealFieldElem, y::ComplexFieldElem) = x // y
 /(x::ComplexFieldElem, y::RealFieldElem) = x // y
 
-for T in (Float64, BigFloat, Rational, QQFieldElem)
+for T in (Float64, BigFloat, Rational, QQFieldElem, Complex)
   @eval begin
     +(x::$T, y::ComplexFieldElem) = parent(y)(x) + y
     +(x::ComplexFieldElem, y::$T) = x + parent(x)(y)
