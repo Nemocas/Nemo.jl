@@ -1937,10 +1937,7 @@ function _arb_set(x::ArbFieldElemOrPtr, y::BigFloat)
 end
 
 function _arb_set(x::ArbFieldElemOrPtr, y::BigFloat, p::Int)
-  m = _mid_ptr(x)
-  r = _rad_ptr(x)
-  @ccall libflint.arf_set_mpfr(m::Ptr{arf_struct}, y::Ref{BigFloat})::Nothing
-  @ccall libflint.mag_zero(r::Ptr{mag_struct})::Nothing
+  _arb_set(x, y)
   @ccall libflint.arb_set_round(x::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, p::Int)::Nothing
 end
 
@@ -1958,6 +1955,24 @@ end
 
 function _arb_set(x::ArbFieldElemOrPtr, y::Real, p::Int)
   _arb_set(x, BigFloat(y), p)
+end
+
+function _arb_set(x::ArbFieldElemOrPtr, y::Irrational)
+  _arb_set(x, y, precision(parent(x)))
+end
+
+function _arb_set(x::ArbFieldElemOrPtr, y::Irrational, p::Int)
+  if y == pi
+    @ccall libflint.arb_const_pi(x::Ref{ArbFieldElem}, p::Int)::Nothing
+  elseif y == MathConstants.e
+    @ccall libflint.arb_const_e(x::Ref{ArbFieldElem}, p::Int)::Nothing
+  elseif y == MathConstants.catalan
+    @ccall libflint.arb_const_catalan(x::Ref{ArbFieldElem}, p::Int)::Nothing
+  elseif y == MathConstants.eulergamma
+    @ccall libflint.arb_const_euler(x::Ref{ArbFieldElem}, p::Int)::Nothing
+  else
+    _arb_set(x, BigFloat(y; precision=p), p)
+  end
 end
 
 ################################################################################
@@ -1979,17 +1994,9 @@ function (r::ArbField)(x::Any)
 end
 
 function (r::ArbField)(x::Irrational)
-  if x == pi
-    return const_pi(r)
-  elseif x == MathConstants.e
-    return const_e(r)
-  elseif x == MathConstants.catalan
-    return const_catalan(r)
-  elseif x == MathConstants.eulergamma
-    return const_euler(r)
-  else
-    error("constant not supported")
-  end
+  z = r()
+  _arb_set(z, x)
+  return z
 end
 
 ################################################################################

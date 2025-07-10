@@ -344,6 +344,21 @@ end
   @test overlaps(const_catalan(RR), RR("0.9159655941772190150546035 +/- 1.86e-26"))
   @test overlaps(const_khinchin(RR), RR("2.685452001065306445309715 +/- 2.28e-25"))
   @test overlaps(const_glaisher(RR), RR("1.282427129100622636875343 +/- 4.78e-25"))
+
+  @test overlaps(RR(MathConstants.pi), RR("3.141592653589793238462643 +/- 4.03e-25"))
+  @test overlaps(RR(MathConstants.e), RR("2.718281828459045235360287 +/- 4.96e-25"))
+  @test overlaps(RR(MathConstants.eulergamma), RR("0.5772156649015328606065121 +/- 3.42e-26"))
+  @test overlaps(RR(MathConstants.catalan), RR("0.9159655941772190150546035 +/- 1.86e-26"))
+
+  set_precision!(Balls, 400) do
+    x = sin(RR(MathConstants.pi))
+    @test contains(RR("0.0 +/- 8.40e-121"), x)
+    @test contains(x, RR("0.0 +/- 8.40e-122"))
+
+    x = log(RR(MathConstants.e))
+    @test contains(RR("1.0 +/- 1.76e-120"), x)
+    @test contains(x, RR("1.0 +/- 1.76e-121"))
+  end
 end
 
 @testset "RealFieldElem.functions" begin
