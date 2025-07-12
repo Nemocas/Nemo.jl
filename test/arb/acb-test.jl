@@ -45,6 +45,7 @@ end
   @test CC("1.0 +/- 0") == a
   @test CC("+1.00000e+0") == a
   @test CC(BigFloat(1)) == a
+  @test CC(Complex{Int}(1)) == a
 
   b = CC(2,3)
   @test CC("2","3") == b
@@ -55,6 +56,7 @@ end
   @test CC(Rational{BigInt}(2), Rational{BigInt}(3)) == b
   @test CC(2.0, 3.0) == b
   @test CC(BigFloat(2), BigFloat(3)) == b
+  @test CC(2 + 3*im) == b
   @test real(b) == 2
   @test imag(b) == 3
 
@@ -149,7 +151,6 @@ end
   @test x // y == 0.5
 
   for T in [ZZRingElem, QQFieldElem, Int, BigInt, Rational{Int}, Rational{BigInt}]
-
     @test x + T(4) == 6
     @test x - T(4) == -2
     @test x * T(4) == 8
@@ -159,6 +160,14 @@ end
     @test T(2) * y == 8
     @test T(2) // y == 0.5
     @test x ^ T(4) == 16
+  end
+
+  xx = CC(2, 2)
+  for T in [Complex{Int}, Complex{Float64}]
+    @test xx + T(2, 2) == T(2, 2) + xx == CC(4, 4)
+    @test xx * T(0, 1) == T(0, 1) * xx == CC(-2, 2)
+    @test xx // T(0, 1) == CC(2, -2)
+    @test xx - T(2, 2) == -(T(2, 2) - xx) == zero(CC)
   end
 
   for T in [Float64, BigFloat, ArbFieldElem]
