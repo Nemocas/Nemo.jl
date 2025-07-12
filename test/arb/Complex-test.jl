@@ -136,6 +136,9 @@ end
   @test -CC(3) == CC(-3)
   @test abs(-CC(3)) == 3
   @test abs(CC(3)) == 3
+  @test abs2(-CC(3)) == 9
+  @test abs2(CC(3)) == 9
+  @test abs2(CC(0)) == 0
   @test inv(CC(2)) == CC(QQ(1,2))
 
   @test angle(CC(3)) == 0
