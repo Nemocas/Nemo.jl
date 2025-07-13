@@ -307,7 +307,7 @@ divexact(x::AcbFieldElem, y::ArbFieldElem; check::Bool=true) = x // y
 /(x::ArbFieldElem, y::AcbFieldElem) = x // y
 /(x::AcbFieldElem, y::ArbFieldElem) = x // y
 
-for T in (Float64, BigFloat, Rational, QQFieldElem)
+for T in (Float64, BigFloat, Rational, QQFieldElem, Complex)
   @eval begin
     +(x::$T, y::AcbFieldElem) = parent(y)(x) + y
     +(x::AcbFieldElem, y::$T) = x + parent(x)(y)
