@@ -12,7 +12,7 @@ SHA = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 
 [compat]
-AbstractAlgebra = "0.45.0"
+AbstractAlgebra = "0.45.0, 0.46"
 FLINT_jll = "~301.300.000"
 LinearAlgebra = "1.6"
 Random = "1.6"
