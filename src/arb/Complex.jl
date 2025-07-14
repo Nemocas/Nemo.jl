@@ -531,6 +531,12 @@ function abs(x::ComplexFieldElem, prec::Int = precision(Balls))
   return z
 end
 
+function abs2(x::ComplexFieldElem, prec::Int = precision(Balls))
+  set_precision!(Balls, prec) do
+    return real(x)^2 + imag(x)^2
+  end
+end
+
 ################################################################################
 #
 #  Inversion

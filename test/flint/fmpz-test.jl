@@ -682,6 +682,8 @@ end
 
 @testset "ZZRingElem.abs" begin
   @test abs(ZZRingElem(-12)) == 12
+  @test abs2(ZZRingElem(-12)) == 144
+  @test abs2(ZZRingElem(0)) == 0
 end
 
 @testset "ZZRingElem.divrem" begin
