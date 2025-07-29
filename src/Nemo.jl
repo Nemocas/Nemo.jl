@@ -12,8 +12,6 @@ import Random: rand!
 
 using RandomExtensions: RandomExtensions, make, Make2, Make3
 
-import TOML
-
 import SHA
 
 # N.B: do not import div, divrem from Base
