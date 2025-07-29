@@ -460,6 +460,10 @@ function size(F::FpField)
   return order(F)
 end
 
+function size(F::FqField)
+  return order(F)
+end
+
 function order(R::zzModRing)
   return ZZRingElem(R.n)
 end
