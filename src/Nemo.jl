@@ -12,8 +12,6 @@ import Random: rand!
 
 using RandomExtensions: RandomExtensions, make, Make2, Make3
 
-import TOML
-
 import SHA
 
 # N.B: do not import div, divrem from Base
@@ -331,14 +329,15 @@ end
 
 const __isthreaded = Ref(false)
 
+const NEMO_VERSION = Base.pkgversion(@__MODULE__)
+
 function show_banner()
-  PROJECT_TOML = TOML.parsefile(joinpath(@__DIR__, "..", "Project.toml"))
-  VERSION_NUMBER = PROJECT_TOML["version"]
+  version_string = string(NEMO_VERSION)
   if isdir(joinpath(@__DIR__, "..", ".git"))
-    VERSION_NUMBER *= "-dev"
+    version_string *= "-dev"
   end
   println("")
-  println("Welcome to Nemo version $VERSION_NUMBER")
+  println("Welcome to Nemo version $(version_string)")
   println("")
   println("Nemo comes with absolutely no warranty whatsoever")
 end
