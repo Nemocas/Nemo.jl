@@ -45,6 +45,7 @@ end
   @test CC("1.0 +/- 0") == a
   @test CC("+1.00000e+0") == a
   @test CC(BigFloat(1)) == a
+  @test CC(Complex{Int}(1)) == a
 
   b = CC(2,3)
   @test CC("2","3") == b
@@ -55,6 +56,7 @@ end
   @test CC(Rational{BigInt}(2), Rational{BigInt}(3)) == b
   @test CC(2.0, 3.0) == b
   @test CC(BigFloat(2), BigFloat(3)) == b
+  @test CC(Complex{Int}(2, 3)) == b
   @test real(b) == 2
   @test imag(b) == 3
 
@@ -165,6 +167,14 @@ end
     @test x ^ T(4) == 16
   end
 
+  xx = CC(2, 2)
+  for T in [Complex{Int}, Complex{Float64}]
+    @test xx + T(2, 2) == T(2, 2) + xx == CC(4, 4)
+    @test xx * T(0, 1) == T(0, 1) * xx == CC(-2, 2)
+    @test xx // T(0, 1) == CC(2, -2)
+    @test xx - T(2, 2) == -(T(2, 2) - xx) == zero(CC)
+  end
+
   for T in [Float64, BigFloat, RealFieldElem]
     @test contains(x + T(4), 6)
     @test contains(x - T(4), -2)
@@ -221,6 +231,21 @@ end
 
 @testset "ComplexFieldElem.constants" begin
   @test overlaps(const_pi(CC), CC("3.141592653589793238462643 +/- 4.03e-25"))
+
+  @test overlaps(CC(MathConstants.pi), CC("3.141592653589793238462643 +/- 4.03e-25"))
+  @test overlaps(CC(MathConstants.e), CC("2.718281828459045235360287 +/- 4.96e-25"))
+  @test overlaps(CC(MathConstants.eulergamma), CC("0.5772156649015328606065121 +/- 3.42e-26"))
+  @test overlaps(CC(MathConstants.catalan), CC("0.9159655941772190150546035 +/- 1.86e-26"))
+
+  set_precision!(Balls, 400) do
+    x = sin(CC(MathConstants.pi))
+    @test contains(CC("0.0 +/- 8.40e-121"), x)
+    @test contains(x, CC("0.0 +/- 8.40e-122"))
+
+    x = log(CC(MathConstants.e))
+    @test contains(CC("1.0 +/- 1.76e-120"), x)
+    @test contains(x, CC("1.0 +/- 1.76e-121"))
+  end
 end
 
 @testset "ComplexFieldElem.functions" begin
@@ -492,6 +517,29 @@ end
     @test Phi == x^2*y+16*x-y^2
   end
 end
+
+@testset "ComplexFieldElem.rand" begin
+  C = ComplexField()
+
+  n = 100
+  for _ in 1:n
+    rnd_default = rand(C)
+    rnd_urandom = rand(C; randtype = :urandom)
+    rnd_randtest = rand(C; randtype = :randtest)
+    rnd_special = rand(C; randtype = :randtest_special)
+    rnd_precise = rand(C; randtype = :randtest_precise)
+    rnd_param = rand(C; randtype = :randtest_param)
+
+    @test abs(rnd_default) <= 1
+    @test abs(rnd_urandom) <= 1
+    @test isfinite(rnd_randtest)
+    @test isfinite(rnd_precise)
+    @test isfinite(rnd_param)
+    @test rnd_special isa ComplexFieldElem
+    @test rnd_param isa ComplexFieldElem
+  end
+end
+
 
 @testset "ComplexFieldElem.integration" begin
   res = Nemo.integrate(CC, x->x,  -1, 1)

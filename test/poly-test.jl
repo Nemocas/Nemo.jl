@@ -32,3 +32,16 @@ end
   @test is_squarefree(2*x)
   @test !is_squarefree(2*x^2)
 end
+
+@testset "partial_fractions" begin
+  R, x = QQ["x"]
+  f = 3*x^4+1
+  g = (1-x)*(1-x^2)
+  p = partial_fractions(f, g)
+  #order is depending on factoring, hence not deterministic
+  @test Set(p) == Set([3*x + 3//x^0, 5//(x - 1), 2//(x^2 - 2*x + 1), 1//(x + 1)])
+  @test isone(denominator(first(p)))
+  @test sum(p) == f//g
+end
+
+

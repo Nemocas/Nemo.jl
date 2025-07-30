@@ -94,6 +94,12 @@ end
   @test sprint(show, "text/plain", y + y^2) == "y^2 + y"
 end
 
+@testset "QQPolyRingElem.krull_dim" begin
+  S, y = polynomial_ring(QQ, "y")
+
+  @test krull_dim(S) == 1 
+end
+
 @testset "QQPolyRingElem.manipulation" begin
   S, y = polynomial_ring(QQ, "y")
 
@@ -484,6 +490,19 @@ end
   g = 61y - 9
 
   @test gcdx(f, g) == (1, ZZRingElem(3721)//18579, -ZZRingElem(1037)//18579*y-ZZRingElem(824)//18579)
+end
+
+@testset "QQPolyRingElem.interpolate" begin
+  Rx, x = polynomial_ring(QQ, "x")
+
+  xval = [ ZZ(0), ZZ(2), ZZ(4), ZZ(6) ]
+
+  yval = [ ZZ(0), ZZ(2), ZZ(8), ZZ(18) ]
+
+  f = interpolate(Rx, xval, yval)
+
+  @test parent(f) == Rx
+  @test f == 1//2*x^2
 end
 
 @testset "QQPolyRingElem.factor" begin
