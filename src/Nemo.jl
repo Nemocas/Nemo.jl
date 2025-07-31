@@ -212,8 +212,61 @@ using FLINT_jll: libflint
 
 const pkgdir = realpath(joinpath(dirname(@__DIR__)))
 
+###############################################################################
+#
+#   Flint Exception handling
+#
+###############################################################################
+
 function flint_abort()
   error("Problem in the FLINT-Subsystem")
+end
+
+@enum FlintExceptionType begin
+  FLINT_ERROR
+  FLINT_OVERFLOW
+  FLINT_IMPINV
+  FLINT_DOMERR
+  FLINT_DIVZERO
+  FLINT_EXPOF
+  FLINT_INEXACT
+  FLINT_TEST_FAIL
+end
+
+struct FlintException <: Exception
+  type::FlintExceptionType
+  msg::String
+end
+
+function Base.showerror(io::IO, e::FlintException)
+  print(io, "Flint Exception (")
+  if e.type == FLINT_ERROR
+    print(io, "General error")
+  elseif e.type == FLINT_OVERFLOW
+    print(io, "Overflow")
+  elseif e.type == FLINT_IMPINV
+    print(io, "Impossible inverse")
+  elseif e.type == FLINT_DOMERR
+    print(io, "Domain error")
+  elseif e.type == FLINT_DIVZERO
+    print(io, "Divide by zero")
+  elseif e.type == FLINT_EXPOF
+    print(io, "Exponent overflow")
+  elseif e.type == FLINT_INEXACT
+    print(io, "Inexact")
+  elseif e.type == FLINT_TEST_FAIL
+    print(io, "Test failure")
+  else
+    print(io, "Unknown exception")
+  end
+  print(io, "):\n")
+  print(io, strip(e.msg))
+end
+
+function flint_throw(err_type::FlintExceptionType, cmsg::Cstring)
+  msg = unsafe_string(cmsg)
+
+  throw(FlintException(err_type, msg))
 end
 
 ################################################################################
@@ -354,6 +407,7 @@ function __init__()
   end
 
   @ccall libflint.flint_set_abort(@cfunction(flint_abort, Nothing, ())::Ptr{Nothing})::Nothing
+  @ccall libflint.flint_set_throw(@cfunction(flint_throw, Nothing, (FlintExceptionType, Cstring))::Ptr{Nothing})::Nothing
 
   add_verbosity_scope(:UnimodVerif)
 
