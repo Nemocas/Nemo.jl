@@ -104,6 +104,9 @@ end
   @test inv(u) == u // 2
 
   @test abs(-u) == u
+  @test abs2(u) == 2
+  @test abs2(u+i) == 3
+  @test abs2(u-i) == 3
   @test u != i
   @test sign(2*i) == i
   @test conj(i) == -i
@@ -354,6 +357,7 @@ Base.@irrational mynumber 1.0 BigFloat("1")
   @test csgn(-i) == -1
   @test sign(2*i) == i
   @test abs(1+i) == u
+  @test abs2(1+i) == 2
   @test conj(1+i) == 1-i
   @test conj(1+C(pi)*i, form=:deep) == 1-C(pi)*i
   @test conj(1+C(pi)*i, form=:shallow) == 1-C(pi)*i

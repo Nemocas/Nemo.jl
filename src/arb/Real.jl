@@ -842,6 +842,10 @@ function abs(x::RealFieldElem)
   return z
 end
 
+function abs2(x::RealFieldElem)
+  return x^2
+end
+
 ################################################################################
 #
 #  Inverse

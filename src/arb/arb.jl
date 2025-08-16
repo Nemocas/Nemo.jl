@@ -836,6 +836,10 @@ function abs(x::ArbFieldElem)
   return z
 end
 
+function abs2(x::ArbFieldElem)
+  return x^2
+end
+
 ################################################################################
 #
 #  Inverse
