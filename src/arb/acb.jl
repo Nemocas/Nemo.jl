@@ -458,7 +458,7 @@ contains(x::AcbFieldElem, y::Integer) = contains(x, ZZRingElem(y))
 Returns `true` if the box $x$ contains the given rational value, otherwise
 return `false`.
 """
-contains(x::AcbFieldElem, y::Rational{T}) where {T <: Integer} = contains(x, ZZRingElem(y))
+contains(x::AcbFieldElem, y::Rational{T}) where {T <: Integer} = contains(x, QQFieldElem(y))
 
 @doc raw"""
     contains_zero(x::AcbFieldElem)

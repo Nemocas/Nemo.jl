@@ -447,7 +447,7 @@ contains(x::ComplexFieldElem, y::Integer) = contains(x, ZZRingElem(y))
 Returns `true` if the box $x$ contains the given rational value, otherwise
 return `false`.
 """
-contains(x::ComplexFieldElem, y::Rational{T}) where {T <: Integer} = contains(x, ZZRingElem(y))
+contains(x::ComplexFieldElem, y::Rational{T}) where {T <: Integer} = contains(x, QQFieldElem(y))
 
 @doc raw"""
     contains_zero(x::ComplexFieldElem)
