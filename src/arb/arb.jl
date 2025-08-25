@@ -1961,7 +1961,7 @@ function _arb_set(x::ArbFieldElemOrPtr, y::Real, p::Int)
   _arb_set(x, BigFloat(y), p)
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::Irrational)
+function _arb_set(x::ArbFieldElem, y::Irrational)
   _arb_set(x, y, precision(parent(x)))
 end
 
