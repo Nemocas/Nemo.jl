@@ -34,7 +34,7 @@ one(r::ComplexField) = one!(ComplexFieldElem())
 @doc raw"""
     onei(r::ComplexField)
 
-Return exact one times $i$ in the given Arb complex field.
+Return exact one times $i$ in the given complex field.
 """
 function onei(r::ComplexField)
   z = ComplexFieldElem()
@@ -183,8 +183,6 @@ end
 #  Binary operations
 #
 ################################################################################
-
-# AcbFieldElem - AcbFieldElem
 
 for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (://, "acb_div"), (:-,"acb_sub"), (:^,"acb_pow"))
   @eval begin
@@ -449,7 +447,7 @@ contains(x::ComplexFieldElem, y::Integer) = contains(x, ZZRingElem(y))
 Returns `true` if the box $x$ contains the given rational value, otherwise
 return `false`.
 """
-contains(x::ComplexFieldElem, y::Rational{T}) where {T <: Integer} = contains(x, ZZRingElem(y))
+contains(x::ComplexFieldElem, y::Rational{T}) where {T <: Integer} = contains(x, QQFieldElem(y))
 
 @doc raw"""
     contains_zero(x::ComplexFieldElem)
@@ -1178,7 +1176,7 @@ end
 @doc raw"""
     rising_factorial(x::ComplexFieldElem, n::Int)
 
-Return the rising factorial $x(x + 1)\ldots (x + n - 1)$ as an Acb.
+Return the rising factorial $x(x + 1)\ldots (x + n - 1)$.
 """
 function rising_factorial(x::ComplexFieldElem, n::Int)
   n < 0 && throw(DomainError(n, "Argument must be non-negative"))

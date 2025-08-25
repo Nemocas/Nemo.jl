@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   ComplexPoly.jl : Polynomials over AcbFieldElem
+#   ComplexPoly.jl : Polynomials over ComplexFieldElem
 #
 ###############################################################################
 
@@ -313,7 +313,7 @@ function truncate(a::ComplexPolyRingElem, n::Int)
   if length(a) <= n
     return a
   end
-  # todo: implement set_trunc in ArbFieldElem
+  # todo: implement set_trunc in RealFieldElem
   z = deepcopy(a)
   @ccall libflint.acb_poly_truncate(z::Ref{ComplexPolyRingElem}, n::Int)::Nothing
   return z
@@ -610,7 +610,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    roots_upper_bound(x::ComplexPolyRingElem) -> ArbFieldElem
+    roots_upper_bound(x::ComplexPolyRingElem) -> RealFieldElem
 
 Returns an upper bound for the absolute value of all complex roots of $x$.
 """
@@ -729,7 +729,7 @@ promote_rule(::Type{ComplexPolyRingElem}, ::Type{ZZPolyRingElem}) = ComplexPolyR
 
 promote_rule(::Type{ComplexPolyRingElem}, ::Type{QQPolyRingElem}) = ComplexPolyRingElem
 
-promote_rule(::Type{ComplexPolyRingElem}, ::Type{ArbPolyRingElem}) = ComplexPolyRingElem
+promote_rule(::Type{ComplexPolyRingElem}, ::Type{RealPolyRingElem}) = ComplexPolyRingElem
 
 promote_rule(::Type{ComplexPolyRingElem}, ::Type{ComplexPolyRingElem}) = ComplexPolyRingElem
 

@@ -915,7 +915,7 @@ end
 @doc raw"""
     setunion(x::RealFieldElem, y::RealFieldElem)
 
-Return an `ArbFieldElem` containing the union of the intervals represented by $x$ and
+Return an `RealFieldElem` containing the union of the intervals represented by $x$ and
 $y$.
 """
 function setunion(x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
@@ -927,7 +927,7 @@ end
 @doc raw"""
     setintersection(x::RealFieldElem, y::RealFieldElem)
 
-Return an `ArbFieldElem` containing the intersection of the intervals represented by
+Return an `RealFieldElem` containing the intersection of the intervals represented by
 $x$ and $y$.
 """
 function setintersection(x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
@@ -1449,7 +1449,7 @@ end
 @doc raw"""
     factorial(n::Int, r::RealField)
 
-Return the factorial of $n$ in the given Arb field.
+Return the factorial of $n$ in the given field.
 """
 factorial(n::Int, r::RealField, prec::Int = precision(Balls)) = n < 0 ? factorial(r(n), prec) : factorial(UInt(n), r, prec)
 
@@ -1467,7 +1467,7 @@ end
 @doc raw"""
     binomial(n::UInt, k::UInt, r::RealField)
 
-Return the binomial coefficient ${n \choose k}$ in the given Arb field.
+Return the binomial coefficient ${n \choose k}$ in the given field.
 """
 function binomial(n::UInt, k::UInt, r::RealField, prec::Int = precision(Balls))
   z = r()
@@ -1478,7 +1478,7 @@ end
 @doc raw"""
     fibonacci(n::ZZRingElem, r::RealField)
 
-Return the $n$-th Fibonacci number in the given Arb field.
+Return the $n$-th Fibonacci number in the given field.
 """
 function fibonacci(n::ZZRingElem, r::RealField, prec::Int = precision(Balls))
   z = r()
@@ -1495,14 +1495,14 @@ end
 @doc raw"""
     fibonacci(n::Int, r::RealField)
 
-Return the $n$-th Fibonacci number in the given Arb field.
+Return the $n$-th Fibonacci number in the given field.
 """
 fibonacci(n::Int, r::RealField, prec::Int = precision(Balls)) = n >= 0 ? fibonacci(UInt(n), r, prec) : fibonacci(ZZRingElem(n), r, prec)
 
 @doc raw"""
     gamma(x::ZZRingElem, r::RealField)
 
-Return the Gamma function evaluated at $x$ in the given Arb field.
+Return the Gamma function evaluated at $x$ in the given field.
 """
 function gamma(x::ZZRingElem, r::RealField, prec::Int = precision(Balls))
   z = r()
@@ -1513,7 +1513,7 @@ end
 @doc raw"""
     gamma(x::QQFieldElem, r::RealField)
 
-Return the Gamma function evaluated at $x$ in the given Arb field.
+Return the Gamma function evaluated at $x$ in the given field.
 """
 function gamma(x::QQFieldElem, r::RealField, prec::Int = precision(Balls))
   z = r()
@@ -1531,8 +1531,7 @@ end
 @doc raw"""
     zeta(n::Int, r::RealField)
 
-Return the Riemann zeta function $\zeta(n)$ as an element of the given Arb
-field.
+Return the Riemann zeta function $\zeta(n)$ as an element of the given field.
 """
 zeta(n::Int, r::RealField, prec::Int = precision(Balls)) = n >= 0 ? zeta(UInt(n), r, prec) : zeta(r(n), prec)
 
@@ -1545,7 +1544,7 @@ end
 @doc raw"""
     bernoulli(n::Int, r::RealField)
 
-Return the $n$-th Bernoulli number as an element of the given Arb field.
+Return the $n$-th Bernoulli number as an element of the given field.
 """
 bernoulli(n::Int, r::RealField, prec::Int = precision(Balls)) = n >= 0 ? bernoulli(UInt(n), r, prec) : throw(DomainError(n, "Index must be non-negative"))
 
@@ -1558,7 +1557,7 @@ end
 @doc raw"""
     rising_factorial(x::RealFieldElem, n::Int)
 
-Return the rising factorial $x(x + 1)\ldots (x + n - 1)$ as an Arb.
+Return the rising factorial $x(x + 1)\ldots (x + n - 1)$.
 """
 rising_factorial(x::RealFieldElem, n::Int, prec::Int = precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : rising_factorial(x, UInt(n), prec)
 
@@ -1572,7 +1571,7 @@ end
     rising_factorial(x::QQFieldElem, n::Int, r::RealField)
 
 Return the rising factorial $x(x + 1)\ldots (x + n - 1)$ as an element of the
-given Arb field.
+given field.
 """
 rising_factorial(x::QQFieldElem, n::Int, r::RealField, prec::Int = precision(Balls)) = n < 0 ? throw(DomainError(n, "Index must be non-negative")) : rising_factorial(x, UInt(n), r, prec)
 
@@ -2014,15 +2013,15 @@ end
 @doc raw"""
     rand(r::RealField; randtype::Symbol=:urandom)
 
-Return a random element in given Arb field.
+Return a random element in given field.
 
-The `randtype` default is `:urandom` which return an `ArbFieldElem` contained in
+The `randtype` default is `:urandom` which return an `RealFieldElem` contained in
 $[0,1]$.
 
 The rest of the methods return non-uniformly distributed values in order to
 exercise corner cases. The option `:randtest` will return a finite number, and
 `:randtest_exact` the same but with a zero radius. The option
-`:randtest_precise` return an `ArbFieldElem` with a radius around $2^{-\mathrm{prec}}$
+`:randtest_precise` return an `RealFieldElem` with a radius around $2^{-\mathrm{prec}}$
 the magnitude of the midpoint, while `:randtest_wide` return a radius that
 might be big relative to its midpoint. The `:randtest_special`-option might
 return a midpoint and radius whose values are `NaN` or `inf`.

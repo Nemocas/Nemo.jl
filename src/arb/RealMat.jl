@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   RealMat.jl : Arb matrices over ArbFieldElem
+#   RealMat.jl : Matrices over RealFieldElem
 #
 ###############################################################################
 
@@ -16,7 +16,7 @@ dense_matrix_type(::Type{RealFieldElem}) = RealMatrix
 
 is_zero_initialized(::Type{RealMatrix}) = true
 
-function getindex!(z::ArbFieldElem, x::RealMatrix, r::Int, c::Int)
+function getindex!(z::RealFieldElem, x::RealMatrix, r::Int, c::Int)
   GC.@preserve x begin
     v = mat_entry_ptr(x, r, c)
     _arb_set(z, v)
@@ -50,11 +50,11 @@ end
 
 Base.@propagate_inbounds setindex!(x::RealMatrix, y::Integer,
                                    r::Int, c::Int) =
-setindex!(x, ZZRingElem(y), r, c)
+  setindex!(x, ZZRingElem(y), r, c)
 
 Base.@propagate_inbounds setindex!(x::RealMatrix, y::Rational{T},
                                    r::Int, c::Int) where {T <: Integer} =
-setindex!(x, ZZRingElem(y), r, c)
+  setindex!(x, QQFieldElem(y), r, c)
 
 function one(x::RealMatrixSpace)
   check_square(x)
@@ -151,13 +151,13 @@ end
 
 *(x::ZZRingElem, y::RealMatrix) = y*x
 
-function *(x::RealMatrix, y::ArbFieldElem)
+function *(x::RealMatrix, y::RealFieldElem)
   z = similar(x)
   @ccall libflint.arb_mat_scalar_mul_arb(z::Ref{RealMatrix}, x::Ref{RealMatrix}, y::Ref{RealFieldElem}, precision(Balls)::Int)::Nothing
   return z
 end
 
-*(x::ArbFieldElem, y::RealMatrix) = y*x
+*(x::RealFieldElem, y::RealMatrix) = y*x
 
 for T in [Integer, ZZRingElem, QQFieldElem, RealFieldElem]
   @eval begin
@@ -328,7 +328,7 @@ end
 @doc raw"""
     inv(x::RealMatrix)
 
-Given a  $n\times n$ matrix of type `ArbMatrix`, return an
+Given a  $n\times n$ matrix of type `RealMatrix`, return an
 $n\times n$ matrix $X$ such that $AX$ contains the
 identity matrix. If $A$ cannot be inverted numerically an exception is raised.
 """
@@ -375,7 +375,7 @@ function divexact(x::RealMatrix, y::ZZRingElem; check::Bool=true)
   return z
 end
 
-function divexact(x::RealMatrix, y::ArbFieldElem; check::Bool=true)
+function divexact(x::RealMatrix, y::RealFieldElem; check::Bool=true)
   z = similar(x)
   @ccall libflint.arb_mat_scalar_div_arb(z::Ref{RealMatrix}, x::Ref{RealMatrix}, y::Ref{RealFieldElem}, precision(Balls)::Int)::Nothing
   return z
@@ -565,7 +565,7 @@ end
 @doc raw"""
     bound_inf_norm(x::RealMatrix)
 
-Returns a non-negative element $z$ of type `ArbFieldElem`, such that $z$ is an upper
+Returns a non-negative element $z$ of type `RealFieldElem`, such that $z$ is an upper
 bound for the infinity norm for every matrix in $x$
 """
 function bound_inf_norm(x::RealMatrix)
@@ -706,7 +706,7 @@ end
 #
 ###############################################################################
 
-function round!(b::ZZMatrix, a::ArbMatrix)
+function round!(b::ZZMatrix, a::RealMatrix)
   for i = 1:nrows(a)
     for j = 1:ncols(a)
       b[i, j] = round(ZZRingElem, a[i, j])

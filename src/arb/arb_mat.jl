@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   arb_mat.jl : Arb matrices over ArbFieldElem
+#   arb_mat.jl : Matrices over ArbFieldElem
 #
 ###############################################################################
 
@@ -52,11 +52,11 @@ end
 
 Base.@propagate_inbounds setindex!(x::ArbMatrix, y::Integer,
                                    r::Int, c::Int) =
-setindex!(x, ZZRingElem(y), r, c)
+  setindex!(x, ZZRingElem(y), r, c)
 
 Base.@propagate_inbounds setindex!(x::ArbMatrix, y::Rational{T},
                                    r::Int, c::Int) where {T <: Integer} =
-setindex!(x, ZZRingElem(y), r, c)
+  setindex!(x, QQFieldElem(y), r, c)
 
 function one(x::ArbMatrixSpace)
   check_square(x)
@@ -698,6 +698,21 @@ end
 function matrix(R::ArbField, r::Int, c::Int, arr::AbstractVector{Rational{T}}) where {T <: Integer}
   arr_fmpz = map(QQFieldElem, arr)
   return matrix(R, r, c, arr_fmpz)
+end
+
+###############################################################################
+#
+#  Rounding
+#
+###############################################################################
+
+function round!(b::ZZMatrix, a::ArbMatrix)
+  for i = 1:nrows(a)
+    for j = 1:ncols(a)
+      b[i, j] = round(ZZRingElem, a[i, j])
+    end
+  end
+  return b
 end
 
 ###############################################################################

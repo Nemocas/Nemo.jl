@@ -195,8 +195,6 @@ end
 #
 ################################################################################
 
-# AcbFieldElem - AcbFieldElem
-
 for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (://, "acb_div"), (:-,"acb_sub"), (:^,"acb_pow"))
   @eval begin
     function ($s)(x::AcbFieldElem, y::AcbFieldElem)
@@ -460,7 +458,7 @@ contains(x::AcbFieldElem, y::Integer) = contains(x, ZZRingElem(y))
 Returns `true` if the box $x$ contains the given rational value, otherwise
 return `false`.
 """
-contains(x::AcbFieldElem, y::Rational{T}) where {T <: Integer} = contains(x, ZZRingElem(y))
+contains(x::AcbFieldElem, y::Rational{T}) where {T <: Integer} = contains(x, QQFieldElem(y))
 
 @doc raw"""
     contains_zero(x::AcbFieldElem)
