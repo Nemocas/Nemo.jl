@@ -52,11 +52,11 @@ end
 
 Base.@propagate_inbounds setindex!(x::ArbMatrix, y::Integer,
                                    r::Int, c::Int) =
-setindex!(x, ZZRingElem(y), r, c)
+  setindex!(x, ZZRingElem(y), r, c)
 
 Base.@propagate_inbounds setindex!(x::ArbMatrix, y::Rational{T},
                                    r::Int, c::Int) where {T <: Integer} =
-setindex!(x, ZZRingElem(y), r, c)
+  setindex!(x, QQFieldElem(y), r, c)
 
 function one(x::ArbMatrixSpace)
   check_square(x)

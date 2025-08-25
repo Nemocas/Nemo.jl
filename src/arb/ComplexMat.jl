@@ -50,7 +50,7 @@ end
 
 Base.@propagate_inbounds setindex!(x::ComplexMatrix, y::Rational{T},
                                    r::Int, c::Int) where {T <: Integer} =
-setindex!(x, QQFieldElem(y), r, c)
+  setindex!(x, QQFieldElem(y), r, c)
 
 for T in [Integer, Float64, ZZRingElem, QQFieldElem, RealFieldElem, BigFloat, AbstractString]
   @eval begin
@@ -66,7 +66,7 @@ for T in [Integer, Float64, ZZRingElem, QQFieldElem, RealFieldElem, BigFloat, Ab
 end
 
 setindex!(x::ComplexMatrix, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) where {T <: Integer} =
-setindex!(x, map(QQFieldElem, y), r, c)
+  setindex!(x, map(QQFieldElem, y), r, c)
 
 function one(x::ComplexMatrixSpace)
   check_square(x)
