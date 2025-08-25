@@ -195,8 +195,6 @@ end
 #
 ################################################################################
 
-# AcbFieldElem - AcbFieldElem
-
 for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (://, "acb_div"), (:-,"acb_sub"), (:^,"acb_pow"))
   @eval begin
     function ($s)(x::AcbFieldElem, y::AcbFieldElem)

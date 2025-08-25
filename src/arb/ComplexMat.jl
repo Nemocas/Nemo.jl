@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   ComplexMat.jl : Arb matrices over AcbFieldElem
+#   ComplexMat.jl : Arb matrices over ComplexFieldElem
 #
 ###############################################################################
 
@@ -368,7 +368,7 @@ Bool(@ccall libflint.acb_mat_is_real(x::Ref{ComplexMatrix})::Cint)
 @doc raw"""
     inv(x::ComplexMatrix)
 
-Given a $n\times n$ matrix of type `AcbMatrix`, return an
+Given a $n\times n$ matrix of type `ComplexMatrix`, return an
 $n\times n$ matrix $X$ such that $AX$ contains the
 identity matrix. If $A$ cannot be inverted numerically an exception is raised.
 """
@@ -441,10 +441,10 @@ divexact(x::ComplexMatrix, y::Rational{T}; check::Bool=true) where T <: Union{In
 #
 ################################################################################
 
-function charpoly(x::AcbPolyRing, y::ComplexMatrix, prec::Int = precision(Balls))
+function charpoly(x::ComplexPolyRing, y::ComplexMatrix, prec::Int = precision(Balls))
   base_ring(x) != base_ring(y) && error("Base rings must coincide")
   z = x()
-  @ccall libflint.acb_mat_charpoly(z::Ref{AcbPolyRingElem}, y::Ref{ComplexMatrix}, prec::Int)::Nothing
+  @ccall libflint.acb_mat_charpoly(z::Ref{ComplexPolyRingElem}, y::Ref{ComplexMatrix}, prec::Int)::Nothing
   return z
 end
 
@@ -619,7 +619,7 @@ end
 @doc raw"""
     bound_inf_norm(x::ComplexMatrix)
 
-Returns a non-negative element $z$ of type `AcbFieldElem`, such that $z$ is an upper
+Returns a non-negative element $z$ of type `ComplexFieldElem`, such that $z$ is an upper
 bound for the infinity norm for every matrix in $x$
 """
 function bound_inf_norm(x::ComplexMatrix)
@@ -815,7 +815,7 @@ promote_rule(::Type{ComplexMatrix}, ::Type{ZZRingElem}) = ComplexMatrix
 
 promote_rule(::Type{ComplexMatrix}, ::Type{QQFieldElem}) = ComplexMatrix
 
-promote_rule(::Type{ComplexMatrix}, ::Type{ArbFieldElem}) = ComplexMatrix
+promote_rule(::Type{ComplexMatrix}, ::Type{RealFieldElem}) = ComplexMatrix
 
 promote_rule(::Type{ComplexMatrix}, ::Type{ComplexFieldElem}) = ComplexMatrix
 
@@ -823,7 +823,7 @@ promote_rule(::Type{ComplexMatrix}, ::Type{ZZMatrix}) = ComplexMatrix
 
 promote_rule(::Type{ComplexMatrix}, ::Type{QQMatrix}) = ComplexMatrix
 
-promote_rule(::Type{ComplexMatrix}, ::Type{ArbMatrix}) = ComplexMatrix
+promote_rule(::Type{ComplexMatrix}, ::Type{RealMatrix}) = ComplexMatrix
 
 ###############################################################################
 #
@@ -911,7 +911,7 @@ end
 @doc raw"""
     eigenvalues_simple(A::ComplexMatrix, algorithm::Symbol = :default)
 
-Returns the eigenvalues of `A` as a vector of `AcbFieldElem`. It is assumed that `A`
+Returns the eigenvalues of `A` as a vector of `ComplexFieldElem`. It is assumed that `A`
 has only simple eigenvalues.
 
 The algorithm used can be changed by setting the `algorithm` keyword to
