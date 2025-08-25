@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   ComplexMat.jl : Arb matrices over ComplexFieldElem
+#   ComplexMat.jl : Matrices over ComplexFieldElem
 #
 ###############################################################################
 
