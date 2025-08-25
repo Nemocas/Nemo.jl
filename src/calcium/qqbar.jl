@@ -761,6 +761,8 @@ function sqrt(a::QQBarFieldElem; check::Bool=true)
   return z
 end
 
+# TODO: also add cbrt and friends???
+
 @doc raw"""
     root(a::QQBarFieldElem, n::Int)
 
@@ -1394,7 +1396,7 @@ function sub!(z::QQBarFieldElemOrPtr, x::UInt, y::QQBarFieldElemOrPtr)
 end
 
 sub!(c::QQBarFieldElemOrPtr, a::QQBarFieldElemOrPtr, b::Union{Integer, Rational}) = sub!(c, a, flintify(b))
-sub!(c::QQBarFieldElemOrPtr, a::Union{QQFieldElemOrPtr, ZZRingElemOrPtr, Integer, Rational}, b::QQBarFieldElemOrPtr) = sub!(c, flintify(a), b)
+sub!(c::QQBarFieldElemOrPtr, a::Union{Integer, Rational}, b::QQBarFieldElemOrPtr) = sub!(c, flintify(a), b)
 
 #
 
