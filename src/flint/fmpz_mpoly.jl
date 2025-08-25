@@ -643,7 +643,7 @@ function set!(z::ZZMPolyRingElem, a::UInt)
   return z
 end
 
-set!(z::ZZMPolyRingElem, a::Union{Integer, Rational}) = set!(z, flintify(a))
+set!(z::ZZMPolyRingElem, a::Integer) = set!(z, flintify(a))
 
 #
 
