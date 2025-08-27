@@ -12,7 +12,7 @@ SHA = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 
 [compat]
 AbstractAlgebra = "0.46.0"
-FLINT_jll = "~301.300.102" # or whatever version contains https://github.com/JuliaPackaging/Yggdrasil/pull/11754
+FLINT_jll = "~301.300.102"
 LinearAlgebra = "1.6"
 Random = "1.6"
 RandomExtensions = "0.4.2"
