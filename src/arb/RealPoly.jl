@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   RealPoly.jl : Polynomials over ArbFieldElem
+#   RealPoly.jl : Polynomials over RealFieldElem
 #
 ###############################################################################
 
@@ -300,7 +300,7 @@ function truncate(a::RealPolyRingElem, n::Int)
   if length(a) <= n
     return a
   end
-  # todo: implement set_trunc in ArbFieldElem
+  # todo: implement set_trunc in RealFieldElem
   z = deepcopy(a)
   @ccall libflint.arb_poly_truncate(z::Ref{RealPolyRingElem}, n::Int)::Nothing
   return z
@@ -338,9 +338,9 @@ function evaluate(x::RealPolyRingElem, y::RealFieldElem, prec::Int = precision(B
   return z
 end
 
-function evaluate(x::RealPolyRingElem, y::AcbFieldElem, prec::Int = precision(Balls))
+function evaluate(x::RealPolyRingElem, y::ComplexFieldElem, prec::Int = precision(Balls))
   z = parent(y)()
-  @ccall libflint.arb_poly_evaluate_acb(z::Ref{AcbFieldElem}, x::Ref{RealPolyRingElem}, y::Ref{AcbFieldElem}, prec::Int)::Nothing
+  @ccall libflint.arb_poly_evaluate_acb(z::Ref{ComplexFieldElem}, x::Ref{RealPolyRingElem}, y::Ref{ComplexFieldElem}, prec::Int)::Nothing
   return z
 end
 
@@ -366,7 +366,7 @@ end
 function evaluate2(x::RealPolyRingElem, y::ComplexFieldElem, prec::Int = precision(Balls))
   z = parent(y)()
   w = parent(y)()
-  @ccall libflint.arb_poly_evaluate2_acb(z::Ref{AcbFieldElem}, w::Ref{AcbFieldElem}, x::Ref{RealPolyRingElem}, y::Ref{AcbFieldElem}, prec::Int)::Nothing
+  @ccall libflint.arb_poly_evaluate2_acb(z::Ref{ComplexFieldElem}, w::Ref{ComplexFieldElem}, x::Ref{RealPolyRingElem}, y::Ref{ComplexFieldElem}, prec::Int)::Nothing
   return z, w
 end
 
@@ -515,7 +515,7 @@ end
 ###############################################################################
 
 @doc raw"""
-    roots_upper_bound(x::RealPolyRingElem) -> ArbFieldElem
+    roots_upper_bound(x::RealPolyRingElem) -> RealFieldElem
 
 Returns an upper bound for the absolute value of all complex roots of $x$.
 """

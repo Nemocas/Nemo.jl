@@ -645,7 +645,7 @@ mutable struct ComplexPolyRingElem <: PolyRingElem{ComplexFieldElem}
 
   function ComplexPolyRingElem(x::RealPolyRingElem, p::Int)
     z = ComplexPolyRingElem()
-    @ccall libflint.acb_poly_set_arb_poly(z::Ref{ComplexPolyRingElem}, x::Ref{ArbPolyRingElem}, p::Int)::Nothing
+    @ccall libflint.acb_poly_set_arb_poly(z::Ref{ComplexPolyRingElem}, x::Ref{RealPolyRingElem}, p::Int)::Nothing
     @ccall libflint.acb_poly_set_round(z::Ref{ComplexPolyRingElem}, z::Ref{ComplexPolyRingElem}, p::Int)::Nothing
     return z
   end
@@ -990,7 +990,7 @@ mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
 
   function ComplexMatrix(a::RealMatrix)
     z = ComplexMatrix(a.r, a.c)
-    @ccall libflint.acb_mat_set_arb_mat(z::Ref{ComplexMatrix}, a::Ref{ArbMatrix})::Nothing
+    @ccall libflint.acb_mat_set_arb_mat(z::Ref{ComplexMatrix}, a::Ref{RealMatrix})::Nothing
     return z
   end
 

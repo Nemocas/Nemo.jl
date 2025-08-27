@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   acb_mat.jl : Arb matrices over AcbFieldElem
+#   acb_mat.jl : Matrices over AcbFieldElem
 #
 ###############################################################################
 
@@ -52,7 +52,7 @@ end
 
 Base.@propagate_inbounds setindex!(x::AcbMatrix, y::Rational{T},
                                    r::Int, c::Int) where {T <: Integer} =
-setindex!(x, QQFieldElem(y), r, c)
+  setindex!(x, QQFieldElem(y), r, c)
 
 for T in [Integer, Float64, ZZRingElem, QQFieldElem, ArbFieldElem, BigFloat, AbstractString]
   @eval begin
@@ -68,7 +68,7 @@ for T in [Integer, Float64, ZZRingElem, QQFieldElem, ArbFieldElem, BigFloat, Abs
 end
 
 setindex!(x::AcbMatrix, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) where {T <: Integer} =
-setindex!(x, map(QQFieldElem, y), r, c)
+  setindex!(x, map(QQFieldElem, y), r, c)
 
 function one(x::AcbMatrixSpace)
   check_square(x)

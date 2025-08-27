@@ -1,38 +1,26 @@
 ```@meta
 CurrentModule = Nemo
+CollapsedDocStrings = true
 DocTestSetup = quote
     using Nemo
 end
 ```
 
-# Algebraic numbers
+# Algebraic closure of the rational numbers
 
-Nemo allows working with exact real and complex algebraic numbers.
+An implementation of the field of all algebraic numbers, that is, an algebraic closure of the field of rational numbers, is provided through the type `QQBarField` and the corresponding element type `QQBarFieldElem`.
 
-The default algebraic number type in Nemo is provided by Calcium. The
-associated field of algebraic numbers can be constructed using
-`QQBar = algebraic_closure(QQ)`. We will leave out this line from
-all code blocks on this page for brevity.
+Note that the field of algebraic closure is implemented as an ordered field;
+see [Comparing algebraic numbers](@ref).
 
- Library        | Element type     | Parent type
-----------------|------------------|--------------------
-Calcium         | `QQBarFieldElem` | `QQBarField`
+## Constructing the field of algebraic numbers
 
-**Important note on performance**
-
-The default algebraic number type represents algebraic numbers
-in canonical form using minimal polynomials. This works well for representing
-individual algebraic numbers, but it does not provide the best
-performance for field arithmetic.
-For fast calculation in $\overline{\mathbb{Q}}$,
-`CalciumField` should typically be used instead (see the section
-on *Exact real and complex numbers*).
-Alternatively, to compute in a fixed subfield of $\overline{\mathbb{Q}}$,
-you may fix a generator $a$ and construct a number field to represent $\mathbb{Q}(a)$.
+```jldoctest
+julia> algebraic_closure(QQ)
+Algebraic closure of rational field
+```
 
 ## Algebraic number functionality
-
-### Constructing algebraic numbers
 
 Methods to construct algebraic numbers include:
 
@@ -47,24 +35,28 @@ Methods to construct algebraic numbers include:
 
 Arithmetic:
 
-```jldoctest; setup = :(QQBar = algebraic_closure(QQ))
-julia> ZZRingElem(QQBar(3))
+```jldoctest
+julia> Qb = algebraic_closure(QQ);
+
+julia> ZZRingElem(Qb(3))
 3
 
-julia> QQFieldElem(QQBar(3) // 2)
+julia> QQFieldElem(Qb(3) // 2)
 3//2
 
-julia> QQBar(-1) ^ (QQBar(1) // 3)
+julia> Qb(-1) ^ (Qb(1) // 3)
 Root 0.500000 + 0.866025*im of x^2 - x + 1
 ```
 
 Solving the quintic equation:
 
-```jldoctest; setup = :(QQBar = algebraic_closure(QQ))
+```jldoctest
+julia> Qb = algebraic_closure(QQ);
+
 julia> R, x = polynomial_ring(QQ, "x")
 (Univariate polynomial ring in x over QQ, x)
 
-julia> v = roots(QQBar, x^5-x-1)
+julia> v = roots(Qb, x^5-x-1)
 5-element Vector{QQBarFieldElem}:
  Root 1.16730 of x^5 - x - 1
  Root 0.181232 + 1.08395*im of x^5 - x - 1
@@ -78,8 +70,10 @@ true
 
 Computing exact eigenvalues of a matrix:
 
-```jldoctest; setup = :(QQBar = algebraic_closure(QQ))
-julia> eigenvalues(QQBar, ZZ[1 1 0; 0 1 1; 1 0 1])
+```jldoctest
+julia> Qb = algebraic_closure(QQ);
+
+julia> eigenvalues(Qb, ZZ[1 1 0; 0 1 1; 1 0 1])
 3-element Vector{QQBarFieldElem}:
  Root 2.00000 of x - 2
  Root 0.500000 + 0.866025*im of x^2 - x + 1
@@ -106,11 +100,13 @@ Algebraic numbers can be evaluated
 numerically to arbitrary precision by converting
 to real or complex Arb fields:
 
-```jldoctest; setup = :(QQBar = algebraic_closure(QQ))
-julia> RR = ArbField(64); RR(sqrt(QQBar(2)))
+```jldoctest
+julia> Qb = algebraic_closure(QQ);
+
+julia> RR = ArbField(64); RR(sqrt(Qb(2)))
 [1.414213562373095049 +/- 3.45e-19]
 
-julia> CC = AcbField(32); CC(QQBar(-1) ^ (QQBar(1) // 4))
+julia> CC = AcbField(32); CC(Qb(-1) ^ (Qb(1) // 4))
 [0.707106781 +/- 2.74e-10] + [0.707106781 +/- 2.74e-10]*im
 ```
 
@@ -121,11 +117,13 @@ julia> CC = AcbField(32); CC(QQBar(-1) ^ (QQBar(1) // 4))
 Retrieving the minimal polynomial and algebraic conjugates
 of a given algebraic number:
 
-```jldoctest; setup = :(QQBar = algebraic_closure(QQ))
-julia> minpoly(polynomial_ring(ZZ, "x")[1], QQBar(1+2im))
+```jldoctest
+julia> Qb = algebraic_closure(QQ);
+
+julia> minpoly(polynomial_ring(ZZ, "x")[1], Qb(1+2im))
 x^2 - 2*x + 5
 
-julia> conjugates(QQBar(1+2im))
+julia> conjugates(Qb(1+2im))
 2-element Vector{QQBarFieldElem}:
  Root 1.00000 + 2.00000*im of x^2 - 2x + 5
  Root 1.00000 - 2.00000*im of x^2 - 2x + 5
@@ -154,17 +152,19 @@ height_bits(x::QQBarFieldElem)
 
 **Examples**
 
-```jldoctest; setup = :(QQBar = algebraic_closure(QQ))
-julia> real(sqrt(QQBar(1im)))
+```jldoctest
+julia> Qb = algebraic_closure(QQ);
+
+julia> real(sqrt(Qb(1im)))
 Root 0.707107 of 2x^2 - 1
 
-julia> abs(sqrt(QQBar(1im)))
+julia> abs(sqrt(Qb(1im)))
 Root 1.00000 of x - 1
 
-julia> floor(sqrt(QQBar(1000)))
+julia> floor(sqrt(Qb(1000)))
 Root 31.0000 of x - 31
 
-julia> sign(QQBar(-10-20im))
+julia> sign(Qb(-10-20im))
 Root -0.447214 - 0.894427*im of 5x^4 + 6x^2 + 5
 ```
 
@@ -212,11 +212,13 @@ first.
 
 **Examples**
 
-```jldoctest; setup = :(QQBar = algebraic_closure(QQ))
-julia> 1 < sqrt(QQBar(2)) < QQBar(3)//2
+```jldoctest
+julia> Qb = algebraic_closure(QQ);
+
+julia> 1 < sqrt(Qb(2)) < Qb(3)//2
 true
 
-julia> x = QQBar(3+4im)
+julia> x = Qb(3+4im)
 Root 3.00000 + 4.00000*im of x^2 - 6x + 25
 
 julia> is_equal_abs(x, -x)
@@ -249,23 +251,25 @@ is_less_root_order(a::QQBarFieldElem, b::QQBarFieldElem)
 
 **Examples**
 
-```jldoctest; setup = :(QQBar = algebraic_closure(QQ))
-julia> root(QQBar(2), 5)
+```jldoctest
+julia> Qb =  algebraic_closure(QQ);
+
+julia> root(Qb(2), 5)
 Root 1.14870 of x^5 - 2
 
-julia> sinpi(QQBar(7) // 13)
+julia> sinpi(Qb(7) // 13)
 Root 0.992709 of 4096x^12 - 13312x^10 + 16640x^8 - 9984x^6 + 2912x^4 - 364x^2 + 13
 
-julia> tanpi(atanpi(sqrt(QQBar(2)) + 1))
+julia> tanpi(atanpi(sqrt(Qb(2)) + 1))
 Root 2.41421 of x^2 - 2x - 1
 
-julia> root_of_unity(QQBar, 5)
+julia> root_of_unity(Qb, 5)
 Root 0.309017 + 0.951057*im of x^4 + x^3 + x^2 + x + 1
 
-julia> root_of_unity(QQBar, 5, 4)
+julia> root_of_unity(Qb, 5, 4)
 Root 0.309017 - 0.951057*im of x^4 + x^3 + x^2 + x + 1
 
-julia> w = (1 - sqrt(QQBar(-3)))//2
+julia> w = (1 - sqrt(Qb(-3)))//2
 Root 0.500000 - 0.866025*im of x^2 - x + 1
 
 julia> is_root_of_unity(w)
@@ -304,8 +308,10 @@ atanpi(a::QQBarFieldElem)
 
 An algebraic number can be recovered from a numerical value:
 
-```jldoctest; setup = :(QQBar = algebraic_closure(QQ))
-julia> RR = RealField(); guess(QQBar, RR("1.41421356 +/- 1e-6"), 2)
+```jldoctest
+julia> Qb = algebraic_closure(QQ);
+
+julia> RR = RealField(); guess(Qb, RR("1.41421356 +/- 1e-6"), 2)
 Root 1.41421 of x^2 - 2
 ```
 
@@ -314,16 +320,18 @@ approximation, you should add an error estimate; otherwise, at best the only
 algebraic number that can be guessed is the binary floating-point number
 itself, at worst no guess is possible.
 
-```jldoctest; setup = :(QQBar = algebraic_closure(QQ))
+```jldoctest
+julia> Qb = algebraic_closure(QQ);
+
 julia> RR = RealField();
 
 julia> x = RR(0.1)       # note: 53-bit binary approximation of 1//10 without radius
 [0.10000000000000000555 +/- 1.12e-21]
 
-julia> guess(QQBar, x, 1)
+julia> guess(Qb, x, 1)
 ERROR: No suitable algebraic number found
 
-julia> guess(QQBar, x + RR("+/- 1e-10"), 1)
+julia> guess(Qb, x + RR("+/- 1e-10"), 1)
 Root 0.100000 of 10x - 1
 ```
 
@@ -332,4 +340,16 @@ Root 0.100000 of 10x - 1
 ```@docs
 guess
 ```
+
+# Important note on performance
+
+The default algebraic number type represents algebraic numbers
+in canonical form using minimal polynomials. This works well for representing
+individual algebraic numbers, but it does not provide the best
+performance for field arithmetic.
+For fast calculation in $\overline{\mathbb{Q}}$,
+`CalciumField` should typically be used instead (see the section
+on *Exact real and complex numbers*).
+Alternatively, to compute in a fixed subfield of $\overline{\mathbb{Q}}$,
+you may fix a generator $a$ and construct a number field to represent $\mathbb{Q}(a)$.
 

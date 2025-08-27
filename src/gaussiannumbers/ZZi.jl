@@ -484,6 +484,8 @@ function divrem(a::ZZiRingElem, b::ZZiRingElem)
   return q, a - q*b
 end
 
+divrem(a::ZZiRingElem, b::Integer) = divrem(a, ZZRingElem(b))
+
 function Base.div(a::ZZiRingElem, b::ZZiRingElem)
   return divrem(a, b)[1]
 end
@@ -496,7 +498,7 @@ function mod(a::ZZiRingElem, b::ZZiRingElem)
   return divrem(a, b)[2]
 end
 
-function divides(a::ZZiRingElem, b::Union{ZZRingElem, ZZiRingElem})
+function divides(a::ZZiRingElem, b::Union{Integer, ZZRingElem, ZZiRingElem})
   if iszero(b)
     return iszero(a), b
   end
