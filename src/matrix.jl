@@ -447,7 +447,6 @@ function reduce_mod!(A::QQMatrix, B::QQMatrix)
   end
 
   t = QQ()
-  _A = deepcopy(A)
   @assert ncols(A) == ncols(B)
   for h = 1:nrows(A)
     j = 1
@@ -456,28 +455,17 @@ function reduce_mod!(A::QQMatrix, B::QQMatrix)
         j += 1
       end
       if scale
-        error("WE")
         A[h, :] -= A[h, j] * (inv(B[i, j]) * B[i, :])
       else
         Aj = mat_entry_ptr(A, h, j)
-#        aj = A[h, j]
         for k = j+1:ncols(A)
-#          @assert aj == A[h, j]
-#          @assert A[h, k] == A[h, k]
           Ah = mat_entry_ptr(A, h, k)
           Bh = mat_entry_ptr(B, i, k)
-#          @assert aj == A[h, j]
           mul!(t, Aj, Bh)
-#          @assert t == A[h, j]*B[i, k]
-#          @assert aj == A[h, j]
           sub!(Ah, Ah, t)
-#          @show k
         end
         A[h, j] = 0
-#        _A[h, :] -= _A[h, j] * B[i, :]
-#        @assert _A[h, j] == 0
-#        @show h, i, A - _A
-#        @assert _A == A
+#        A[h, :] -= _A[h, j] * B[i, :]
       end
     end
   end
