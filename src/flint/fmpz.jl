@@ -3050,7 +3050,7 @@ function _rational_reconstruction(a::ZZRingElem, b::ZZRingElem; error_tolerant::
   if unbalanced
     n = ZZ()
     d = ZZ()
-    fl = ratcec!(n, d, a, b)
+    fl = _ratrec!(n, d, a, b)
     return fl, n, d
   elseif error_tolerant
     m = matrix(ZZ, 2, 2, [a, ZZRingElem(1), b, ZZRingElem(0)])
