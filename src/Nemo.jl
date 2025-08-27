@@ -226,7 +226,6 @@ function capture_stdout(f::Function)
     notify(started)
     try
       f()
-    catch
     finally
       Base.Libc.flush_cstdio()
       close(pipe.in)
