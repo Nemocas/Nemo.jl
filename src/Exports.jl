@@ -196,6 +196,7 @@ export finite_field
 export fits
 export flint_cleanup
 export flint_set_num_threads
+export FlintException
 export FlintLocalField
 export FlintLocalFieldElem
 export FlintPuiseuxSeriesElem
