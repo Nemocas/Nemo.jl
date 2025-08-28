@@ -439,6 +439,40 @@ function reduce_mod!(A::MatElem{T}, B::MatElem{T}) where {T<:FieldElem}
   return A
 end
 
+function reduce_mod!(A::QQMatrix, B::QQMatrix)
+  if is_rref(B)
+    scale = false
+  else
+    scale = true
+  end
+
+  t = QQ()
+  @assert ncols(A) == ncols(B)
+  for h = 1:nrows(A)
+    j = 1
+    for i = 1:nrows(B)
+      while is_zero_entry(B, i, j)
+        j += 1
+      end
+      if scale
+        A[h, :] -= A[h, j] * (inv(B[i, j]) * B[i, :])
+      else
+        Aj = mat_entry_ptr(A, h, j)
+        for k = j+1:ncols(A)
+          Ah = mat_entry_ptr(A, h, k)
+          Bh = mat_entry_ptr(B, i, k)
+          mul!(t, Aj, Bh)
+          sub!(Ah, Ah, t)
+        end
+        A[h, j] = 0
+#        A[h, :] -= _A[h, j] * B[i, :]
+      end
+    end
+  end
+  return A
+end
+
+
 @doc raw"""
     reduce_mod(A::MatElem{T}, B::MatElem{T}) where T <: FieldElem -> MatElem
 
