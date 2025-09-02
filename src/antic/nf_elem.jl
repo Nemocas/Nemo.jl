@@ -234,6 +234,11 @@ function Base.show(io::IO, a::AbsSimpleNumFieldElem)
   print(io, AbstractAlgebra.obj_to_string(a, context = io))
 end
 
+function pretty_lt(x::AbsSimpleNumFieldElem, y::AbsSimpleNumFieldElem)
+  return pretty_lt(parent(parent(x).pol)(x), parent(parent(y).pol)(y))
+end
+pretty_eq(x::AbsSimpleNumFieldElem, y::AbsSimpleNumFieldElem) = (x == y)
+
 ###############################################################################
 #
 #   Unary operators

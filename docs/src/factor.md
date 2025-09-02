@@ -13,7 +13,7 @@ the respective ring elements. This is best illustrated by an example.
 
 ```jldoctest
 julia> fac = factor(ZZ(-6000361807272228723606))
--1 * 2 * 229^3 * 43669^3 * 3
+-1 * 2 * 3 * 229^3 * 43669^3
 
 julia> unit(fac)
 -1
@@ -23,9 +23,9 @@ true
 
 julia> for (p, e) in fac; println("$p $e"); end
 2 1
+3 1
 229 3
 43669 3
-3 1
 
 julia> 229 in fac
 true

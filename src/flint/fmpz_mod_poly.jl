@@ -668,7 +668,7 @@ function factor(x::ZZModPolyRingElem)
   iszero(x) && throw(ArgumentError("Argument must be non-zero"))
   !is_probable_prime(modulus(x)) && error("Modulus not prime in factor")
   fac = _factor(x)
-  return Fac(parent(x)(leading_coefficient(x)), fac)
+  return Fac(parent(x)(leading_coefficient(x)), _pretty_sort(fac))
 end
 
 function _factor(x::ZZModPolyRingElem)
@@ -689,7 +689,7 @@ function factor_squarefree(x::ZZModPolyRingElem)
   iszero(x) && throw(ArgumentError("Argument must be non-zero"))
   !is_probable_prime(modulus(x)) && error("Modulus not prime in factor_squarefree")
   fac = _factor_squarefree(x)
-  return Fac(parent(x)(leading_coefficient(x)), fac)
+  return Fac(parent(x)(leading_coefficient(x)), _pretty_sort(fac))
 end
 
 function _factor_squarefree(x::ZZModPolyRingElem)

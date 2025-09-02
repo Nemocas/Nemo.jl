@@ -567,7 +567,7 @@ for (factor_fn, factor_fn_inner, flint_fn) in
          function $factor_fn(x::QQPolyRingElem)
            iszero(x) && throw(ArgumentError("Argument must be non-zero"))
            res, z = $factor_fn_inner(x)
-           return Fac(parent(x)(z), res)
+           return Fac(parent(x)(z), _pretty_sort(res))
          end
 
          function $factor_fn_inner(x::QQPolyRingElem)

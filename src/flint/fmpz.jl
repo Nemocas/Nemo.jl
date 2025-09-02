@@ -325,6 +325,8 @@ function show(io::IO, a::ZZRing)
   end
 end
 
+
+
 ###############################################################################
 #
 #   Canonicalisation
@@ -1550,11 +1552,14 @@ function is_squarefree(n::Union{Int, ZZRingElem})
   if e > 1
     return false
   end
-  return isone(maximum(values(factor(n).fac); init = 1))
+  return isone(maximum(y for (_,y) in factor(n); init = 1))
 end
 
 is_divisible_by_four(n::Integer) = (n % 4) == 0
 is_divisible_by_four(n::ZZRingElem) = ((n % UInt) % 4) == 0
+
+pretty_lt(x::ZZRingElem, y::ZZRingElem) = isless(x, y)
+pretty_eq(x::ZZRingElem, y::ZZRingElem) = (x == y)
 
 ################################################################################
 #

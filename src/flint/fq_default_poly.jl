@@ -530,7 +530,7 @@ end
 function factor(x::FqPolyRingElem)
   iszero(x) && throw(ArgumentError("Argument must be non-zero"))
   fac, z = _factor(x)
-  return Fac(parent(x)(z), fac)
+  return Fac(parent(x)(z), _pretty_sort(fac))
 end
 
 function _factor(x::FqPolyRingElem)
@@ -553,7 +553,7 @@ function factor_squarefree(x::FqPolyRingElem)
   iszero(x) && throw(ArgumentError("Argument must be non-zero"))
   # _factor_squareefree does weird things if the polynomial is not monic
   return Fac(parent(x)(leading_coefficient(x)),
-             _factor_squarefree(divexact(x, leading_coefficient(x))))
+             _pretty_sort(_factor_squarefree(divexact(x, leading_coefficient(x)))))
 end
 
 function _factor_squarefree(x::FqPolyRingElem)

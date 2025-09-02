@@ -555,6 +555,12 @@ end
 
   @test length(R) == 2
   @test R == Dict(3=>1, 1=>2)
+
+
+  R, = residue_ring(ZZ, ZZ(7))
+  Rx, x = R[:x]
+  @test collect(factor(x * (x + 1) * (x^2 + 1))) ==
+        [x => 1, x + 1 => 1, x^2 + 1 => 1]
 end
 
 @testset "ZZModPolyRingElem.roots" begin

@@ -1073,13 +1073,13 @@ end
 
   fact = factor(ZZRingElem(-1))
 
-  @test fact.fac == Dict{ZZRingElem, Int}()
+  @test collect(fact) == Pair{ZZRingElem, Int}[]
 
   fact = factor(ZZRingElem(-2))
 
   @test occursin("2", sprint(show, "text/plain", fact))
 
-  @test fact.fac == Dict(ZZRingElem(2) => 1)
+  @test collect(fact) == [ZZRingElem(2) => 1]
   @test unit(fact) == -1
 
   @test_throws ArgumentError factor(ZZRingElem(0))
@@ -1106,20 +1106,20 @@ end
 
   fact = factor(-1)
 
-  @test fact.fac == Dict{Int, Int}()
+  @test collect(fact) == Pair{Int, Int}[]
 
   fact = factor(-2)
 
   @test occursin("2", sprint(show, "text/plain", fact))
 
-  @test fact.fac == Dict(2 => 1)
+  @test collect(fact) == [2 => 1]
   @test unit(fact) == -1
 
   @test_throws ArgumentError factor(0)
   @test_throws ArgumentError factor(UInt(0))
 
   fact = factor(next_prime(3*UInt(2)^62))
-  @test length(fact.fac) == 1
+  @test length(fact) == 1
 
   n = ZZRingElem(2 * 1125899906842679)
   b, f = Nemo.ecm(n)

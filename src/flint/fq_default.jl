@@ -347,6 +347,31 @@ function show(io::IO, a::FqField)
   end
 end
 
+function pretty_lt(x::FqFieldElem, y::FqFieldElem)
+  c(x, k) = is_absolute(parent(x)) ? _coeff(x, k) : coeff(x, k)
+  vx = []
+  found = false
+  for i in degree(parent(x)):-1:0
+    if !found && is_zero(c(x, i))
+      continue
+    end
+    found = true
+    pushfirst!(vx, c(x, i))
+  end
+  vy = []
+  found = false
+  for i in degree(parent(y)):-1:0
+    if !found && is_zero(c(y, i))
+      continue
+    end
+    found = true
+    pushfirst!(vy, c(y, i))
+  end
+  return pretty_lt_lex(vx, vy)
+end
+pretty_eq(x::FqFieldElem, y::FqFieldElem) = (x == y)
+
+
 ###############################################################################
 #
 #   Unary operations
