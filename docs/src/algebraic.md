@@ -20,6 +20,25 @@ julia> algebraic_closure(QQ)
 Algebraic closure of rational field
 ```
 
+### Printing
+
+Before looking at examples, we comment on the printing of algebraic numbers.
+As an illustration, consider the algebraic number $\sqrt[3]{2}$ with minimal polynomial $X^3 - 2$. This is printed as follows:
+
+```jldoctest
+julia> Qbar = algebraic_closure(QQ);
+
+julia> z = root(Qbar(2), 3)
+{a3: 1.25992}
+
+julia> Qx, x = QQ[:x]
+(Univariate polynomial ring in x over QQ, x)
+
+julia> minpoly(Qx, z) # to see the minimal polynomial
+x^3 - 2
+```
+The first part `a3` indicates that this is an algebraic number of degree $3$, which is followed by `1.25992`, the approximation of the root.
+
 ## Algebraic number functionality
 
 Methods to construct algebraic numbers include:
@@ -45,7 +64,7 @@ julia> QQFieldElem(Qb(3) // 2)
 3//2
 
 julia> Qb(-1) ^ (Qb(1) // 3)
-Root 0.500000 + 0.866025*im of x^2 - x + 1
+{a2: 0.500000 + 0.866025*im}
 ```
 
 Solving the quintic equation:
@@ -58,11 +77,11 @@ julia> R, x = polynomial_ring(QQ, "x")
 
 julia> v = roots(Qb, x^5-x-1)
 5-element Vector{QQBarFieldElem}:
- Root 1.16730 of x^5 - x - 1
- Root 0.181232 + 1.08395*im of x^5 - x - 1
- Root 0.181232 - 1.08395*im of x^5 - x - 1
- Root -0.764884 + 0.352472*im of x^5 - x - 1
- Root -0.764884 - 0.352472*im of x^5 - x - 1
+ {a5: 1.16730}
+ {a5: 0.181232 + 1.08395*im}
+ {a5: 0.181232 - 1.08395*im}
+ {a5: -0.764884 + 0.352472*im}
+ {a5: -0.764884 - 0.352472*im}
 
 julia> v[1]^5 - v[1] - 1 == 0
 true
@@ -75,9 +94,9 @@ julia> Qb = algebraic_closure(QQ);
 
 julia> eigenvalues(Qb, ZZ[1 1 0; 0 1 1; 1 0 1])
 3-element Vector{QQBarFieldElem}:
- Root 2.00000 of x - 2
- Root 0.500000 + 0.866025*im of x^2 - x + 1
- Root 0.500000 - 0.866025*im of x^2 - x + 1
+ {a1: 2.00000}
+ {a2: 0.500000 + 0.866025*im}
+ {a2: 0.500000 - 0.866025*im}
 ```
 
 **Interface**
@@ -125,8 +144,8 @@ x^2 - 2*x + 5
 
 julia> conjugates(Qb(1+2im))
 2-element Vector{QQBarFieldElem}:
- Root 1.00000 + 2.00000*im of x^2 - 2x + 5
- Root 1.00000 - 2.00000*im of x^2 - 2x + 5
+ {a2: 1.00000 + 2.00000*im}
+ {a2: 1.00000 - 2.00000*im}
 ```
 
 **Interface**
@@ -156,16 +175,16 @@ height_bits(x::QQBarFieldElem)
 julia> Qb = algebraic_closure(QQ);
 
 julia> real(sqrt(Qb(1im)))
-Root 0.707107 of 2x^2 - 1
+{a2: 0.707107}
 
 julia> abs(sqrt(Qb(1im)))
-Root 1.00000 of x - 1
+{a1: 1.00000}
 
 julia> floor(sqrt(Qb(1000)))
-Root 31.0000 of x - 31
+{a1: 31.0000}
 
 julia> sign(Qb(-10-20im))
-Root -0.447214 - 0.894427*im of 5x^4 + 6x^2 + 5
+{a4: -0.447214 - 0.894427*im}
 ```
 
 **Interface**
@@ -219,7 +238,7 @@ julia> 1 < sqrt(Qb(2)) < Qb(3)//2
 true
 
 julia> x = Qb(3+4im)
-Root 3.00000 + 4.00000*im of x^2 - 6x + 25
+{a2: 3.00000 + 4.00000*im}
 
 julia> is_equal_abs(x, -x)
 true
@@ -255,22 +274,22 @@ is_less_root_order(a::QQBarFieldElem, b::QQBarFieldElem)
 julia> Qb =  algebraic_closure(QQ);
 
 julia> root(Qb(2), 5)
-Root 1.14870 of x^5 - 2
+{a5: 1.14870}
 
 julia> sinpi(Qb(7) // 13)
-Root 0.992709 of 4096x^12 - 13312x^10 + 16640x^8 - 9984x^6 + 2912x^4 - 364x^2 + 13
+{a12: 0.992709}
 
 julia> tanpi(atanpi(sqrt(Qb(2)) + 1))
-Root 2.41421 of x^2 - 2x - 1
+{a2: 2.41421}
 
 julia> root_of_unity(Qb, 5)
-Root 0.309017 + 0.951057*im of x^4 + x^3 + x^2 + x + 1
+{a4: 0.309017 + 0.951057*im}
 
 julia> root_of_unity(Qb, 5, 4)
-Root 0.309017 - 0.951057*im of x^4 + x^3 + x^2 + x + 1
+{a4: 0.309017 - 0.951057*im}
 
 julia> w = (1 - sqrt(Qb(-3)))//2
-Root 0.500000 - 0.866025*im of x^2 - x + 1
+{a2: 0.500000 - 0.866025*im}
 
 julia> is_root_of_unity(w)
 true
@@ -312,7 +331,7 @@ An algebraic number can be recovered from a numerical value:
 julia> Qb = algebraic_closure(QQ);
 
 julia> RR = real_field(); guess(Qb, RR("1.41421356 +/- 1e-6"), 2)
-Root 1.41421 of x^2 - 2
+{a2: 1.41421}
 ```
 
 Warning: the input should be an enclosure. If you have a floating-point
@@ -332,7 +351,7 @@ julia> guess(Qb, x, 1)
 ERROR: No suitable algebraic number found
 
 julia> guess(Qb, x + RR("+/- 1e-10"), 1)
-Root 0.100000 of 10x - 1
+{a1: 0.100000}
 ```
 
 **Interface**

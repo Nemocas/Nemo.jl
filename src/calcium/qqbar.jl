@@ -87,14 +87,20 @@ end
 function expressify(a::QQBarFieldElem; context = nothing)
   R, _ = polynomial_ring(ZZ, :x; cached=false)
   f = minpoly(R, a)
-
-  f_str = replace(string(f), "*" => "")
-  return Expr(:sequence, Expr(:text, "Root "), Expr(:text, _native_string(a)), Expr(:text, " of "), Expr(:text, f_str))
+  fl = context isa IOContext && get(context, :compact, false)
+  # use 6 digits normally and 3 in matrices and julia Array
+  prec = fl ? 3 : 6
+  return Expr(:list, Expr(:sequence, Expr(:text, "a$(degree(f)): "), Expr(:text, _native_string(a, prec))))
 end
+
+function AbstractAlgebra.show_via_expressify(io::IO, mi::MIME, obj::QQBarFieldElem; context = nothing)
+   AbstractAlgebra.PrettyPrinting.show_obj(io, mi, AbstractAlgebra.PrettyPrinting.canonicalize(expressify(obj, context = io)))
+end
+
 @enable_all_show_via_expressify QQBarFieldElem
 
-function _native_string(x::QQBarFieldElem)
-  cstr = @ccall libflint.qqbar_get_str_nd(x::Ref{QQBarFieldElem}, Int(6)::Int)::Ptr{UInt8}
+function _native_string(x::QQBarFieldElem, prec = 6)
+  cstr = @ccall libflint.qqbar_get_str_nd(x::Ref{QQBarFieldElem}, Int(prec)::Int)::Ptr{UInt8}
   number = unsafe_string(cstr)
   @ccall libflint.flint_free(cstr::Ptr{UInt8})::Nothing
 
@@ -991,7 +997,7 @@ Throws if this value is transcendental.
 julia> QQBar = algebraic_closure(QQ);
 
 julia> x = sinpi(QQBar(1//3))
-Root 0.866025 of 4x^2 - 3
+{a2: 0.866025}
 ```
 """
 function sinpi(a::QQBarFieldElem)
@@ -1015,7 +1021,7 @@ Throws if this value is transcendental.
 julia> QQBar = algebraic_closure(QQ);
 
 julia> x = cospi(QQBar(1//6))
-Root 0.866025 of 4x^2 - 3
+{a2: 0.866025}
 ```
 """
 function cospi(a::QQBarFieldElem)
@@ -1039,7 +1045,7 @@ Throws if either value is transcendental.
 julia> QQBar = algebraic_closure(QQ);
 
 julia> s, c = sincospi(QQBar(1//3))
-(Root 0.866025 of 4x^2 - 3, Root 0.500000 of 2x - 1)
+({a2: 0.866025}, {a1: 0.500000})
 ```
 """
 function sincospi(a::QQBarFieldElem)
@@ -1490,7 +1496,7 @@ julia> K = algebraic_closure(QQ)
 Algebraic closure of rational field
 
 julia> sqrt(K(2))
-Root 1.41421 of x^2 - 2
+{a2: 1.41421}
 ```
 """
 algebraic_closure(::QQField) = QQBarField()

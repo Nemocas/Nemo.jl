@@ -166,7 +166,7 @@ julia> QQ(C(1))
 1
 
 julia> algebraic_closure(QQ)(sqrt(C(2)) // 2)
-Root 0.707107 of 2x^2 - 1
+{a2: 0.707107}
 
 julia> QQ(C(pi))
 ERROR: unable to convert to a rational number
