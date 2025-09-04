@@ -49,7 +49,7 @@ set_precision!(f::Any, ::Type{Balls}, n::Int)
 In order to construct real balls in Nemo, one must first construct the Arb
 real field itself. This is accomplished with the following constructor.
 
-```julia
+```@docs
 real_field()
 ```
 

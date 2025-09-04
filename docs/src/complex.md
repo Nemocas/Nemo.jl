@@ -42,7 +42,7 @@ See [Precision management](@ref precision_management).
 In order to construct complex boxes in Nemo, one must first construct the Arb
 complex field itself. This is accomplished with the following constructor.
 
-```
+```@docs
 complex_field()
 ```
 
