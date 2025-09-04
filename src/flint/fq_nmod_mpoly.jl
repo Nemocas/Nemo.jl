@@ -112,11 +112,8 @@ function coeff(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
 end
 
 function trailing_coefficient(p::fqPolyRepMPolyRingElem)
-  if iszero(p)
-    return zero(base_ring(p))
-  else
-    return coeff(p, length(p))
-  end
+  @req !iszero(p) "Zero polynomial does not have a leading monomial"
+  return coeff(p, length(p))
 end
 
 ###############################################################################

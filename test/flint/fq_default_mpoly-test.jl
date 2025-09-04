@@ -241,7 +241,7 @@ begin
       @test trailing_coefficient(3x^2*y^2 + 2x*y + 5x) == 5
       @test trailing_coefficient(x) == 1
       @test trailing_coefficient(S(2)) == 2
-      @test trailing_coefficient(S()) == 0
+      @test_throws ArgumentError trailing_coefficient(S())
     end
 
     for (R, a) in test_fields
