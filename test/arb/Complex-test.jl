@@ -1,7 +1,8 @@
-RR = RealField()
-CC = ComplexField()
+RR = real_field()
+CC = complex_field()
 
 @testset "ComplexFieldElem.constructors" begin
+  @test complex_field() === CC
   @test isa(CC, ComplexField)
   @test isa(CC(2), FieldElem)
 
@@ -522,7 +523,7 @@ end
 end
 
 @testset "ComplexFieldElem.rand" begin
-  C = ComplexField()
+  C = complex_field()
 
   n = 100
   for _ in 1:n

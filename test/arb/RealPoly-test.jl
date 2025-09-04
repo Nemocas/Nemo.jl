@@ -1,4 +1,4 @@
-RR = RealField()
+RR = real_field()
 coeff_types = [Int8, Int, UInt, BigInt,
                Float32, Float64, BigFloat,
                Rational{Int8}, Rational{Int}, Rational{BigInt},
@@ -84,7 +84,7 @@ end
 end
 
 @testset "RealPolyRingElem.polynomial" begin
-  R = RealField()
+  R = real_field()
 
   f = polynomial(R, [])
   g = polynomial(R, [1, 2, 3])
@@ -104,7 +104,7 @@ end
 end
 
 @testset "RealPolyRingElem.similar" begin
-  R = RealField()
+  R = real_field()
 
   f = polynomial(R, [1, 2, 3])
   g = similar(f)

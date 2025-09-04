@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-base_ring(a::ComplexMatrix) = ComplexField()
+base_ring(a::ComplexMatrix) = complex_field()
 
 dense_matrix_type(::Type{ComplexFieldElem}) = ComplexMatrix
 

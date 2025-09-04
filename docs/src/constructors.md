@@ -86,5 +86,5 @@ they represent.
 | $S = \mathrm{Mat}_{m\times n}(R)$     | `S = matrix_space(R, m, n)`                   |
 | $S = \mathbb{Q}[x]/(f)$               | `S, a = number_field(f, "a")`                 |
 | $S = \mathbb{Q}_p$ (to precision $N$) | `S = PadicField(p, n)`                        |
-| $S = \mathbb{R}$                      | `S = RealField()`                             |
-| $S = \mathbb{C}$                      | `S = ComplexField()`                          |
+| $S = \mathbb{R}$                      | `S = real_field()`                             |
+| $S = \mathbb{C}$                      | `S = complex_field()`                          |

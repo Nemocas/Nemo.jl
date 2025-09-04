@@ -1,4 +1,4 @@
-RR = RealField()
+RR = real_field()
 
 @testset "RealMatrix.constructors" begin
   @test_throws ErrorException matrix_space(RR, -1, 5)
