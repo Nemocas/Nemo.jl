@@ -1183,7 +1183,7 @@ function guess(R::QQBarField, x::ArbFieldElem, maxdeg::Int, maxbits::Int=0)
 end
 
 function guess(R::QQBarField, x::RealFieldElem, maxdeg::Int, maxbits::Int=0)
-  CC = ComplexField()
+  CC = complex_field()
   return guess(R, CC(x), maxdeg, maxbits)
 end
 

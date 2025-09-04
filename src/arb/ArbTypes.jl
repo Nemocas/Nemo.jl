@@ -271,10 +271,10 @@ Set the precision for all ball arithmetic to be `n`.
 # Examples
 
 ```julia
-julia> const_pi(RealField())
+julia> const_pi(real_field())
 [3.141592653589793239 +/- 5.96e-19]
 
-julia> set_precision!(Balls, 200); const_pi(RealField())
+julia> set_precision!(Balls, 200); const_pi(real_field())
 [3.14159265358979323846264338327950288419716939937510582097494 +/- 5.73e-60]
 ```
 """
@@ -308,12 +308,12 @@ Change ball arithmetic precision to `n` for the duration of `f`..
 
 ```jldoctest
 julia> set_precision!(Balls, 4) do
-         const_pi(RealField())
+         const_pi(real_field())
        end
 [3e+0 +/- 0.376]
 
 julia> set_precision!(Balls, 200) do
-         const_pi(RealField())
+         const_pi(real_field())
        end
 [3.1415926535897932385 +/- 3.74e-20]
 ```
@@ -511,7 +511,7 @@ parent(x::RealPolyRingElem) = x.parent
 
 var(x::RealPolyRing) = x.S
 
-base_ring(a::RealPolyRing) = RealField()
+base_ring(a::RealPolyRing) = real_field()
 
 # fixed precision
 
@@ -677,7 +677,7 @@ parent(x::ComplexPolyRingElem) = x.parent
 
 var(x::ComplexPolyRing) = x.S
 
-base_ring(a::ComplexPolyRing) = ComplexField()
+base_ring(a::ComplexPolyRing) = complex_field()
 
 # fixed precision
 

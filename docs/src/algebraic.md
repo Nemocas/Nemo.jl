@@ -311,7 +311,7 @@ An algebraic number can be recovered from a numerical value:
 ```jldoctest
 julia> Qb = algebraic_closure(QQ);
 
-julia> RR = RealField(); guess(Qb, RR("1.41421356 +/- 1e-6"), 2)
+julia> RR = real_field(); guess(Qb, RR("1.41421356 +/- 1e-6"), 2)
 Root 1.41421 of x^2 - 2
 ```
 
@@ -323,7 +323,7 @@ itself, at worst no guess is possible.
 ```jldoctest
 julia> Qb = algebraic_closure(QQ);
 
-julia> RR = RealField();
+julia> RR = real_field();
 
 julia> x = RR(0.1)       # note: 53-bit binary approximation of 1//10 without radius
 [0.10000000000000000555 +/- 1.12e-21]

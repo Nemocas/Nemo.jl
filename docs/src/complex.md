@@ -43,7 +43,7 @@ In order to construct complex boxes in Nemo, one must first construct the Arb
 complex field itself. This is accomplished with the following constructor.
 
 ```
-ComplexField()
+complex_field()
 ```
 
 Here is an example of creating an Arb complex field and using the resulting
@@ -52,7 +52,7 @@ parent object to coerce values into the resulting field.
 **Examples**
 
 ```jldoctest
-julia> CC = ComplexField()
+julia> CC = complex_field()
 Complex field
 
 julia> a = CC("0.25")
@@ -89,7 +89,7 @@ onei(::ComplexField)
 
 **Examples**
 
-```jldoctest; setup = :(CC = ComplexField())
+```jldoctest; setup = :(CC = complex_field())
 julia> c = onei(CC)
 1.0000000000000000000*im
 ```
@@ -181,10 +181,10 @@ return it. A copy of the original is not made.
 Here are some examples of coercing elements into the Arb complex field.
 
 ```jldoctest
-julia> RR = RealField()
+julia> RR = real_field()
 Real field
 
-julia> CC = ComplexField()
+julia> CC = complex_field()
 Complex field
 
 julia> a = CC(3)
@@ -234,7 +234,7 @@ accuracy_bits(::ComplexFieldElem)
 
 **Examples**
 
-```jldoctest; setup = :(CC = ComplexField())
+```jldoctest; setup = :(CC = complex_field())
 julia> a = CC("1.2 +/- 0.001")
 [1.20 +/- 1.01e-3]
 
@@ -289,7 +289,7 @@ contains_zero(::ComplexFieldElem)
 
 **Examples**
 
-```jldoctest; setup = :(CC = ComplexField())
+```jldoctest; setup = :(CC = complex_field())
 julia> x = CC("1 +/- 0.001")
 [1.00 +/- 1.01e-3]
 
@@ -340,7 +340,7 @@ Function                     |
 
 **Examples**
 
-```jldoctest; setup = :(CC = ComplexField())
+```jldoctest; setup = :(CC = complex_field())
 julia> x = CC("1 +/- 0.001")
 [1.00 +/- 1.01e-3]
 
@@ -367,7 +367,7 @@ true
 
 **Examples**
 
-```jldoctest; setup = :(CC = ComplexField())
+```jldoctest; setup = :(CC = complex_field())
 julia> x = CC("-1 +/- 0.001")
 [-1.00 +/- 1.01e-3]
 
@@ -379,7 +379,7 @@ julia> a = abs(x)
 
 **Examples**
 
-```jldoctest; setup = :(CC = ComplexField())
+```jldoctest; setup = :(CC = complex_field())
 julia> x = CC("-3 +/- 0.001")
 [-3.00 +/- 1.01e-3]
 
@@ -402,7 +402,7 @@ unique_integer(::ComplexFieldElem)
 
 **Examples**
 
-```jldoctest; setup = :(CC = ComplexField())
+```jldoctest; setup = :(CC = complex_field())
 julia> x = CC("-3 +/- 0.001", "0.1")
 [-3.00 +/- 1.01e-3] + [0.100000000000000000 +/- 1.22e-20]*im
 
@@ -429,7 +429,7 @@ const_pi(::ComplexField)
 **Examples**
 
 ```julia
-CC = ComplexField()
+CC = complex_field()
 set_precision!(ComplexField, 200) do
   a = const_pi(CC)
 end
@@ -664,7 +664,7 @@ weierstrass_p(::ComplexFieldElem, ::ComplexFieldElem)
 
 **Examples**
 
-```jldoctest; setup = :(CC = ComplexField())
+```jldoctest; setup = :(CC = complex_field())
 julia> s = CC(1, 2)
 1.0000000000000000000 + 2.0000000000000000000*im
 
@@ -696,7 +696,7 @@ lindep(A::Matrix{ComplexFieldElem}, bits::Int)
 
 **Examples**
 
-```jldoctest; setup = :(CC = ComplexField())
+```jldoctest; setup = :(CC = complex_field())
 julia> # These are two of the roots of x^5 + 3x + 1
 
 julia> a = CC(1.0050669478588622428791051888364775253, -0.93725915669289182697903585868761513585)

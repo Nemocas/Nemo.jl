@@ -1,5 +1,5 @@
-CC = ComplexField()
-RR = RealField()
+CC = complex_field()
+RR = real_field()
 
 @testset "ComplexMatrix.constructors" begin
   @test_throws ErrorException matrix_space(CC, -1, 5)

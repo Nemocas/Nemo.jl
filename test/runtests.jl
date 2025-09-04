@@ -30,8 +30,8 @@ end
                          finite_field(ZZRingElem(3), 2, "b")[1] => FqPolyRepMatrix,
                          ArbField()                      => ArbMatrix,
                          AcbField()                      => AcbMatrix,
-                         RealField()                     => RealMatrix,
-                         ComplexField()                  => ComplexMatrix,
+                         real_field()                    => RealMatrix,
+                         complex_field()                 => ComplexMatrix,
                         )
 
 @everywhere include("rand.jl")

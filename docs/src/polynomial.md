@@ -67,7 +67,7 @@ evaluate2(::ComplexPolyRingElem, ::ComplexFieldElem)
 **Examples**
 
 ```jldoctest
-julia> RR = RealField()
+julia> RR = real_field()
 Real field
 
 julia> T, z = polynomial_ring(RR, "z")
@@ -96,7 +96,7 @@ roots(::ComplexPolyRingElem)
 **Examples**
 
 ```jldoctest
-julia> CC = ComplexField()
+julia> CC = complex_field()
 Complex field
 
 julia> C, y = polynomial_ring(CC, "y")
@@ -136,7 +136,7 @@ from_roots(::AcbPolyRing, ::Vector{AcbFieldElem})
 **Examples**
 
 ```jldoctest
-julia> RR = RealField()
+julia> RR = real_field()
 Real field
 
 julia> R, x = polynomial_ring(RR, "x")
@@ -229,7 +229,7 @@ unique_integer(::ComplexPolyRingElem)
 **Examples**
 
 ```jldoctest
-julia> RR = RealField()
+julia> RR = real_field()
 Real field
 
 julia> R, x = polynomial_ring(RR, "x")
@@ -255,7 +255,7 @@ julia> t, z = unique_integer(k)
 ```
 
 ```jldoctest
-julia> CC = ComplexField()
+julia> CC = complex_field()
 Complex field
 
 julia> C, y = polynomial_ring(CC, "y")

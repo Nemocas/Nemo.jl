@@ -82,6 +82,7 @@ export coeffs_raw
 export combine_like_terms!
 export combit!
 export compare_index
+export complex_field
 export complex_normal_form
 export ComplexField
 export ComplexFieldElem
@@ -520,6 +521,7 @@ export Rational
 export rational_field
 #export rational_reconstruction
 export real
+export real_field
 export RealField
 export RealFieldElem
 export RealMatrix
