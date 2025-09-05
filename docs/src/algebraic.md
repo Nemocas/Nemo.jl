@@ -37,7 +37,7 @@ julia> Qx, x = QQ[:x]
 julia> minpoly(Qx, z) # to see the minimal polynomial
 x^3 - 2
 ```
-The first part `a3` indicates that this is an algebraic number of degree $3$, which is followed by `1.25992`, the approximation of the root.
+The first part `a3` indicates that this is an algebraic number of degree $3$, which is followed by `1.25992`, an approximation of the root.
 
 ## Algebraic number functionality
 
