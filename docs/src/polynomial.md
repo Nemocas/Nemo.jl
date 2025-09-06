@@ -309,10 +309,10 @@ julia> g = x^3 + 3x + 1
 x^3 + 3*x + 1
 
 julia> R = factor(f*g)
-1 * (x + 1)^2 * (x^3 + 3*x + 1)
+(x + 1)^2 * (x^3 + 3*x + 1)
 
 julia> S = factor_squarefree(f*g)
-1 * (x + 1)^2 * (x^3 + 3*x + 1)
+(x + 1)^2 * (x^3 + 3*x + 1)
 
 julia> T = factor_distinct_deg((x + 1)*g*(x^5+x^3+x+1))
 Dict{Int64, zzModPolyRingElem} with 3 entries:

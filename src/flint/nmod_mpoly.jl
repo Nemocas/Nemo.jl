@@ -126,11 +126,8 @@ for (etype, rtype, ftype, ctype, utype) in (
     end
 
     function trailing_coefficient(p::($etype))
-      if iszero(p)
-        return zero(base_ring(p))
-      else
-        return coeff(p, length(p))
-      end
+      @req !iszero(p) "Zero polynomial does not have a leading monomial"
+      return coeff(p, length(p))
     end
 
     ###############################################################################
