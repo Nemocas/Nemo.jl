@@ -53,24 +53,24 @@ end
 
   # with basic interpolation
   @test_throws FlintException(Nemo.FLINT_ERROR, "Foo 42 bar") @ccall Nemo.libflint.flint_throw(
-    Nemo.FLINT_ERROR::Int, "Foo %d bar"::Cstring, 42::Cint
+    Nemo.FLINT_ERROR::Int, "Foo %d bar"::Cstring; 42::Cint
   )::Nothing
   @test_throws FlintException(Nemo.FLINT_ERROR, "Foo 42  9 bar") @ccall Nemo.libflint.flint_throw(
-    Nemo.FLINT_ERROR::Int, "Foo %d %2d bar"::Cstring, 42::Cint, 9::Cint
+    Nemo.FLINT_ERROR::Int, "Foo %d %2d bar"::Cstring; 42::Cint, 9::Cint
   )::Nothing
   @test_throws FlintException(Nemo.FLINT_ERROR, "Foo foobar bar") @ccall Nemo.libflint.flint_throw(
-    Nemo.FLINT_ERROR::Int, "Foo %s bar"::Cstring, "foobar"::Cstring
+    Nemo.FLINT_ERROR::Int, "Foo %s bar"::Cstring; "foobar"::Cstring
   )::Nothing
 
   # with flint interpolation
   @test_throws FlintException(Nemo.FLINT_ERROR, "Foo 42 bar") @ccall Nemo.libflint.flint_throw(
-    Nemo.FLINT_ERROR::Int, "Foo %{fmpz} bar"::Cstring, ZZ(42)::Ref{ZZRingElem}
+    Nemo.FLINT_ERROR::Int, "Foo %{fmpz} bar"::Cstring; ZZ(42)::Ref{ZZRingElem}
   )::Nothing
   @test_throws FlintException(Nemo.FLINT_ERROR, "Foo 1267650600228229401496703205376 bar") @ccall Nemo.libflint.flint_throw(
-    Nemo.FLINT_ERROR::Int, "Foo %{fmpz} bar"::Cstring, (ZZ(2)^100)::Ref{ZZRingElem}
+    Nemo.FLINT_ERROR::Int, "Foo %{fmpz} bar"::Cstring; (ZZ(2)^100)::Ref{ZZRingElem}
   )::Nothing
   @test_throws FlintException(Nemo.FLINT_ERROR, "Foo 2 / 3 bar") @ccall Nemo.libflint.flint_throw(
-    Nemo.FLINT_ERROR::Int, "Foo %{fmpq} bar"::Cstring, QQ(2, 3)::Ref{QQFieldElem}
+    Nemo.FLINT_ERROR::Int, "Foo %{fmpq} bar"::Cstring; QQ(2, 3)::Ref{QQFieldElem}
   )::Nothing
 end
 
