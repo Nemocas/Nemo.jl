@@ -72,13 +72,13 @@ julia> K = algebraic_closure(QQ)
 Algebraic closure of rational field
 
 julia> sqrt(K(2))
-Root 1.41421 of x^2 - 2
+{a2: 1.41421}
 
 julia> QQBar(2//3)
-Root 0.666667 of 3x - 2
+{a1: 0.666667}
 
 julia> sinpi(QQBar(2//3))
-Root 0.866025 of 4x^2 - 3
+{a2: 0.866025}
 ```
 """
 
