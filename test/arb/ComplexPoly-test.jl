@@ -1,5 +1,5 @@
-RR = RealField()
-CC = ComplexField()
+RR = real_field()
+CC = complex_field()
 coeff_types = [Int8, Int, UInt, BigInt,
                Float32, Float64, BigFloat,
                Rational{Int8}, Rational{Int}, Rational{BigInt},
@@ -395,7 +395,7 @@ end
 end
 
 @testset "Issue #1587" begin
-  CC = ComplexField()
+  CC = complex_field()
   R, t = polynomial_ring(CC, "t")
   D, Dt = polynomial_ring(R, "Dt")
   A_scalarform = t^3 * (32 * t^2 - 1) * (32 * t^2 + 1) * Dt^4 + 2 * t^2 * (7168 * t^4 - 3) * Dt^3 + t * (55296 * t^4 - 7) * Dt^2 + (61440 * t^4 - 1) * Dt + 12288 * t^3

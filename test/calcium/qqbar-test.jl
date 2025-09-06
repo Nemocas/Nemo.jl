@@ -273,8 +273,8 @@ end
     @test round(ZZRingElem, e, RoundNearest) == rn && round(ZZRingElem, e, RoundNearest) isa ZZRingElem
   end
 
-  RR = RealField()
-  CC = ComplexField()
+  RR = real_field()
+  CC = complex_field()
 
   @test RR(QQBarFieldElem(3)) == 3
   @test CC(QQBarFieldElem(3)) == 3
@@ -447,7 +447,7 @@ end
     for i in 1:10
       a = rand(R, degree=5, bits=5)
       b = ComplexF64(a)
-      @test contains(ComplexField()(a), ComplexField()(b))
+      @test contains(complex_field()(a), complex_field()(b))
     end
   end
 

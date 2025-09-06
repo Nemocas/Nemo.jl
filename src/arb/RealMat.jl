@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-base_ring(a::RealMatrix) = RealField()
+base_ring(a::RealMatrix) = real_field()
 
 dense_matrix_type(::Type{RealFieldElem}) = RealMatrix
 

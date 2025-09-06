@@ -7,6 +7,17 @@
 #
 ###############################################################################
 
+@doc raw"""
+    real_field()
+
+Return the field of real numbers modelled via real balls.
+
+See `precision` and `set_precision!` on how to control the precision.
+"""
+function real_field()
+  return RealField()
+end
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -21,7 +32,7 @@ base_ring_type(::Type{RealField}) = typeof(Union{})
 
 base_ring(R::RealField) = Union{}
 
-parent(x::RealFieldElem) = RealField()
+parent(x::RealFieldElem) = real_field()
 
 is_domain_type(::Type{RealFieldElem}) = true
 
@@ -1766,7 +1777,7 @@ returns an array of Nemo integers representing the linear combination.
 # Examples
 
 ```jldoctest
-julia> RR = RealField()
+julia> RR = real_field()
 Real field
 
 julia> a = RR(-0.33198902958450931620250069492231652319)
@@ -1821,7 +1832,7 @@ b_2$ and $a_1 < a_2$.
 # Examples
 
 ```jldoctest
-julia> RR = RealField()
+julia> RR = real_field()
 Real field
 
 julia> simplest_rational_inside(const_pi(RR))

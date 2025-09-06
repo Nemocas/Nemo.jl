@@ -49,8 +49,8 @@ set_precision!(f::Any, ::Type{Balls}, n::Int)
 In order to construct real balls in Nemo, one must first construct the Arb
 real field itself. This is accomplished with the following constructor.
 
-```julia
-RealField()
+```@docs
+real_field()
 ```
 
 Here is an example of creating the real field and using the resulting
@@ -59,7 +59,7 @@ parent object to coerce values into the resulting field.
 **Examples**
 
 ```jldoctest
-julia> RR = RealField()
+julia> RR = real_field()
 Real field
 
 julia> a = RR("0.25")
@@ -94,7 +94,7 @@ Using coercion into the real field, new elements can be created.
 
 **Examples**
 
-```jldoctest; setup = :(RR = RealField())
+```jldoctest; setup = :(RR = real_field())
 julia> c = RR(1)
 1.0000000000000000000
 
@@ -104,7 +104,7 @@ julia> d = RR(1//2)
 
 Note that for the construction, also the precision can be supplied:
 
-```jldoctest; setup = :(RR = RealField())
+```jldoctest; setup = :(RR = real_field())
 julia> c = RR(1//3, precision=100)
 [0.33333333333333333333 +/- 3.34e-21]
 
@@ -114,7 +114,7 @@ julia> d = RR(1//3, precision=4)
 
 ### Conversions
 
-```jldoctest; setup = :(RR = RealField())
+```jldoctest; setup = :(RR = real_field())
 julia> convert(Float64, RR(1//3))
 0.3333333333333333
 ```
@@ -168,7 +168,7 @@ accuracy_bits(::RealFieldElem)
 **Examples**
 
 ```jldoctest
-julia> RR = RealField()
+julia> RR = real_field()
 Real field
 
 julia> a = RR("1.2 +/- 0.001")
@@ -204,7 +204,7 @@ julia> f = accuracy_bits(a)
 Printing real balls can at first sight be confusing. Lets look at the following
 example:
 
-```jldoctest; setup = :(RR = RealField())
+```jldoctest; setup = :(RR = real_field())
 julia> a = RR(1)
 1.0000000000000000000
 
@@ -289,7 +289,7 @@ contains_nonpositive(::RealFieldElem)
 
 **Examples**
 
-```jldoctest; setup = :(RR = RealField())
+```jldoctest; setup = :(RR = real_field())
 julia> x = RR("1 +/- 0.001")
 [1.00 +/- 1.01e-3]
 
@@ -353,7 +353,7 @@ Function                      |
 
 **Examples**
 
-```jldoctest; setup = :(RR = RealField())
+```jldoctest; setup = :(RR = real_field())
 julia> x = RR("1 +/- 0.001")
 [1.00 +/- 1.01e-3]
 
@@ -380,7 +380,7 @@ true
 
 **Examples**
 
-```jldoctest; setup = :(RR = RealField())
+```jldoctest; setup = :(RR = real_field())
 julia> x = RR("-1 +/- 0.001")
 [-1.00 +/- 1.01e-3]
 
@@ -392,7 +392,7 @@ julia> a = abs(x)
 
 **Examples**
 
-```jldoctest; setup = :(RR = RealField())
+```jldoctest; setup = :(RR = real_field())
 julia> x = RR("-3 +/- 0.001")
 [-3.00 +/- 1.01e-3]
 
@@ -423,7 +423,7 @@ setunion(::RealFieldElem, ::RealFieldElem)
 
 **Examples**
 
-```jldoctest; setup = :(RR = RealField())
+```jldoctest; setup = :(RR = real_field())
 julia> x = RR("-3 +/- 0.001")
 [-3.00 +/- 1.01e-3]
 
@@ -476,7 +476,7 @@ const_glaisher(::RealField)
 
 **Examples**
 
-```jldoctest; setup = :(RR = RealField())
+```jldoctest; setup = :(RR = real_field())
 julia> a = const_pi(RR)
 [3.141592653589793239 +/- 5.96e-19]
 
@@ -662,7 +662,7 @@ airy_bi_prime(::RealFieldElem)
 
 **Examples**
 
-```jldoctest; setup = :(RR = RealField())
+```jldoctest; setup = :(RR = real_field())
 julia> a = floor(exp(RR(1)))
 2.0000000000000000000
 

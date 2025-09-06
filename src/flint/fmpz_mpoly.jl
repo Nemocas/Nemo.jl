@@ -115,12 +115,9 @@ function coeff(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
   return z
 end
 
-function trailing_coefficient(p::ZZPolyRingElem)
-  if iszero(p)
-    return zero(base_ring(p))
-  else
-    return coeff(p, length(p))
-  end
+function trailing_coefficient(p::ZZMPolyRingElem)
+  @req !iszero(p) "Zero polynomial does not have a leading monomial"
+  return coeff(p, length(p))
 end
 
 ###############################################################################

@@ -1,15 +1,15 @@
-RR = RealField()
+RR = real_field()
 
 @testset "RealFieldElem.precision" begin
   old_prec = precision(RealField)
 
   set_precision!(RealField, 100) do
-    RR = RealField()
+    RR = real_field()
     @test precision(RR) == 100
   end
 
-  set_precision!(RealField(), 100) do
-    RR = RealField()
+  set_precision!(real_field(), 100) do
+    RR = real_field()
     @test precision(RR) == 100
   end
 
@@ -18,13 +18,14 @@ RR = RealField()
   set_precision!(RealField, 200)
   @test precision(RealField) == 200
 
-  set_precision!(RealField(), 300)
+  set_precision!(real_field(), 300)
   @test precision(RealField) == 300
 
   set_precision!(RealField, old_prec)
 end
 
 @testset "RealFieldElem.constructors" begin
+  @test real_field() === RR
   @test isa(RR, RealField)
   @test isa(RR(2), FieldElem)
 
@@ -33,7 +34,7 @@ end
   @test parent_type(RealFieldElem) == RealField
   @test base_ring(RR) == Union{}
 
-  @test RealField() == RealField()
+  @test real_field() == real_field()
 end
 
 @testset "arf.hecke_semantics" begin
@@ -573,7 +574,7 @@ end
 end
 
 @testset "RealFieldElem.lindep" begin
-  CC = ComplexField()
+  CC = complex_field()
 
   tau = (1 + sqrt(CC(-23)))/2
   a = abs2(modular_weber_f2(tau))
@@ -583,7 +584,7 @@ end
 end
 
 @testset "RealFieldElem.simplest_rational_inside" begin
-  R = RealField()
+  R = real_field()
   @test @inferred simplest_rational_inside(R(1)) == 1
   @test simplest_rational_inside(R(1//2)) == 1//2
   @test simplest_rational_inside(R("0.1 +/- 0.01")) == 1//10
@@ -591,7 +592,7 @@ end
 end
 
 @testset "RealFieldElem.rand" begin
-  R = RealField()
+  R = real_field()
 
   n = 100
   for _ in 1:n

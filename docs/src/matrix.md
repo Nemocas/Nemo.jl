@@ -78,7 +78,7 @@ In addition we have the following ad hoc comparison operators.
 
 **Examples**
 
-```jldoctest; setup = :(RR = RealField())
+```jldoctest; setup = :(RR = real_field())
 julia> C = RR[1 2; 3 4]
 [1.0000000000000000000   2.0000000000000000000]
 [3.0000000000000000000   4.0000000000000000000]
@@ -473,7 +473,7 @@ gram_schmidt_orthogonalisation(::QQMatrix)
 
 **Examples**
 
-```jldoctest; setup = :(RR = RealField())
+```jldoctest; setup = :(RR = real_field())
 julia> A = RR[2 0 0; 0 3 0; 0 0 1]
 [2.0000000000000000000                       0                       0]
 [                    0   3.0000000000000000000                       0]
@@ -497,7 +497,7 @@ bound_inf_norm(::ComplexMatrix)
 
 **Examples**
 
-```jldoctest; setup = :(RR = RealField())
+```jldoctest; setup = :(RR = real_field())
 julia> A = RR[1 2 3; 4 5 6; 7 8 9]
 [1.0000000000000000000   2.0000000000000000000   3.0000000000000000000]
 [4.0000000000000000000   5.0000000000000000000   6.0000000000000000000]
@@ -511,7 +511,7 @@ julia> d = bound_inf_norm(A)
 
 **Examples**
 
-```jldoctest; setup = :(RR = RealField())
+```jldoctest; setup = :(RR = real_field())
 julia> A = RR[1 2 3; 4 5 6; 7 8 9]
 [1.0000000000000000000   2.0000000000000000000   3.0000000000000000000]
 [4.0000000000000000000   5.0000000000000000000   6.0000000000000000000]
@@ -530,7 +530,7 @@ true
 
 **Examples**
 
-```jldoctest; setup = :(CC = ComplexField())
+```jldoctest; setup = :(CC = complex_field())
 julia> A = CC[1 2 3; 4 5 6; 7 8 9]
 [1.0000000000000000000   2.0000000000000000000   3.0000000000000000000]
 [4.0000000000000000000   5.0000000000000000000   6.0000000000000000000]
@@ -564,7 +564,7 @@ eigenvalues_with_multiplicities(::ComplexMatrix)
 eigenvalues_simple(a::ComplexMatrix)
 ```
 
-```jldoctest; setup = :(CC = ComplexField())
+```jldoctest; setup = :(CC = complex_field())
 julia> A = CC[1 2 3; 0 4 5; 0 0 6]
 [1.0000000000000000000   2.0000000000000000000   3.0000000000000000000]
 [                    0   4.0000000000000000000   5.0000000000000000000]

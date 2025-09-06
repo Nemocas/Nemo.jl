@@ -13,6 +13,17 @@
 #
 ###############################################################################
 
+@doc raw"""
+    complex_field()
+
+Return the field of complex numbers modelled via complex balls.
+
+See `precision` and `set_precision!` on how to control the precision.
+"""
+function complex_field()
+  return ComplexField()
+end
+
 elem_type(::Type{ComplexField}) = ComplexFieldElem
 
 parent_type(::Type{ComplexFieldElem}) = ComplexField
@@ -21,7 +32,7 @@ base_ring_type(::Type{ComplexField}) = typeof(Union{})
 
 base_ring(R::ComplexField) = Union{}
 
-parent(x::ComplexFieldElem) = ComplexField()
+parent(x::ComplexFieldElem) = complex_field()
 
 is_domain_type(::Type{ComplexFieldElem}) = true
 
@@ -1750,7 +1761,7 @@ for S in (Real, ZZRingElem, QQFieldElem, RealFieldElem, AbstractString)
     if S != T || S == Real
       @eval begin
         function (r::ComplexField)(x::$(S), y::$(T); precision::Int = precision(Balls))
-          z = ComplexFieldElem(RealField()(x), RealField()(y), precision)
+          z = ComplexFieldElem(real_field()(x), real_field()(y), precision)
           return z
         end
       end
