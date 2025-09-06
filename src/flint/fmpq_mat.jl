@@ -404,6 +404,8 @@ function minpoly(R::QQPolyRing, x::QQMatrix)
   return z
 end
 
+minpoly(x::QQMatrix) = minpoly(polynomial_ring(QQ; cached = false)[1], x)
+
 ###############################################################################
 #
 #   Determinant
