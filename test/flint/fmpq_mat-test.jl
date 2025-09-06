@@ -838,6 +838,10 @@ end
   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 6 3])
 
   @test charpoly(R, A) == x^3 - 9*x^2 - 64*x + 30
+
+  M = QQ[1 1 0 0; 0 1 0 0; 0 0 1 1; 0 0 0 1]
+  Qx, x = QQ[:x]
+  @test charpoly(M)(x) == (x^2 - 2*x + 1)^2
 end
 
 @testset "QQMatrix.minpoly" begin
@@ -858,6 +862,10 @@ end
   end
 
   @test degree(minpoly(R, M)) == 5
+
+  M = QQ[1 1 0 0; 0 1 0 0; 0 0 1 1; 0 0 0 1]
+  Qx, x = QQ[:x]
+  @test minpoly(M)(x) == x^2 - 2*x + 1
 end
 
 @testset "QQMatrix.rand" begin

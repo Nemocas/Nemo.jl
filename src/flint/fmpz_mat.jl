@@ -630,6 +630,8 @@ function minpoly(R::ZZPolyRing, x::ZZMatrix)
   return z
 end
 
+minpoly(x::ZZMatrix) = minpoly(polynomial_ring(ZZ; cached = false)[1], x)
+
 ###############################################################################
 #
 #   Determinant

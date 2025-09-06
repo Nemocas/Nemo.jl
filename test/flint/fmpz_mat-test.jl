@@ -554,6 +554,13 @@ end
   end
 end
 
+@testset "ZZMatrix.minpoly_charpoly" begin
+  M = ZZ[1 1 0 0; 0 1 0 0; 0 0 1 1; 0 0 0 1]
+  Zx, x = ZZ[:x]
+  @test minpoly(M)(x) == x^2 - 2*x + 1
+  @test charpoly(M)(x) == (x^2 - 2*x + 1)^2
+end
+
 @testset "ZZMatrix.hnf" begin
   S = matrix_space(ZZ, 3, 3)
 
