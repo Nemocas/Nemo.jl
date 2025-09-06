@@ -4,7 +4,7 @@
   f = (x - 1)^2 * x^2 * (x + 1)
   sf = factor_squarefree(f)
   @test length(sf) == 2
-  @test all(is_squarefree, keys(sf.fac))
+  @test all(is_squarefree, (x for (x, _) in sf))
   @test evaluate(sf) == f
 
   sf = factor_squarefree(Kx(1))

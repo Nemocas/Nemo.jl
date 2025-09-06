@@ -98,6 +98,9 @@ function show(io::IO, a::FpFieldElem)
   print(io, a.data)
 end
 
+pretty_lt(x::FpFieldElem, y::FpFieldElem) = isless(x.data, y.data)
+pretty_eq(x::FpFieldElem, y::FpFieldElem) = (x == y)
+
 ###############################################################################
 #
 #   Unary operations

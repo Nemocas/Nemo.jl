@@ -546,6 +546,20 @@ end
   @test 11*prod([h for (e,h) = B]) == ((y + 1)*g*(y^5+y^3+y+1))
 
   @test issetequal(roots(5 * y * (y^2 + 1)*(y^2 + 2)*(y+1) * (y - x)^10), R.([0, -1, x]))
+
+  let
+    R = GF(23)
+    Rx, x = polynomial_ring(R, "x")
+    @test collect(factor(x * (x + 1) * (x + 3) * (x^2 + 1) * (x^3 + x + 3))) ==
+          [x => 1, x + 1 => 1, x + 3 => 1, x^2 + 1 => 1, x^3 + x + 3 => 1]
+  end
+
+  let
+    R, x = finite_field(23, 5, "x")
+    S, y = polynomial_ring(R, "y")
+    @test collect(factor(y * (y + 1) * (y + x) * (y + x + x^2))) ==
+          [y => 1, y + 1 => 1, y + x => 1, y + x^2 + x => 1]
+  end
 end
 
 @testset "FqPolyRingElem.remove_valuation" begin

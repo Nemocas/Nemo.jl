@@ -187,6 +187,10 @@ import AbstractAlgebra: LowercaseOff
 import AbstractAlgebra: Module
 import AbstractAlgebra: nullspace
 import AbstractAlgebra: pretty
+import AbstractAlgebra: pretty_eq
+import AbstractAlgebra: pretty_lt
+import AbstractAlgebra: pretty_lt_lex
+import AbstractAlgebra: pretty_sort
 import AbstractAlgebra: promote_rule
 import AbstractAlgebra: Ring
 import AbstractAlgebra: Set

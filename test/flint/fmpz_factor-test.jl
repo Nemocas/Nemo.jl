@@ -69,4 +69,6 @@
     end
   end
 
+  @test collect(factor(ZZ(2^2*3^3*5^4*7^5))) ==
+        [ZZ(2) => 2, ZZ(3) => 3, ZZ(5) => 4, ZZ(7) => 5]
 end

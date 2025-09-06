@@ -129,6 +129,9 @@ function show(io::IO, a::ZZModRingElem)
   print(io, a.data)
 end
 
+pretty_lt(x::ZZModRingElem, y::ZZModRingElem) = isless(x.data, y.data)
+pretty_eq(x::ZZModRingElem, y::ZZModRingElem) = (x == y)
+
 ###############################################################################
 #
 #   Unary operations

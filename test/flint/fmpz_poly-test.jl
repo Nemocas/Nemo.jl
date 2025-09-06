@@ -411,7 +411,7 @@ end
   fac = factor_squarefree(-10*f^10 * g^20)
 
   @test -10*f^10 * g^20 == unit(fac) * prod([ p^e for (p, e) in fac])
-  @test length(fac.fac) == 4
+  @test length(fac) == 4
 
   @test !is_irreducible(Rx(0))
   @test !is_irreducible(Rx(1))
@@ -434,6 +434,9 @@ end
   @test is_squarefree(2*x)
   @test !is_squarefree(4*x)
   @test !is_squarefree(2*x^2)
+
+  @test collect(factor(x * (x + 1) * x^2 * (x^2 + 1) * (x^4 + x + 1))) ==
+        [x => 3, x + 1 => 1, x^2 + 1 => 1, x^4 + x + 1 => 1]
 end
 
 @testset "ZZPolyRingElem.square_root" begin

@@ -1,3 +1,8 @@
+_pretty_sort(D::Dict) = sort!(collect(D); by = x -> pretty_sort(x[1]))
+
+_pretty_sort!(D::Vector) = sort!(D; by = x -> pretty_sort(x[1]))
+
+
 function rem!(z::T, f::T, g::T) where {T<:PolyRingElem}
   z = rem(f, g)
   return z
@@ -31,7 +36,7 @@ function factor_squarefree(f::PolyRingElem{<:FieldElement})
     end
   end
   return Fac(unit(fac),
-             Dict{typeof(f),Int}(facs[i] => es[i] for i in 1:length(es)))
+             _pretty_sort!(Tuple{typeof(f),Int}[facs[i] => es[i] for i in 1:length(es)]))
 end
 
 # This is Musser's algorithm
@@ -39,14 +44,14 @@ function _factor_squarefree_char_0(f::PolyRingElem)
   @assert iszero(characteristic(base_ring(f)))
   res = Dict{typeof(f),Int}()
   if is_constant(f)
-    return Fac(f, res)
+    return Fac(f, _pretty_sort(res))
   end
   c = leading_coefficient(f)
   f = divexact(f, c)
   di = gcd(f, derivative(f))
   if isone(di)
     res[f] = 1
-    return Fac(parent(f)(c), res)
+    return Fac(parent(f)(c), _pretty_sort(res))
   end
   ei = divexact(f, di)
   i = 1
@@ -60,7 +65,7 @@ function _factor_squarefree_char_0(f::PolyRingElem)
     di = dii
     ei = eii
   end
-  return Fac(parent(f)(c), res)
+  return Fac(parent(f)(c), _pretty_sort(res))
 end
 
 ################################################################################
@@ -196,7 +201,7 @@ true
 """
 function partial_fractions(n::T, d::T) where T <: Union{Nemo.IntegerUnion, <:PolyRingElem{<:FieldElem}}
   n1, n = divrem(n, d)
-  ld = collect(factor(d).fac)
+  ld = collect(factor(d))
   res = [n1//one(parent(n))]
   #TODO: use a product tree to make this asymptotically fast - if anyone cares
   #here we're suboptimal: split d= prod p_i^n_i into

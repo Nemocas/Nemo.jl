@@ -611,7 +611,7 @@ for (factor_fn, factor_fn_inner, flint_fn) in
              fac[parent(x)(p)] = e
            end
 
-           return Fac(parent(x)(unit(ffac)), fac)
+           return Fac(parent(x)(unit(ffac)), _pretty_sort(fac))
          end
 
          function $factor_fn_inner(x::ZZPolyRingElem)

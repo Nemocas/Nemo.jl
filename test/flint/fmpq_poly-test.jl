@@ -542,6 +542,9 @@ end
   @test is_squarefree(2*y)
   @test is_squarefree(4*y)
   @test !is_squarefree(2*y^2)
+
+  @test collect(factor(y * (y + 1) * y^2 * (y^2 + 1) * (y^4 + y + 1))) ==
+        [y => 3, y + 1 => 1, y^2 + 1 => 1, y^4 + y + 1 => 1]
 end
 
 @testset "QQPolyRingElem.signature" begin

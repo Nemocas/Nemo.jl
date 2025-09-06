@@ -139,6 +139,30 @@ function show(io::IO, a::fqPolyRepField)
   end
 end
 
+function pretty_lt(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
+  vx = UInt[]
+  found = false
+  for i in degree(parent(x)):-1:0
+    if !found && is_zero(coeff(x, i))
+      continue
+    end
+    found = true
+    pushfirst!(vx, coeff(x, i))
+  end
+  vy = UInt[]
+  found = false
+  for i in degree(parent(y)):-1:0
+    if !found && is_zero(coeff(y, i))
+      continue
+    end
+    found = true
+    pushfirst!(vy, coeff(y, i))
+  end
+  return pretty_lt_lex(vx, vy)
+end
+pretty_eq(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem) = (x == y)
+
+
 ###############################################################################
 #
 #   Unary operations

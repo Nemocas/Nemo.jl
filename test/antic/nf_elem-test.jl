@@ -359,3 +359,12 @@ end
   @test f^20*f^30 == mul_classical(f^20, f^30)
   @test f^20*f^30 == sqr_classical(f^25)
 end
+
+@testset "AbsSimpleNumFieldElem.PrettyOrdering" begin
+  R, x = polynomial_ring(QQ, "x")
+  K, a = number_field(x^3 + 3x + 1, "a")
+  @test Nemo.pretty_lt(a, a^2)
+  @test Nemo.pretty_lt(1//2*a, a)
+  @test !Nemo.pretty_lt(1//2*a + 1, a)
+end
+

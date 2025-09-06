@@ -666,6 +666,13 @@ end
   @test isempty(roots(f))
   L = Native.GF(3, 2)
   @test length(roots(L, f)) == 2
+
+  let
+    R = Native.GF(23)
+    Rx, x = polynomial_ring(R, "x")
+    @test collect(factor(x * (x + 1) * (x + 3) * (x^2 + 1) * (x^3 + x + 3))) ==
+          [x => 1, x + 1 => 1, x + 3 => 1, x^2 + 1 => 1, x^3 + x + 3 => 1]
+  end
 end
 
 @testset "fpPolyRingElem.canonicalization" begin

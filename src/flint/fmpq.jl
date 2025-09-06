@@ -273,6 +273,9 @@ function show(io::IO, a::QQField)
   end
 end
 
+pretty_lt(x::QQFieldElem, y::QQFieldElem) = isless(x, y)
+pretty_eq(x::QQFieldElem, y::QQFieldElem) = (x == y)
+
 ###############################################################################
 #
 #   Unary operators

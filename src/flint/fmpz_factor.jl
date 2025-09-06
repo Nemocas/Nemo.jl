@@ -51,7 +51,7 @@ function _factor(::Type{T}, a::UInt)  where T <: Integer
     z = T(F.p[i])
     res[z] = F.exp[i]
   end
-  return Fac(T(1), res)
+  return Fac(T(1), _pretty_sort(res))
 end
 
 function _factor(::Type{T}, a::ZZRingElem)  where T <: Integer
@@ -60,10 +60,10 @@ function _factor(::Type{T}, a::ZZRingElem)  where T <: Integer
   u = T(sign(a))
   F = factor(abs(a))
   res = Dict{T, Int}()  # factor-multiplicity pairs
-  for (fac,exp) in F.fac
+  for (fac,exp) in F
     res[T(fac)] = exp
   end
-  return Fac(u, res)
+  return Fac(u, _pretty_sort(res))
 end
 
 
@@ -141,7 +141,7 @@ function factor(N::ZZRingElem)
   end
   if is_unit(N)
     @assert N == c
-    return Fac(c, r)
+    return Fac(c, _pretty_sort(r))
   end
   N *= c
   @assert N > 0
@@ -159,7 +159,7 @@ function factor(N::ZZRingElem)
       push!(big_primes, p)
     end
   end
-  return Fac(c, r)
+  return Fac(c, _pretty_sort(r))
 end
 
 function factor_insert!(r::Dict{ZZRingElem,Int}, N::ZZRingElem, scale::Int=1)
