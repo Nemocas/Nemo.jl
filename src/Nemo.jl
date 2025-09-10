@@ -653,6 +653,10 @@ function test_module(x, y)
   run(`$julia_exe -e $cmd`)
 end
 
+function doctestsetup()
+  return :(using Nemo)
+end
+
 ################################################################################
 #
 #   Deprecations

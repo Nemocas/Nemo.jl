@@ -1,6 +1,6 @@
 using Documenter, Nemo, AbstractAlgebra
 
-DocMeta.setdocmeta!(Nemo, :DocTestSetup, :(using Nemo); recursive = true)
+DocMeta.setdocmeta!(Nemo, :DocTestSetup, Nemo.doctestsetup(); recursive = true)
 DocMeta.setdocmeta!(AbstractAlgebra, :DocTestSetup, AbstractAlgebra.doctestsetup(); recursive = true)
 
 makedocs(
