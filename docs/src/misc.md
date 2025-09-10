@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = Nemo
+CollapsedDocStrings = true
+DocTestSetup = Nemo.doctestsetup()
+```
 # Miscellaneous
 
 ## Global variables and precompilation

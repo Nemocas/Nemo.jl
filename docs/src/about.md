@@ -1,3 +1,9 @@
+```@meta
+CurrentModule = Nemo
+CollapsedDocStrings = true
+DocTestSetup = Nemo.doctestsetup()
+```
+
 # About Nemo
 
 Nemo is a library for fast basic arithmetic in various commonly used rings, for the
