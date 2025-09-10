@@ -1,9 +1,7 @@
 ```@meta
 CurrentModule = Nemo
 CollapsedDocStrings = true
-DocTestSetup = quote
-    using Nemo
-end
+DocTestSetup = Nemo.doctestsetup()
 ```
 
 # Algebraic closure of the rational numbers

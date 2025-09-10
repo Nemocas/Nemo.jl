@@ -1,3 +1,8 @@
+```@meta
+CurrentModule = Nemo
+CollapsedDocStrings = true
+DocTestSetup = Nemo.doctestsetup()
+```
 # Types in Nemo
 
 Nemo is fully compatible with AbstractAlgebra.jl, but specialises implementations of

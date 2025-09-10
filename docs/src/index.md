@@ -1,9 +1,7 @@
 ```@meta
 CurrentModule = Nemo
-DocTestFilters = r"[0-9\.]+ seconds \(.*\)"
-DocTestSetup = quote
-    using Nemo
-end
+CollapsedDocStrings = true
+DocTestSetup = Nemo.doctestsetup()
 ```
 
 # Getting Started
@@ -56,7 +54,7 @@ Here are some examples of using Nemo.
 
 This example computes recursive univariate polynomials.
 
-```jldoctest
+```jldoctest; filter=r"[0-9\.]+ seconds \(.*\)"
 julia> using Nemo
 
 julia> R, x = polynomial_ring(ZZ, "x")
@@ -79,7 +77,7 @@ julia> @time q = p*(p+1);
 
 Here is an example using generic recursive ring constructions.
 
-```jldoctest
+```jldoctest; filter=r"[0-9\.]+ seconds \(.*\)"
 julia> using Nemo
 
 julia> R, x = finite_field(7, 11, "x")
@@ -109,7 +107,7 @@ julia> @time resultant(s, t)
 
 Here is an example using matrices.
 
-```jldoctest
+```jldoctest; filter=r"[0-9\.]+ seconds \(.*\)"
 julia> using Nemo
 
 julia> R, x = polynomial_ring(ZZ, "x")
@@ -127,7 +125,7 @@ julia> @time det(M);
 
 And here is an example with power series.
 
-```jldoctest
+```jldoctest; filter=r"[0-9\.]+ seconds \(.*\)"
 julia> using Nemo
 
 julia> R, x = QQ["x"]

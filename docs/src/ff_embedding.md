@@ -1,8 +1,7 @@
 ```@meta
 CurrentModule = Nemo
-DocTestSetup = quote
-    using Nemo
-end
+CollapsedDocStrings = true
+DocTestSetup = Nemo.doctestsetup()
 ```
 
 # Finite field embeddings
