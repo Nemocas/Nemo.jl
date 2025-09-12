@@ -28,7 +28,7 @@ end
 
 #as above, but as a plain UInt, no bounds checking
 function getindex_raw(a::T, i::Int, j::Int) where T <: Zmodn_mat
-  return unsafe_load(mat_entry_ptr(a, i, j))
+  return GC.@preserve a unsafe_load(mat_entry_ptr(a, i, j))
 end
 
 @inline function setindex!(a::T, u::UInt, i::Int, j::Int) where T <: Zmodn_mat
