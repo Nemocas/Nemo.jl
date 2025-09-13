@@ -22,8 +22,7 @@ is_zero_initialized(::Type{ZZModMatrix}) = true
 
 @inline function getindex(a::T, i::Int, j::Int) where T <: Zmod_fmpz_mat
   @boundscheck _checkbounds(a, i, j)
-  u = ZZRingElem()
-  @ccall libflint.fmpz_mod_mat_get_entry(u::Ref{ZZRingElem}, a::Ref{T}, (i - 1)::Int, (j - 1)::Int, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  u = getindex_raw(a, i, j)
   return ZZModRingElem(u, base_ring(a)) # no reduction needed
 end
 
