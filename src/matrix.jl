@@ -286,6 +286,24 @@ give a basis of the eigenspace of $M$ with respect to the eigenvalue $\lambda$.
 If `side` is `:right`, the right eigenspace is computed, i.e. vectors $v$ such that
 $Mv = \lambda v$. If `side` is `:left`, the left eigenspace is computed, i.e. vectors
 $v$ such that $vM = \lambda v$.
+
+# Examples
+```jldoctest
+julia> F = GF(3) 
+julia> m =matrix(F, [1 0 ; 1 1])
+[1   0]
+[1   1]
+
+julia> eigenvalues(F, m) == [1]
+true
+
+julia> eigenspace(m, 1; side=:left)
+[1   0]
+
+julia> eigenspace(m, 1; side=:right)
+[0]
+[1]
+```
 """
 function eigenspace(M::MatElem{T1}, lambda::T2; side::Symbol = :left) where {T1 <: RingElem, T2 <: RingElement}
   @assert is_square(M)
