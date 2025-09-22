@@ -289,8 +289,9 @@ $v$ such that $vM = \lambda v$.
 
 # Examples
 ```jldoctest
-julia> F = GF(3) 
-julia> m =matrix(F, [1 0 ; 1 1])
+julia> F = GF(3);
+
+julia> m = matrix(F, [1 0 ; 1 1])
 [1   0]
 [1   1]
 
