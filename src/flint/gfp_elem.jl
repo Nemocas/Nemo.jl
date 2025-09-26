@@ -14,9 +14,7 @@ parent_type(::Type{fpFieldElem}) = fpField
 
 elem_type(::Type{fpField}) = fpFieldElem
 
-base_ring_type(::Type{fpField}) = typeof(Union{})
-
-base_ring(a::fpField) = Union{}
+base_ring_type(::Type{fpField}) = Union{}
 
 parent(a::fpFieldElem) = a.parent
 
