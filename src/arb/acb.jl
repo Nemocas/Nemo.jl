@@ -17,9 +17,7 @@ elem_type(::Type{AcbField}) = AcbFieldElem
 
 parent_type(::Type{AcbFieldElem}) = AcbField
 
-base_ring_type(::Type{AcbField}) = typeof(Union{})
-
-base_ring(R::AcbField) = Union{}
+base_ring_type(::Type{AcbField}) = Union{}
 
 parent(x::AcbFieldElem) = x.parent
 
