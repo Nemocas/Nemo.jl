@@ -6,7 +6,7 @@ CC = AcbField(64)
   @test isa(CC(2), FieldElem)
 
   @test elem_type(CC) == AcbFieldElem
-  @test base_ring(CC) == Union{}
+  @test base_ring_type(CC) == Union{}
 
   @test elem_type(AcbField) == AcbFieldElem
   @test parent_type(AcbFieldElem) == AcbField

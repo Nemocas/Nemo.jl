@@ -7,7 +7,7 @@ RR = ArbField(64)
   @test elem_type(RR) == ArbFieldElem
   @test elem_type(ArbField) == ArbFieldElem
   @test parent_type(ArbFieldElem) == ArbField
-  @test base_ring(RR) == Union{}
+  @test base_ring_type(RR) == Union{}
 
   @test ArbField(10, cached = true) === ArbField(10, cached = true)
   @test ArbField(11, cached = false) !== ArbField(11, cached = false)

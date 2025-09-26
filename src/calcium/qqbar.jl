@@ -16,9 +16,7 @@ parent_type(::Type{QQBarFieldElem}) = QQBarField
 
 elem_type(::Type{QQBarField}) = QQBarFieldElem
 
-base_ring_type(::Type{QQBarField}) = typeof(Union{})
-
-base_ring(::QQBarField) = Union{}
+base_ring_type(::Type{QQBarField}) = Union{}
 
 is_domain_type(::Type{QQBarFieldElem}) = true
 
