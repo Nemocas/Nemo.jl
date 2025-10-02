@@ -4,6 +4,15 @@
 #
 ###############################################################################
 
+AbstractAlgebra.Solve.matrix_normal_form_type(::AbsSimpleNumField) = AbstractAlgebra.Solve.FFLUTrait()
+function AbstractAlgebra.Solve._common_denominator(A::MatElem{AbsSimpleNumFieldElem}) 
+  return base_ring(A)(mapreduce(denominator, lcm, A; init = ZZ(1)))
+end
+function AbstractAlgebra.Solve.solve_context_type(::AbstractAlgebra.Solve.FFLUTrait, ::Type{AbsSimpleNumFieldElem})
+   MatType = dense_matrix_type(AbsSimpleNumFieldElem)
+   return AbstractAlgebra.Solve.SolveCtx{AbsSimpleNumFieldElem, AbstractAlgebra.Solve.FFLUTrait, MatType, MatType, MatType}
+end
+
 ###############################################################################
 #
 #   Type and parent object methods
