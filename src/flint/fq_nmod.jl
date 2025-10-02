@@ -14,9 +14,7 @@ parent_type(::Type{fqPolyRepFieldElem}) = fqPolyRepField
 
 elem_type(::Type{fqPolyRepField}) = fqPolyRepFieldElem
 
-base_ring_type(::Type{fqPolyRepField}) = typeof(Union{})
-
-base_ring(a::fqPolyRepField) = Union{}
+base_ring_type(::Type{fqPolyRepField}) = Union{}
 
 parent(a::fqPolyRepFieldElem) = a.parent
 

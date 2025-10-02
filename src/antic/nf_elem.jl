@@ -30,9 +30,7 @@ parent(a::AbsSimpleNumFieldElem) = a.parent
 
 elem_type(::Type{AbsSimpleNumField}) = AbsSimpleNumFieldElem
 
-base_ring_type(::Type{AbsSimpleNumField}) = typeof(Union{})
-
-base_ring(a::AbsSimpleNumField) = Union{}
+base_ring_type(::Type{AbsSimpleNumField}) = Union{}
 
 is_domain_type(::Type{AbsSimpleNumFieldElem}) = true
 
