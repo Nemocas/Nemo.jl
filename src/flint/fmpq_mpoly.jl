@@ -1015,7 +1015,7 @@ end
 QQMPolyRingElem(ctx::QQMPolyRing, a::RationalUnion) = QQMPolyRingElem(ctx, flintify(a))
 
 function (R::QQMPolyRing)(a::QQMPolyRingElem)
-  parent(a) != R && error("Unable to coerce polynomial")
+  parent(a) != R && error("Coercion not permitted; instead use map_coefficients with kwarg `parent'")
   return a
 end
 
