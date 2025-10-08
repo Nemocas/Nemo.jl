@@ -1023,7 +1023,7 @@ end
 
 (a::ZZPolyRing)(b::Vector{T}) where {T <: Integer} = a(map(ZZRingElem, b))
 
-(a::ZZPolyRing)(b::ZZPolyRingElem) = (a == parent(b)) ? b : error("Coercion not permitted; instead use map_coefficients with kwarg `parent'")
+(a::ZZPolyRing)(b::ZZPolyRingElem) = (a == parent(b)) ? b : error("Coercion not supported; instead use map_coefficients with kwarg `parent'")
 
 ###############################################################################
 #

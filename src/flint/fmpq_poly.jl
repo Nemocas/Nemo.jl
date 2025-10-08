@@ -1006,7 +1006,7 @@ function (a::QQPolyRing)(b::Vector{ZZRingElem}, copy::Bool=true)
   return x
 end
 
-(a::QQPolyRing)(b::QQPolyRingElem) = (a == parent(b)) ? b : error("Coercion not permitted; instead use map_coefficients with kwarg `parent'")
+(a::QQPolyRing)(b::QQPolyRingElem) = (a == parent(b)) ? b : error("Coercion not supported; instead use map_coefficients with kwarg `parent'")
 
 function (a::QQPolyRing)(b::ZZPolyRingElem)
   z = QQPolyRingElem(b)

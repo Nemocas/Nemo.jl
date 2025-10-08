@@ -961,7 +961,7 @@ function (R::ZZMPolyRing)(b::IntegerUnion)
 end
 
 function (R::ZZMPolyRing)(a::ZZMPolyRingElem)
-  parent(a) != R && error("Coercion not permitted; instead use map_coefficients with kwarg `parent'")
+  parent(a) != R && error("Coercion not supported; instead use map_coefficients with kwarg `parent'")
   return a
 end
 
