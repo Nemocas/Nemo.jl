@@ -82,8 +82,11 @@ end
 @testset "AbsSimpleNumFieldElem.fmpq_poly_conversion" begin
   R, x = polynomial_ring(QQ, "x")
   K, a = number_field(x^3 + 3x + 1, "a")
+  RR, y = polynomial_ring(QQ, "y")
 
   @test R(a^2 + a) == x^2 + x
+  @test lift(R, a^2 + a) == x^2 + x
+  @test lift(RR, a^2 + a) == y^2 + y
 
   K, a = number_field(x^2 - 7, "a")
 

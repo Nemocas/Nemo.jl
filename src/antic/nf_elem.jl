@@ -1045,6 +1045,12 @@ function (a::QQPolyRing)(b::AbsSimpleNumFieldElem)
   return r
 end
 
+function lift(a::QQPolyRing, b::AbsSimpleNumFieldElem)
+  r = a()
+  @ccall libflint.nf_elem_get_fmpq_poly(r::Ref{QQPolyRingElem}, b::Ref{AbsSimpleNumFieldElem}, parent(b)::Ref{AbsSimpleNumField})::Nothing
+  return r
+end
+
 (::QQField)(a::AbsSimpleNumFieldElem) = (is_rational(a) && return coeff(a, 0)) || error("not a rational")
 
 (::ZZRing)(a::AbsSimpleNumFieldElem) = (is_integer(a) && return numerator(coeff(a, 0))) || error("not an integer")
