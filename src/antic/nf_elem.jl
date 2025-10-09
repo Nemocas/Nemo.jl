@@ -1020,7 +1020,7 @@ function (a::AbsSimpleNumField)(b::AbsSimpleNumFieldElem)
 end
 
 function (a::AbsSimpleNumField)(pol::QQPolyRingElem)
-  pol = parent(a.pol)(pol) # check pol has correct parent
+  pol = map_coefficients(identity, pol; parent=parent(a.pol)) # map into "correct" ring so that call below to mod(..., a.pol) works
   z = AbsSimpleNumFieldElem(a)
   if length(pol) >= length(a.pol)
     pol = mod(pol, a.pol)
