@@ -1,6 +1,8 @@
 testlist = [
 # Aqua.jl
   "Aqua.jl",
+# Flint integration,
+  "Flint_error_handling-test.jl",
 # Julia extensions
   "julia/Float-test.jl",
   "julia/Integer-test.jl",

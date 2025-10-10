@@ -222,6 +222,26 @@ const pkgdir = realpath(joinpath(dirname(@__DIR__)))
 #
 ###############################################################################
 
+# heavily inspired by https://discourse.julialang.org/t/a-minimal-example-with-base-redirect-stdout/64245/8
+function capture_stdout(f::Function)
+  pipe = Pipe()
+  started = Base.Event()
+  writer = @async redirect_stdout(pipe) do
+    notify(started)
+    try
+      f()
+    finally
+      Base.Libc.flush_cstdio()
+      close(pipe.in)
+    end
+  end
+  wait(started)
+  result = readchomp(pipe)
+  wait(writer)
+  close(pipe)
+  return result
+end
+
 function flint_abort()
   error("Problem in the FLINT-Subsystem")
 end
@@ -267,9 +287,12 @@ function Base.showerror(io::IO, e::FlintException)
   print(io, strip(e.msg))
 end
 
-function flint_throw(err_type::FlintExceptionType, cmsg::Cstring)
-  msg = unsafe_string(cmsg)
-
+function flint_throw(err_type::FlintExceptionType, cmsg::Cstring, va_list::Ptr{Cvoid})
+  # use flint_vsprintf once available, see https://github.com/flintlib/flint/issues/2388
+  msg = capture_stdout() do
+    @ccall libflint.flint_vprintf(cmsg::Cstring, va_list::Ptr{Cvoid})::Int
+  end
+  @ccall libflint.flint_va_end(va_list::Ptr{Cvoid})::Nothing
   throw(FlintException(err_type, msg))
 end
 
@@ -411,7 +434,7 @@ function __init__()
   end
 
   @ccall libflint.flint_set_abort(@cfunction(flint_abort, Nothing, ())::Ptr{Nothing})::Nothing
-  @ccall libflint.flint_set_throw(@cfunction(flint_throw, Nothing, (FlintExceptionType, Cstring))::Ptr{Nothing})::Nothing
+  @ccall libflint.flint_set_throw(@cfunction(flint_throw, Nothing, (FlintExceptionType, Cstring, Ptr{Cvoid}))::Ptr{Nothing})::Nothing
 
   add_verbosity_scope(:UnimodVerif)
 
