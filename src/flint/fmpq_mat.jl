@@ -462,8 +462,9 @@ function is_zero_det_probabilistic(M::QQMatrix; modulus_bitsize::Int = 100)
         return false
       end
       log2_modulus += log2(p)  # only approximate, but that's fine
-    catch IgnoreError
-      # The prime was bad, so we just ignore it
+    catch exc
+      (typeof(exc) == ErrorException && exc.msg == "Unable to coerce") || rethrow()
+      # The prime was bad, so we just ignore it (& the exception)
     end
   end
   return true
