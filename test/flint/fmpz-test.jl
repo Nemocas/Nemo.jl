@@ -958,6 +958,21 @@ end
   @test mod_sym(ZZ(4), ZZ(-5)) == ZZ(-1)
   @test mod_sym(ZZ(-4), ZZ(5)) == ZZ(1)
   @test mod_sym(ZZ(-4), ZZ(-5)) == ZZ(1)
+
+  for (p, k) in [(2, 4), (2, 5), (5, 1), (5, 5)]
+    b = rand(1:p^k - 1) % p^k
+    while gcd(b, p) != 1
+      b = rand(1:p^k - 1) % p^k
+    end
+    a = powermod(b, 2, p^k)
+    c = Nemo.sqrtmod_pk(a, p, k)
+    @test c^2 % p^k == a
+    c = Nemo._sqrtmod_pk_small(a, p, k)
+    @test c^2 % p^k == a
+  end
+
+  @test_throws ArgumentError Nemo.sqrtmod_pk(2, 2, 5)
+  @test_throws ErrorException Nemo.sqrtmod_pk(3, 5, 10)
 end
 
 @testset "ZZRingElem.crt" begin
