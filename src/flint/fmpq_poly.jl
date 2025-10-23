@@ -492,7 +492,7 @@ function sqrt(x::QQPolyRingElem; check::Bool=true)
   n = polynomial(ZZ, [], cached = false)
   @ccall libflint.fmpq_poly_get_numerator(n::Ref{ZZPolyRingElem}, x::Ref{QQPolyRingElem})::Nothing
   sn = sqrt(n; check=check)
-  s = R(sn)
+  s = change_base_ring(QQ, sn; parent = R)
   return divexact(s, sd)
 end
 
@@ -522,7 +522,7 @@ function is_square_with_sqrt(x::QQPolyRingElem)
   if !f2
     return false, zero(R)
   end
-  s = R(s2)
+  s = change_base_ring(QQ, s2; parent = R)
   return true, divexact(s, s1)
 end
 
@@ -578,7 +578,7 @@ for (factor_fn, factor_fn_inner, flint_fn) in
            for i in 1:fac.num
              @ccall libflint.fmpz_poly_factor_get_fmpz_poly(f::Ref{ZZPolyRingElem}, fac::Ref{fmpz_poly_factor}, (i - 1)::Int)::Nothing
              e = unsafe_load(fac.exp, i)
-             res[parent(x)(f)] = e
+             res[QQPolyRingElem(parent(x), f)] = e
            end
            return res, QQFieldElem(z, denominator(x))
          end
@@ -871,9 +871,12 @@ function fmpq_poly_to_nmod_poly_raw!(r::zzModPolyRingElem, a::QQPolyRingElem)
 end
 
 function (R::zzModPolyRing)(g::QQPolyRingElem)
-  r = R()
-  fmpq_poly_to_nmod_poly_raw!(r, g)
-  return r
+  error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
+end
+
+function AbstractAlgebra._map(R::zzModRing, g::QQPolyRingElem, parent::zzModPolyRing)
+  @assert R === base_ring(parent)
+  return fmpq_poly_to_nmod_poly_raw!(parent(), g)
 end
 
 function fmpq_poly_to_gfp_poly_raw!(r::fpPolyRingElem, a::QQPolyRingElem)
@@ -882,9 +885,12 @@ function fmpq_poly_to_gfp_poly_raw!(r::fpPolyRingElem, a::QQPolyRingElem)
 end
 
 function (R::fpPolyRing)(g::QQPolyRingElem)
-  r = R()
-  fmpq_poly_to_gfp_poly_raw!(r, g)
-  return r
+  error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
+end
+
+function AbstractAlgebra._map(R::fpField, g::QQPolyRingElem, parent::fpPolyRing)
+  @assert R === base_ring(parent)
+  return fmpq_poly_to_gfp_poly_raw!(parent(), g)
 end
 
 function fmpq_poly_to_fq_default_poly_raw!(r::FqPolyRingElem, a::QQPolyRingElem, t1::ZZPolyRingElem=ZZPolyRingElem(), t2::ZZRingElem=ZZRingElem())
@@ -898,9 +904,12 @@ function fmpq_poly_to_fq_default_poly_raw!(r::FqPolyRingElem, a::QQPolyRingElem,
 end
 
 function (R::FqPolyRing)(g::QQPolyRingElem)
-  r = R()
-  fmpq_poly_to_fq_default_poly_raw!(r, g)
-  return r
+  error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
+end
+
+function AbstractAlgebra._map(R::FqField, g::QQPolyRingElem, parent::FqFieldElem)
+  @assert R === base_ring(parent)
+  return fmpq_poly_to_fq_default_poly_raw!(parent(), g)
 end
 
 function fmpq_poly_to_fmpz_mod_poly_raw!(r::ZZModPolyRingElem, a::QQPolyRingElem, t1::ZZPolyRingElem=ZZPolyRingElem(), t2::ZZRingElem=ZZRingElem())
@@ -916,9 +925,12 @@ function fmpq_poly_to_fmpz_mod_poly_raw!(r::ZZModPolyRingElem, a::QQPolyRingElem
 end
 
 function (R::ZZModPolyRing)(g::QQPolyRingElem)
-  r = R()
-  fmpq_poly_to_fmpz_mod_poly_raw!(r, g)
-  return r
+  error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
+end
+
+function AbstractAlgebra._map(R::ZZModRing, g::QQPolyRingElem, parent::ZZModPolyRing)
+  @assert R === base_ring(parent)
+  return fmpq_poly_to_fmpz_mod_poly_raw!(parent(), g)
 end
 
 function fmpq_poly_to_gfp_fmpz_poly_raw!(r::FpPolyRingElem, a::QQPolyRingElem, t1::ZZPolyRingElem=ZZPolyRingElem(), t2::ZZRingElem=ZZRingElem())
@@ -934,16 +946,12 @@ function fmpq_poly_to_gfp_fmpz_poly_raw!(r::FpPolyRingElem, a::QQPolyRingElem, t
 end
 
 function (R::FpPolyRing)(g::QQPolyRingElem)
-  r = R()
-  fmpq_poly_to_gfp_fmpz_poly_raw!(r, g)
-  return r
+  error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
 end
 
-function (a::ZZPolyRing)(b::QQPolyRingElem)
-  (!isone(denominator(b))) && error("Denominator has to be 1")
-  z = a()
-  @ccall libflint.fmpq_poly_get_numerator(z::Ref{ZZPolyRingElem}, b::Ref{QQPolyRingElem})::Nothing
-  return z
+function AbstractAlgebra._map(R::FpField, g::QQPolyRingElem, parent::FpPolyRing)
+  @assert R === base_ring(parent)
+  return fmpq_poly_to_gfp_fmpz_poly_raw!(parent(), g)
 end
 
 ###############################################################################
@@ -958,9 +966,23 @@ end
 
 (a::QQPolyRing)(b::Vector{<:RationalUnion}) = QQPolyRingElem(a, b)
 
-(a::QQPolyRing)(b::QQPolyRingElem) = b
+function (a::QQPolyRing)(b::QQPolyRingElem)
+  parent(b) != a && error("Coercion not supported; instead use `change_base_ring(QQ, p; parent = Qx)")
+  return b
+end
 
-(a::QQPolyRing)(b::ZZPolyRingElem) = QQPolyRingElem(a, b)
+function AbstractAlgebra._map(::QQField, p::QQPolyRingElem, parent::QQPolyRing)
+  p.parent = parent
+  return p
+end
+
+function (Qx::QQPolyRing)(p::ZZPolyRingElem)
+  error("Coercion not supported; instead use `change_base_ring(QQ, p; parent = Qx)")
+end
+
+function AbstractAlgebra._map(::QQField, p::ZZPolyRingElem, parent::QQPolyRing)
+  return QQPolyRingElem(parent, p)
+end
 
 ###############################################################################
 #
