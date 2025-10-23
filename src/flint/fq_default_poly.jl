@@ -711,12 +711,14 @@ function (R::FqPolyRing)(x::Vector{T}) where {T <: Integer}
 end
 
 function (R::FqPolyRing)(x::ZZPolyRingElem)
+  error("not supported; use blabla")
   z = FqPolyRingElem(x, base_ring(R))
   z.parent = R
   return z
 end
 
 function (R::FqPolyRing)(x::Union{zzModPolyRingElem, fpPolyRingElem})
+  error("not supported; use blabla")
   characteristic(base_ring(x)) != characteristic(base_ring(R)) &&
   error("Incompatible characteristic")
   z = FqPolyRingElem(x, base_ring(R))
@@ -725,6 +727,7 @@ function (R::FqPolyRing)(x::Union{zzModPolyRingElem, fpPolyRingElem})
 end
 
 function (R::FqPolyRing)(x::Union{ZZModPolyRingElem, FpPolyRingElem})
+  error("not supported; use blabla")
   characteristic(base_ring(x)) != characteristic(base_ring(R)) &&
   error("Incompatible characteristic")
   z = FqPolyRingElem(x, base_ring(R))

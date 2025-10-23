@@ -976,10 +976,12 @@ function fmpz_poly_to_nmod_poly_raw!(r::zzModPolyRingElem, a::ZZPolyRingElem)
   return r
 end
 
-function (Rx::zzModPolyRing)(f::ZZPolyRingElem)
-  r = Rx()
-  fmpz_poly_to_nmod_poly_raw!(r, f)
-  return r
+function (R::zzModPolyRing)(g::ZZPolyRingElem)
+  error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
+end
+
+function AbstractAlgebra._map(R::zzModRing, g::ZZPolyRingElem, parent::zzModPolyRing)
+  return fmpz_poly_to_nmod_poly_raw!(parent(), g)
 end
 
 function fmpz_poly_to_gfp_poly_raw!(r::fpPolyRingElem, a::ZZPolyRingElem)
@@ -987,10 +989,12 @@ function fmpz_poly_to_gfp_poly_raw!(r::fpPolyRingElem, a::ZZPolyRingElem)
   return r
 end
 
-function (Rx::fpPolyRing)(f::ZZPolyRingElem)
-  r = Rx()
-  fmpz_poly_to_gfp_poly_raw!(r, f)
-  return r
+function (R::fpPolyRing)(g::ZZPolyRingElem)
+  error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
+end
+
+function AbstractAlgebra._map(R::fpField, g::ZZPolyRingElem, parent::fpPolyRing)
+  return fmpz_poly_to_gfp_poly_raw!(parent(), g)
 end
 
 ###############################################################################
@@ -1005,7 +1009,10 @@ end
 
 (a::ZZPolyRing)(b::Vector{<:IntegerUnion}) = ZZPolyRingElem(a, b)
 
-(a::ZZPolyRing)(b::ZZPolyRingElem) = b
+function (a::ZZPolyRing)(b::ZZPolyRingElem)
+  parent(b) != a && error("Coercion not supported; instead use `map_coefficients` with kwarg `parent`")
+  return b
+end
 
 ###############################################################################
 #
