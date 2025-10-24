@@ -1398,13 +1398,15 @@ end
 #
 ###############################################################################
 
-function AbstractAlgebra.add_row!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int)
+function AbstractAlgebra.add_row!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int; cols::UnitRange{Int64}=1:ncols(A))
   @assert 1 <= i <= nrows(A)
   @assert 1 <= j <= nrows(A)
+  @assert 1 <= first(cols) && last(cols) <= ncols(A)
+  c = first(cols)
   GC.@preserve A begin
-    i_ptr = mat_entry_ptr(A, i, 1)
-    j_ptr = mat_entry_ptr(A, j, 1)
-    for k = 1:ncols(A)
+    i_ptr = mat_entry_ptr(A, i, c)
+    j_ptr = mat_entry_ptr(A, j, c)
+    for k = cols
       addmul!(i_ptr, s, j_ptr)
       i_ptr += sizeof(ZZRingElem)
       j_ptr += sizeof(ZZRingElem)
@@ -1412,11 +1414,13 @@ function AbstractAlgebra.add_row!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int)
   end
 end
 
-function AbstractAlgebra.add_column!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int)
+function AbstractAlgebra.add_column!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int; rows::UnitRange{Int64}=1:nrows(A))
   @assert 1 <= i <= ncols(A)
   @assert 1 <= j <= ncols(A)
+  @assert 1 <= first(rows)
+  @assert last(rows) <= nrows(A)
   GC.@preserve A begin
-    for k = 1:nrows(A)
+    for k = rows
       i_ptr = mat_entry_ptr(A, k, i)
       j_ptr = mat_entry_ptr(A, k, j)
       addmul!(i_ptr, s, j_ptr)
