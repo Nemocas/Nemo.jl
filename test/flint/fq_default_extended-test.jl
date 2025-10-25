@@ -319,3 +319,18 @@ end
   LLL, = finite_field(x - 2);
   @test one(LLL) + one(prime_field(LL)) == 2
 end
+
+@testset "extension" begin
+  K = GF(9)
+  L, h = Nemo._extension(K, 3)
+  @test domain(h) === K
+  @test codomain(h) === L
+  @test order(L) == ZZ(9)^3
+  for i in 1:10
+    a = rand(K)
+    b = rand(K)
+    @test h(a) + h(b) == h(a + b)
+    @test h(a) * h(b) == h(a * b)
+    @test preimage(h, h(a)) == a
+  end
+end
