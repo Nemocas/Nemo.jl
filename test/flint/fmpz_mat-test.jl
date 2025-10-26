@@ -925,7 +925,25 @@ end
   @test Nemo.is_zero_row(A, 1)
 
   add_row!(A, ZZ(3), 1, 2)
-  @test A == ZZ[12 18 9; 4 6 3]
+  @test A == ZZ[0 0 0; 4 6 3]
+
+  add_row!(A, ZZ(-2), 2, 1, 1:2)
+  @test A == ZZ[-8 -12 0; 4 6 3]
+
+
+  A = ZZ[2 3 5; 4 6 3]
+
+  add_row!(A, 0, 1, 1)
+  @test A == ZZ[2 3 5; 4 6 3]
+
+  add_row!(A, -1, 1, 1)
+  @test Nemo.is_zero_row(A, 1)
+
+  add_row!(A, 3, 1, 2)
+  @test A == ZZ[0 0 0; 4 6 3]
+
+  add_row!(A, -2, 2, 1, 1:2)
+  @test A == ZZ[-8 -12 0; 4 6 3]
 end
 
 @testset "ZZMatrix.add_column!" begin
@@ -937,6 +955,9 @@ end
   add_column!(A, ZZ(-1), 1, 1)
   @test Nemo.is_zero_column(A, 1)
 
-  add_column!(A, ZZ(3), 1, 2)
-  @test A == ZZ[9 3 5; 18 6 3]
+  add_column!(A, ZZ(3), 2, 3)
+  @test A == ZZ[0 3 14; 0 6 21]
+
+  add_column!(A, -3, 2, 3, 1:1)
+  @test A == ZZ[0 3 5; 0 6 21]
 end

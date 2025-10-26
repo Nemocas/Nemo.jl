@@ -988,3 +988,97 @@ end
   @test A == R[0 0; 0 0]
   @test_throws BoundsError Generic.add_one!(A, 3, 1)
 end
+
+@testset "ZZModMatrix.add_row!" begin
+  R, _ = residue_ring(ZZ, ZZ(8))
+  A = R[2 3 5; 4 6 3]
+
+  add_row!(A, R(0), 1, 1)
+  @test A == R[2 3 5; 4 6 3]
+
+  add_row!(A, R(-1), 1, 1)
+  @test Nemo.is_zero_row(A, 1)
+
+  add_row!(A, R(3), 1, 2)
+  @test A == R[0 0 0; 4 6 3]
+
+  add_row!(A, R(-2), 2, 1, 1:2)
+  @test A == R[-8 -12 0; 4 6 3]
+
+  A = R[2 3 5; 4 6 3]
+
+  add_row!(A, 0, 1, 1)
+  @test A == R[2 3 5; 4 6 3]
+
+  add_row!(A, -1, 1, 1)
+  @test is_zero_row(A, 1)
+
+  add_row!(A, 3, 1, 2)
+  @test A == R[0 0 0; 4 6 3]
+
+  add_row!(A, -2, 2, 1, 1:2)
+  @test A == R[-8 -12 0; 4 6 3]
+
+  # check that reduction works
+  add_row!(A, 1, 1, 1)
+  add_row!(A, 1, 1, 1)
+  add_row!(A, 1, 1, 1)
+  add_row!(A, 1, 1, 1)
+  @test is_zero_row(A, 1)
+
+end
+
+@testset "ZZModMatrix.add_column!" begin
+  R, _ = residue_ring(ZZ, ZZ(8))
+  A = R[2 3 5; 4 6 3]
+
+  add_column!(A, R(0), 1, 1)
+  @test A == R[2 3 5; 4 6 3]
+
+  add_column!(A, R(-1), 1, 1)
+  @test Nemo.is_zero_column(A, 1)
+
+  add_column!(A, R(3), 2, 3)
+  @test A == R[0 3 14; 0 6 21]
+
+  add_column!(A, -3, 2, 3, 1:1)
+  @test A == R[0 3 5; 0 6 21]
+
+  A = R[2 3 5; 4 6 3]
+  # check that reduction works
+  add_column!(A, 1, 1, 1)
+  add_column!(A, 1, 1, 1)
+  add_column!(A, 1, 1, 1)
+  add_column!(A, 1, 1, 1)
+  @test is_zero_row(A, 1)
+
+
+end
+
+@testset "ZZModMatrix.multiply_row!" begin
+  R, _ = residue_ring(ZZ, ZZ(8))
+
+  A = R[2 3 5; 4 6 3]
+
+  multiply_row!(A, R(2), 1)
+  @test A == R[4 6 2; 4 6 3]
+
+  multiply_row!(A, R(2), 1)
+  @test A == R[0 4 4; 4 6 3]
+
+  multiply_row!(A, R(2), 2, 2:3)
+  @test A == R[0 4 4; 4 4 6]
+end
+
+@testset "ZZModMatrix.multiply_column!" begin
+  R, _ = residue_ring(ZZ, ZZ(8))
+
+  A = R[2 3 5; 4 6 3]
+
+  multiply_column!(A, R(2), 1)
+  @test A == R[4 3 5; 0 6 3]
+
+  multiply_column!(A, R(2), 3, 1:1)
+  @test A == R[4 3 2; 0 6 3]
+end
+

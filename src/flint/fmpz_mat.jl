@@ -1398,7 +1398,34 @@ end
 #
 ###############################################################################
 
-function AbstractAlgebra.add_row!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int; cols::UnitRange{Int}=1:ncols(A))
+function AbstractAlgebra.multiply_row!(A::ZZMatrix, s::Union{Int, ZZRingElemOrPtr}, i::Int, cols::UnitRange{Int}=1:ncols(A))
+  @assert 1 <= i <= nrows(A)
+  @assert 1 <= first(cols) && last(cols) <= ncols(A)
+  c = first(cols)
+  GC.@preserve A begin
+    # these are Ptr{ZZRingElem}
+    i_ptr = mat_entry_ptr(A, i, c)
+    for k = cols
+      mul!(i_ptr, s, i_ptr)
+      i_ptr += sizeof(ZZRingElem)
+    end
+  end
+end
+
+function AbstractAlgebra.multiply_column!(A::ZZMatrix, s::Union{Int, ZZRingElemOrPtr}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
+  @assert 1 <= j <= ncols(A)
+  @assert 1 <= first(rows)
+  @assert last(rows) <= nrows(A)
+  GC.@preserve A begin
+    for k = rows
+      i_ptr = mat_entry_ptr(A, k, i)
+      mul!(i_ptr, s, i_ptr)
+    end
+  end
+end
+
+
+function AbstractAlgebra.add_row!(A::ZZMatrix, s::Union{ZZRingElemOrPtr, Int}, i::Int, j::Int, cols::UnitRange{Int}=1:ncols(A))
   @assert 1 <= i <= nrows(A)
   @assert 1 <= j <= nrows(A)
   @assert 1 <= first(cols) && last(cols) <= ncols(A)
@@ -1407,14 +1434,14 @@ function AbstractAlgebra.add_row!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int; co
     i_ptr = mat_entry_ptr(A, i, c)
     j_ptr = mat_entry_ptr(A, j, c)
     for k = cols
-      addmul!(i_ptr, s, j_ptr)
+      addmul!(j_ptr, s, i_ptr)
       i_ptr += sizeof(ZZRingElem)
       j_ptr += sizeof(ZZRingElem)
     end
   end
 end
 
-function AbstractAlgebra.add_column!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int; rows::UnitRange{Int}=1:nrows(A))
+function AbstractAlgebra.add_column!(A::ZZMatrix, s::Union{ZZRingElemOrPtr, Int}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
   @assert 1 <= i <= ncols(A)
   @assert 1 <= j <= ncols(A)
   @assert 1 <= first(rows)
@@ -1423,7 +1450,7 @@ function AbstractAlgebra.add_column!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int;
     for k = rows
       i_ptr = mat_entry_ptr(A, k, i)
       j_ptr = mat_entry_ptr(A, k, j)
-      addmul!(i_ptr, s, j_ptr)
+      addmul!(j_ptr, s, i_ptr)
     end
   end
 end
