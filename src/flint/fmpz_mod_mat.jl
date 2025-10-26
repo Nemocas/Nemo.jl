@@ -195,7 +195,7 @@ function AbstractAlgebra.add_row!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::Int, j:
   end
 end
 
-function AbstractAlgebra.add_column!(A::Zmod_fmpz_mat, s::ZZModRingElemOrPtr, i::Int, j::Int; rows::UnitRange{Int64}=1:nrows(A))
+function AbstractAlgebra.add_column!(A::Zmod_fmpz_mat, s::ZZModRingElemOrPtr, i::Int, j::Int; rows::UnitRange{Int}=1:nrows(A))
   @assert 1 <= i <= ncols(A)
   @assert 1 <= j <= ncols(A)
   @assert 1 <= first(rows)
