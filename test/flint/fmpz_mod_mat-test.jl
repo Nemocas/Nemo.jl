@@ -1050,7 +1050,7 @@ end
   add_column!(A, 1, 1, 1)
   add_column!(A, 1, 1, 1)
   add_column!(A, 1, 1, 1)
-  @test is_zero_row(A, 1)
+  @test is_zero_column(A, 1)
 
 
 end
