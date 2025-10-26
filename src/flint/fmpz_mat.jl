@@ -1398,7 +1398,7 @@ end
 #
 ###############################################################################
 
-function AbstractAlgebra.add_row!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int; cols::UnitRange{Int64}=1:ncols(A))
+function AbstractAlgebra.add_row!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int; cols::UnitRange{Int}=1:ncols(A))
   @assert 1 <= i <= nrows(A)
   @assert 1 <= j <= nrows(A)
   @assert 1 <= first(cols) && last(cols) <= ncols(A)
