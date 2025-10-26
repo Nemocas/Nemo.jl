@@ -145,7 +145,7 @@ end
 #   manual linear algebra: row and col operations
 #
 ###############################################################################
-function AbstractAlgebra.multiply_row!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::Int; cols::UnitRange{Int64}=1:ncols(A))
+function AbstractAlgebra.multiply_row!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::Int; cols::UnitRange{Int}=1:ncols(A))
   @assert 1 <= i <= nrows(A)
   @assert 1 <= first(cols) && last(cols) <= ncols(A)
   c = first(cols)
