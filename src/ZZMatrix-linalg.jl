@@ -962,12 +962,12 @@ function _to_base!(a::ZZMatrix, _b::ZZRingElem)
   while nr > 1
     mul!(bb, b, b)
     for i=1:div(nr, 2)
-      add_row!(a, b, 2*i-1, 2*i)
+      add_row!(a, b, 2*i, 2*i-1)
       swap_rows!(a, i, 2*i-1)
       zero_row!(a, 2*i) #to release memory early
     end
     if is_odd(nr)
-      add_row!(a, bb, div(nr, 2), nr)
+      add_row!(a, bb, nr, div(nr, 2))
       zero_row!(a, nr)
     end
     nr = div(nr, 2)
