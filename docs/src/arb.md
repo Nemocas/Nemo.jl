@@ -4,7 +4,7 @@ CollapsedDocStrings = true
 DocTestSetup = Nemo.doctestsetup()
 ```
 
-# Fixed precision real balls
+# [Fixed precision real balls](@id arb_field_section)
 
 Fixed precision real ball arithmetic is supplied by Arb which provides a
 ball representation which tracks error bounds rigorously. Real numbers are 
