@@ -4,7 +4,7 @@ CollapsedDocStrings = true
 DocTestSetup = Nemo.doctestsetup()
 ```
 
-# Arbitrary precision complex balls
+# [Arbitrary precision complex balls](@id complex_field_section)
 
 Arbitrary precision complex ball arithmetic is supplied by Arb which provides a
 ball representation which tracks error bounds rigorously. Complex numbers are 

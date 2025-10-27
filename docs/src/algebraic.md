@@ -4,7 +4,7 @@ CollapsedDocStrings = true
 DocTestSetup = Nemo.doctestsetup()
 ```
 
-# Algebraic closure of the rational numbers
+# [Algebraic closure of the rational numbers](@id qqbar_section)
 
 An implementation of the field of all algebraic numbers, that is, an algebraic closure of the field of rational numbers, is provided through the type `QQBarField` and the corresponding element type `QQBarFieldElem`.
 

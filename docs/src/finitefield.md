@@ -4,7 +4,7 @@ CollapsedDocStrings = true
 DocTestSetup = Nemo.doctestsetup()
 ```
 
-# Finite fields
+# [Finite fields](@id finite_fields_section)
 
 A finite field $K$ is represented as simple extension $K = k(\alpha) = k[x]/(f)$, where $k$ can
 be
