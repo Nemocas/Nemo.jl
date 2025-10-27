@@ -1078,6 +1078,41 @@ function sqrtmod(x::ZZRingElem, m::ZZRingElem)
   return z
 end
 
+function sqrtmod_pk(a::IntegerUnion, p::IntegerUnion, k::Int)
+  @req a != 0 && valuation(a, p) == 0 "Element must be a unit modulo p^k"
+  return _sqrtmod_pk_big(ZZ(a), ZZ(p), k)
+end
+
+function _sqrtmod_pk_big(a::ZZRingElem, p::ZZRingElem, k::Int)
+  # must be unit modulo p
+  r = ZZ()
+  fl = @ccall libflint._padic_sqrt(r::Ref{ZZRingElem}, a::Ref{ZZRingElem}, p::Ref{ZZRingElem}, k::Int)::Bool
+  if !fl
+    error("No square root exists")
+  end
+  return r
+end
+
+function _sqrtmod_pk_small(a::Int, p::Int, k::Int)
+  # this is too expensive to check
+  #@req k < @ccall Nemo.libflint.n_flog((UInt(1) << 63)::UInt, p::Int)::Int
+  if a < 0
+    a = mod(a, p)
+  end
+  # must be unit modulo p
+  res = Ref(Ptr{UInt}())
+  n = @ccall libflint.n_sqrtmod_primepow(res::Ref{Ptr{UInt}}, a::Int, p::Int, k::Int)::Int
+
+  if n == 0
+    error("No square root exists")
+  end
+
+  ptr = res[]
+  b = unsafe_load(ptr, 1)
+  @ccall libflint.flint_free(ptr::Ptr{UInt})::Nothing
+  return b % Int
+end
+
 function _normalize_crt(r::ZZRingElem, m::ZZRingElem, signed)
   s = sign(Int, m)
   if s > 0
