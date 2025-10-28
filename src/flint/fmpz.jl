@@ -49,9 +49,7 @@ parent(a::ZZRingElem) = ZZ
 
 elem_type(::Type{ZZRing}) = ZZRingElem
 
-base_ring_type(::Type{ZZRing}) = typeof(Union{})
-
-base_ring(a::ZZRing) = Union{}
+base_ring_type(::Type{ZZRing}) = Union{}
 
 is_domain_type(::Type{ZZRingElem}) = true
 

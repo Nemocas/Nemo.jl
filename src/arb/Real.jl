@@ -28,9 +28,7 @@ elem_type(::Type{RealField}) = RealFieldElem
 
 parent_type(::Type{RealFieldElem}) = RealField
 
-base_ring_type(::Type{RealField}) = typeof(Union{})
-
-base_ring(R::RealField) = Union{}
+base_ring_type(::Type{RealField}) = Union{}
 
 parent(x::RealFieldElem) = real_field()
 

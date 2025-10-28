@@ -11,8 +11,8 @@ end
   @test elem_type(CalciumField) == CalciumFieldElem
   @test parent_type(CalciumFieldElem) == CalciumField
   @test is_domain_type(CalciumFieldElem) == true
-  @test base_ring(C) == Union{}      # ?
-  @test base_ring(C(3)) == Union{}      # ?
+  @test base_ring_type(C) == Union{}      # ?
+  @test base_ring_type(C(3)) == Union{}      # ?
 
   @test isa(C, CalciumField)
 
