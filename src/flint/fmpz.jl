@@ -138,11 +138,14 @@ end
 
 ################################################################################
 #
-#   Hashing
+#   Low-level direct access
 #
 ################################################################################
 
-# Similar to hash for BigInt found in julia/base
+@inline function __fmpz_is_small(a::Int)
+  return (unsigned(a) >> (Sys.WORD_SIZE - 2) != 1)
+end
+
 @inline function _fmpz_is_small(a::ZZRingElemOrPtr)
   return __fmpz_is_small(data(a))
 end
@@ -158,6 +161,12 @@ end
   return _fmpz_is_small(a) ? 1 : GC.@preserve a _as_bigint(a).size
 end
 
+################################################################################
+#
+#   Hashing
+#
+################################################################################
+
 function hash_integer(a::ZZRingElem, h::UInt)
   return GC.@preserve a _hash_integer(data(a), h)
 end
@@ -165,10 +174,6 @@ end
 function hash(a::ZZRingElem, h::UInt)
   _fmpz_is_small(a) && return Base.hash(data(a), h)
   return hash_integer(a, h)
-end
-
-@inline function __fmpz_is_small(a::Int)
-  return (unsigned(a) >> (Sys.WORD_SIZE - 2) != 1)
 end
 
 function _hash_integer(a::Int, h::UInt)
@@ -232,7 +237,7 @@ is_positive(n::ZZRingElemOrPtr) = sign(Int, n) > 0
 
 Return `true` if $a$ fits into an `Int`, otherwise return `false`.
 """
-fits(::Type{Int}, a::ZZRingElem) = @ccall libflint.fmpz_fits_si(a::Ref{ZZRingElem})::Bool
+fits(::Type{Int}, a::ZZRingElem) = _fmpz_is_small(a) || @ccall libflint.fmpz_fits_si(a::Ref{ZZRingElem})::Bool
 
 @doc raw"""
     fits(::Type{UInt}, a::ZZRingElem)
@@ -2968,17 +2973,20 @@ function (::Type{BigInt})(a::ZZRingElem)
 end
 
 function (::Type{Int})(a::ZZRingElem)
+  _fmpz_is_small(a) && return data(a)
   (a > typemax(Int) || a < typemin(Int)) && throw(InexactError(:convert, Int, a))
   return @ccall libflint.fmpz_get_si(a::Ref{ZZRingElem})::Int
 end
 
 function (::Type{UInt})(a::ZZRingElem)
+  _fmpz_is_small(a) && return UInt(data(a))
   (a > typemax(UInt) || a < 0) && throw(InexactError(:convert, UInt, a))
   return @ccall libflint.fmpz_get_ui(a::Ref{ZZRingElem})::UInt
 end
 
 if Culong !== UInt
   function (::Type{Culong})(a::ZZRingElem)
+    _fmpz_is_small(a) && return Culong(data(a))
     fits(Culong, a) || throw(InexactError(:convert, Culong, a))
     return (@ccall libflint.fmpz_get_ui(a::Ref{ZZRingElem})::UInt) % Culong
   end
@@ -2988,8 +2996,10 @@ end
 
 (::Type{T})(a::ZZRingElem) where T <: Union{UInt8, UInt16, UInt32} = T(UInt(a))
 
-(::Type{Int128})(a::ZZRingElem) = Int128(BigInt(a))
-(::Type{UInt128})(a::ZZRingElem) = UInt128(BigInt(a))
+function (::Type{T})(a::ZZRingElem) where T <: Union{Int128, UInt128}
+  _fmpz_is_small(a) && return T(data(a))
+  T(BigInt(a))
+end
 
 Base.Integer(a::ZZRingElem) = BigInt(a)
 
