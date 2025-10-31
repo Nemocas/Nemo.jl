@@ -18,7 +18,7 @@ elem_type(::Type{FpPolyRing}) = FpPolyRingElem
 
 parent_type(::Type{FpPolyRingElem}) = FpPolyRing
 
-dense_poly_type(::Type{FpFieldElem}) = FpPolyRingElem
+poly_type(::Type{FpFieldElem}) = FpPolyRingElem
 
 ###############################################################################
 #

@@ -10,7 +10,7 @@
   @test elem_type(S) == QQPolyRingElem
   @test elem_type(QQPolyRing) == QQPolyRingElem
   @test parent_type(QQPolyRingElem) == QQPolyRing
-  @test dense_poly_type(QQFieldElem) == QQPolyRingElem
+  @test poly_type(QQFieldElem) == QQPolyRingElem
 
   @test isa(S, QQPolyRing)
 
