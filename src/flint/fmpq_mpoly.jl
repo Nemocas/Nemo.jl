@@ -283,7 +283,7 @@ for jT in (QQFieldElem, ZZRingElem, Integer, Rational)
 
     divexact(a::QQMPolyRingElem, b::($jT); check::Bool=true) = divexact!(parent(a)(), a, b)
 
-    //(a::QQMPolyRingElem, b::($jT)) = a//parent(a)(b)
+    //(a::QQMPolyRingElem, b::($jT)) = a*(1/QQ(b))
   end
 end
 
