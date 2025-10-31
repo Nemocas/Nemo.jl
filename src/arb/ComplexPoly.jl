@@ -14,7 +14,7 @@ parent_type(::Type{ComplexPolyRingElem}) = ComplexPolyRing
 
 elem_type(::Type{ComplexPolyRing}) = ComplexPolyRingElem
 
-dense_poly_type(::Type{ComplexFieldElem}) = ComplexPolyRingElem
+poly_type(::Type{ComplexFieldElem}) = ComplexPolyRingElem
 
 length(x::ComplexPolyRingElem) = x.length
 

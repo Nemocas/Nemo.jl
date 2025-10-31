@@ -12,7 +12,7 @@
   @test elem_type(S) == ZZModPolyRingElem
   @test elem_type(ZZModPolyRing) == ZZModPolyRingElem
   @test parent_type(ZZModPolyRingElem) == ZZModPolyRing
-  @test dense_poly_type(ZZModRingElem) == ZZModPolyRingElem
+  @test poly_type(ZZModRingElem) == ZZModPolyRingElem
 
   @test S isa ZZModPolyRing
 

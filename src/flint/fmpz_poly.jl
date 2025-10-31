@@ -14,7 +14,7 @@ parent_type(::Type{ZZPolyRingElem}) = ZZPolyRing
 
 elem_type(::Type{ZZPolyRing}) = ZZPolyRingElem
 
-dense_poly_type(::Type{ZZRingElem}) = ZZPolyRingElem
+poly_type(::Type{ZZRingElem}) = ZZPolyRingElem
 
 base_ring(a::ZZPolyRing) = ZZ
 

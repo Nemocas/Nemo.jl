@@ -88,7 +88,7 @@ type. For example, if AbstractAlgebra is being used, `dense_matrix_type(ZZ)`
 will return `Mat{BigInt}` whereas if Nemo is being used it will return
 `ZZMatrix`.
 
-We also have `dense_poly_type` for univariate polynomials, `abs_series_type`
+We also have `poly_type` for univariate polynomials, `abs_series_type`
 for absolute series and `rel_series_type` for relative series.
 
 In theory such functions should exist for all major object types, however they

@@ -18,7 +18,7 @@ coeff_types = [Int8, Int, UInt, BigInt,
   @test elem_type(R) == ComplexPolyRingElem
   @test elem_type(ComplexPolyRing) == ComplexPolyRingElem
   @test parent_type(ComplexPolyRingElem) == ComplexPolyRing
-  @test dense_poly_type(ComplexFieldElem) == ComplexPolyRingElem
+  @test poly_type(ComplexFieldElem) == ComplexPolyRingElem
 
   @test R isa ComplexPolyRing
 
