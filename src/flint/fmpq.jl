@@ -87,7 +87,7 @@ Return the sign of $a$ ($-1$, $0$ or $1$) as a fraction.
 """
 sign(a::QQFieldElem) = QQFieldElem(sign(numerator(a)))
 
-sign(::Type{Int}, a::QQFieldElemOrPtr) = Int(@ccall libflint.fmpq_sgn(a::Ref{QQFieldElem})::Cint)
+sign(::Type{Int}, a::QQFieldElemOrPtr) = sign(Int, _num_ptr(a))
 
 Base.signbit(a::QQFieldElem) = signbit(sign(Int, a))
 
@@ -330,22 +330,6 @@ function cmp(a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
   @ccall libflint.fmpq_cmp(a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Cint
 end
 
-function cmp(a::QQFieldElemOrPtr, b::ZZRingElemOrPtr)
-  @ccall libflint.fmpq_cmp_fmpz(a::Ref{QQFieldElem}, b::Ref{ZZRingElem})::Cint
-end
-
-function cmp(a::QQFieldElemOrPtr, b::Int)
-  @ccall libflint.fmpq_cmp_si(a::Ref{QQFieldElem}, b::Int)::Cint
-end
-
-function cmp(a::QQFieldElemOrPtr, b::UInt)
-  @ccall libflint.fmpq_cmp_ui(a::Ref{QQFieldElem}, b::UInt)::Cint
-end
-
-cmp(a::QQFieldElemOrPtr, b::Integer) = cmp(a, flintify(b))
-
-cmp(a::Union{ZZRingElemOrPtr, Integer}, b::QQFieldElemOrPtr) = -cmp(b, a)
-
 function ==(a::QQFieldElem, b::QQFieldElem)
   return @ccall libflint.fmpq_equal(a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Bool
 end
@@ -367,17 +351,34 @@ end
 #
 ###############################################################################
 
-function ==(a::QQFieldElem, b::Int)
-  return @ccall libflint.fmpq_equal_si(a::Ref{QQFieldElem}, b::Int)::Bool
+function cmp(a::QQFieldElemOrPtr, b::ZZRingElemOrPtr)
+  @ccall libflint.fmpq_cmp_fmpz(a::Ref{QQFieldElem}, b::Ref{ZZRingElem})::Cint
 end
 
-==(a::Int, b::QQFieldElem) = b == a
-
-function ==(a::QQFieldElem, b::ZZRingElem)
-  return @ccall libflint.fmpq_equal_fmpz(a::Ref{QQFieldElem}, b::Ref{ZZRingElem})::Bool
+function cmp(a::QQFieldElemOrPtr, b::Int)
+  @ccall libflint.fmpq_cmp_si(a::Ref{QQFieldElem}, b::Int)::Cint
 end
 
-==(a::ZZRingElem, b::QQFieldElem) = b == a
+function cmp(a::QQFieldElemOrPtr, b::UInt)
+  @ccall libflint.fmpq_cmp_ui(a::Ref{QQFieldElem}, b::UInt)::Cint
+end
+
+cmp(a::QQFieldElemOrPtr, b::Integer) = cmp(a, flintify(b))
+
+cmp(a::Union{ZZRingElemOrPtr, Integer}, b::QQFieldElemOrPtr) = -cmp(b, a)
+
+
+for T in (Int, UInt, ZZRingElem, Integer)
+  @eval begin
+    ==(x::QQFieldElem, y::$T) = isinteger(x) && cmp(_num_ptr(x), y) == 0
+    <=(x::QQFieldElem, y::$T) = cmp(x,y) <= 0
+    <(x::QQFieldElem, y::$T) = cmp(x,y) < 0
+
+    ==(x::$T, y::QQFieldElem) = y == x
+    <=(x::$T, y::QQFieldElem) = cmp(y,x) >= 0
+    <(x::$T, y::QQFieldElem) = cmp(y,x) > 0
+  end
+end
 
 ==(a::QQFieldElem, b::Rational{T}) where {T <: Integer} = a == QQFieldElem(b)
 
