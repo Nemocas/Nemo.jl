@@ -962,7 +962,7 @@ end
 #
 ###############################################################################
 
-function mod!(r::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
+function mod!(r::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   @ccall libflint.fmpz_fdiv_r(r::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
   return r
 end
