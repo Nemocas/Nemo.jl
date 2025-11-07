@@ -14,11 +14,8 @@ function valuation(a::UInt, b::UInt)
   return @ccall libflint.n_remove(a::Ref{UInt}, b::UInt)::Int
 end
 
-fits(::Type{Int}, a::Int) = true
-
-function fits(::Type{Int}, a::Integer)
-  #TODO: possibly not optimal?
-  return a % Int == a
+function fits(::Type{T}, a::Integer) where {T <: Integer}
+  return typemin(T) <= a <= typemax(T)
 end
 
 clog(a::Int, b::Int) = clog(ZZRingElem(a), b)
