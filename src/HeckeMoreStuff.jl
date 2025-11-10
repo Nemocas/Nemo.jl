@@ -823,9 +823,8 @@ end
 Base.replace!(::typeof(-), m::ZZMatrix) = -m
 
 function (A::AbsSimpleNumField)(a::ZZPolyRingElem)
-  return A(QQ["x"][1](a))
+  return A(parent(defining_polynomial(A))(a))
 end
-
 
 AbstractAlgebra.promote_rule(::Type{S}, ::Type{ZZRingElem}) where {S<:NumFieldElem} = S
 
