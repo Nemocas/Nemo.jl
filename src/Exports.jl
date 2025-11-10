@@ -377,6 +377,7 @@ export is_unit
 export is_unknown
 export is_unimodular
 export is_upper_triangular
+export is_zero_det_probabilistic
 export is_zero_entry
 export is_zero_row
 export isequal
