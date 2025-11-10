@@ -16,7 +16,7 @@ coeff_types = [Int8, Int, UInt, BigInt,
   @test elem_type(R) == ArbPolyRingElem
   @test elem_type(ArbPolyRing) == ArbPolyRingElem
   @test parent_type(ArbPolyRingElem) == ArbPolyRing
-  @test dense_poly_type(ArbFieldElem) == ArbPolyRingElem
+  @test poly_type(ArbFieldElem) == ArbPolyRingElem
 
   @test R isa ArbPolyRing
 

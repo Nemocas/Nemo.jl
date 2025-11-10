@@ -18,7 +18,7 @@ elem_type(::Type{ZZModPolyRing}) = ZZModPolyRingElem
 
 parent_type(::Type{ZZModPolyRingElem}) = ZZModPolyRing
 
-dense_poly_type(::Type{ZZModRingElem}) = ZZModPolyRingElem
+poly_type(::Type{ZZModRingElem}) = ZZModPolyRingElem
 
 function _is_one_or_throw(f, y)
   R = base_ring(y)

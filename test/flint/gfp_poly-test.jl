@@ -12,7 +12,7 @@
   @test elem_type(Rx) == fpPolyRingElem
   @test elem_type(fpPolyRing) == fpPolyRingElem
   @test parent_type(fpPolyRingElem) == fpPolyRing
-  @test dense_poly_type(fpFieldElem) == fpPolyRingElem
+  @test poly_type(fpFieldElem) == fpPolyRingElem
 
   S = Native.GF(19)
   Sy, y = polynomial_ring(R, "y")
