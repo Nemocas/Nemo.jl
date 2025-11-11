@@ -3024,7 +3024,7 @@ promote_rule(::Type{ZZRingElem}, ::Type{T}) where {T <: Integer} = ZZRingElem
 #used below in rational_reconstruction and, more seriously, in the 
 #solvers in ZZMatrix-Linalg
 
-function _ratrec!(n::ZZRingElem, d::ZZRingElem, a::ZZRingElem, b::ZZRingElem, N::ZZRingElem = ZZ(), D::ZZRingElem= ZZ())
+function _ratrec!(n::ZZRingElem, d::ZZRingElem, a::ZZRingElem, b::ZZRingElem, N::ZZRingElem = ZZ(), D::ZZRingElem= ZZ(); error_tolerant::Bool = false)
   k = nbits(b)
   l = 1
   set!(N, b)
@@ -3048,6 +3048,21 @@ function _ratrec!(n::ZZRingElem, d::ZZRingElem, a::ZZRingElem, b::ZZRingElem, N:
 
     if fl && (nbits(n)+nbits(d) < max(k/2, k - 30) || D>N)
       return fl
+    end
+    if !fl && error_tolerant
+      # the code in flint actually computes (seems to compute) n and d
+      # "correctly" and then returns true iff they are coprime
+      # fl = false can mean
+      #   wrong bitsize
+      #   not coprime
+      # in the error tolerant case, "not coprime" is ok, the gcd is
+      # the product of the bad primes...
+      if (nbits(n)+nbits(d) < max(k/2, k - 30) || D>N)
+        g = gcd(n, d)
+        divexact!(n, n, g)
+        divexact!(d, d, g)
+        return true
+      end
     end
     l += 1
   end
@@ -3093,6 +3108,12 @@ function _rational_reconstruction(a::ZZRingElem, b::ZZRingElem; error_tolerant::
     fl = _ratrec!(n, d, a, b)
     return fl, n, d
   elseif error_tolerant
+    n = ZZ()
+    d = ZZ()
+    a = mod(a, b)
+    fl = _ratrec!(n, d, a, b; error_tolerant)
+    return fl, n, d
+    #safe, but slow. LLL could be made fast for 2x2 matrices, but is not
     m = matrix(ZZ, 2, 2, [a, ZZRingElem(1), b, ZZRingElem(0)])
     lll!(m)
     x = m[1,1]
