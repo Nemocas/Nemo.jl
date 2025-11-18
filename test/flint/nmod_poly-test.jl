@@ -12,7 +12,7 @@
   @test elem_type(Rx) == zzModPolyRingElem
   @test elem_type(zzModPolyRing) == zzModPolyRingElem
   @test parent_type(zzModPolyRingElem) == zzModPolyRing
-  @test dense_poly_type(zzModRingElem) == zzModPolyRingElem
+  @test poly_type(zzModRingElem) == zzModPolyRingElem
 
   S, = residue_ring(ZZ, 19)
   Sy, y = polynomial_ring(R, "y")

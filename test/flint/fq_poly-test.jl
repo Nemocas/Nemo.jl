@@ -12,7 +12,7 @@
   @test elem_type(S) == FqPolyRepPolyRingElem
   @test elem_type(FqPolyRepPolyRing) == FqPolyRepPolyRingElem
   @test parent_type(FqPolyRepPolyRingElem) == FqPolyRepPolyRing
-  @test dense_poly_type(FqPolyRepFieldElem) == FqPolyRepPolyRingElem
+  @test poly_type(FqPolyRepFieldElem) == FqPolyRepPolyRingElem
 
   @test S isa FqPolyRepPolyRing
 

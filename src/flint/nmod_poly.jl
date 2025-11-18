@@ -18,7 +18,7 @@ parent_type(::Type{zzModPolyRingElem}) = zzModPolyRing
 
 elem_type(::Type{zzModPolyRing}) = zzModPolyRingElem
 
-dense_poly_type(::Type{zzModRingElem}) = zzModPolyRingElem
+poly_type(::Type{zzModRingElem}) = zzModPolyRingElem
 
 ################################################################################
 #

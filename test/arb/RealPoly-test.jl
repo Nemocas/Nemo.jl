@@ -16,7 +16,7 @@ coeff_types = [Int8, Int, UInt, BigInt,
   @test elem_type(R) == RealPolyRingElem
   @test elem_type(RealPolyRing) == RealPolyRingElem
   @test parent_type(RealPolyRingElem) == RealPolyRing
-  @test dense_poly_type(RealFieldElem) == RealPolyRingElem
+  @test poly_type(RealFieldElem) == RealPolyRingElem
 
   @test R isa RealPolyRing
 

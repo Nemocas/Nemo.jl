@@ -14,7 +14,7 @@ parent_type(::Type{fqPolyRepPolyRingElem}) = fqPolyRepPolyRing
 
 elem_type(::Type{fqPolyRepPolyRing}) = fqPolyRepPolyRingElem
 
-dense_poly_type(::Type{fqPolyRepFieldElem}) = fqPolyRepPolyRingElem
+poly_type(::Type{fqPolyRepFieldElem}) = fqPolyRepPolyRingElem
 
 base_ring(a::fqPolyRepPolyRing) = a.base_ring
 

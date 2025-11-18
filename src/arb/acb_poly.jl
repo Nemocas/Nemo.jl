@@ -14,7 +14,7 @@ parent_type(::Type{AcbPolyRingElem}) = AcbPolyRing
 
 elem_type(::Type{AcbPolyRing}) = AcbPolyRingElem
 
-dense_poly_type(::Type{AcbFieldElem}) = AcbPolyRingElem
+poly_type(::Type{AcbFieldElem}) = AcbPolyRingElem
 
 length(x::AcbPolyRingElem) = x.length
 

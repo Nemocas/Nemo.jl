@@ -14,7 +14,7 @@ parent_type(::Type{RealPolyRingElem}) = RealPolyRing
 
 elem_type(::Type{RealPolyRing}) = RealPolyRingElem
 
-dense_poly_type(::Type{RealFieldElem}) = RealPolyRingElem
+poly_type(::Type{RealFieldElem}) = RealPolyRingElem
 
 length(x::RealPolyRingElem) = x.length
 

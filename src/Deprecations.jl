@@ -7,8 +7,6 @@
 # ALL aliases here are only a temporary measure to allow for a smooth transition downstream.
 # they will be replaced by deprecations eventually
 
-
-
 ###############################################################################
 #
 #   Deprecated bindings
