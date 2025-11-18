@@ -313,6 +313,7 @@ function eigenspace(M::MatElem{T1}, lambda::T2; side::Symbol = :left) where {T1 
   end
   common_parent = parent(zero(base_ring(M))+lambda)
   isa(common_parent, Field) || throw(ArgumentError("Please give the eigenvalue as a field element (since matrix is not over a field)"))
+  is_exact_type(common_parent) || throw(ArgumentError("Eigen spaces can only be computed over exact fields"))
   N = change_base_ring(common_parent,M)
   for i = 1:ncols(N)
     N[i, i] -= lambda
