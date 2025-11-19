@@ -92,6 +92,8 @@ end
   end
 
   let
-    @test_throws "Flint Exception (General error):\nException (fmpz_divexact). Division by zero." divexact!(ZZ(), ZZ(5), ZZ(0))
+    # https://github.com/flintlib/flint/pull/2398 changed this error message. Until there is the FLINT 3.4.0 release, we accept both.
+    # TODO: Remove the "General error" variant when we require FLINT >= 3.4.0
+    @test_throws in(["Flint Exception (General error):\nException (fmpz_divexact). Division by zero.", "Flint Exception (Divide by zero):\nException (fmpz_divexact). Division by zero."]) divexact!(ZZ(), ZZ(5), ZZ(0))
   end
 end
