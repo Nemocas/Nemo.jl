@@ -921,5 +921,5 @@ end
 
 @testset "QQMatrix.denominator" begin
   M = QQ[1//2 3//4; 5//6 0]
-  @test @inferred denominator(M) == 12
+  @test 12 == @inferred denominator(M)
 end

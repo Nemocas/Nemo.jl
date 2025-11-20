@@ -89,9 +89,9 @@ end
 
     for j in 1:20
       x = rand(ka)
-      @test @inferred f(g(x)) == x
-      @test @inferred preimage(g, g(x)) == x
-      @test @inferred ka(kab(x)) == x
+      @test x == @inferred f(g(x))
+      @test x == @inferred preimage(g, g(x))
+      @test x == @inferred ka(kab(x))
     end
   end
 end
