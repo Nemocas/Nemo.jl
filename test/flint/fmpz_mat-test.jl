@@ -748,6 +748,7 @@ end
   X = matrix(ZZ, 3, 2, [3,1, 4,1, 5,9])
   trX = transpose(X)
   @test AbstractAlgebra._solve_triu_left(U_triang, trX*U_triang) == trX
+  @test AbstractAlgebra._solve_triu(U_triang, trX*U_triang; side = :left) == trX
   @test AbstractAlgebra._solve_triu(U_triang, U_triang*X; side = :right) == X
 
   c = similar(X)
