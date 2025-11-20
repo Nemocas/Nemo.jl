@@ -596,6 +596,7 @@ function (a::QQMPolyRingElem)(vals::Union{NCRingElem, RingElement}...)
 end
 
 function evaluate(a::QQMPolyRingElem, bs::Vector{QQMPolyRingElem})
+  allequal(map(parent, bs)) || error("parents do not match")
   R = parent(a)
   S = parent(bs[1])
 
@@ -609,6 +610,7 @@ function evaluate(a::QQMPolyRingElem, bs::Vector{QQMPolyRingElem})
 end
 
 function evaluate(a::QQMPolyRingElem, bs::Vector{QQPolyRingElem})
+  allequal(map(parent, bs)) || error("parents do not match")
   R = parent(a)
   S = parent(bs[1])
 
