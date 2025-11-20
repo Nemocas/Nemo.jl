@@ -496,6 +496,15 @@ function exponent_vector(a::FqMPolyRingElem, i::Int)
   return exponent_vector(a.data, i)
 end
 
+function exponent_vector(T, a::FqMPolyRingElem, i::Int)
+  return exponent_vector(T, a.data, i)
+end
+
+# Need to specify the type of v to avoid an ambiguity with AbstractAlgebra
+function exponent_vector!(v::Vector{S}, a::FqMPolyRingElem, i::Int) where S
+  return exponent_vector!(v, a.data, i)
+end
+
 function exponent_vector!(v, a::FqMPolyRingElem, i::Int)
   return exponent_vector!(v, a.data, i)
 end
