@@ -737,19 +737,22 @@ end
 end
 
 @testset "ZZMatrix.solve" begin
-  A = matrix(ZZ, 2, 2, [1,2,3,4])
+  # Test matrices have size (at least) 3x3 -- smaller failed to detect a bug.
+  U_triang = matrix(ZZ, 3, 3, [1,2,3, 0,4,5, 0,0,6])
+  L_triang = matrix(ZZ, 3, 3, [1,0,0, 2,3,0, 4,5,6])
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(ZZ) === AbstractAlgebra.Solve.HermiteFormTrait()
-  @test AbstractAlgebra.Solve.matrix_normal_form_type(A) === AbstractAlgebra.Solve.HermiteFormTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(U_triang) === AbstractAlgebra.Solve.HermiteFormTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(L_triang) === AbstractAlgebra.Solve.HermiteFormTrait()
 
-  b = matrix(ZZ, 1, 2, [1, 6])
-  @test AbstractAlgebra._solve_triu_left(A, b) == matrix(ZZ, 1, 2, [1, 1])
-  b = matrix(ZZ, 2, 1, [3, 4])
-  @test AbstractAlgebra._solve_triu(A, b; side = :right) == matrix(ZZ, 2, 1, [1, 1])
-  b = matrix(ZZ, 2, 1, [1, 7])
-  c = similar(b)
-  AbstractAlgebra._solve_tril!(c, A, b)
-  @test c == matrix(ZZ, 2, 1, [1, 1])
+  X = matrix(ZZ, 3, 2, [3,1, 4,1, 5,9])
+  trX = transpose(X)
+  @test AbstractAlgebra._solve_triu_left(U_triang, trX*U_triang) == trX
+  @test AbstractAlgebra._solve_triu(U_triang, U_triang*X; side = :right) == X
+
+  c = similar(X)
+  AbstractAlgebra._solve_tril!(c, L_triang, L_triang*X)
+  @test c == X
 
   S = matrix_space(ZZ, 3, 3)
 
