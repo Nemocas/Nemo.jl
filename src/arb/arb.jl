@@ -1832,7 +1832,7 @@ function simplest_rational_inside(x::ArbFieldElem)
   !fits(Int, e) && error("Result does not fit into an QQFieldElem")
   _e = Int(e)
   if e >= 0
-    return a << _e
+    return QQ(a << _e)
   end
   _e = -_e
   d = ZZRingElem(1) << _e
