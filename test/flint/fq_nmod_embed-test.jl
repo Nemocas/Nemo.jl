@@ -97,8 +97,8 @@ end
 
     for j in 1:20
       x = rand(ka)
-      @test @inferred preimage(g, g(x)) == x
-      @test @inferred f(g(x)) == x
+      @test x == @inferred preimage(g, g(x))
+      @test x == @inferred f(g(x))
     end
 
     a, b = rand(1:5), rand(1:5)

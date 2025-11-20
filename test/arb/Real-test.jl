@@ -585,7 +585,7 @@ end
 
 @testset "RealFieldElem.simplest_rational_inside" begin
   R = real_field()
-  @test @inferred simplest_rational_inside(R(1)) == 1
+  @test (@inferred simplest_rational_inside(R(1))) == 1
   @test simplest_rational_inside(R(1//2)) == 1//2
   @test simplest_rational_inside(R("0.1 +/- 0.01")) == 1//10
   @test simplest_rational_inside(const_pi(R)) == 8717442233//2774848045

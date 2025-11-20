@@ -45,9 +45,9 @@ end
 
 @testset "Diagonal" begin
   A = QQ[1 2 3; 4 5 6]
-  @test @inferred diagonal(A) == [QQ(1), QQ(5)]
+  @test (@inferred diagonal(A)) == [QQ(1), QQ(5)]
   A = transpose(A)
-  @test @inferred diagonal(A) == [QQ(1), QQ(5)]
+  @test (@inferred diagonal(A)) == [QQ(1), QQ(5)]
 
   @test prod_diagonal(A) == QQ(5)
   @test prod_diagonal(zero_matrix(QQ, 0, 0)) == QQ(1)

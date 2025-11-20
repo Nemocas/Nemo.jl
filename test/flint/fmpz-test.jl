@@ -259,7 +259,7 @@ end
     end
 
     for T in [Int, BigInt]
-      @test @inferred func(T, QQ(2//3)) == func(T, 2//3)
+      @test (@inferred func(T, QQ(2//3))) == func(T, 2//3)
     end
   end
 
@@ -1370,11 +1370,11 @@ end
 
   # Perfect power with data
   for T in [Int, BigInt, ZZRingElem]
-    @test @inferred is_perfect_power_with_data(T(5)) == (1, 5)
-    @test @inferred is_perfect_power_with_data(T(-5)) == (1, -5)
-    @test @inferred is_perfect_power_with_data(T(64)) == (6, 2)
-    @test @inferred is_perfect_power_with_data(T(-64)) == (3, -4)
-    @test @inferred is_perfect_power_with_data(T(1)) == (0, 1)
+    @test (@inferred is_perfect_power_with_data(T(5))) == (1, 5)
+    @test (@inferred is_perfect_power_with_data(T(-5))) == (1, -5)
+    @test (@inferred is_perfect_power_with_data(T(64))) == (6, 2)
+    @test (@inferred is_perfect_power_with_data(T(-64))) == (3, -4)
+    @test (@inferred is_perfect_power_with_data(T(1))) == (0, 1)
   end
 
   # is_power(::ZZRingElem, n::Int)
@@ -1691,8 +1691,8 @@ end
 end
 
 @testset "ZZRingElem.bits" begin
-  @test @inferred collect(bits(ZZ(-4))) == [true, false, false]
-  @test @inferred collect(bits(ZZ(0))) == Bool[]
-  @test @inferred collect(bits(ZZ(5))) == Bool[true, false, true]
-  @test @inferred collect(bits(ZZ(2)^64)) == append!([true], falses(64))
+  @test (@inferred collect(bits(ZZ(-4)))) == [true, false, false]
+  @test (@inferred collect(bits(ZZ(0)))) == Bool[]
+  @test (@inferred collect(bits(ZZ(5)))) == Bool[true, false, true]
+  @test (@inferred collect(bits(ZZ(2)^64))) == append!([true], falses(64))
 end
