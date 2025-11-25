@@ -241,7 +241,7 @@ function fits(::Type{Int}, a::ZZRingElem)
   _fmpz_is_small(a) && return true
   n = _fmpz_size(a)
   n == 1 && return rem(a, UInt) <= typemax(Int)
-  n == -1 && return rem(a, UInt) <= reinterpret(UInt,typemin(Int))
+  n == -1 && return rem(a, UInt) >= reinterpret(UInt,typemin(Int))
   return false
 end
 
