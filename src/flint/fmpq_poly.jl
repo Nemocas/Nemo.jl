@@ -1006,7 +1006,10 @@ function (a::QQPolyRing)(b::Vector{ZZRingElem}, copy::Bool=true)
   return x
 end
 
-(a::QQPolyRing)(b::QQPolyRingElem) = b
+function (a::QQPolyRing)(b::QQPolyRingElem)
+  parent(b) != a && error("Unable to coerce polynomial")
+  return b
+end
 
 function (a::QQPolyRing)(b::ZZPolyRingElem)
   z = QQPolyRingElem(b)

@@ -1023,7 +1023,10 @@ end
 
 (a::ZZPolyRing)(b::Vector{T}) where {T <: Integer} = a(map(ZZRingElem, b))
 
-(a::ZZPolyRing)(b::ZZPolyRingElem) = b
+function (a::ZZPolyRing)(b::ZZPolyRingElem)
+  parent(b) != a && error("Unable to coerce polynomial")
+  return b
+end
 
 ###############################################################################
 #
