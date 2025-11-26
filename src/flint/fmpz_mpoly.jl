@@ -534,7 +534,8 @@ end
 ###############################################################################
 
 function evaluate(a::ZZMPolyRingElem, b::Vector{ZZRingElem})
-  length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
+  iszero(length(b)) && error("need at least one value")
+  length(b) != nvars(parent(a)) && error("Number of variables does not match number of values")
   z = ZZRingElem()
   GC.@preserve b @ccall libflint.fmpz_mpoly_evaluate_all_fmpz(z::Ref{ZZRingElem}, a::Ref{ZZMPolyRingElem}, b::Ptr{ZZRingElem}, parent(a)::Ref{ZZMPolyRing})::Nothing
   return z
@@ -545,21 +546,8 @@ function evaluate(a::ZZMPolyRingElem, b::Vector{<:Integer})
   return evaluate(a, fmpz_vec)
 end
 
-function (a::ZZMPolyRingElem)()
-  error("need at least one value")
-end
-
-function (a::ZZMPolyRingElem)(vals::ZZRingElem...)
-  length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
-  return evaluate(a, [vals...])
-end
-
-function (a::ZZMPolyRingElem)(vals::Integer...)
-  length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
-  return evaluate(a, [vals...])
-end
-
-function (a::ZZMPolyRingElem)(vals::NCRingElement...)
+function evaluate(a::ZZMPolyRingElem, vals::Vector{<:NCRingElement})
+  iszero(length(vals)) && error("need at least one value")
   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
   R = base_ring(a)
   # The best we can do here is to cache previously used powers of the values
