@@ -67,9 +67,7 @@ O(R::QadicField, m::Integer) = O(R, ZZRingElem(m))
 
 elem_type(::Type{QadicField}) = QadicFieldElem
 
-base_ring_type(::Type{QadicField}) = typeof(Union{})
-
-base_ring(a::QadicField) = Union{}
+base_ring_type(::Type{QadicField}) = Union{}
 
 parent(a::QadicFieldElem) = a.parent
 
