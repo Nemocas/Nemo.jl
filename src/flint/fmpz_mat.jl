@@ -684,6 +684,51 @@ function det_given_divisor(x::ZZMatrix, d::Integer, proved=true)
 end
 
 
+# Test whether the determinant of an integer matrix is zero:
+# -- false means definitely not zero
+# -- true means "probably" zero (but hard to quantify how probable)
+# We use random starting points for the primes so that it is
+# harder to supply an input which will fool the implementation.
+# For initial speed we use small 22-bit primes, but after 3 iters
+# we switch to larger 61-bit primes (which are faster amortized).
+
+@doc raw"""
+    is_zero_det_probabilistic(M::ZZMatrix; modulus_bitsize::Int = 100)
+
+Return `true` if `det(M) == 0`, and probably return `false` otherwise.
+The algorithm is heuristic, and may _very rarely_ return `true` when
+`det(M) != 0`.  It is faster than doing `is_zero(det(M))`.  The kwarg
+`modular_bitsize` must be between 20 and 1000; larger values decrease
+the probability of a false positive (but require more time).
+"""
+function is_zero_det_probabilistic(M::ZZMatrix; modulus_bitsize::Int = 100)
+  @req  is_square(M)  "matrix must be square"
+  @req ((modulus_bitsize >= 20) && (modulus_bitsize <= 1000))  "modulus_bitsize must be between 20 and 1000 (but bigger than about 250 is usually senseless)"
+  # Dispose of two trivial cases:
+  (nrows(M) == 0) && return false
+  (nrows(M) == 1) && return is_zero(M)
+  # General method starts here:
+  small_prime_size = 21
+  large_prime_size = 60
+  p = 2^small_prime_size + rand(1:2^(small_prime_size-1))  # works well on my computer
+  log2_modulus = 0.0
+  while log2_modulus < modulus_bitsize
+    # After 3 iters, we switch to larger primes (to make progress faster)
+    if log2_modulus > 3*small_prime_size && log2_modulus < 3*small_prime_size + 4
+      p = 2^large_prime_size + rand(1:2^30)
+    end
+    p = next_prime(p)  # ?? better to do  next_prime(p+rand(1:2^16)) ??
+    log2_modulus += log2(p)  # only approximate, but that's fine
+    Fp = Native.GF(p; cached=false, check=false)
+    Mp = change_base_ring(Fp, M)
+    if det(Mp) != 0
+      return false
+    end
+  end
+  return true
+end
+
+
 @doc raw"""
     hadamard_bound2(M::ZZMatrix)
 
