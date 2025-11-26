@@ -140,7 +140,7 @@ end
   a = ZZRingElem(-123)
   b = ZZRingElem(12)
 
-  @testset "ZZRingElem.convert for $T" for T in [Int8, Int16, Int32, Int, BigInt, Float16, Float32, Float64, BigFloat]
+  @testset "ZZRingElem.convert for $T" for T in [Int8, Int16, Int32, Int64, Int128, BigInt, Float16, Float32, Float64, BigFloat]
     x = @inferred T(a)
     @test x isa T
     @test x == -123
@@ -150,10 +150,17 @@ end
   @test x isa BigInt
   @test x == -123
 
-  @testset "ZZRingElem.convert for $T" for T in [UInt8, UInt16, UInt32, UInt]
-    x = @inferred T(b)
-    @test x isa T
-    @test x == 12
+  @testset "ZZRingElem.convert for $T and $f+2^$e" for
+      T in (Int8, Int16, Int32, Int64, Int128, UInt8, UInt16, UInt32, UInt64, UInt128),
+      e in 1:130, f in -1:1
+    c = ZZ(2)^e + f
+    if fits(T, c)
+      x = @inferred T(c)
+      @test x isa T
+      @test x == T(big(2)^e + f)
+    else
+      @test_throws InexactError T(c)
+    end
   end
 
   @test_throws InexactError Int(ZZRingElem(1234484735687346876324432764872))
