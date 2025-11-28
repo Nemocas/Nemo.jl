@@ -321,16 +321,19 @@ end
 
 # Cannot use IntegerUnion here to avoid ambiguity.
 
-function ^(x::ZZMatrix, y::Int)
-  is_negative(y) && throw(DomainError(y, "Exponent must be non-negative"))
-  nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
-  return pow!(similar(x), x, y)
-end
+^(x::ZZMatrix, y::Int) = _powpow(x, y)
 
-function ^(x::ZZMatrix, y::ZZRingElem)
-  is_negative(y) && throw(DomainError(y, "Exponent must be non-negative"))
-  nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
-  return pow!(similar(x), x, y)
+^(x::ZZMatrix, y::ZZRingElem) = _powpow(x, y)
+
+function _powpow(x, y)
+  @req nrows(x) == ncols(x) "Incompatible matrix dimensions"
+  if y >= 0
+    return pow!(similar(x), x, y)
+  else
+    fl, xi = is_invertible_with_inverse(x)
+    @req fl "Matrix must be invertible"
+    return pow!(xi, xi, -y)
+  end
 end
 
 ###############################################################################
@@ -388,18 +391,24 @@ end
 #
 ###############################################################################
 
-function inv(x::ZZMatrix)
-  !is_square(x) && error("Matrix not invertible")
+function is_invertible_with_inverse(x::ZZMatrix)
   z = similar(x)
   d = ZZRingElem()
   @ccall libflint.fmpz_mat_inv(z::Ref{ZZMatrix}, d::Ref{ZZRingElem}, x::Ref{ZZMatrix})::Nothing
   if isone(d)
-    return z
+    return true, z
   end
   if d == -1
-    return -z
+    return true, -z
   end
-  error("Matrix not invertible")
+  return false, x
+end
+
+function inv(x::ZZMatrix)
+  @req is_square(x) "Matrix not invertible"
+  fl, z = is_invertible_with_inverse(x)
+  @req fl "Matrix not invertible"
+  return z
 end
 
 ###############################################################################

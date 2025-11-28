@@ -347,7 +347,15 @@ end
 
   @test A^0 == one(S)
 
-  @test_throws DomainError A^-1
+  @test_throws ArgumentError A^-1
+
+  a = ZZ[1 2;0 1]
+  @test a^-2 == inv(a)^2
+  @test a^ZZ(-2) == inv(a)^2
+  n = -2
+  @test a^n == inv(a)^2
+  n = ZZ(-2)
+  @test a^n == inv(a)^2
 end
 
 @testset "ZZMatrix.adhoc_exact_division" begin
@@ -458,11 +466,11 @@ end
   @test inv(A)*A == one(S)
 
   a = ZZ[1 1;]
-  @test_throws ErrorException inv(a)
+  @test_throws ArgumentError inv(a)
   b = ZZ[1 0; 0 2]
-  @test_throws ErrorException inv(b)
+  @test_throws ArgumentError inv(b)
   c = ZZ[1 1; 1 1]
-  @test_throws ErrorException inv(c)
+  @test_throws ArgumentError inv(c)
 end
 
 @testset "ZZMatrix.pseudo_inversion" begin
