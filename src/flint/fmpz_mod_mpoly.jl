@@ -762,6 +762,10 @@ for (etype, rtype, ftype, ctype) in (
     # Return zero if there is no such term
     function coeff(a::($etype), exps::Vector{UInt})
       z = ZZRingElem()
+      return coeff!(z, a, exps)
+    end
+
+    function coeff!(z::ZZRingElem, a::($etype), exps::Vector{UInt})
       @ccall libflint.fmpz_mod_mpoly_get_coeff_fmpz_ui(z::Ref{ZZRingElem}, a::Ref{($etype)}, exps::Ptr{UInt}, parent(a)::Ref{($rtype)})::UInt
       return base_ring(parent(a))(z)
     end
@@ -770,6 +774,10 @@ for (etype, rtype, ftype, ctype) in (
     # Return zero if there is no such term
     function coeff(a::($etype), exps::Vector{Int})
       z = ZZRingElem()
+      return coeff!(z, a, exps)
+    end
+
+    function coeff!(z::ZZRingElem, a::($etype), exps::Vector{Int})
       @ccall libflint.fmpz_mod_mpoly_get_coeff_fmpz_ui(z::Ref{ZZRingElem}, a::Ref{($etype)}, exps::Ptr{Int}, parent(a)::Ref{($rtype)})::UInt
       return base_ring(parent(a))(z)
     end
@@ -805,6 +813,10 @@ for (etype, rtype, ftype, ctype) in (
     # Return the i-th term of the polynomial, as a polynomial
     function term(a::($etype), i::Int)
       z = parent(a)()
+      return term!(z, a, i)
+    end
+
+    function term!(z::($etype), a::($etype), i::Int)
       @ccall libflint.fmpz_mod_mpoly_get_term(z::Ref{($etype)}, a::Ref{($etype)}, (i - 1)::Int, parent(a)::Ref{($rtype)})::Nothing
       return z
     end
