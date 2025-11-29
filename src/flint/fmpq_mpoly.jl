@@ -525,37 +525,17 @@ end
 ###############################################################################
 
 function evaluate(a::QQMPolyRingElem, b::Vector{QQFieldElem})
-  length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
+  iszero(length(b)) && error("need at least one value")
+  length(b) != nvars(parent(a)) && error("Number of variables does not match number of values")
   z = QQFieldElem()
   GC.@preserve b @ccall libflint.fmpq_mpoly_evaluate_all_fmpq(z::Ref{QQFieldElem}, a::Ref{QQMPolyRingElem}, b::Ptr{QQFieldElem}, parent(a)::Ref{QQMPolyRing})::Nothing
   return z
 end
 
-function evaluate(a::QQMPolyRingElem, b::Vector{ZZRingElem})
-  fmpq_vec = [QQFieldElem(s) for s in b]
-  return evaluate(a, fmpq_vec)
-end
+evaluate(a::QQMPolyRingElem, b::Vector{<:Union{ZZRingElem, Integer}}) = evaluate(a, QQFieldElem.(b))
 
-function evaluate(a::QQMPolyRingElem, b::Vector{<:Integer})
-  fmpq_vec = [QQFieldElem(s) for s in b]
-  return evaluate(a, fmpq_vec)
-end
-
-function (a::QQMPolyRingElem)()
-  error("need at least one value")
-end
-
-function (a::QQMPolyRingElem)(vals::QQFieldElem...)
-  length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
-  return evaluate(a, [vals...])
-end
-
-function (a::QQMPolyRingElem)(vals::Integer...)
-  length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
-  return evaluate(a, [vals...])
-end
-
-function (a::QQMPolyRingElem)(vals::Union{NCRingElem, RingElement}...)
+function evaluate(a::QQMPolyRingElem, vals::Vector{<:Union{NCRingElem, RingElement}})
+  iszero(length(b)) && error("need at least one value")
   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
   R = base_ring(a)
   # The best we can do here is to cache previously used powers of the values
@@ -621,6 +601,10 @@ function evaluate(a::QQMPolyRingElem, bs::Vector{QQPolyRingElem})
   fl = @ccall libflint.fmpq_mpoly_compose_fmpq_poly(c::Ref{QQPolyRingElem}, a::Ref{QQMPolyRingElem}, bs::Ptr{Ref{QQPolyRingElem}}, R::Ref{QQMPolyRing})::Cint
   fl == 0 && error("Something wrong in evaluation.")
   return c
+end
+
+function (a::QQMPolyRingElem)(vals::T...) where T <: Union{NCRingElem, RingElement}
+  return evaluate(a, T[vals...])
 end
 
 ###############################################################################
