@@ -598,6 +598,12 @@ mutable struct zzModPolyRingElem <: PolyRingElem{zzModRingElem}
     finalizer(_nmod_poly_clear_fn, z)
     return z
   end
+
+  function zzModPolyRingElem(R::zzModPolyRing, args...)
+    z = zzModPolyRingElem(R.n, args...)
+    z.parent = R
+    return z
+  end
 end
 
 mutable struct nmod_poly_factor
@@ -706,6 +712,12 @@ mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
     @ccall libflint.nmod_poly_init2(z::Ref{fpPolyRingElem}, n::UInt, length(f)::Int)::Nothing
     @ccall libflint.nmod_poly_set(z::Ref{fpPolyRingElem}, f::Ref{fpPolyRingElem})::Nothing
     finalizer(_nmod_poly_clear_fn, z)
+    return z
+  end
+
+  function fpPolyRingElem(R::fpPolyRing, args...)
+    z = fpPolyRingElem(R.n, args...)
+    z.parent = R
     return z
   end
 end

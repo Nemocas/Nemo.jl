@@ -901,30 +901,14 @@ promote_rule(::Type{zzModPolyRingElem}, ::Type{zzModRingElem}) = zzModPolyRingEl
 #
 ################################################################################
 
-function (R::zzModPolyRing)()
-  z = zzModPolyRingElem(R.n)
-  z.parent = R
-  return z
-end
+(R::zzModPolyRing)() = zzModPolyRingElem(R)
 
 function (R::zzModPolyRing)(x::ZZRingElem)
   r = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, R.n::UInt)::UInt
-  z = zzModPolyRingElem(R.n, r)
-  z.parent = R
-  return z
+  return zzModPolyRingElem(R, r)
 end
 
-function (R::zzModPolyRing)(x::UInt)
-  z = zzModPolyRingElem(R.n, x)
-  z.parent = R
-  return z
-end
-
-function (R::zzModPolyRing)(x::Integer)
-  z = zzModPolyRingElem(R.n, x)
-  z.parent = R
-  return z
-end
+(R::zzModPolyRing)(x::Integer) = zzModPolyRingElem(R, x)
 
 function (R::zzModPolyRing)(x::zzModPolyRingElem)
   R != parent(x) && error("Wrong parents")
@@ -933,21 +917,15 @@ end
 
 function (R::zzModPolyRing)(x::zzModRingElem)
   base_ring(R) != parent(x) && error("Wrong parents")
-  z = zzModPolyRingElem(R.n, x.data)
-  z.parent = R
-  return z
+  return zzModPolyRingElem(R, x.data)
 end
 
 function (R::zzModPolyRing)(arr::Vector{ZZRingElem})
-  z = zzModPolyRingElem(R.n, arr)
-  z.parent = R
-  return z
+  return zzModPolyRingElem(R, arr)
 end
 
 function (R::zzModPolyRing)(arr::Vector{UInt})
-  z = zzModPolyRingElem(R.n, arr)
-  z.parent = R
-  return z
+  return zzModPolyRingElem(R, arr)
 end
 
 (R::zzModPolyRing)(arr::Vector{T}) where {T <: Integer} = R(map(base_ring(R), arr))
@@ -956,7 +934,5 @@ function (R::zzModPolyRing)(arr::Vector{zzModRingElem})
   if length(arr) > 0
     (base_ring(R) != parent(arr[1])) && error("Wrong parents")
   end
-  z = zzModPolyRingElem(R.n, arr)
-  z.parent = R
-  return z
+  return zzModPolyRingElem(R, arr)
 end
