@@ -773,29 +773,16 @@ mutable struct ZZModPolyRingElem <: PolyRingElem{ZZModRingElem}
     return z
   end
 
-
-  function ZZModPolyRingElem(R::ZZModRing)
-    return ZZModPolyRingElem(R.ninv)
-  end
-
   function ZZModPolyRingElem(n::fmpz_mod_ctx_struct, a::ZZRingElem)
     z = ZZModPolyRingElem(n)
     @ccall libflint.fmpz_mod_poly_set_coeff_fmpz(z::Ref{ZZModPolyRingElem}, 0::Int, a::Ref{ZZRingElem}, n::Ref{fmpz_mod_ctx_struct})::Nothing
     return z
   end
 
-  function ZZModPolyRingElem(R::ZZModRing, a::ZZRingElem)
-    return ZZModPolyRingElem(R.ninv, a)
-  end
-
   function ZZModPolyRingElem(n::fmpz_mod_ctx_struct, a::UInt)
     z = ZZModPolyRingElem(n)
     @ccall libflint.fmpz_mod_poly_set_coeff_ui(z::Ref{ZZModPolyRingElem}, 0::Int, a::UInt, n::Ref{fmpz_mod_ctx_struct})::Nothing
     return z
-  end
-
-  function ZZModPolyRingElem(R::ZZModRing, a::UInt)
-    return ZZModPolyRingElem(R.ninv, a)
   end
 
   function ZZModPolyRingElem(n::fmpz_mod_ctx_struct, arr::Vector{ZZRingElem})
@@ -809,10 +796,6 @@ mutable struct ZZModPolyRingElem <: PolyRingElem{ZZModRingElem}
     return z
   end
 
-  function ZZModPolyRingElem(R::ZZModRing, arr::Vector{ZZRingElem})
-    return ZZModPolyRingElem(R.ninv, arr)
-  end
-
   function ZZModPolyRingElem(n::fmpz_mod_ctx_struct, arr::Vector{ZZModRingElem})
     z = new()
     @ccall libflint.fmpz_mod_poly_init2(z::Ref{ZZModPolyRingElem}, length(arr)::Int, n::Ref{fmpz_mod_ctx_struct})::Nothing
@@ -823,20 +806,12 @@ mutable struct ZZModPolyRingElem <: PolyRingElem{ZZModRingElem}
     return z
   end
 
-  function ZZModPolyRingElem(R::ZZModRing, arr::Vector{ZZModRingElem})
-    return ZZModPolyRingElem(R.ninv, arr)
-  end
-
   function ZZModPolyRingElem(n::fmpz_mod_ctx_struct, f::ZZPolyRingElem)
     z = new()
     @ccall libflint.fmpz_mod_poly_init2(z::Ref{ZZModPolyRingElem}, length(f)::Int, n::Ref{fmpz_mod_ctx_struct})::Nothing
     @ccall libflint.fmpz_mod_poly_set_fmpz_poly(z::Ref{ZZModPolyRingElem}, f::Ref{ZZPolyRingElem}, n::Ref{fmpz_mod_ctx_struct})::Nothing
     finalizer(_fmpz_mod_poly_clear_fn, z)
     return z
-  end
-
-  function ZZModPolyRingElem(R::ZZModRing, f::ZZPolyRingElem)
-    return ZZModPolyRingElem(R.ninv, f)
   end
 
   function ZZModPolyRingElem(n::fmpz_mod_ctx_struct, f::ZZModPolyRingElem)
@@ -847,8 +822,14 @@ mutable struct ZZModPolyRingElem <: PolyRingElem{ZZModRingElem}
     return z
   end
 
-  function ZZModPolyRingElem(R::ZZModRing, f::ZZModPolyRingElem)
-    return ZZModPolyRingElem(R.ninv, f)
+  function ZZModPolyRingElem(R::ZZModRing, args...)
+    z = ZZModPolyRingElem(R.ninv, args...)
+  end
+
+  function ZZModPolyRingElem(R::ZZModPolyRing, args...)
+    z = ZZModPolyRingElem(base_ring(R), args...)
+    z.parent = R
+    return z
   end
 end
 
