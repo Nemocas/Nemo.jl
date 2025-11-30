@@ -45,11 +45,7 @@ gen(a::ZZPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
 is_gen(x::ZZPolyRingElem) = @ccall libflint.fmpz_poly_is_gen(x::Ref{ZZPolyRingElem})::Bool
 
-function deepcopy_internal(a::ZZPolyRingElem, dict::IdDict)
-  z = ZZPolyRingElem(a)
-  z.parent = parent(a)
-  return z
-end
+deepcopy_internal(a::ZZPolyRingElem, dict::IdDict) = ZZPolyRingElem(parent(a), a)
 
 @doc raw"""
     height(a::ZZPolyRingElem)
@@ -1003,25 +999,11 @@ end
 #
 ###############################################################################
 
-function (a::ZZPolyRing)()
-  z = ZZPolyRingElem()
-  z.parent = a
-  return z
-end
+(a::ZZPolyRing)() = ZZPolyRingElem(a)
 
-function (a::ZZPolyRing)(b::IntegerUnion)
-  z = ZZPolyRingElem(flintify(b))
-  z.parent = a
-  return z
-end
+(a::ZZPolyRing)(b::IntegerUnion) = ZZPolyRingElem(a, b)
 
-function (a::ZZPolyRing)(b::Vector{ZZRingElem})
-  z = ZZPolyRingElem(b)
-  z.parent = a
-  return z
-end
-
-(a::ZZPolyRing)(b::Vector{T}) where {T <: Integer} = a(map(ZZRingElem, b))
+(a::ZZPolyRing)(b::Vector{<:IntegerUnion}) = ZZPolyRingElem(a, b)
 
 (a::ZZPolyRing)(b::ZZPolyRingElem) = b
 
