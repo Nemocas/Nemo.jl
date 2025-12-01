@@ -62,11 +62,7 @@ gen(a::QQPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
 is_gen(x::QQPolyRingElem) = @ccall libflint.fmpq_poly_is_gen(x::Ref{QQPolyRingElem})::Bool
 
-function deepcopy_internal(a::QQPolyRingElem, dict::IdDict)
-  z = QQPolyRingElem(a)
-  z.parent = parent(a)
-  return z
-end
+deepcopy_internal(a::QQPolyRingElem, dict::IdDict) = QQPolyRingElem(parent(a), a)
 
 Base.copy(f::QQPolyRingElem) = parent(f)(f)
 
@@ -956,63 +952,15 @@ end
 #
 ###############################################################################
 
-function (a::QQPolyRing)()
-  z = QQPolyRingElem()
-  z.parent = a
-  return z
-end
+(a::QQPolyRing)() = QQPolyRingElem(a)
 
-function (a::QQPolyRing)(b::Int)
-  z = QQPolyRingElem(b)
-  z.parent = a
-  return z
-end
+(a::QQPolyRing)(b::RationalUnion) = QQPolyRingElem(a, b)
 
-function (a::QQPolyRing)(b::Integer)
-  z = QQPolyRingElem(ZZRingElem(b))
-  z.parent = a
-  return z
-end
-
-function (a::QQPolyRing)(b::ZZRingElem)
-  z = QQPolyRingElem(b)
-  z.parent = a
-  return z
-end
-
-function (a::QQPolyRing)(b::QQFieldElem)
-  z = QQPolyRingElem(b)
-  z.parent = a
-  return z
-end
-
-function (a::QQPolyRing)(b::Vector{QQFieldElem})
-  z = QQPolyRingElem(b)
-  z.parent = a
-  return z
-end
-
-(a::QQPolyRing)(b::Rational) = a(QQFieldElem(b))
-
-(a::QQPolyRing)(b::Vector{T}, copy::Bool=true) where {T <: Integer} = a(map(QQFieldElem, b))
-
-(a::QQPolyRing)(b::Vector{Rational{T}}, copy::Bool=true) where {T <: Integer} = a(map(QQFieldElem, b))
-
-function (a::QQPolyRing)(b::Vector{ZZRingElem}, copy::Bool=true) 
-  x = a()
-  for i=1:length(b)
-    @ccall libflint.fmpq_poly_set_coeff_fmpz(x::Ref{QQPolyRingElem}, (i - 1)::Int, b[i]::Ref{ZZRingElem})::Cvoid
-  end
-  return x
-end
+(a::QQPolyRing)(b::Vector{<:RationalUnion}) = QQPolyRingElem(a, b)
 
 (a::QQPolyRing)(b::QQPolyRingElem) = b
 
-function (a::QQPolyRing)(b::ZZPolyRingElem)
-  z = QQPolyRingElem(b)
-  z.parent = a
-  return z
-end
+(a::QQPolyRing)(b::ZZPolyRingElem) = QQPolyRingElem(a, b)
 
 ###############################################################################
 #
