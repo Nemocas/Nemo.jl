@@ -490,30 +490,14 @@ promote_rule(::Type{fpPolyRingElem}, ::Type{fpFieldElem}) = fpPolyRingElem
 #
 ################################################################################
 
-function (R::fpPolyRing)()
-  z = fpPolyRingElem(R.n)
-  z.parent = R
-  return z
-end
+(R::fpPolyRing)() = fpPolyRingElem(R)
 
 function (R::fpPolyRing)(x::ZZRingElem)
   r = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, R.n::UInt)::UInt
-  z = fpPolyRingElem(R.n, r)
-  z.parent = R
-  return z
+  return fpPolyRingElem(R, r)
 end
 
-function (R::fpPolyRing)(x::UInt)
-  z = fpPolyRingElem(R.n, x)
-  z.parent = R
-  return z
-end
-
-function (R::fpPolyRing)(x::Integer)
-  z = fpPolyRingElem(R.n, x)
-  z.parent = R
-  return z
-end
+(R::fpPolyRing)(x::Integer) = fpPolyRingElem(R, x)
 
 function (R::fpPolyRing)(x::fpPolyRingElem)
   R != parent(x) && error("Wrong parents")
@@ -522,22 +506,12 @@ end
 
 function (R::fpPolyRing)(x::fpFieldElem)
   base_ring(R) != parent(x) && error("Wrong parents")
-  z = fpPolyRingElem(R.n, x.data)
-  z.parent = R
-  return z
+  return fpPolyRingElem(R, x.data)
 end
 
-function (R::fpPolyRing)(arr::Vector{ZZRingElem})
-  z = fpPolyRingElem(R.n, arr)
-  z.parent = R
-  return z
-end
+(R::fpPolyRing)(arr::Vector{ZZRingElem}) = fpPolyRingElem(R, arr)
 
-function (R::fpPolyRing)(arr::Vector{UInt})
-  z = fpPolyRingElem(R.n, arr)
-  z.parent = R
-  return z
-end
+(R::fpPolyRing)(arr::Vector{UInt}) = fpPolyRingElem(R, arr)
 
 (R::fpPolyRing)(arr::Vector{T}) where {T <: Integer} = R(map(base_ring(R), arr))
 
@@ -545,7 +519,5 @@ function (R::fpPolyRing)(arr::Vector{fpFieldElem})
   if length(arr) > 0
     (base_ring(R) != parent(arr[1])) && error("Wrong parents")
   end
-  z = fpPolyRingElem(R.n, arr)
-  z.parent = R
-  return z
+  return fpPolyRingElem(R, arr)
 end

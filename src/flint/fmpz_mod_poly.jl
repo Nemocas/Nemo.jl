@@ -833,53 +833,29 @@ promote_rule(::Type{ZZModPolyRingElem}, ::Type{ZZModRingElem}) = ZZModPolyRingEl
 #
 ################################################################################
 
-function (R::ZZModPolyRing)()
-  z = ZZModPolyRingElem(base_ring(R))
-  z.parent = R
-  return z
-end
+(R::ZZModPolyRing)() = ZZModPolyRingElem(R)
 
-function (R::ZZModPolyRing)(x::ZZRingElem)
-  z = ZZModPolyRingElem(base_ring(R), x)
-  z.parent = R
-  return z
-end
+(R::ZZModPolyRing)(x::ZZRingElem) = ZZModPolyRingElem(R, x)
 
-function (R::ZZModPolyRing)(x::Integer)
-  z = ZZModPolyRingElem(base_ring(R), ZZRingElem(x))
-  z.parent = R
-  return z
-end
+(R::ZZModPolyRing)(x::Integer) = ZZModPolyRingElem(R, ZZRingElem(x))
 
 function (R::ZZModPolyRing)(x::ZZModRingElem)
   base_ring(R) != parent(x) && error("Wrong parents")
-  z = ZZModPolyRingElem(base_ring(R), x.data)
-  z.parent = R
-  return z
+  return ZZModPolyRingElem(R, x.data)
 end
 
-function (R::ZZModPolyRing)(arr::Vector{ZZRingElem})
-  z = ZZModPolyRingElem(base_ring(R), arr)
-  z.parent = R
-  return z
-end
+(R::ZZModPolyRing)(arr::Vector{ZZRingElem}) = ZZModPolyRingElem(R, arr)
 
 function (R::ZZModPolyRing)(arr::Vector{ZZModRingElem})
   if length(arr) > 0
     (base_ring(R) != parent(arr[1])) && error("Wrong parents")
   end
-  z = ZZModPolyRingElem(base_ring(R), arr)
-  z.parent = R
-  return z
+  return ZZModPolyRingElem(R, arr)
 end
 
 (R::ZZModPolyRing)(arr::Vector{T}) where {T <: Integer} = R(map(base_ring(R), arr))
 
-function (R::ZZModPolyRing)(x::ZZPolyRingElem)
-  z = ZZModPolyRingElem(base_ring(R), x)
-  z.parent = R
-  return z
-end
+(R::ZZModPolyRing)(x::ZZPolyRingElem) = ZZModPolyRingElem(R, x)
 
 function (R::ZZModPolyRing)(f::ZZModPolyRingElem)
   parent(f) != R && error("Unable to coerce polynomial")
