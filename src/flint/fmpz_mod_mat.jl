@@ -158,6 +158,7 @@ function AbstractAlgebra.multiply_row!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::In
       i_ptr += sizeof(ZZRingElem)
     end
   end
+  return A
 end
 
 function AbstractAlgebra.multiply_column!(A::Zmod_fmpz_mat, s::ZZModRingElemOrPtr, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
@@ -171,6 +172,7 @@ function AbstractAlgebra.multiply_column!(A::Zmod_fmpz_mat, s::ZZModRingElemOrPt
       @ccall libflint.fmpz_mod_mul(i_ptr::Ref{ZZRingElem}, i_ptr::Ref{ZZRingElem}, lift(s)::Ref{ZZRingElem}, ctx::Ref{fmpz_mod_ctx_struct})::Nothing
     end
   end
+  return A
 end
 
 
@@ -193,6 +195,7 @@ function AbstractAlgebra.add_row!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::Int, j:
       j_ptr += sizeof(ZZRingElem)
     end
   end
+  return A
 end
 
 function AbstractAlgebra.add_column!(A::Zmod_fmpz_mat, s::ZZModRingElemOrPtr, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
@@ -212,6 +215,7 @@ function AbstractAlgebra.add_column!(A::Zmod_fmpz_mat, s::ZZModRingElemOrPtr, i:
       @ccall libflint.fmpz_mod_set_fmpz(j_ptr::Ref{ZZRingElem}, j_ptr::Ref{ZZRingElem}, ctx::Ref{fmpz_mod_ctx_struct})::Nothing
     end
   end
+  return A
 end
 
 ################################################################################

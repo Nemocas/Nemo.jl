@@ -1419,6 +1419,7 @@ function AbstractAlgebra.multiply_row!(A::ZZMatrix, s::Union{Int, ZZRingElemOrPt
       i_ptr += sizeof(ZZRingElem)
     end
   end
+  return A
 end
 
 function AbstractAlgebra.multiply_column!(A::ZZMatrix, s::Union{Int, ZZRingElemOrPtr}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
@@ -1431,6 +1432,7 @@ function AbstractAlgebra.multiply_column!(A::ZZMatrix, s::Union{Int, ZZRingElemO
       mul!(i_ptr, s, i_ptr)
     end
   end
+  return A
 end
 
 
@@ -1448,6 +1450,7 @@ function AbstractAlgebra.add_row!(A::ZZMatrix, s::Union{ZZRingElemOrPtr, Int}, i
       j_ptr += sizeof(ZZRingElem)
     end
   end
+  return A
 end
 
 function AbstractAlgebra.add_column!(A::ZZMatrix, s::Union{ZZRingElemOrPtr, Int}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
@@ -1462,6 +1465,7 @@ function AbstractAlgebra.add_column!(A::ZZMatrix, s::Union{ZZRingElemOrPtr, Int}
       addmul!(j_ptr, s, i_ptr)
     end
   end
+  return A
 end
 
 ###############################################################################
