@@ -881,3 +881,21 @@ end
   m = [[BigInt(0),BigInt(0)], [BigInt(1),BigInt(0)], [BigInt(0),BigInt(1)]]
   @test S([BigInt(0), BigInt(1), BigInt(2)], m) == 1*x+2*y
 end
+
+@testset "zzModMPolyRingElem.iterators" begin
+  F, _ = residue_ring(ZZ, 23)
+  R, (x, y, z) = polynomial_ring(F, [:x, :y, :z])
+  f = x * y + 2 * x - 3 * z
+
+  @test (@inferred collect(exponent_vectors(f))) == [[1, 1, 0], [1, 0, 0], [0, 0, 1]]
+  @test (@inferred collect(exponent_vectors(Vector{UInt}, f))) == [UInt[1, 1, 0], UInt[1, 0, 0], UInt[0, 0, 1]]
+  @test (@inferred collect(coefficients(f))) == [F(1), F(2), F(-3)]
+  @test (@inferred collect(terms(f))) == [x * y, 2 * x, -3 * z]
+  @test (@inferred collect(monomials(f))) == [x * y, x, z]
+
+  @test (@inferred first(exponent_vectors(f, inplace = true))) == [1, 1, 0]
+  @test (@inferred first(exponent_vectors(Vector{UInt}, f, inplace = true))) == UInt[1, 1, 0]
+  @test (@inferred first(coefficients(f, inplace = true))) == F(1)
+  @test (@inferred first(monomials(f, inplace = true))) == x * y
+  @test (@inferred first(terms(f, inplace = true))) == x * y
+end

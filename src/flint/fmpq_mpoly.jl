@@ -108,6 +108,10 @@ end
 
 function coeff(a::QQMPolyRingElem, i::Int)
   z = QQFieldElem()
+  return coeff!(z, a, i)
+end
+
+function coeff!(z::QQFieldElem, a::QQMPolyRingElem, i::Int)
   n = length(a)
   (i < 1 || i > n) && error("Index must be between 1 and $(length(a))")
   @ccall libflint.fmpq_mpoly_get_term_coeff_fmpq(z::Ref{QQFieldElem}, a::Ref{QQMPolyRingElem}, (i - 1)::Int, a.parent::Ref{QQMPolyRing})::Nothing
@@ -913,6 +917,10 @@ end
 # Return the i-th term of the polynomial, as a polynomial
 function term(a::QQMPolyRingElem, i::Int)
   z = parent(a)()
+  return term!(z, a, i)
+end
+
+function term!(z::QQMPolyRingElem, a::QQMPolyRingElem, i::Int)
   n = length(a)
   (i < 1 || i > n) && error("Index must be between 1 and $(length(a))")
   @ccall libflint.fmpq_mpoly_get_term(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, (i - 1)::Int, a.parent::Ref{QQMPolyRing})::Nothing

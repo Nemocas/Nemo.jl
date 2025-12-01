@@ -100,6 +100,10 @@ end
 
 function coeff(a::ZZMPolyRingElem, i::Int)
   z = ZZRingElem()
+  return coeff!(z, a, i)
+end
+
+function coeff!(z::ZZRingElem, a::ZZMPolyRingElem, i::Int)
   n = length(a)
   # this check is not needed as fmpz_mpoly_get_term_coeff_fmpz throws
   (i < 1 || i > n) && error("Index must be between 1 and $(length(a))")
@@ -874,6 +878,10 @@ end
 # Return the i-th term of the polynomial, as a polynomial
 function term(a::ZZMPolyRingElem, i::Int)
   z = parent(a)()
+  return term!(z, a, i)
+end
+
+function term!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, i::Int)
   @ccall libflint.fmpz_mpoly_get_term(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, (i - 1)::Int, a.parent::Ref{ZZMPolyRing})::Nothing
   return z
 end
