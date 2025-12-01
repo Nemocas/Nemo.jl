@@ -277,6 +277,8 @@ to get optimal dispatch.
 This also works for Nemo types that also have special handlers for `UInt`,
 as their method for `b::UInt` takes precedence over the fallback method.
 """
+flintify(::RationalUnion)
+
 flintify(x::ZZRingElem) = x
 flintify(x::QQFieldElem) = x
 flintify(x::Int) = x
