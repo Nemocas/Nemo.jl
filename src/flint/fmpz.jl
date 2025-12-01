@@ -237,22 +237,29 @@ is_positive(n::ZZRingElemOrPtr) = sign(Int, n) > 0
 
 Return `true` if $a$ fits into an `Int`, otherwise return `false`.
 """
-fits(::Type{Int}, a::ZZRingElem) = _fmpz_is_small(a) || @ccall libflint.fmpz_fits_si(a::Ref{ZZRingElem})::Bool
+function fits(::Type{Int}, a::ZZRingElem)
+  _fmpz_is_small(a) && return true
+  n = _fmpz_size(a)
+  n == 1 && return rem(a, UInt) <= typemax(Int)
+  n == -1 && return rem(a, UInt) >= reinterpret(UInt,typemin(Int))
+  return false
+end
 
 @doc raw"""
     fits(::Type{UInt}, a::ZZRingElem)
 
 Return `true` if $a$ fits into a `UInt`, otherwise return `false`.
 """
-@inline function fits(::Type{UInt}, a::ZZRingElem)
-  a < 0 && return false
-  return @ccall libflint.fmpz_abs_fits_ui(a::Ref{ZZRingElem})::Bool
+function fits(::Type{UInt}, a::ZZRingElem)
+  return !is_negative(a) && size(a) == 1
 end
 
-if Culong !== UInt
-  function fits(::Type{Culong}, a::ZZRingElem)
-    return 0 <= a && a <= UInt(typemax(Culong))
-  end
+function fits(::Type{T}, a::ZZRingElem) where {T <: Union{Int32,Int16,Int8,UInt32,UInt16,UInt8}}
+  return _fmpz_is_small(a) && typemin(T) <= data(a) <= typemax(T)
+end
+
+function fits(::Type{T}, a::ZZRingElem) where {T <: Integer}
+  return typemin(T) <= a <= typemax(T)
 end
 
 @doc raw"""
@@ -495,7 +502,7 @@ function is_divisible_by(x::Integer, y::ZZRingElem)
   return is_divisible_by(ZZRingElem(x), y)
 end
 
-function rem(x::ZZRingElemOrPtr, ::Type{UInt64})
+function rem(x::ZZRingElemOrPtr, ::Type{UInt})
   return _fmpz_is_small(x) ? (data(x) % UInt) : GC.@preserve x (_as_bigint(x) % UInt)
 end
 
@@ -826,7 +833,7 @@ end
 ###############################################################################
 
 function cmp(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
-  Int(@ccall libflint.fmpz_cmp(x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Cint)
+  @ccall libflint.fmpz_cmp(x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Cint
 end
 
 ==(x::ZZRingElem, y::ZZRingElem) = cmp(x,y) == 0
@@ -841,9 +848,9 @@ end
 
 isless(x::ZZRingElem, y::ZZRingElem) = x < y
 
-isless(x::ZZRingElem, y::Integer) = x < ZZRingElem(y)
+isless(x::ZZRingElem, y::Integer) = x < flintify(y)
 
-isless(x::Integer, y::ZZRingElem) = ZZRingElem(x) < y
+isless(x::Integer, y::ZZRingElem) = flintify(x) < y
 
 function Base.isapprox(x::ZZRingElem, y::ZZRingElem;
                        atol::Real=0, rtol::Real=0,
@@ -862,37 +869,28 @@ end
 ###############################################################################
 
 function cmp(x::ZZRingElemOrPtr, y::Int)
+  _fmpz_is_small(x) && return cmp(data(x), y)
   Int(@ccall libflint.fmpz_cmp_si(x::Ref{ZZRingElem}, y::Int)::Cint)
 end
 
-==(x::ZZRingElem, y::Int) = cmp(x,y) == 0
-
-<=(x::ZZRingElem, y::Int) = cmp(x,y) <= 0
-
-<(x::ZZRingElem, y::Int) = cmp(x,y) < 0
-
-==(x::Int, y::ZZRingElem) = cmp(y,x) == 0
-
-<=(x::Int, y::ZZRingElem) = cmp(y,x) >= 0
-
-<(x::Int, y::ZZRingElem) = cmp(y,x) > 0
-
 function cmp(x::ZZRingElemOrPtr, y::UInt)
+  _fmpz_is_small(x) && return cmp(data(x), y)
   Int(@ccall libflint.fmpz_cmp_ui(x::Ref{ZZRingElem}, y::UInt)::Cint)
 end
 
-==(x::ZZRingElem, y::UInt) = cmp(x,y) == 0
+cmp(x::ZZRingElemOrPtr, y::Integer) = cmp(x, flintify(y))
 
-<=(x::ZZRingElem, y::UInt) = cmp(x,y) <= 0
+for T in (Int, UInt, Integer)
+  @eval begin
+    ==(x::ZZRingElem, y::$T) = cmp(x,y) == 0
+    <=(x::ZZRingElem, y::$T) = cmp(x,y) <= 0
+    <(x::ZZRingElem, y::$T) = cmp(x,y) < 0
 
-<(x::ZZRingElem, y::UInt) = cmp(x,y) < 0
-
-==(x::UInt, y::ZZRingElem) = cmp(y,x) == 0
-
-<=(x::UInt, y::ZZRingElem) = cmp(y,x) >= 0
-
-<(x::UInt, y::ZZRingElem) = cmp(y,x) > 0
-
+    ==(x::$T, y::ZZRingElem) = cmp(y,x) == 0
+    <=(x::$T, y::ZZRingElem) = cmp(y,x) >= 0
+    <(x::$T, y::ZZRingElem) = cmp(y,x) > 0
+  end
+end
 
 ==(x::ZZRingElem, y::Rational) = isinteger(y) && x == numerator(y)
 
@@ -2974,14 +2972,13 @@ end
 
 function (::Type{Int})(a::ZZRingElem)
   _fmpz_is_small(a) && return data(a)
-  (a > typemax(Int) || a < typemin(Int)) && throw(InexactError(:convert, Int, a))
+  fits(Int, a) || throw(InexactError(:convert, Int, a))
   return @ccall libflint.fmpz_get_si(a::Ref{ZZRingElem})::Int
 end
 
 function (::Type{UInt})(a::ZZRingElem)
-  _fmpz_is_small(a) && return UInt(data(a))
-  (a > typemax(UInt) || a < 0) && throw(InexactError(:convert, UInt, a))
-  return @ccall libflint.fmpz_get_ui(a::Ref{ZZRingElem})::UInt
+  fits(UInt, a) || throw(InexactError(:convert, UInt, a))
+  return rem(a, UInt)
 end
 
 if Culong !== UInt
