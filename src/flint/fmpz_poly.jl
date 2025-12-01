@@ -1005,7 +1005,10 @@ end
 
 (a::ZZPolyRing)(b::Vector{<:IntegerUnion}) = ZZPolyRingElem(a, b)
 
-(a::ZZPolyRing)(b::ZZPolyRingElem) = b
+function (a::ZZPolyRing)(b::ZZPolyRingElem)
+  parent(b) != a && error("Unable to coerce polynomial")
+  return b
+end
 
 ###############################################################################
 #

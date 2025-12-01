@@ -958,7 +958,10 @@ end
 
 (a::QQPolyRing)(b::Vector{<:RationalUnion}) = QQPolyRingElem(a, b)
 
-(a::QQPolyRing)(b::QQPolyRingElem) = b
+function (a::QQPolyRing)(b::QQPolyRingElem)
+  parent(b) != a && error("Unable to coerce polynomial")
+  return b
+end
 
 (a::QQPolyRing)(b::ZZPolyRingElem) = QQPolyRingElem(a, b)
 
