@@ -1,6 +1,6 @@
 name = "Nemo"
 uuid = "2edaba10-b0f1-5616-af89-8c11ac63239a"
-version = "0.52.4"
+version = "0.53.0-DEV"
 
 [deps]
 AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
@@ -12,7 +12,7 @@ SHA = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 
 [compat]
 AbstractAlgebra = "0.47.4"
-FLINT_jll = "~301.300.102"
+FLINT_jll = "~301.400.0"
 LinearAlgebra = "1.6"
 Random = "1.6"
 RandomExtensions = "0.4.2"
