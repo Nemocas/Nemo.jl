@@ -1005,7 +1005,7 @@ end
 
 (a::ZZPolyRing)(b::Vector{<:IntegerUnion}) = ZZPolyRingElem(a, b)
 
-(a::ZZPolyRing)(b::ZZPolyRingElem) = b
+(a::ZZPolyRing)(b::ZZPolyRingElem) = (a == parent(b)) ? b : error("Coercion not supported; instead use map_coefficients with kwarg `parent'")
 
 ###############################################################################
 #
