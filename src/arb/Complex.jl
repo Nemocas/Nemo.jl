@@ -28,9 +28,7 @@ elem_type(::Type{ComplexField}) = ComplexFieldElem
 
 parent_type(::Type{ComplexFieldElem}) = ComplexField
 
-base_ring_type(::Type{ComplexField}) = typeof(Union{})
-
-base_ring(R::ComplexField) = Union{}
+base_ring_type(::Type{ComplexField}) = Union{}
 
 parent(x::ComplexFieldElem) = complex_field()
 

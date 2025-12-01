@@ -7,7 +7,7 @@ CC = complex_field()
   @test isa(CC(2), FieldElem)
 
   @test elem_type(CC) == ComplexFieldElem
-  @test base_ring(CC) == Union{}
+  @test base_ring_type(CC) == Union{}
 
   @test elem_type(ComplexField) == ComplexFieldElem
   @test parent_type(ComplexFieldElem) == ComplexField

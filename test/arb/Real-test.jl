@@ -32,7 +32,7 @@ end
   @test elem_type(RR) == RealFieldElem
   @test elem_type(RealField) == RealFieldElem
   @test parent_type(RealFieldElem) == RealField
-  @test base_ring(RR) == Union{}
+  @test base_ring_type(RR) == Union{}
 
   @test real_field() == real_field()
 end
