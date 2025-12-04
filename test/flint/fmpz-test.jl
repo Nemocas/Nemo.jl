@@ -2476,3 +2476,21 @@ end
    @test_throws DomainError euler_phi(-1)
    @test_throws DomainError euler_phi(ZZ(-1))
 end
+
+@testset "ZZRingElem.OneTo" begin
+  n = ZZ(5)
+
+  r = Base.OneTo(n)
+
+  @test r isa ZZRingElemUnitRange
+  @test r[1] == ZZ(1)
+  @test r[end] == n
+  @test length(r) == 5
+  @test collect(r) == ZZRingElem[1, 2, 3, 4, 5]
+
+  m = ZZ(20)
+  r2 = Base.OneTof(m)
+  @test first(r2) == ZZ(1)
+  @test last(r2) == m
+  @test length(r2) == 20
+end
