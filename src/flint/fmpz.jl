@@ -85,6 +85,8 @@ ifelse(stop >= start, stop, start - one(ZZRingElem))
 
 Base.:(:)(a::ZZRingElem, b::ZZRingElem) = ZZRingElemUnitRange(a, b)
 
+Base.OneTo(n::ZZRingElem) = ZZRingElemUnitRange(parent(n)(1), n)
+
 @inline function getindex(r::ZZRingElemUnitRange, i::ZZRingElem)
   val = r.start + (i - 1)
   @boundscheck _in_unit_range(r, val) || Base.throw_boundserror(r, i)
