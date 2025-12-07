@@ -81,9 +81,9 @@ is_gen(a::T) where T <: Zmodn_poly = (degree(a) == 1 &&
 
 iszero(a::T) where T <: Zmodn_poly = Bool(@ccall libflint.nmod_poly_is_zero(a::Ref{T})::Int32)
 
-modulus(a::T) where T <: Zmodn_poly = a.parent.n
+modulus(a::T) where T <: Zmodn_poly = modulus(parent(a))
 
-modulus(R::zzModPolyRing) = R.n
+modulus(R::zzModPolyRing) = modulus(base_ring(R))
 
 var(R::zzModPolyRing) = R.S
 

@@ -50,7 +50,7 @@ one(R::fpPolyRing) = R(UInt(1))
 
 gen(R::fpPolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
-modulus(R::fpPolyRing) = R.n
+modulus(R::fpPolyRing) = modulus(base_ring(R))
 
 var(R::fpPolyRing) = R.S
 

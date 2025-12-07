@@ -63,9 +63,9 @@ is_gen(a::Zmodn_fmpz_poly) = (degree(a) == 1 &&
 
 var(R::ZmodNFmpzPolyRing) = R.S
 
-modulus(a::Zmodn_fmpz_poly) = a.parent.n
+modulus(a::Zmodn_fmpz_poly) = modulus(parent(a))
 
-modulus(R::ZmodNFmpzPolyRing) = R.n
+modulus(R::ZmodNFmpzPolyRing) = modulus(base_ring(R))
 
 function deepcopy_internal(a::T, dict::IdDict) where {T <: Zmodn_fmpz_poly}
   z = T(base_ring(parent(a)), a)
