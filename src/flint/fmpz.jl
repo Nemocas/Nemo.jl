@@ -85,7 +85,43 @@ ifelse(stop >= start, stop, start - one(ZZRingElem))
 
 Base.:(:)(a::ZZRingElem, b::ZZRingElem) = ZZRingElemUnitRange(a, b)
 
-Base.OneTo(n::ZZRingElem) = ZZRingElemUnitRange(parent(n)(1), n)
+struct ZZOneTo <: AbstractUnitRange{ZZRingElem}
+  stop::ZZRingElem
+end
+
+Base.OneTo(n::ZZRingElem) = ZZOneTo(n)
+
+Base.eltype(::Type{ZZOneTo}) = ZZRingElem
+Base.first(::ZZOneTo) = ZZ(1)
+Base.last(r::ZZOneTo) = r.stop
+
+function Base.length(r::ZZOneTo)
+  s = r.stop
+  if fits(Int, s)
+      return Int(s)
+  else
+      return BigInt(s)
+  end
+end
+
+function Base.getindex(r::ZZOneTo, i::Integer)
+  if i < 1 || i > length(r)
+      throw(BoundsError(r, i))
+  end
+  return ZZ(i)
+end
+
+Base.iterate(r::ZZOneTo) = (ZZ(1), ZZ(1))
+function Base.iterate(r::ZZOneTo, state::ZZRingElem)
+  nxt = state + ZZ(1)
+  if nxt <= r.stop
+      return (nxt, nxt)
+  else
+      return nothing
+  end
+end
+
+Base.in(x::ZZRingElem, r::ZZOneTo) = (x >= ZZ(1) && x <= r.stop)
 
 @inline function getindex(r::ZZRingElemUnitRange, i::ZZRingElem)
   val = r.start + (i - 1)
