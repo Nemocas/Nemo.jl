@@ -582,7 +582,7 @@ for (etype, rtype, ftype, ctype) in (
 
     # TODO have AA define evaluate(a, vals) for general vals
     # so we can get rid of this copy pasta
-    function (a::($etype))(vals::Union{NCRingElem, RingElement}...)
+    function (a::($etype))(vals::NCRingElement...)
       length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
       R = base_ring(a)
       powers = [Dict{Int, Any}() for i in 1:length(vals)]

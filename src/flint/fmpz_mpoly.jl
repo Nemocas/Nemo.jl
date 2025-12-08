@@ -531,7 +531,7 @@ function (a::ZZMPolyRingElem)(vals::Integer...)
   return evaluate(a, [vals...])
 end
 
-function (a::ZZMPolyRingElem)(vals::Union{NCRingElem, RingElement}...)
+function (a::ZZMPolyRingElem)(vals::NCRingElement...)
   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
   R = base_ring(a)
   # The best we can do here is to cache previously used powers of the values
