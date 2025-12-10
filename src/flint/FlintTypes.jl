@@ -678,7 +678,7 @@ mutable struct zzModPolyRingElem <: PolyRingElem{zzModRingElem}
   end
 
   function zzModPolyRingElem(R::zzModPolyRing, args...)
-    z = zzModPolyRingElem(R.n, args...)
+    z = zzModPolyRingElem(modulus(R), args...)
     z.parent = R
     return z
   end
@@ -792,7 +792,7 @@ mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
   end
 
   function fpPolyRingElem(R::fpPolyRing, args...)
-    z = fpPolyRingElem(R.n, args...)
+    z = fpPolyRingElem(modulus(R), args...)
     z.parent = R
     return z
   end
