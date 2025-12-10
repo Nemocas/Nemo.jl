@@ -76,7 +76,7 @@ one(R::zzModPolyRing) = R(UInt(1))
 
 gen(R::zzModPolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
-is_gen(a::T) where T <: Zmodn_poly = (degree(a) == 1 &&
+is_gen(a::T) where T <: Zmodn_poly = (degree(a) <= 1 &&
                                       iszero(coeff(a,0)) && isone(coeff(a,1)))
 
 iszero(a::T) where T <: Zmodn_poly = Bool(@ccall libflint.nmod_poly_is_zero(a::Ref{T})::Int32)

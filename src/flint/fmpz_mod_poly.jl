@@ -58,7 +58,7 @@ one(R::ZmodNFmpzPolyRing) = R(1)
 
 gen(R::ZmodNFmpzPolyRing) = R([ZZRingElem(0), ZZRingElem(1)])
 
-is_gen(a::Zmodn_fmpz_poly) = (degree(a) == 1 &&
+is_gen(a::Zmodn_fmpz_poly) = (degree(a) <= 1 &&
                               iszero(coeff(a,0)) && isone(coeff(a,1)))
 
 var(R::ZmodNFmpzPolyRing) = R.S

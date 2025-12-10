@@ -2,8 +2,7 @@
   # for the modulus 1 we get a null ring and some things don't work quite
   # right, e.g. isone(one(S))==false when S is a univariate polynomial ring
   # over the null ring
-  ConformanceTests.test_Ring_interface(residue_ring(ZZ, ZZ(1))[1])
-  for i in [6, 13, 2^8, 2^16, 2^32, next_prime(2^8), next_prime(2^16), next_prime(2^32)]
+  for i in [1, 6, 13, 2^8, 2^16, 2^32, next_prime(2^8), next_prime(2^16), next_prime(2^32)]
     ConformanceTests.test_Ring_interface_recursive(residue_ring(ZZ, ZZ(i))[1])
   end
 end
