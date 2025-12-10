@@ -20,6 +20,30 @@ function sub(x::_MatTypes, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
   return deepcopy(view(x, r, c))
 end
 
+# flint does not support windows with non-continuous row or column indices
+# we overload some specific types to not hit the AA fallback
+for T in [ZZMatrix, QQMatrix]
+  @eval begin
+    # have to "duplicate" this, otherwise we get ambiguity errors
+    function sub(x::$T, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
+      return deepcopy(view(x, r, c))
+    end
+
+    function sub(M::$T, r::AbstractVector{Int}, c::AbstractVector{Int})
+      N = zero_matrix(base_ring(M), length(r), length(c))
+      GC.@preserve M N begin
+        for (ii, i) in enumerate(r)
+          for (jj, j) in enumerate(c)
+            set!(mat_entry_ptr(N, ii, jj), mat_entry_ptr(M, i, j))
+          end
+        end
+      end
+      return N
+    end
+  end
+end
+
+# make x[r, c] sugar for sub(x, r, c)
 getindex(x::_MatTypes, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) = sub(x, r, c)
 
 ################################################################################

@@ -858,6 +858,11 @@ end
   @test collect(v) == [3, 6, 9]
   v[1] = 1
   @test A == S([1 2 1; 4 5 6; 7 8 9])
+
+  m = Z17[1 2 4; 5 6 7]
+  n = m[[1], [1, 3]]
+  @test n == Z17[1 4]
+  n = m[1:2, 1:2]
 end
 
 @testset "ZZModMatrix.sub" begin
