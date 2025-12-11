@@ -157,8 +157,8 @@ julia> q = lift(QQ, divexact(a, b))
 
 ### Square root
 
-```@docs
-Base.sqrt(::PadicFieldElem)
+```@docs; canonical=false
+is_square(::NCRingElement)
 ```
 
 **Examples**

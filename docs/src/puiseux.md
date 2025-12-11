@@ -63,8 +63,8 @@ for specific rings provided by Nemo.
 
 ### Special functions
 
-```@docs
-Base.sqrt(a::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem})
+```@docs; canonical=false
+is_square(::NCRingElement)
 ```
 
 ```@docs

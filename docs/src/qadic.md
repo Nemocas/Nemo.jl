@@ -143,8 +143,8 @@ q = lift(Zy, divexact(a, b))
 
 ### Square root
 
-```@docs
-Base.sqrt(::QadicFieldElem)
+```@docs; canonical=false
+is_square(::NCRingElement)
 ```
 
 **Examples**
