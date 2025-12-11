@@ -1007,7 +1007,7 @@ function (a::QQPolyRing)(b::Vector{ZZRingElem}, copy::Bool=true)
 end
 
 function (a::QQPolyRing)(b::QQPolyRingElem)
-  parent(b) != a && error("Unable to coerce polynomial")
+  parent(b) != a && error("Coercion not supported; instead use `map_coefficients` with kwarg `parent`")
   return b
 end
 
