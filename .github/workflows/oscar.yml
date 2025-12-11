@@ -63,6 +63,7 @@ jobs:
     env:
       PR_NUMBER: ${{github.event.number}}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NUMPROCS: 6
     strategy:
       matrix: ${{fromJSON(needs.generatematrix.outputs.matrix)}}
       fail-fast: false
