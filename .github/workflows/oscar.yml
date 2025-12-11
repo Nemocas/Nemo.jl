@@ -57,7 +57,7 @@ jobs:
 
   test-oscar:
     needs: generatematrix
-    name: ${{ join(matrix.*.name) }} - ${{ matrix.os }}, julia ${{ matrix.julia-version}}
+    name: ${{ join(matrix.*.name) }} - ${{ join(matrix.os) }}, julia ${{ matrix.julia-version}}
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.julia-version == 'nightly' }}
     env:
