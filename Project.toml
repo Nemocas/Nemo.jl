@@ -11,7 +11,7 @@ RandomExtensions = "fb686558-2515-59ef-acaa-46db3789a887"
 SHA = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 
 [compat]
-AbstractAlgebra = "0.47.4"
+AbstractAlgebra = "0.47.6"
 FLINT_jll = "~301.400.0"
 LinearAlgebra = "1.6"
 Random = "1.6"

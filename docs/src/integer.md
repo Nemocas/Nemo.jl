@@ -325,8 +325,8 @@ is_divisible_by(::ZZRingElem, ::Int)
 is_divisible_by(::ZZRingElem, ::ZZRingElem)
 ```
 
-```@docs
-is_square(::ZZRingElem)
+```@docs; canonical=false
+is_square(::NCRingElement)
 ```
 
 ```@docs
