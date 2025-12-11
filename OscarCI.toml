@@ -1,6 +1,7 @@
 title = "metadata for Oscar CI run"
 
 [env]
+os = [ ["Linux", "RPTU", "normal-memory"] ]
 # os = [ "ubuntu-latest" ]
 # julia-version = [ "~1.6.0-0" ]
 # branches = [ "<matching>", "release" ]
