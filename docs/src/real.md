@@ -232,12 +232,12 @@ julia> print(x, "\n", y, "\n", mid, "\n", rad)
 [2.0000000037252902985 +/- 3.81e-20]
 ```
 
-The first reason that `c` is not printed as `[1 +/- 2]` is that the
+The first reason that `x` is not printed as `[1 +/- 2]` is that the
 midpoint does not have a greater exponent than the radius in its scientific
 notation. For similar reasons `y` is not printed as `[12 +/- 2]`.
 
 The second reason is that we get an additional error term after our addition. As we
-see, `radius(c)` is not equal to $2$, which when printed rounds it up to a
+see, `radius(x)` is not equal to $2$, which when printed rounds it up to a
 reasonable decimal place. This is because real balls keep track of
 rounding errors of basic arithmetic.
 
