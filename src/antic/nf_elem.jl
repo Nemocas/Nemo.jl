@@ -1029,7 +1029,7 @@ function (a::AbsSimpleNumField)(b::AbsSimpleNumFieldElem)
 end
 
 function (a::AbsSimpleNumField)(pol::QQPolyRingElem)
-  pol = parent(a.pol)(pol) # check pol has correct parent
+  check_parent(defining_polynomial(a), pol)
   z = AbsSimpleNumFieldElem(a)
   if length(pol) >= length(a.pol)
     pol = mod(pol, a.pol)
