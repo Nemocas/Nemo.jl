@@ -22,4 +22,4 @@ os = [ ["Linux", "RPTU", "normal-memory"] ]
   Singular = "release"
   Hecke = "release"
   julia-version = "1.10"
-  os = "ubuntu-latest"
+  os = [ ["Linux", "RPTU", "normal-memory"] ]
