@@ -823,7 +823,7 @@ end
 Base.replace!(::typeof(-), m::ZZMatrix) = -m
 
 function (A::AbsSimpleNumField)(a::ZZPolyRingElem)
-  return A(map_coefficients(identity,a;parent=parent(A.pol)))
+  return A(map_coefficients(identity,a;parent=parent(defining_polynomial(A))))
 end
 
 
