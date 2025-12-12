@@ -259,6 +259,12 @@ end
   C[1, 1] = 20
   @test B == matrix_space(ZZ, 2, 2)([10 2; 4 5])
   @test A == S([1 2 3; 4 5 6; 7 8 9])
+
+  m = ZZ[1 2 4; 5 6 7]
+  n = m[[1], [1, 3]]
+  @test n == ZZ[1 4]
+  n = m[1:2, 1:2]
+  @test n == ZZ[1 2; 5 6]
 end
 
 @testset "ZZMatrix.unary_ops" begin
