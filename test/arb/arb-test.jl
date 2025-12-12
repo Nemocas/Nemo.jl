@@ -143,6 +143,17 @@ end
   @test contains_positive(approx3 - 3)
   @test contains_nonpositive(approx3 - 3)
   @test contains_nonnegative(approx3 - 3)
+
+  x = RR("[1 +/- 0.5]")
+  y = RR("[1.1 +/- 0.2]")
+  z = max(x, y)
+  zz = maximum([x, y])
+  for i in 1:10
+    xx = Nemo._rand_rational_in_ball(x)
+    yy = Nemo._rand_rational_in_ball(y)
+    @test contains(z, max(xx, yy))
+    @test contains(zz, max(xx, yy))
+  end
 end
 
 @testset "ArbFieldElem.adhoc_comparison" begin
