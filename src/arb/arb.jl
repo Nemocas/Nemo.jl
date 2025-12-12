@@ -438,6 +438,13 @@ end
 <=(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) <= y
 <(x::Rational{T}, y::ArbFieldElem) where {T <: Integer} = QQFieldElem(x) < y
 
+function max(x::ArbFieldElem, y::ArbFieldElem)
+  z = parent(x)()
+  prec = precision(parent(x))
+  @ccall libflint.arb_max(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Ref{ArbFieldElem}, prec::Int)::Cvoid
+  return z
+end
+
 ################################################################################
 #
 #  Predicates
@@ -2052,4 +2059,11 @@ function rand(r::ArbField; randtype::Symbol=:urandom)
   end
 
   return x
+end
+
+function _rand_rational_in_ball(x::ArbFieldElem)
+  state = _flint_rand_states[Threads.threadid()]
+  z = QQ()
+  @ccall libflint.arb_get_rand_fmpq(z::Ref{QQFieldElem}, state::Ref{rand_ctx}, x::Ref{ArbFieldElem}, precision(parent(x))::Int)::Nothing
+  return z
 end
