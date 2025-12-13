@@ -800,3 +800,20 @@ end
   @test abc - a - b == c
   @test abc - ab == c
 end
+
+@testset "ZZMPolyRingElem.iterators" begin
+  R, (x, y, z) = polynomial_ring(ZZ, [:x, :y, :z])
+  f = x * y + 2 * x - 3 * z
+
+  @test (@inferred collect(exponent_vectors(f))) == [[1, 1, 0], [1, 0, 0], [0, 0, 1]]
+  @test (@inferred collect(exponent_vectors(Vector{UInt}, f))) == [UInt[1, 1, 0], UInt[1, 0, 0], UInt[0, 0, 1]]
+  @test (@inferred collect(coefficients(f))) == [ZZ(1), ZZ(2), ZZ(-3)]
+  @test (@inferred collect(terms(f))) == [x * y, 2 * x, -3 * z]
+  @test (@inferred collect(monomials(f))) == [x * y, x, z]
+
+  @test (@inferred first(exponent_vectors(f, inplace = true))) == [1, 1, 0]
+  @test (@inferred first(exponent_vectors(Vector{UInt}, f, inplace = true))) == UInt[1, 1, 0]
+  @test (@inferred first(coefficients(f, inplace = true))) == ZZ(1)
+  @test (@inferred first(monomials(f, inplace = true))) == x * y
+  @test (@inferred first(terms(f, inplace = true))) == x * y
+end
