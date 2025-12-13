@@ -217,7 +217,7 @@ domain(f::CanonicalFqDefaultMapInverse) = f.D
 codomain(f::CanonicalFqDefaultMapInverse) = f.C
 
 function _fq_default_ctx_type(F::FqField)
-  return @ccall libflint.fq_default_ctx_type(F::Ref{FqField})::Cint
+  return F.which_ring
 end
 
 function _get_raw_type(::Type{fqPolyRepField}, F::FqField)
