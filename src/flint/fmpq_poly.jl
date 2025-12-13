@@ -958,7 +958,7 @@ end
 
 (a::QQPolyRing)(b::Vector{<:RationalUnion}) = QQPolyRingElem(a, b)
 
-(a::QQPolyRing)(b::QQPolyRingElem) = b
+(a::QQPolyRing)(b::QQPolyRingElem) = (a == parent(b)) ? b : error("Coercion not supported; instead use map_coefficients with kwarg `parent'")
 
 (a::QQPolyRing)(b::ZZPolyRingElem) = QQPolyRingElem(a, b)
 
