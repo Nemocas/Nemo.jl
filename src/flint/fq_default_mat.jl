@@ -164,26 +164,22 @@ end
 ################################################################################
 
 function +(x::FqMatrix, y::FqMatrix)
-  check_parent(x,y)
+  check_parent(x, y)
   z = similar(x)
-  @ccall libflint.fq_default_mat_add(z::Ref{FqMatrix}, x::Ref{FqMatrix}, y::Ref{FqMatrix}, base_ring(x)::Ref{FqField})::Nothing
-  return z
+  return add!(z, x, y)
 end
 
 function -(x::FqMatrix, y::FqMatrix)
-  check_parent(x,y)
+  check_parent(x, y)
   z = similar(x)
-  @ccall libflint.fq_default_mat_sub(z::Ref{FqMatrix}, x::Ref{FqMatrix}, y::Ref{FqMatrix}, base_ring(x)::Ref{FqField})::Nothing
-
-  return z
+  return sub!(z, x, y)
 end
 
 function *(x::FqMatrix, y::FqMatrix)
   (base_ring(x) != base_ring(y)) && error("Base ring must be equal")
-  (ncols(x) != nrows(y)) && error("Dimensions are wrong")
+  ncols(x) != nrows(y) && error("Incompatible matrix dimensions")
   z = similar(x, nrows(x), ncols(y))
-  @ccall libflint.fq_default_mat_mul(z::Ref{FqMatrix}, x::Ref{FqMatrix}, y::Ref{FqMatrix}, base_ring(x)::Ref{FqField})::Nothing
-  return z
+  return mul!(z, x, y)
 end
 
 
@@ -206,6 +202,16 @@ end
 function neg!(z::FqMatrix, a::FqMatrix)
   @ccall libflint.fq_default_mat_neg(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
   return z
+end
+
+function add!(a::FqMatrix, b::FqMatrix, c::FqMatrix)
+  @ccall libflint.fq_default_mat_add(a::Ref{FqMatrix}, b::Ref{FqMatrix}, c::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
+  return a
+end
+
+function sub!(a::FqMatrix, b::FqMatrix, c::FqMatrix)
+  @ccall libflint.fq_default_mat_sub(a::Ref{FqMatrix}, b::Ref{FqMatrix}, c::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
+  return a
 end
 
 function mul!(a::FqMatrix, b::FqMatrix, c::FqMatrix)
@@ -232,11 +238,6 @@ function mul!(a::FqMatrix, b::FqMatrix, c::FqFieldElem)
 end
 
 mul!(a::FqMatrix, b::FqFieldElem, c::FqMatrix) = mul!(a, c, b)
-
-function add!(a::FqMatrix, b::FqMatrix, c::FqMatrix)
-  @ccall libflint.fq_default_mat_add(a::Ref{FqMatrix}, b::Ref{FqMatrix}, c::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
-  return a
-end
 
 function Generic.add_one!(a::FqMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
