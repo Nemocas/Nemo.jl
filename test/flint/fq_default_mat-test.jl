@@ -980,7 +980,7 @@ end
       GC.@preserve A begin
         for i in 1:2
           for j in 1:2
-            z = Nemo.fq_default_mat_entry_ptr(A, i, j)
+            z = Nemo.mat_entry_ptr(A, i, j)
             zz = unsafe_load(z)
             zz.parent = F
             @test zz == A[i, j]
