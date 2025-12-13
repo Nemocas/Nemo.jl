@@ -85,7 +85,7 @@ end
 @inline function is_zero_entry(A::FqMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(A, i, j)
   GC.@preserve A begin
-    x = fq_default_mat_entry_ptr(A, i, j)
+    x = mat_entry_ptr(A, i, j)
     return @ccall libflint.fq_default_is_zero(x::Ptr{FqFieldElem}, base_ring(A)::Ref{FqField})::Bool
   end
 end
@@ -222,8 +222,8 @@ function mul!(a::FqMatrix, b::FqMatrix, c::FqFieldElem)
   GC.@preserve a begin
     for i in 1:nrows(a)
       for j in 1:ncols(a)
-        x = fq_default_mat_entry_ptr(a, i, j)
-        y = fq_default_mat_entry_ptr(b, i, j)
+        x = mat_entry_ptr(a, i, j)
+        y = mat_entry_ptr(b, i, j)
         @ccall libflint.fq_default_mul(x::Ptr{FqFieldElem}, y::Ptr{FqFieldElem}, c::Ref{FqFieldElem}, F::Ref{FqField})::Nothing
       end
     end
@@ -242,7 +242,7 @@ function Generic.add_one!(a::FqMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   F = base_ring(a)
   GC.@preserve a begin
-    x = fq_default_mat_entry_ptr(a, i, j)
+    x = mat_entry_ptr(a, i, j)
     # There is no fq_default_add_one, but only ...sub_one
     @ccall libflint.fq_default_neg(x::Ptr{FqFieldElem}, x::Ptr{FqFieldElem}, F::Ref{FqField})::Nothing
     @ccall libflint.fq_default_sub_one(x::Ptr{FqFieldElem}, x::Ptr{FqFieldElem}, F::Ref{FqField})::Nothing
@@ -626,19 +626,18 @@ end
 #
 ################################################################################
 
-function fq_default_mat_entry_ptr(a::FqMatrix, i, j)
+function mat_entry_ptr(a::FqMatrix, i::Int, j::Int)
   t = _fq_default_ctx_type(base_ring(a))
-  ptr = pointer_from_objref(a)
   if t == _FQ_DEFAULT_FQ_ZECH
-    pptr = @ccall libflint.fq_zech_mat_entry(ptr::Ptr{Cvoid}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
+    pptr = @ccall libflint.fq_zech_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   elseif t == _FQ_DEFAULT_FQ_NMOD
-    pptr = @ccall libflint.fq_nmod_mat_entry(ptr::Ptr{Cvoid}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
+    pptr = @ccall libflint.fq_nmod_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   elseif t == _FQ_DEFAULT_FQ
-    pptr = @ccall libflint.fq_mat_entry(ptr::Ptr{Cvoid}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
+    pptr = @ccall libflint.fq_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   elseif t == _FQ_DEFAULT_NMOD
-    pptr = @ccall libflint.nmod_mat_entry_ptr(ptr::Ptr{Cvoid}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
+    pptr = @ccall libflint.nmod_mat_entry_ptr(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   else#if t == _FQ_DEFAULT_FMPZ_NMOD
-    pptr = @ccall libflint.fmpz_mod_mat_entry(ptr::Ptr{Cvoid}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
+    pptr = @ccall libflint.fmpz_mod_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   end
   return pptr
 end
