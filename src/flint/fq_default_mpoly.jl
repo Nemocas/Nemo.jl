@@ -97,6 +97,13 @@ function coeff(a::FqMPolyRingElem, i::Int)
   return _unchecked_coerce(base_ring(a), coeff(a.data, i))
 end
 
+function coeff!(b::FqFieldElem, a::FqMPolyRingElem, i::Int)
+  # I don't know how to put the coefficient directly into b
+  c = coeff(a, i)
+  set!(b, c)
+  return b
+end
+
 function coeff(a::FqMPolyRingElem, b::FqMPolyRingElem)
   return _unchecked_coerce(base_ring(a), coeff(a.data, b.data))
 end
@@ -489,6 +496,20 @@ function exponent_vector(a::FqMPolyRingElem, i::Int)
   return exponent_vector(a.data, i)
 end
 
+function exponent_vector(::Type{Vector{S}}, a::FqMPolyRingElem, i::Int) where S
+  v = [zero(S) for _ in 1:nvars(parent(a))]
+  return exponent_vector!(v, a.data, i)
+end
+
+# Need to specify the type of v to avoid an ambiguity with AbstractAlgebra
+function exponent_vector!(v::Vector{S}, a::FqMPolyRingElem, i::Int) where S
+  return exponent_vector!(v, a.data, i)
+end
+
+function exponent_vector!(v, a::FqMPolyRingElem, i::Int)
+  return exponent_vector!(v, a.data, i)
+end
+
 function exponent(a::FqMPolyRingElem, i::Int, j::Int)
   return exponent(a.data, i, j)
 end
@@ -503,14 +524,21 @@ function sort_terms!(a::FqMPolyRingElem)
 end
 
 function term(a::FqMPolyRingElem, i::Int)
-  return FqMPolyRingElem(parent(a), term(a.data, i))
+  b = parent(a)()
+  return term!(b, a, i)
 end
 
-function monomial(a::(FqMPolyRingElem), i::Int)
-  return FqMPolyRingElem(parent(a), monomial(a.data, i))
+function term!(b::FqMPolyRingElem, a::FqMPolyRingElem, i::Int)
+  b.data = term!(b.data, a.data, i)
+  return b
 end
 
-function monomial!(m::(FqMPolyRingElem), a::(FqMPolyRingElem), i::Int)
+function monomial(a::FqMPolyRingElem, i::Int)
+  b = parent(a)()
+  return monomial!(b, a, i)
+end
+
+function monomial!(m::FqMPolyRingElem, a::FqMPolyRingElem, i::Int)
   m.data = monomial!(m.data, a.data, i)
   return m
 end

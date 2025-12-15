@@ -96,9 +96,13 @@ end
 ################################################################################
 
 function coeff(a::fqPolyRepMPolyRingElem, i::Int)
+  z = base_ring(parent(a))()
+  return coeff!(z, a, i)
+end
+
+function coeff!(z::fqPolyRepFieldElem, a::fqPolyRepMPolyRingElem, i::Int)
   n = length(a)
   !(1 <= i <= n) && error("Index must be between 1 and $(length(a))")
-  z = base_ring(parent(a))()
   @ccall libflint.fq_nmod_mpoly_get_term_coeff_fq_nmod(z::Ref{fqPolyRepFieldElem}, a::Ref{fqPolyRepMPolyRingElem}, (i - 1)::Int, a.parent::Ref{fqPolyRepMPolyRing})::Nothing
   return z
 end
@@ -781,6 +785,10 @@ end
 # Return the i-th term of the polynomial, as a polynomial
 function term(a::fqPolyRepMPolyRingElem, i::Int)
   z = parent(a)()
+  return term!(z, a, i)
+end
+
+function term!(z::fqPolyRepMPolyRingElem, a::fqPolyRepMPolyRingElem, i::Int)
   @ccall libflint.fq_nmod_mpoly_get_term(z::Ref{fqPolyRepMPolyRingElem}, a::Ref{fqPolyRepMPolyRingElem}, (i - 1)::Int, a.parent::Ref{fqPolyRepMPolyRing})::Nothing
   return z
 end
@@ -788,8 +796,7 @@ end
 # Return the i-th monomial of the polynomial, as a polynomial
 function monomial(a::fqPolyRepMPolyRingElem, i::Int)
   z = parent(a)()
-  @ccall libflint.fq_nmod_mpoly_get_term_monomial(z::Ref{fqPolyRepMPolyRingElem}, a::Ref{fqPolyRepMPolyRingElem}, (i - 1)::Int, a.parent::Ref{fqPolyRepMPolyRing})::Nothing
-  return z
+  return monomial!(z, a, i)
 end
 
 # Sets the given polynomial m to the i-th monomial of the polynomial

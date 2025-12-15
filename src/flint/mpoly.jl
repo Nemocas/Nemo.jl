@@ -35,6 +35,11 @@ function exponent_vector(::Type{ZZRingElem}, a::FlintMPolyUnion, i::Int)
   return exponent_vector!(z, a, i)
 end
 
+function exponent_vector(::Type{Vector{S}}, a::FlintMPolyUnion, i::Int) where S
+  z = [zero(S) for _ in 1:nvars(parent(a))]
+  return exponent_vector!(z, a, i)
+end
+
 function exponent_vector(a::FlintMPolyUnion, i::Int)
   return exponent_vector(Int, a, i)
 end
