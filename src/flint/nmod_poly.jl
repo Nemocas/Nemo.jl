@@ -81,9 +81,9 @@ is_gen(a::T) where T <: Zmodn_poly = (degree(a) <= 1 &&
 
 iszero(a::T) where T <: Zmodn_poly = Bool(@ccall libflint.nmod_poly_is_zero(a::Ref{T})::Int32)
 
-modulus(a::T) where T <: Zmodn_poly = a.parent.n
+modulus(a::T) where T <: Zmodn_poly = modulus(parent(a))
 
-modulus(R::zzModPolyRing) = R.n
+modulus(R::zzModPolyRing) = modulus(base_ring(R))
 
 var(R::zzModPolyRing) = R.S
 
@@ -176,7 +176,7 @@ function *(x::T, y::ZZRingElem) where T <: Zmodn_poly
   z = parent(x)()
   t = ZZRingElem()
   tt = UInt(0)
-  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, y::Ref{ZZRingElem}, parent(x).n::UInt)::UInt
+  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, y::Ref{ZZRingElem}, modulus(x)::UInt)::UInt
   tt = @ccall libflint.fmpz_get_ui(t::Ref{ZZRingElem})::UInt
   return x*tt
 end
@@ -207,7 +207,7 @@ function +(x::T, y::ZZRingElem) where T <: Zmodn_poly
   z = parent(x)()
   t = ZZRingElem()
   tt = UInt(0)
-  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, y::Ref{ZZRingElem}, parent(x).n::UInt)::UInt
+  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, y::Ref{ZZRingElem}, modulus(x)::UInt)::UInt
   tt = @ccall libflint.fmpz_get_ui(t::Ref{ZZRingElem})::UInt
   return +(x,tt)
 end
@@ -238,7 +238,7 @@ function -(x::T, y::ZZRingElem) where T <: Zmodn_poly
   z = parent(x)()
   t = ZZRingElem()
   tt = UInt(0)
-  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, y::Ref{ZZRingElem}, parent(x).n::UInt)::UInt
+  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, y::Ref{ZZRingElem}, modulus(x)::UInt)::UInt
   tt = @ccall libflint.fmpz_get_ui(t::Ref{ZZRingElem})::UInt
   return -(x,tt)
 end
@@ -739,7 +739,7 @@ end
 
 function roots(a::zzModPolyRingElem)
   R = parent(a)
-  n = R.n
+  n = modulus(R)
   fac = nmod_poly_factor(n)
   if is_prime(n)
     @ccall libflint.nmod_poly_roots(fac::Ref{nmod_poly_factor}, a::Ref{zzModPolyRingElem}, 0::Cint)::UInt
@@ -904,7 +904,7 @@ promote_rule(::Type{zzModPolyRingElem}, ::Type{zzModRingElem}) = zzModPolyRingEl
 (R::zzModPolyRing)() = zzModPolyRingElem(R)
 
 function (R::zzModPolyRing)(x::ZZRingElem)
-  r = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, R.n::UInt)::UInt
+  r = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, modulus(R)::UInt)::UInt
   return zzModPolyRingElem(R, r)
 end
 

@@ -50,7 +50,7 @@ one(R::fpPolyRing) = R(UInt(1))
 
 gen(R::fpPolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
-modulus(R::fpPolyRing) = R.n
+modulus(R::fpPolyRing) = modulus(base_ring(R))
 
 var(R::fpPolyRing) = R.S
 
@@ -437,7 +437,7 @@ end
 
 function roots(a::fpPolyRingElem)
   R = parent(a)
-  n = R.n
+  n = modulus(R)
   fac = nmod_poly_factor(n)
   @ccall libflint.nmod_poly_roots(fac::Ref{nmod_poly_factor}, a::Ref{fpPolyRingElem}, 0::Cint)::UInt
   f = R()
@@ -493,7 +493,7 @@ promote_rule(::Type{fpPolyRingElem}, ::Type{fpFieldElem}) = fpPolyRingElem
 (R::fpPolyRing)() = fpPolyRingElem(R)
 
 function (R::fpPolyRing)(x::ZZRingElem)
-  r = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, R.n::UInt)::UInt
+  r = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, modulus(R)::UInt)::UInt
   return fpPolyRingElem(R, r)
 end
 

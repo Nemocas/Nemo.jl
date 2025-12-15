@@ -595,12 +595,10 @@ end
 @attributes mutable struct zzModPolyRing <: PolyRing{zzModRingElem}
   base_ring::zzModRing
   S::Symbol
-  n::UInt
 
   function zzModPolyRing(R::zzModRing, s::Symbol, cached::Bool = true)
     return get_cached!(NmodPolyRingID, (R, s), cached) do
-      m = UInt(modulus(R))
-      return new(R, s, m)
+      return new(R, s)
     end
   end
 end
@@ -680,7 +678,7 @@ mutable struct zzModPolyRingElem <: PolyRingElem{zzModRingElem}
   end
 
   function zzModPolyRingElem(R::zzModPolyRing, args...)
-    z = zzModPolyRingElem(R.n, args...)
+    z = zzModPolyRingElem(modulus(R), args...)
     z.parent = R
     return z
   end
@@ -711,12 +709,10 @@ end
 @attributes mutable struct fpPolyRing <: PolyRing{fpFieldElem}
   base_ring::fpField
   S::Symbol
-  n::UInt
 
   function fpPolyRing(R::fpField, s::Symbol, cached::Bool = true)
     return get_cached!(GFPPolyRingID, (R, s), cached) do
-      m = UInt(modulus(R))
-      return new(R, s, m)
+      return new(R, s)
     end
   end
 end
@@ -796,7 +792,7 @@ mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
   end
 
   function fpPolyRingElem(R::fpPolyRing, args...)
-    z = fpPolyRingElem(R.n, args...)
+    z = fpPolyRingElem(modulus(R), args...)
     z.parent = R
     return z
   end
@@ -827,11 +823,10 @@ end
 @attributes mutable struct ZZModPolyRing <: PolyRing{ZZModRingElem}
   base_ring::ZZModRing
   S::Symbol
-  n::ZZRingElem
 
   function ZZModPolyRing(R::ZZModRing, s::Symbol, cached::Bool = true)
     return get_cached!(FmpzModPolyRingID, (R, s), cached) do
-      return new(R, s, modulus(R))
+      return new(R, s)
     end
   end
 end
@@ -944,12 +939,10 @@ end
 @attributes mutable struct FpPolyRing <: PolyRing{FpFieldElem}
   base_ring::FpField
   S::Symbol
-  n::ZZRingElem
 
   function FpPolyRing(R::FpField, s::Symbol, cached::Bool = true)
-    m = modulus(R)
     return get_cached!(GFPFmpzPolyRingID, (R, s), cached) do
-      return new(R, s, m)
+      return new(R, s)
     end
   end
 end

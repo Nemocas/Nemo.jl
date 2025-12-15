@@ -20,7 +20,7 @@ base_ring(a::FqMPolyRing) = a.base_ring
 
 modulus(R::FqMPolyRing) = modulus(base_ring(R))
 
-modulus(f::FqMPolyRingElem) = modulus(base_ring(parent(f)))
+modulus(f::FqMPolyRingElem) = modulus(parent(f))
 
 function internal_ordering(a::FqMPolyRing)
   return internal_ordering(a.data)
