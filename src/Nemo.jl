@@ -198,6 +198,7 @@ import AbstractAlgebra: Set
 import AbstractAlgebra: set_attribute!
 import AbstractAlgebra: Solve
 import AbstractAlgebra: terse
+import AbstractAlgebra: transpose!
 import AbstractAlgebra: truncate!
 import AbstractAlgebra: add_verbosity_scope
 
