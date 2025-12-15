@@ -100,3 +100,4 @@ import Base: Array, view
 @deprecate view(x::_MatTypes, r1::Int, c1::Int, r2::Int, c2::Int) _view_window(x, r1, c1, r2, c2) false
 
 # to be deprecated in a future minor release
+fq_default_mat_entry_ptr(F::FqMatrix, i::Int, j::Int) = mat_entry_ptr(F, i, j)
