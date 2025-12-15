@@ -52,8 +52,8 @@ def is_existing_tag(tag: str) -> bool:
 
 def find_previous_version(version: str) -> str:
     major, minor, patchlevel = map(int, version.split("."))
-    if major != 1:
-        error("unexpected OSCAR version, not starting with '1.'")
+#    if major != 1:
+#        error("unexpected OSCAR version, not starting with '1.'")
     if patchlevel != 0:
         patchlevel -= 1
         return f"{major}.{minor}.{patchlevel}"
@@ -168,10 +168,10 @@ def pr_to_md(pr: Dict[str, Any]) -> str:
     """Returns markdown string for the PR entry"""
     k = pr["number"]
     if has_label(pr, 'release notes: use body'):
-        mdstring = re.sub(r'^- ', f"- [#{k}](https://github.com/oscar-system/Oscar.jl/pull/{k}) ", pr["body"])
+        mdstring = re.sub(r'^- ', f"- [#{k}](https://github.com/Nemocas/Nemo.jl/pull/{k}) ", pr["body"])
     else:
         title = pr["title"]
-        mdstring = f"- [#{k}](https://github.com/oscar-system/Oscar.jl/pull/{k}) {title}\n"        
+        mdstring = f"- [#{k}](https://github.com/Nemocas/Nemo.jl/pull/{k}) {title}\n"        
     return mdstring
 
 def body_to_release_notes(pr):
@@ -199,6 +199,9 @@ def body_to_release_notes(pr):
 
 
 def has_label(pr: Dict[str, Any], label: str) -> bool:
+    print(pr["labels"])
+    print(label)
+    print("======================================")
     return any(x["name"] == label for x in pr["labels"])
 
 
@@ -208,7 +211,7 @@ def changes_overview(
     """Writes files with information for release notes."""
 
     date = datetime.now().strftime("%Y-%m-%d")
-    release_url = f"https://github.com/oscar-system/Oscar.jl/releases/tag/v{new_version}"
+    release_url = f"https://github.com/Nemocas/Nemo.jl/releases/tag/v{new_version}"
 
     # Could also introduce some consistency checks here for wrong combinations of labels
     notice("Writing release notes into file " + newfile)
@@ -307,6 +310,7 @@ which we think might affect some users directly.
                 'When done, change their label to "release notes: use title".\n\n'
             )
             for pr in prs_to_be_added:
+                print(pr)
                 relnotes_file.write(pr_to_md(pr))
             relnotes_file.write("\n")
         if len(prs_with_use_title) > 0:
@@ -335,6 +339,7 @@ which we think might affect some users directly.
                 'as above, or change their label to "release notes: not needed".\n\n'
             )
             for pr in prs:
+                print(pr)
                 relnotes_file.write(pr_to_md(pr))
             relnotes_file.write('\n')
 
@@ -385,22 +390,22 @@ def main(new_version: str) -> None:
     major, minor, patchlevel = map(int, new_version.split("."))
     extra = ""
     release_type = 0 # 0 by default, 1 for point release, 2 for patch release
-    if major != 1:
-        error("unexpected OSCAR version, not starting with '1.'")
+#    if major != 1:
+#        error("unexpected OSCAR version, not starting with '1.'")
     if patchlevel == 0:
         # "major" OSCAR release which changes just the minor version
         release_type = 1
         previous_minor = minor - 1
         basetag = f"v{major}.{minor}dev"
         # *exclude* PRs backported to previous stable-1.X branch
-        extra = f'-label:"backport {major}.{previous_minor}.x done"'
+        #extra = f'-label:"backport {major}.{previous_minor}.x done"'
     else:
         # "minor" OSCAR release which changes just the patchlevel
         release_type = 2
         previous_patchlevel = patchlevel - 1
         basetag = f"v{major}.{minor}.{previous_patchlevel}"
         # *include* PRs backported to current stable-4.X branch
-        extra = f'label:"backport {major}.{minor}.x done"'
+        #extra = f'label:"backport {major}.{minor}.x done"'
 
     if release_type == 2:
         timestamp = get_tag_date(basetag)
@@ -429,7 +434,7 @@ def main(new_version: str) -> None:
 
     # reset changelog file to state tracked in git
     
-    subprocess.run(f'git checkout -- {finalfile}'.split(), check=True)
+#    subprocess.run(f'git checkout -- {finalfile}'.split(), check=True)
 
     changes_overview(prs, new_version)
 
