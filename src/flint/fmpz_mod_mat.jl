@@ -105,13 +105,17 @@ isequal(a::T, b::T) where T <: Zmod_fmpz_mat = ==(a, b)
 
 function transpose(a::T) where T <: Zmod_fmpz_mat
   z = similar(a, ncols(a), nrows(a))
-  @ccall libflint.fmpz_mod_mat_transpose(z::Ref{T}, a::Ref{T}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
+  return transpose!(z, a)
 end
 
 function transpose!(a::T) where T <: Zmod_fmpz_mat
-  !is_square(a) && error("Matrix must be a square matrix")
-  @ccall libflint.fmpz_mod_mat_transpose(a::Ref{T}, a::Ref{T}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @req is_square(a) "Matrix must be a square matrix"
+  return transpose!(a, a)
+end
+
+function transpose!(z::T, a::T) where T <: Zmod_fmpz_mat
+  @ccall libflint.fmpz_mod_mat_transpose(z::Ref{T}, a::Ref{T}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return z
 end
 
 ###############################################################################

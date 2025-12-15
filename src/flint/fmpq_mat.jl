@@ -170,23 +170,25 @@ function denominator(M::QQMatrix)
   return d
 end
 
-###############################################################################
+################################################################################
 #
-#   transpose
+#  Transpose
 #
-###############################################################################
+################################################################################
 
-function transpose(x::QQMatrix)
-  z = similar(x, ncols(x), nrows(x))
-  transpose!(z, x)
-  return z
+function transpose(a::QQMatrix)
+  z = similar(a, ncols(a), nrows(a))
+  return transpose!(z, a)
 end
 
-transpose!(A::Union{ZZMatrix,QQMatrix}) = is_square(A) ? transpose!(A, A) : transpose(A)
+function transpose!(a::QQMatrixOrPtr)
+  @req is_square(a) "Matrix must be a square matrix"
+  return transpose!(a, a)
+end
 
-function transpose!(A::QQMatrixOrPtr, B::QQMatrixOrPtr)
-  @ccall libflint.fmpq_mat_transpose(A::Ref{QQMatrix}, B::Ref{QQMatrix})::Nothing
-  return A
+function transpose!(z::QQMatrixOrPtr, a::QQMatrixOrPtr)
+  @ccall libflint.fmpq_mat_transpose(z::Ref{QQMatrix}, a::Ref{QQMatrix})::Nothing
+  return z
 end
 
 ###############################################################################
