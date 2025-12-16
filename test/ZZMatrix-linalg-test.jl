@@ -65,3 +65,34 @@ end
   @test A*x == denom*b
 end
 
+@testset "CrtCtx test" begin
+  M = matrix(ZZ, rand(-ZZ(2)^999:ZZ(2)^999,1,1));
+
+  C = Nemo.CrtCtx_Mat(10);
+
+  L1 = Int[];
+  p = next_prime(3^37);
+  for i in 1:200
+    push!(L1,p);
+    p = next_prime(p);
+  end;
+
+  for q in L1
+    Fq = Native.GF(q);
+    push!(C, map_entries(Fq,M));
+  end;
+  @test finish(C) == M
+
+  L2 = Int[];
+  p = next_prime(3^35);
+  for i in 1:100
+    push!(L2,p);
+    p = next_prime(p);
+  end;
+
+  for q in L2
+    Fq = Native.GF(q);
+    push!(C, map_entries(Fq,M));
+  end;
+  @test  finish(C) == M
+end
