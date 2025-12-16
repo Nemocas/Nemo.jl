@@ -24,13 +24,6 @@ function _det(a::fpMatrix)
   return r
 end
 
-function map_entries!(k::Nemo.fpField, a::fpMatrix, A::ZZMatrix)
-  @ccall libflint.nmod_mat_set_mod(a::Ref{fpMatrix}, k.n::UInt)::Cvoid
-  @ccall libflint.fmpz_mat_get_nmod_mat(a::Ref{fpMatrix}, A::Ref{ZZMatrix})::Cvoid
-  a.base_ring = k  # exploiting that the internal repr is the indep of char
-  return a
-end
-
 @doc raw"""
     is_unimodular(A::ZZMatrix)
     is_unimodular(A::ZZMatrix; algorithm=:auto)

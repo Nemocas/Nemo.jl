@@ -2147,24 +2147,38 @@ function (::Type{Base.Matrix{BigInt}})(A::ZZMatrix)
   return mat
 end
 
-function map_entries(R::zzModRing, M::ZZMatrix)
-  MR = zero_matrix(R, nrows(M), ncols(M))
-  @ccall libflint.fmpz_mat_get_nmod_mat(MR::Ref{zzModMatrix}, M::Ref{ZZMatrix})::Nothing
-  return MR
+function map_entries(R::zzModRing, A::ZZMatrix)
+  N = zero_matrix(R, nrows(A), ncols(A))
+  @ccall libflint.fmpz_mat_get_nmod_mat(N::Ref{zzModMatrix}, A::Ref{ZZMatrix})::Nothing
+  return N
 end
 
-function map_entries(F::fpField, M::ZZMatrix)
-  MR = zero_matrix(F, nrows(M), ncols(M))
-  @ccall libflint.fmpz_mat_get_nmod_mat(MR::Ref{fpMatrix}, M::Ref{ZZMatrix})::Nothing
-  return MR
+function map_entries!(R::zzModRing, N::zzModMatrix, A::ZZMatrix)
+  @ccall libflint.nmod_mat_set_mod(N::Ref{zzModMatrix}, R.n::UInt)::Cvoid
+  @ccall libflint.fmpz_mat_get_nmod_mat(N::Ref{zzModMatrix}, A::Ref{ZZMatrix})::Cvoid
+  N.base_ring = R  # exploiting that the internal repr is the indep of char
+  return N
 end
 
-function map_entries(R::ZZModRing, M::ZZMatrix)
-  N = zero_matrix(R, nrows(M), ncols(M))
-  GC.@preserve M N begin
-    for i = 1:nrows(M)
-      for j = 1:ncols(M)
-        m = mat_entry_ptr(M, i, j)
+function map_entries(R::fpField, A::ZZMatrix)
+  N = zero_matrix(R, nrows(A), ncols(A))
+  @ccall libflint.fmpz_mat_get_nmod_mat(N::Ref{fpMatrix}, A::Ref{ZZMatrix})::Nothing
+  return N
+end
+
+function map_entries!(R::fpField, N::fpMatrix, A::ZZMatrix)
+  @ccall libflint.nmod_mat_set_mod(N::Ref{fpMatrix}, R.n::UInt)::Cvoid
+  @ccall libflint.fmpz_mat_get_nmod_mat(N::Ref{fpMatrix}, A::Ref{ZZMatrix})::Cvoid
+  N.base_ring = R  # exploiting that the internal repr is the indep of char
+  return N
+end
+
+function map_entries(R::ZZModRing, A::ZZMatrix)
+  N = zero_matrix(R, nrows(A), ncols(A))
+  GC.@preserve A N begin
+    for i = 1:nrows(A)
+      for j = 1:ncols(A)
+        m = mat_entry_ptr(A, i, j)
         n = mat_entry_ptr(N, i, j)
         @ccall libflint.fmpz_mod(n::Ptr{ZZRingElem}, m::Ptr{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
       end
@@ -2172,6 +2186,11 @@ function map_entries(R::ZZModRing, M::ZZMatrix)
   end
   return N
 end
+
+change_base_ring(R::zzModRing, A::ZZMatrix) = map_entries(R, A)
+change_base_ring(R::fpMatrix, A::ZZMatrix) = map_entries(R, A)
+change_base_ring(R::ZZModRing, A::ZZMatrix) = map_entries(R, A)
+
 
 ###############################################################################
 #
