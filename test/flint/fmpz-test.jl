@@ -2489,13 +2489,26 @@ end
   @test collect(r) == ZZRingElem[1, 2, 3, 4, 5]
   @test ZZ(3) in r
   @test !(ZZ(0) in r)
-  @test sum(r) == sum(1:5)
+  @test 3 in r
+  @test !(0 in r)
+  
+  @test mod(ZZ(1), r) == ZZ(1)
+  @test mod(ZZ(6), r) == ZZ(1)
+  @test mod(ZZ(0), r) == ZZ(5)
+  @test mod(ZZ(-1), r) == ZZ(4)
+  @test mod(6, r) == ZZ(1)
 
-  m = ZZ(20)
-  r2 = Base.OneTo(m)
+  @test sum(r) == sum(1:n)
+  
+  r0 = Base.OneTo(ZZ(0))
+  @test r0 isa ZZOneTo
+  @test isempty(r0)
+  @test length(r0) == 0
+  @test last(r0) == ZZ(0)
 
-  @test r2 isa ZZOneTo
-  @test first(r2) == ZZ(1)
-  @test last(r2) == m
-  @test length(r2) == 20
+  rneg = Base.OneTo(ZZ(-10))
+  @test rneg isa ZZOneTo
+  @test isempty(rneg)
+  @test length(rneg) == 0
+  @test last(rneg) == ZZ(0)
 end
