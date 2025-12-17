@@ -99,7 +99,7 @@ in(x::IntegerUnion, r::ZZRingElemUnitRange) = first(r) <= x <= last(r)
 
 mod(i::IntegerUnion, r::ZZRingElemUnitRange) = mod(i - first(r), length(r)) + first(r)
 
-struct ZZOneTo <: Base.AbstractOneTo{ZZRingElem}
+struct ZZOneTo <: AbstractUnitRange{ZZRingElem}
   stop::ZZRingElem
 end
 
