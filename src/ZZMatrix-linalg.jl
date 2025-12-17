@@ -31,7 +31,8 @@ function map_entries!(k::Nemo.fpField, a::fpMatrix, A::ZZMatrix)
   return a
 end
 
-function change_base_ring!(k::Nemo.fpField, a::fpMatrix)
+# Use this function with great care!
+function _unsafe_change_base_ring!(k::Nemo.fpField, a::fpMatrix)
   @ccall libflint.nmod_mat_set_mod(a::Ref{fpMatrix}, k.n::UInt)::Cvoid
   a.base_ring = k  # exploiting that the internal repr is the indep of char
   return a
@@ -546,9 +547,9 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
               map_entries!(k, Ap, D.A)
               map_entries!(k, Bp, _B)
               map_entries!(k, nump, num)
-              change_base_ring!(k, lhs)
+              _unsafe_change_base_ring!(k, lhs)
               mul!(lhs, Ap, nump)
-              change_base_ring!(k, rhs)
+              _unsafe_change_base_ring!(k, rhs)
               mul!(rhs, Bp, k(den))
             end
             fl = lhs == rhs
@@ -565,6 +566,9 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
       end
     end
 
+    # if-block below chooses between 2 strategies for multiplying
+    # A*y: either direct as ZZMatrix or using CRT approach.
+    # CHALLENGE: make the criterion for choosing the stategy smarter!!
     if ncols(_B) == 1
       n = nrows(D.A)
       GC.@preserve D d begin 
