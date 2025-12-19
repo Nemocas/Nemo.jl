@@ -103,14 +103,17 @@ struct ZZOneTo <: AbstractUnitRange{ZZRingElem}
   stop::ZZRingElem
 end
 
+function ZZOneTo(n::ZZRingElem)
+  n <= 0 && return new(ZZ(0))
+  return new(n)
+end
+
 Base.OneTo(n::ZZRingElem) = ZZOneTo(n)
 
 Base.eltype(::Type{ZZOneTo}) = ZZRingElem
 Base.first(::ZZOneTo) = ZZ(1)
 Base.last(r::ZZOneTo) = r.stop
-
-# `length` should return an Integer, so BigInt seems appropriate as ZZRingElem is not <: Integer
-Base.length(r::ZZOneTo) = BigInt(r.stop)
+Base.length(r::ZZOneTo) = Int(r.stop)
 
 function Base.getindex(r::ZZOneTo, i::Integer)
   @boundscheck  1 <= i <= r.stop || Base.throw_boundserror(r, i)
