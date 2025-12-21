@@ -31,6 +31,13 @@ function map_entries!(k::Nemo.fpField, a::fpMatrix, A::ZZMatrix)
   return a
 end
 
+# Use this function with great care!
+function _unsafe_change_base_ring!(k::Nemo.fpField, a::fpMatrix)
+  @ccall libflint.nmod_mat_set_mod(a::Ref{fpMatrix}, k.n::UInt)::Cvoid
+  a.base_ring = k  # exploiting that the internal repr is the indep of char
+  return a
+end
+
 @doc raw"""
     is_unimodular(A::ZZMatrix)
     is_unimodular(A::ZZMatrix; algorithm=:auto)
@@ -484,12 +491,12 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
   mA = maximum(abs, D.A)
   mB = maximum(abs, B)
   n = nrows(D.A)
-  #bound for the solution is hadarmat/ cramer
+  #bound for the solution is hadamard/ cramer
   bound = max((n-1)*mA^2+mB^2, n*mA^2)^n * 2^30
 
   ppow = ZZRingElem(1)
   i = 1
-  nexti = 1
+  nexti = 2
   while ppow <= bound
     map_entries!(Nemo.fpField(D.p, false), D.d_mod, d)
 
@@ -510,7 +517,6 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
       #TODO: maybe col by col? to stop doing cols that are already there?
       #main use currently is 1 col anyway
       fl, num, den = _induce_rational_reconstruction(D.x, ppow; unbalanced = true)
-
       if fl
 #        @show fl = (D.A*num == den*_B)
          sz = max(maximum(nbits, D.A) + maximum(nbits, num)
@@ -541,7 +547,9 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
               map_entries!(k, Ap, D.A)
               map_entries!(k, Bp, _B)
               map_entries!(k, nump, num)
+              _unsafe_change_base_ring!(k, lhs)
               mul!(lhs, Ap, nump)
+              _unsafe_change_base_ring!(k, rhs)
               mul!(rhs, Bp, k(den))
             end
             fl = lhs == rhs
@@ -558,6 +566,9 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
       end
     end
 
+    # if-block below chooses between 2 strategies for multiplying
+    # A*y: either direct as ZZMatrix or using CRT approach.
+    # CHALLENGE: make the criterion for choosing the stategy smarter!!
     if ncols(_B) == 1
       n = nrows(D.A)
       GC.@preserve D d begin 
@@ -584,7 +595,6 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
         push!(C, D.Ay_mod)
       end
       change_prime!(D.y_mod, D.p)
-      finish(C)
       Nemo.sub!(d, d, finish(C))
     end
     divexact!(d, d, ZZ(D.p))
@@ -685,7 +695,13 @@ function finish(C::CrtCtx_Mat)
     mod_sym!(C.M[pos-1], C.d[pos-1])
     pos -= 1
   end
-  return C.M[1]
+  result = C.M[1]
+  # Reset data members to their original "empty" values
+  C.cc = 0
+  C.pos = 0
+  empty!(C.d)
+  empty!(C.M)
+  return result
 end
 
 

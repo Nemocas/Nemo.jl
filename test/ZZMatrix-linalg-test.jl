@@ -65,3 +65,54 @@ end
   @test A*x == denom*b
 end
 
+@testset "CrtCtx test" begin
+  M = matrix(ZZ, rand(-ZZ(2)^999:ZZ(2)^999,1,1));
+
+  C = Nemo.CrtCtx_Mat(10);
+
+  L1 = Int[];
+  p = next_prime(3^37);
+  for i in 1:200
+    push!(L1,p);
+    p = next_prime(p);
+  end;
+
+  for q in L1
+    Fq = Native.GF(q);
+    push!(C, map_entries(Fq,M));
+  end;
+  @test finish(C) == M
+
+  L2 = Int[];
+  p = next_prime(3^35);
+  for i in 1:100
+    push!(L2,p);
+    p = next_prime(p);
+  end;
+
+  for q in L2
+    Fq = Native.GF(q);
+    push!(C, map_entries(Fq,M));
+  end;
+  @test  finish(C) == M
+end
+
+@testset "dixon_solve bugfix test" begin
+  # See Nemo issue #2203
+  # A below is carefully chosen (unimodular and inv(A) is much larger)
+  A = matrix(ZZ, 10, 10,
+             [ 788,   444,    478,   505,    29,  -1364,   100,   911,  -934,   -398,
+               -569,   955,   -241,  -459,   168,   1139,   775,   -64,   979,  -2175,
+               -10,  -957,  -1015,  -819,  -721,    677,   475,  -292,   135,    953,
+               -826,  -808,   1013,   452,   808,   -573,    24,   773,  -452,    190,
+               -29,   735,   -593,  -523,   723,    106,  -642,  -929,   724,    439,
+               48,  -364,    469,   636,   976,   -131,  -839,   -11,   103,    255,
+               202,  -117,   -120,   878,  -917,   -422,  -788,  -608,  -604,   1803,
+               -184,   426,   -260,  -558,   662,    125,  -428,   248,   436,   -398,
+               -161,    84,   -216,  -888,  -384,   1142,    99,   653,  -603,   -947,
+               -831,   362,   -858,   251,    62,    960,    39,   356,  -400,   -642]);
+  A6 = A^6;
+  V6 = inv(A6);
+  M6,denom = Nemo.dixon_solve(V6,identity_matrix(ZZ,10));  # used to give error
+  @test denom == 1 && M6 == A6
+end
