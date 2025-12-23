@@ -41,17 +41,15 @@ var(a::QQAbsPowerSeriesRing) = a.S
 max_precision(R::QQAbsPowerSeriesRing) = R.prec_max
 
 function normalise(a::QQAbsPowerSeriesRingElem, len::Int)
-  if len > 0
-    c = QQFieldElem()
-    @ccall libflint.fmpq_poly_get_coeff_fmpq(c::Ref{QQFieldElem}, a::Ref{QQAbsPowerSeriesRingElem}, (len - 1)::Int)::Nothing
-  end
+  len <= 0 && return len
+  c = QQFieldElem()
+  @ccall libflint.fmpq_poly_get_coeff_fmpq(c::Ref{QQFieldElem}, a::Ref{QQAbsPowerSeriesRingElem}, (len - 1)::Int)::Nothing
   while len > 0 && iszero(c)
     len -= 1
     if len > 0
       @ccall libflint.fmpq_poly_get_coeff_fmpq(c::Ref{QQFieldElem}, a::Ref{QQAbsPowerSeriesRingElem}, (len - 1)::Int)::Nothing
     end
   end
-
   return len
 end
 

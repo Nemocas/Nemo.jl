@@ -44,9 +44,8 @@ for (etype, rtype, mtype, brtype) in (
     max_precision(R::($rtype)) = R.prec_max
 
     function normalise(a::($etype), len::Int)
-      if len > 0
-        c = @ccall libflint.nmod_poly_get_coeff_ui(a::Ref{($etype)}, (len - 1)::Int)::UInt
-      end
+      len <= 0 && return len
+      c = @ccall libflint.nmod_poly_get_coeff_ui(a::Ref{($etype)}, (len - 1)::Int)::UInt
       while len > 0 && iszero(c)
         len -= 1
         if len > 0
