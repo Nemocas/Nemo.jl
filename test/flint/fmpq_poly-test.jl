@@ -1,6 +1,6 @@
 @testset "QQPolyRingElem.constructors" begin
-  S1 = PolyRing(QQ)
-  S2 = PolyRing(QQ)
+  S1 = polynomial_ring(QQ; cached=false)[1]
+  S2 = polynomial_ring(QQ; cached=false)[1]
 
   @test isa(S1, QQPolyRing)
   @test S1 !== S2

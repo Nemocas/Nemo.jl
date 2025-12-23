@@ -1,6 +1,6 @@
 @testset "ZZPolyRingElem.constructors" begin
-  S1 = PolyRing(ZZ)
-  S2 = PolyRing(ZZ)
+  S1 = polynomial_ring(ZZ; cached=false)[1]
+  S2 = polynomial_ring(ZZ; cached=false)[1]
 
   @test isa(S1, ZZPolyRing)
   @test S1 !== S2
