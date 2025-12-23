@@ -1,8 +1,8 @@
 @testset "zzModPolyRingElem.constructors" begin
   R, = residue_ring(ZZ, 17)
 
-  S1 = PolyRing(R)
-  S2 = PolyRing(R)
+  S1 = polynomial_ring(R; cached=false)[1]
+  S2 = polynomial_ring(R; cached=false)[1]
 
   @test isa(S1, zzModPolyRing)
   @test S1 !== S2
