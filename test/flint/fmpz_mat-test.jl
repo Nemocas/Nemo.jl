@@ -659,6 +659,14 @@ end
   @test_throws ArgumentError lll_gram_with_transform(ZZ[1 0])
   @test_throws ArgumentError lll_gram(ZZ[1 0; 1 1])
   @test_throws ArgumentError lll_gram_with_transform(ZZ[1 0; 1 1])
+
+  # negative definit
+  
+  G = ZZ[-1;]
+  @test G == lll_gram(G)
+  H, T = lll_gram_with_transform(G)
+  @test H == G
+  @test T * G * transpose(T) == G
 end
 
 @testset "ZZMatrix.nullspace" begin
