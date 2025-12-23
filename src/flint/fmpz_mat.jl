@@ -1045,7 +1045,7 @@ function lll_gram_with_transform(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99,
   if _is_definitely_full_rank(x)
     u = identity_matrix(ZZ, nrows(x))
     if x[1, 1] < 0
-      y = neg(x)
+      y = -x
       _lll_gram_with_transform!(y, u, ctx)
       return neg!(y), u
     else
@@ -1122,7 +1122,7 @@ function lll_gram!(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
   # try to recognize the definite case
   if _is_definitely_full_rank(x)
     if x[1, 1] < 0
-      return neg!(_lll_gram!(!neg(x), ctx))
+      return neg!(_lll_gram!(neg!(x), ctx))
     else
       return _lll_gram!(x, ctx)
     end
