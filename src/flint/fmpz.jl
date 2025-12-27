@@ -101,32 +101,31 @@ mod(i::IntegerUnion, r::ZZRingElemUnitRange) = mod(i - first(r), length(r)) + fi
 
 struct ZZOneTo <: AbstractUnitRange{ZZRingElem}
   stop::ZZRingElem
-end
-
-function ZZOneTo(n::ZZRingElem)
-  n <= 0 && return new(ZZ(0))
-  return new(n)
+  function ZZOneTo(stop::ZZRingElem)
+    stop < 0 && (stop = ZZ(0))
+    new(stop)
+  end
 end
 
 Base.OneTo(n::ZZRingElem) = ZZOneTo(n)
 
 Base.eltype(::Type{ZZOneTo}) = ZZRingElem
-Base.first(::ZZOneTo) = ZZ(1)
+Base.first(::ZZOneTo) = one(ZZ)
 Base.last(r::ZZOneTo) = r.stop
-Base.length(r::ZZOneTo) = Int(r.stop)
+Base.length(r::ZZOneTo) = BigInt(r.stop)
 
 function Base.getindex(r::ZZOneTo, i::Integer)
   @boundscheck  1 <= i <= r.stop || Base.throw_boundserror(r, i)
   return ZZ(i)
 end
 
-Base.iterate(r::ZZOneTo) = (ZZ(1), ZZ(1))
+Base.iterate(r::ZZOneTo) = r.stop >= one(ZZ) ? (one(ZZ), one(ZZ)) : nothing
 function Base.iterate(r::ZZOneTo, state::ZZRingElem)
   if state < r.stop
     state += 1
     return (state, state)
   else
-      return nothing
+    return nothing
   end
 end
 
