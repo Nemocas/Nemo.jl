@@ -259,7 +259,7 @@ contains(::RealFieldElem, ::RealFieldElem)
 contains(::RealFieldElem, ::Integer)
 contains(::RealFieldElem, ::ZZRingElem)
 contains(::RealFieldElem, ::QQFieldElem)
-contains{T <: Integer}(::RealFieldElem, ::Rational{T})
+contains(::RealFieldElem, ::Rational)
 contains(::RealFieldElem, ::BigFloat)
 ```
 
