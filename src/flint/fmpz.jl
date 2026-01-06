@@ -3228,7 +3228,7 @@ end
 is_prime_power(q::Integer) = is_prime_power(ZZRingElem(q))
 
 @doc raw"""
-    is_prime_power_with_data(q::IntegerUnion) -> Bool, ZZRingElem, Int
+    is_prime_power_with_data(q::IntegerUnion) -> Bool, Int, ZZRingElem
 
 Returns a flag indicating whether $q$ is a prime power and integers $e, p$ such
 that $q = p^e$. If $q$ is a prime power, than $p$ is a prime.
