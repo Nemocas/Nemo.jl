@@ -692,7 +692,7 @@ end
 
 function (R::FqPolyRing)(x::Vector{FqFieldElem})
   length(x) == 0 && return zero(R)
-  base_ring(R) != parent(x[1]) && error("Coefficient rings must coincide")
+  any(parent(e) != base_ring(R) for e in x) && error("Coefficient rings must coincide")
   z = FqPolyRingElem(x, base_ring(R))
   z.parent = R
   return z
