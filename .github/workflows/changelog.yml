@@ -52,4 +52,3 @@ jobs:
         branch: update-changelog
         title: "Update changelog"
         base: master
-
