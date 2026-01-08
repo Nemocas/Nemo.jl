@@ -85,7 +85,6 @@ ifelse(stop >= start, stop, start - one(ZZRingElem))
 
 Base.:(:)(a::ZZRingElem, b::ZZRingElem) = ZZRingElemUnitRange(a, b)
 
-
 @inline function getindex(r::ZZRingElemUnitRange, i::ZZRingElem)
   val = r.start + (i - 1)
   @boundscheck _in_unit_range(r, val) || Base.throw_boundserror(r, i)
@@ -115,7 +114,7 @@ Base.last(r::ZZOneTo) = r.stop
 Base.length(r::ZZOneTo) = BigInt(r.stop)
 
 function Base.getindex(r::ZZOneTo, i::Integer)
-  @boundscheck  1 <= i <= r.stop || Base.throw_boundserror(r, i)
+  @boundscheck 1 <= i <= r.stop || Base.throw_boundserror(r, i)
   return ZZ(i)
 end
 
