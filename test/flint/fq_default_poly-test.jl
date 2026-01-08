@@ -39,6 +39,8 @@
 
   @test isa(k, PolyRingElem)
 
+  @test_throws ErrorException S([x, xx])
+
   l = S(k)
 
   @test isa(l, PolyRingElem)
