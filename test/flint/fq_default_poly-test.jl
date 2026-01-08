@@ -39,7 +39,7 @@
 
   @test isa(k, PolyRingElem)
 
-  @test_throws ErrorException S([x, xx])
+  @test_throws ArgumentError S([x, xx])
 
   l = S(k)
 
