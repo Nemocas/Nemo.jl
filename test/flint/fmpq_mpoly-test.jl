@@ -632,7 +632,7 @@ end
   r3 = evaluate(f + g, [xx + yy, yy + zz])
   @test r3 == r1 + r2
 
-  @test_throws ErrorException evaluate(x, [x,xx])
+  @test_throws ArgumentError evaluate(x, [x,xx])
 
   SS, z = polynomial_ring(R, "z")
   @test_throws ErrorException evaluate(x, [z])
