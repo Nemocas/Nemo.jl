@@ -580,13 +580,13 @@ end
 
 function (a::FqPolyRepMatrixSpace)(arr::AbstractMatrix{FqPolyRepFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
-  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
+  @req all(parent(e) == base_ring(a) for e in arr) "Elements must have same base ring"
   return FqPolyRepMatrix(arr, base_ring(a))
 end
 
 function (a::FqPolyRepMatrixSpace)(arr::AbstractVector{FqPolyRepFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
-  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
+  @req all(parent(e) == base_ring(a) for e in arr) "Elements must have same base ring"
   return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
 end
 

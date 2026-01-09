@@ -606,9 +606,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
     end
 
     function (a::($rtype))(b::Vector{($mtype)}, len::Int, prec::Int)
-      if length(b) > 0
-        (base_ring(a) != parent(b[1])) && error("Wrong parents")
-      end
+      @req all(parent(e) == base_ring(a) for e in b) "Wrong parents"
       z = ($etype)(base_ring(a), b, len, prec)
       z.parent = a
       return z

@@ -680,7 +680,7 @@ end
 
 function (a::ZZModMatrixSpace)(arr::AbstractVecOrMat{ZZModRingElem})
   _check_dim(nrows(a), ncols(a), arr)
-  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
+  @req all(parent(e) == base_ring(a) for e in arr) "Elements must have same base ring"
   z = ZZModMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
   z.base_ring = a.base_ring
   return z
