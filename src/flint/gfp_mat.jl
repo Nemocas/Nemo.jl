@@ -281,7 +281,7 @@ end
 
 function (a::fpMatrixSpace)(arr::AbstractVecOrMat{fpFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
-  @req all(parent(e) == base_ring(a) for e in arr) "Elements must have same base ring"
+  @req all(parent(e) == base_ring(a) for e in arr) "parents do not match"
   z = fpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
   z.base_ring = a.base_ring
   return z

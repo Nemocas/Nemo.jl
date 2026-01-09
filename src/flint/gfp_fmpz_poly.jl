@@ -417,7 +417,7 @@ end
 (R::FpPolyRing)(arr::Vector{ZZRingElem}) = FpPolyRingElem(R, arr)
 
 function (R::FpPolyRing)(arr::Vector{FpFieldElem})
-  @req all(parent(e) == base_ring(R) for e in arr) "Wrong parents"
+  @req all(parent(e) == base_ring(R) for e in arr) "parents do not match"
   return FpPolyRingElem(R, arr)
 end
 
