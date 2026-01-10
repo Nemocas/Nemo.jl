@@ -786,7 +786,7 @@ end
 mul!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Integer) = mul!(c, a, flintify(b))
 
 function divexact!(z::AbsSimpleNumFieldElem, x::AbsSimpleNumFieldElem, y::Int)
-  @ccall libflint.nf_elem_scalar_div_si(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Int, parent(x)::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_scalar_div_si(z::Ref{AbsSimpleNumFieldElem}, x::Ref{AbsSimpleNumFieldElem}, y::Int, parent(x)::Ref{AbsSimpleNumField})::Nothing
   return z
 end
 
