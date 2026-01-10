@@ -400,6 +400,7 @@ end
 
 function det(a::zzModMatrix)
   !is_square(a) && error("Matrix must be a square matrix")
+  nrows(a) == 0 && return one(base_ring(a))
   if is_prime(a.n)
     r = @ccall libflint.nmod_mat_det(a::Ref{zzModMatrix})::UInt
     return base_ring(a)(r)
