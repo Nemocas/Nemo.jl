@@ -847,9 +847,7 @@ end
 (R::ZZModPolyRing)(arr::Vector{ZZRingElem}) = ZZModPolyRingElem(R, arr)
 
 function (R::ZZModPolyRing)(arr::Vector{ZZModRingElem})
-  if length(arr) > 0
-    (base_ring(R) != parent(arr[1])) && error("Wrong parents")
-  end
+  @req all(parent(e) == base_ring(R) for e in arr) "parents do not match"
   return ZZModPolyRingElem(R, arr)
 end
 

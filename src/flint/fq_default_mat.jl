@@ -574,13 +574,13 @@ end
 
 function (a::FqMatrixSpace)(arr::AbstractMatrix{FqFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
-  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
+  @req all(parent(e) == base_ring(a) for e in arr) "parents do not match"
   return FqMatrix(arr, base_ring(a))
 end
 
 function (a::FqMatrixSpace)(arr::AbstractVector{FqFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
-  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
+  @req all(parent(e) == base_ring(a) for e in arr) "parents do not match"
   return FqMatrix(nrows(a), ncols(a), arr, base_ring(a))
 end
 

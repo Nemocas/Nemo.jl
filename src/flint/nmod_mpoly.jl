@@ -634,7 +634,7 @@ for (etype, rtype, ftype, ctype, utype) in (
     end
 
     function evaluate(a::$(etype), bs::Vector{$etype})
-      allequal(map(parent, bs)) || error("parents do not match")
+      @req allequal(map(parent, bs)) "parents do not match"
       R = parent(a)
       S = parent(bs[1])
       @assert base_ring(R) === base_ring(S)
@@ -650,7 +650,7 @@ for (etype, rtype, ftype, ctype, utype) in (
 
 
     function evaluate(a::($etype), bs::Vector{$utype})
-      allequal(map(parent, bs)) || error("parents do not match")
+      @req allequal(map(parent, bs)) "parents do not match"
       R = parent(a)
       S = parent(bs[1])
       @assert base_ring(R) === base_ring(S)

@@ -576,7 +576,7 @@ function (a::ZZMPolyRingElem)(vals::NCRingElement...)
 end
 
 function evaluate(a::ZZMPolyRingElem, bs::Vector{ZZMPolyRingElem})
-  allequal(map(parent, bs)) || error("parents do not match")
+  @req allequal(map(parent, bs)) "parents do not match"
   R = parent(a)
   S = parent(bs[1])
 
@@ -590,7 +590,7 @@ function evaluate(a::ZZMPolyRingElem, bs::Vector{ZZMPolyRingElem})
 end
 
 function evaluate(a::ZZMPolyRingElem, bs::Vector{ZZPolyRingElem})
-  allequal(map(parent, bs)) || error("parents do not match")
+  @req allequal(map(parent, bs)) "parents do not match"
   R = parent(a)
   S = parent(bs[1])
 

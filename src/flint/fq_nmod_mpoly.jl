@@ -587,7 +587,7 @@ function (a::fqPolyRepMPolyRingElem)(vals::NCRingElement...)
 end
 
 function evaluate(a::fqPolyRepMPolyRingElem, bs::Vector{fqPolyRepMPolyRingElem})
-  allequal(map(parent, bs)) || error("parents do not match")
+  @req allequal(map(parent, bs)) "parents do not match"
   R = parent(a)
   S = parent(bs[1])
   @assert base_ring(R) === base_ring(S)
@@ -602,7 +602,7 @@ function evaluate(a::fqPolyRepMPolyRingElem, bs::Vector{fqPolyRepMPolyRingElem})
 end
 
 function evaluate(a::fqPolyRepMPolyRingElem, bs::Vector{fqPolyRepPolyRingElem})
-  allequal(map(parent, bs)) || error("parents do not match")
+  @req allequal(map(parent, bs)) "parents do not match"
   R = parent(a)
   S = parent(bs[1])
   @assert base_ring(R) === base_ring(S)

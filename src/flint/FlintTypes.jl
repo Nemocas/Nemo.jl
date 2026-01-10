@@ -4598,6 +4598,7 @@ mutable struct FqPolyRepPolyRingElem <: PolyRingElem{FqPolyRepFieldElem}
 
   function FqPolyRepPolyRingElem(a::Vector{FqPolyRepFieldElem})
     z = new()
+    @req allequal(map(parent, a)) "parents do not match"
     ctx = parent(a[1])
     @ccall libflint.fq_poly_init2(z::Ref{FqPolyRepPolyRingElem}, length(a)::Int, ctx::Ref{FqPolyRepField})::Nothing
     for i = 1:length(a)
@@ -4699,6 +4700,7 @@ mutable struct fqPolyRepPolyRingElem <: PolyRingElem{fqPolyRepFieldElem}
 
   function fqPolyRepPolyRingElem(a::Vector{fqPolyRepFieldElem})
     z = new()
+    @req allequal(map(parent, a)) "parents do not match"
     ctx = parent(a[1])
     @ccall libflint.fq_nmod_poly_init2(z::Ref{fqPolyRepPolyRingElem}, length(a)::Int, ctx::Ref{fqPolyRepField})::Nothing
     for i = 1:length(a)
