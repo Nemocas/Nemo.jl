@@ -149,7 +149,7 @@ will have at least length `pad`, the tail being filled with 0.
 function Base.digits(n::T; base::T=gen(parent(n)), pad::Integer = 1) where T <: PolyRingElem{<:FieldElem}
   @assert parent(n) == parent(base)
   @assert degree(base) > 0
-  return digits!(zeros(parent(n), max(floor(Int, 1+degree(n)/degree(base)), pad)), n; base)
+  return digits!([zero(n) for _ in 1:max(floor(Int, 1+degree(n)/degree(base)), pad)], n; base)
 end
 
 function Base.digits!(a::AbstractVector{T}, n::T; base::T) where T <: PolyRingElem{<:FieldElem}

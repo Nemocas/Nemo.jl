@@ -650,3 +650,9 @@ end
   f = 7*y^2 + 3*y + 2
   @test 7*x^2 + 3*x + 2 == @inferred R(f)
 end
+
+@testset "QQPolyRingElem.conversion" begin
+  S, y = polynomial_ring(QQ, "y")
+  f = 7//5*y^2 + 3//2*y + 2
+  @test digits(f) == [2, 3//2, 7//5]
+end
