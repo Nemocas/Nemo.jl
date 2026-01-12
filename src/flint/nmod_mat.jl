@@ -119,13 +119,17 @@ isequal(a::T, b::T) where T <: Zmodn_mat = ==(a, b)
 
 function transpose(a::T) where T <: Zmodn_mat
   z = similar(a, ncols(a), nrows(a))
-  @ccall libflint.nmod_mat_transpose(z::Ref{T}, a::Ref{T})::Nothing
-  return z
+  return transpose!(z, a)
 end
 
 function transpose!(a::T) where T <: Zmodn_mat
-  !is_square(a) && error("Matrix must be a square matrix")
-  @ccall libflint.nmod_mat_transpose(a::Ref{T}, a::Ref{T})::Nothing
+  @req is_square(a) "Matrix must be a square matrix"
+  return transpose!(a, a)
+end
+
+function transpose!(z::T, a::T) where T <: Zmodn_mat
+  @ccall libflint.nmod_mat_transpose(z::Ref{T}, a::Ref{T})::Nothing
+  return z
 end
 
 ###############################################################################
@@ -396,6 +400,7 @@ end
 
 function det(a::zzModMatrix)
   !is_square(a) && error("Matrix must be a square matrix")
+  nrows(a) == 0 && return one(base_ring(a))
   if is_prime(a.n)
     r = @ccall libflint.nmod_mat_det(a::Ref{zzModMatrix})::UInt
     return base_ring(a)(r)
