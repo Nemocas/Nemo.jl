@@ -98,6 +98,40 @@ in(x::IntegerUnion, r::ZZRingElemUnitRange) = first(r) <= x <= last(r)
 
 mod(i::IntegerUnion, r::ZZRingElemUnitRange) = mod(i - first(r), length(r)) + first(r)
 
+struct ZZOneTo <: AbstractUnitRange{ZZRingElem}
+  stop::ZZRingElem
+  function ZZOneTo(stop::ZZRingElem)
+    stop < 0 && (stop = ZZ(0))
+    new(stop)
+  end
+end
+
+Base.OneTo(n::ZZRingElem) = ZZOneTo(n)
+
+Base.eltype(::Type{ZZOneTo}) = ZZRingElem
+Base.first(::ZZOneTo) = one(ZZ)
+Base.last(r::ZZOneTo) = r.stop
+Base.length(r::ZZOneTo) = BigInt(r.stop)
+
+function Base.getindex(r::ZZOneTo, i::Integer)
+  @boundscheck 1 <= i <= r.stop || Base.throw_boundserror(r, i)
+  return ZZ(i)
+end
+
+Base.iterate(r::ZZOneTo) = r.stop >= one(ZZ) ? (one(ZZ), one(ZZ)) : nothing
+function Base.iterate(r::ZZOneTo, state::ZZRingElem)
+  if state < r.stop
+    state += 1
+    return (state, state)
+  else
+    return nothing
+  end
+end
+
+Base.in(x::IntegerUnion, r::ZZOneTo) = 1 <= x <= r.stop
+
+mod(x::IntegerUnion, r::ZZOneTo) = mod(x - 1, r.stop) + 1
+
 Base.:(:)(a::ZZRingElem, b::Integer) = (:)(promote(a, b)...)
 Base.:(:)(a::Integer, b::ZZRingElem) = (:)(promote(a, b)...)
 

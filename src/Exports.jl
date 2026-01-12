@@ -671,6 +671,7 @@ export zzModRingElem
 export ZZModRingElem
 export ZZMPolyRing
 export ZZMPolyRingElem
+export ZZOneTo
 export ZZPolyRing
 export ZZPolyRingElem
 export ZZRelPowerSeriesRing
