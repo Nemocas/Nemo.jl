@@ -692,7 +692,7 @@ end
 
   N = zero_matrix(R, 2, 1)
   C = solve_init(N)
-  b = zeros(R, 2)
+  b = [zero(R), zero(R)]
   fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b, side = :right)
   @test fl
   @test N*x == b
@@ -702,7 +702,7 @@ end
 
   N = zero_matrix(R, 1, 2)
   C = solve_init(N)
-  b = zeros(R, 1)
+  b = [zero(R)]
   fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b, side = :right)
   @test fl
   @test N*x == b
