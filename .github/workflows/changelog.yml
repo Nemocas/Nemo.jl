@@ -27,10 +27,11 @@ jobs:
 
     # Run the update script
     - name: Run python script
-      uses: oscar-system/changelog-script@master
+      uses: oscar-system/changelog-script@v1
       with:
         conffile: "dev/releases/config.toml"
         changelogfile: "CHANGELOG.md"
+        version: ${{ inputs.version }}
 
     # Configure git for the PR
     - name: Set up git
@@ -52,4 +53,3 @@ jobs:
         branch: update-changelog
         title: "Update changelog"
         base: master
-

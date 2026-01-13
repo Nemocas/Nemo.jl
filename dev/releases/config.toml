@@ -1,0 +1,11 @@
+majorversion = 0
+reponame = "Nemocas/Nemo.jl"
+enabletwolevel = false
+requiretwolevel = false
+
+[topics]
+"release notes: highlight" = "Highlights"
+breaking = "Breaking changes"
+enhancement = "New or extended functionality"
+bug = "Fixed bugs"
+doc = "Improvements or additions to documentation"
