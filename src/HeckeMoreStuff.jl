@@ -787,9 +787,8 @@ function mod_sym!(a::T, b::T) where {T}
 end
 
 function (A::AbsSimpleNumField)(a::ZZPolyRingElem)
-  return A(QQ["x"][1](a))
+  return A(QQPolyRingElem(parent(defining_polynomial(A)), a))
 end
-
 
 function is_positive(x::ZZRingElem, ::Union{PosInf,Vector{PosInf}})
   return sign(x) == 1
@@ -843,7 +842,7 @@ Base.log2(a::ZZRingElem) = log2(BigInt(a)) # stupid: there has to be faster way
 
 function nf_elem_to_fmpz_mod_poly!(r::ZZModPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
   @ccall libflint.nf_elem_get_fmpz_mod_poly_den(r::Ref{ZZModPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint, r.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return nothing
+  return r
 end
 
 function (R::ZZModPolyRing)(a::AbsSimpleNumFieldElem)
@@ -854,7 +853,7 @@ end
 
 function nf_elem_to_gfp_poly!(r::fpPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
   @ccall libflint.nf_elem_get_nmod_poly_den(r::Ref{fpPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint)::Nothing
-  return nothing
+  return r
 end
 
 function (R::fpPolyRing)(a::AbsSimpleNumFieldElem)
@@ -865,7 +864,7 @@ end
 
 function nf_elem_to_nmod_poly!(r::zzModPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
   @ccall libflint.nf_elem_get_nmod_poly_den(r::Ref{zzModPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint)::Nothing
-  return nothing
+  return r
 end
 
 function (R::zzModPolyRing)(a::AbsSimpleNumFieldElem)
@@ -876,7 +875,7 @@ end
 
 function nf_elem_to_gfp_fmpz_poly!(r::FpPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
   @ccall libflint.nf_elem_get_fmpz_mod_poly_den(r::Ref{FpPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint, r.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return nothing
+  return r
 end
 
 function mod_sym!(f::ZZPolyRingElem, p::ZZRingElem)

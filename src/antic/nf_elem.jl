@@ -1027,7 +1027,7 @@ function (a::AbsSimpleNumField)(b::AbsSimpleNumFieldElem)
 end
 
 function (a::AbsSimpleNumField)(pol::QQPolyRingElem)
-  pol = parent(a.pol)(pol) # check pol has correct parent
+  check_parent(defining_polynomial(a), pol)
   z = AbsSimpleNumFieldElem(a)
   if length(pol) >= length(a.pol)
     pol = mod(pol, a.pol)
@@ -1132,7 +1132,7 @@ function cyclotomic_field(n::Int, s::VarName = "z_$n", t = "_\$"; cached::Bool =
   Zx, x = polynomial_ring(ZZ, gensym(); cached = false)
   Qx, = polynomial_ring(QQ, t; cached = cached)
   f = cyclotomic(n, x)
-  C, g = number_field(Qx(f), Symbol(s); cached = cached, check = false)
+  C, g = number_field(QQPolyRingElem(Qx, f), Symbol(s); cached = cached, check = false)
   set_attribute!(C, :show => show_cyclo, :cyclo => n)
   return C, g
 end
@@ -1167,7 +1167,7 @@ function cyclotomic_real_subfield(n::Int, s::VarName = "(z_$n + 1/z_$n)", t = "\
   Zx, x = polynomial_ring(ZZ, gensym(); cached = false)
   Qx, = polynomial_ring(QQ, t; cached = cached)
   f = cos_minpoly(n, x)
-  R, a =  number_field(Qx(f), Symbol(s); cached = cached, check = false)
+  R, a =  number_field(change_base_ring(ZZ, f; parent = Qx), Symbol(s); cached = cached, check = false)
   set_attribute!(R, :show => show_maxreal, :maxreal => n)
   return R, a
 end
@@ -1226,7 +1226,9 @@ function charpoly(Zx::ZZPolyRing, a::AbsSimpleNumFieldElem)
   if !isone(denominator(f))
     error("Element is not integral")
   end
-  return Zx(f)
+  g = Zx()
+  @ccall libflint.fmpq_poly_get_numerator(g::Ref{ZZPolyRingElem}, f::Ref{QQPolyRingElem})::Nothing
+  return g
 end
 
 function charpoly(a::AbsSimpleNumFieldElem, Z::ZZRing)
@@ -1267,7 +1269,9 @@ function minpoly(Zx::ZZPolyRing, a::AbsSimpleNumFieldElem)
   if !isone(denominator(f))
     error("Element is not integral")
   end
-  return Zx(f)
+  g = Zx()
+  @ccall libflint.fmpq_poly_get_numerator(g::Ref{ZZPolyRingElem}, f::Ref{QQPolyRingElem})::Nothing
+  return g
 end
 
 ################################################################################

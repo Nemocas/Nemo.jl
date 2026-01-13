@@ -710,25 +710,41 @@ function (R::FqPolyRing)(x::Vector{T}) where {T <: Integer}
   return R(map(ZZRingElem, x))
 end
 
-function (R::FqPolyRing)(x::ZZPolyRingElem)
-  z = FqPolyRingElem(x, base_ring(R))
-  z.parent = R
+function (R::FqPolyRing)(g::ZZPolyRingElem)
+  error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
   return z
 end
 
-function (R::FqPolyRing)(x::Union{zzModPolyRingElem, fpPolyRingElem})
-  characteristic(base_ring(x)) != characteristic(base_ring(R)) &&
-  error("Incompatible characteristic")
-  z = FqPolyRingElem(x, base_ring(R))
-  z.parent = R
+function AbstractAlgebra._map(K::FqField, x::ZZPolyRingElem, parent::FqPolyRing)
+  @assert base_ring(parent) === K
+  z = FqPolyRingElem(x, K)
+  z.parent = parent
   return z
 end
 
-function (R::FqPolyRing)(x::Union{ZZModPolyRingElem, FpPolyRingElem})
-  characteristic(base_ring(x)) != characteristic(base_ring(R)) &&
-  error("Incompatible characteristic")
-  z = FqPolyRingElem(x, base_ring(R))
-  z.parent = R
+function (R::FqPolyRing)(g::Union{zzModPolyRingElem, fpPolyRingElem})
+  error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
+end
+
+function AbstractAlgebra._map(K::FqField, x::Union{zzModPolyRingElem, fpPolyRingElem}, parent::FqPolyRing)
+  @assert base_ring(parent) === K
+  characteristic(base_ring(x)) != characteristic(base_ring(parent)) &&
+    error("Incompatible characteristic")
+  z = FqPolyRingElem(x, K)
+  z.parent = parent
+  return z
+end
+
+function (R::FqPolyRing)(g::Union{ZZModPolyRingElem, FpPolyRingElem})
+  error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
+end
+
+function AbstractAlgebra._map(K::FqField, x::Union{ZZModPolyRingElem, FpPolyRingElem}, parent::FqPolyRing)
+  @assert base_ring(parent) === K
+  characteristic(base_ring(x)) != characteristic(base_ring(parent)) &&
+    error("Incompatible characteristic")
+  z = FqPolyRingElem(x, K)
+  z.parent = parent
   return z
 end
 
