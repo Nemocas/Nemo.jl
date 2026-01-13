@@ -396,13 +396,13 @@ end
 #
 ###############################################################################
 
-function derivative(x::ComplexPolyRingElem, prec::Int = precision(Balls))
+function derivative(x::ComplexPolyRingElem; prec::Int = precision(Balls))
   z = parent(x)()
   @ccall libflint.acb_poly_derivative(z::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, prec::Int)::Nothing
   return z
 end
 
-function integral(x::ComplexPolyRingElem, prec::Int = precision(Balls))
+function integral(x::ComplexPolyRingElem; prec::Int = precision(Balls))
   z = parent(x)()
   @ccall libflint.acb_poly_integral(z::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, prec::Int)::Nothing
   return z

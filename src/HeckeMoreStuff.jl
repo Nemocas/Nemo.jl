@@ -764,14 +764,6 @@ function zeros(f::ZZPolyRingElem)
   return zeros
 end
 
-#This should probably go somewhere else. (Taking the nth derivative)
-function derivative(x::AcbPolyRingElem, n::Int64)
-  for i in (1:n)
-    x = derivative(x)
-  end
-  return x
-end
-
 function lift!(x::fpFieldElem, z::ZZRingElem)
   set!(z, x.data)
   return z
