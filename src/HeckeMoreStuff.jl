@@ -787,12 +787,12 @@ function zeros(f::ZZPolyRingElem)
   return zeros
 end
 
-function lift!(x::fpFieldElem, z::ZZRingElem)
+function lift!(x::fpFieldElem, z::ZZRingElem)  # FIXME: wrong argument order?
   set!(z, x.data)
   return z
 end
 
-function lift!(x::EuclideanRingResidueFieldElem{ZZRingElem}, z::ZZRingElem)
+function lift!(x::EuclideanRingResidueFieldElem{ZZRingElem}, z::ZZRingElem)  # FIXME: wrong argument order?
   set!(z, x.data)
   return z
 end
