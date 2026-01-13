@@ -997,13 +997,13 @@ function mod!(r::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   return r
 end
 
-function mod(x::ZZRingElem, y::ZZRingElem)
+function mod(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   iszero(y) && throw(DivideError())
   r = ZZRingElem()
   return mod!(r, x, y)
 end
 
-function mod(x::ZZRingElem, c::UInt)
+function mod(x::ZZRingElemOrPtr, c::UInt)
   c == 0 && throw(DivideError())
   @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, c::UInt)::UInt
 end
