@@ -715,7 +715,7 @@ function (R::FqPolyRing)(g::ZZPolyRingElem)
   return z
 end
 
-function AbstractAlgebra._map(K::FqField, x::Union{ZZPolyRingElem}, parent::FqPolyRing)
+function AbstractAlgebra._map(K::FqField, x::ZZPolyRingElem, parent::FqPolyRing)
   @assert base_ring(parent) === K
   z = FqPolyRingElem(x, K)
   z.parent = parent
