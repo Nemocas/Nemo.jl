@@ -728,7 +728,7 @@ end
 
 function AbstractAlgebra._map(K::FqField, x::Union{zzModPolyRingElem, fpPolyRingElem}, parent::FqPolyRing)
   @assert base_ring(parent) === K
-  characteristic(base_ring(x)) != characteristic(base_ring(R)) &&
+  characteristic(base_ring(x)) != characteristic(base_ring(parent)) &&
     error("Incompatible characteristic")
   z = FqPolyRingElem(x, K)
   z.parent = parent
@@ -741,7 +741,7 @@ end
 
 function AbstractAlgebra._map(K::FqField, x::Union{ZZModPolyRingElem, FpPolyRingElem}, parent::FqPolyRing)
   @assert base_ring(parent) === K
-  characteristic(base_ring(x)) != characteristic(base_ring(R)) &&
+  characteristic(base_ring(x)) != characteristic(base_ring(parent)) &&
     error("Incompatible characteristic")
   z = FqPolyRingElem(x, K)
   z.parent = parent

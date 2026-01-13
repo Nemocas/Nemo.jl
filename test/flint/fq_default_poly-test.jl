@@ -55,7 +55,7 @@
 
   T, z = polynomial_ring(ZZ, "z")
 
-  p = S(3z^2 + 2z + 5)
+  p = change_base_ring(R, 3z^2 + 2z + 5; parent = S)
 
   @test isa(p, PolyRingElem)
 
@@ -68,7 +68,7 @@
 
     f = 3y^2 + 2y + 1
 
-    @test isa(S(f), PolyRingElem)
+    @test isa(change_base_ring(base_ring(S), f; parent = S), PolyRingElem)
   end
 end
 
