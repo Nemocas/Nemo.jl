@@ -442,25 +442,14 @@ function size(R::Union{EuclideanRingResidueRing{fqPolyRepPolyRingElem},Euclidean
   return size(base_ring(base_ring(R)))^degree(R.modulus)
 end
 
-function size(R::FqPolyRepField)
-  return order(R)
-end
+################################################################################
+#
+#
+#
+################################################################################
 
-function size(R::fqPolyRepField)
-  return order(R)
-end
-
-function size(F::fpField)
-  return order(F)
-end
-
-function size(F::FpField)
-  return order(F)
-end
-
-function size(F::FqField)
-  return order(F)
-end
+# discuss: size = order? order = size?
+size(F::FinField) = order(F)  # TODO: move this to AA
 
 #################################################
 # in triplicate.... and probably cases missing...
