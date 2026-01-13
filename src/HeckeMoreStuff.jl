@@ -786,8 +786,6 @@ function mod_sym!(a::T, b::T) where {T}
   return mod!(a, b)
 end
 
-Base.replace!(::typeof(-), m::ZZMatrix) = -m
-
 function (A::AbsSimpleNumField)(a::ZZPolyRingElem)
   return A(QQ["x"][1](a))
 end
