@@ -615,6 +615,20 @@ for (etype, rtype, ctype, mtype, brtype) in (
   end # eval
 end # for
 
+################################################################################
+#
+#  Lifting
+#
+################################################################################
+
+function lift(R::ZZAbsPowerSeriesRing, f::ZZModAbsPowerSeriesRingElem)
+  r = R()
+  for i = 0:length(f)-1
+    setcoeff!(r, i, lift(coeff(f, i)))
+  end
+  return r
+end
+
 ###############################################################################
 #
 #   Square root

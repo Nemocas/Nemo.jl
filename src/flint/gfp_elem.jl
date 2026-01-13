@@ -68,6 +68,32 @@ characteristic(R::fpField) = ZZRingElem(R.n)
 
 degree(::fpField) = 1
 
+function gen(k::fpField)
+  return k(1)
+end
+
+prime_field(F::fpField; cached::Bool=true) = F
+
+function defining_polynomial(k::fpField)
+  kx, x = polynomial_ring(k, cached=false)
+  return x - k(1)
+end
+
+################################################################################
+#
+#  Basis
+#
+################################################################################
+
+function basis(k::fpField)
+  return [k(1)]
+end
+
+function basis(k::fpField, l::fpField)
+  @assert k == l
+  return [k(1)]
+end
+
 ###############################################################################
 #
 #   AbstractString I/O

@@ -420,6 +420,16 @@ end
 
 mod(x::T, y::T) where {T <: Zmodn_fmpz_poly} = rem(x, y)
 
+function rem!(a::ZZModPolyRingElem, b::ZZModPolyRingElem, c::ZZModPolyRingElem)
+  @ccall libflint.fmpz_mod_poly_rem(a::Ref{ZZModPolyRingElem}, b::Ref{ZZModPolyRingElem}, c::Ref{ZZModPolyRingElem}, a.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return a
+end
+
+function rem!(a::FpPolyRingElem, b::FpPolyRingElem, c::FpPolyRingElem)
+  @ccall libflint.fmpz_mod_poly_rem(a::Ref{FpPolyRingElem}, b::Ref{FpPolyRingElem}, c::Ref{FpPolyRingElem}, a.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return a
+end
+
 ################################################################################
 #
 #  Removal and valuation
@@ -504,6 +514,36 @@ function invmod(x::T, y::T) where {T <: Zmodn_fmpz_poly}
   z = parent(x)()
   r = @ccall libflint.fmpz_mod_poly_invmod(z::Ref{T}, x::Ref{T}, y::Ref{T}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Cint
   r == 0 ? error("Impossible inverse in invmod") : return z
+end
+
+function invmod(f::ZZModPolyRingElem, M::ZZModPolyRingElem)
+  if !is_unit(f)
+    r = parent(f)()
+    ff = ZZ()
+    i = @ccall libflint.fmpz_mod_poly_invmod_f(ff::Ref{ZZRingElem}, r::Ref{ZZModPolyRingElem}, f::Ref{ZZModPolyRingElem}, M::Ref{ZZModPolyRingElem}, f.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Int
+    if iszero(i)
+      error("not yet implemented")
+    else
+      return r
+    end
+  end
+  if !is_unit(leading_coefficient(M))
+    error("not yet implemented")
+  end
+  g = parent(f)(inv(constant_coefficient(f)))
+  #lifting: to invert a, start with an inverse b mod m, then
+  # then b -> b*(2-ab) is an inverse mod m^2
+  # starting with this g, and using the fact that all coeffs are nilpotent
+  # we have an inverse modulo s.th. nilpotent. Hence it works
+  c = f * g
+  rem!(c, c, M)
+  while !isone(c)
+    mul!(g, g, 2 - c)
+    rem!(g, g, M)
+    mul!(c, f, g)
+    rem!(c, c, M)
+  end
+  return g
 end
 
 function mulmod(x::T, y::T, z::T) where {T <: Zmodn_fmpz_poly}
