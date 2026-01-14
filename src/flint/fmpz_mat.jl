@@ -712,6 +712,7 @@ function is_zero_det_probabilistic(M::ZZMatrix; modulus_bitsize::Int = 100)
   large_prime_size = 60
   p = 2^small_prime_size + rand(1:2^(small_prime_size-1))  # works well on my computer
   log2_modulus = 0.0
+  Mp = zero_matrix(Native.GF(2), nrows(M), ncols(M)) # workspace, to avoid reallocating
   while log2_modulus < modulus_bitsize
     # After 3 iters, we switch to larger primes (to make progress faster)
     if log2_modulus > 3*small_prime_size && log2_modulus < 3*small_prime_size + 4
@@ -720,8 +721,8 @@ function is_zero_det_probabilistic(M::ZZMatrix; modulus_bitsize::Int = 100)
     p = next_prime(p)  # ?? better to do  next_prime(p+rand(1:2^16)) ??
     log2_modulus += log2(p)  # only approximate, but that's fine
     Fp = Native.GF(p; cached=false, check=false)
-    Mp = change_base_ring(Fp, M)
-    if det(Mp) != 0
+    Mp = map_entries!(Fp, Mp, M)  # non-allocating change_base_ring
+    if !is_zero(_det(Mp))
       return false
     end
   end

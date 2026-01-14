@@ -457,8 +457,9 @@ function is_zero_det_probabilistic(M::QQMatrix; modulus_bitsize::Int = 100)
     p = next_prime(p)  # ?? better to do  next_prime(p+rand(1:2^16)) ??
     Fp = Native.GF(p; cached=false, check=false)
     try
+      # an attempt to use map_entries! (from AbstractAlgebra/src/Matrix.jl) caused _det to error (no idea why)
       Mp = change_base_ring(Fp, M)  # this will throw if p divides the denominator of some matrix entry
-      if det(Mp) != 0
+      if !is_zero(_det(Mp))
         return false
       end
       log2_modulus += log2(p)  # only approximate, but that's fine
