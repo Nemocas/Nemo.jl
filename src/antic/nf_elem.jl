@@ -1312,6 +1312,13 @@ base_field(::AbsSimpleNumField) = QQ
 #
 ###############################################################################
 
+#Assuming that the denominator of a is one, reduces all the coefficients modulo p
+# non-symmetric (positive) residue system
+function mod!(a::AbsSimpleNumFieldElem, b::ZZRingElem)
+  @ccall libflint.nf_elem_mod_fmpz(a::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
+  return a
+end
+
 function mod_sym!(a::AbsSimpleNumFieldElem, b::ZZRingElem)
   @ccall libflint.nf_elem_smod_fmpz(a::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return a

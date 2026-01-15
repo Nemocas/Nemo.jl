@@ -330,6 +330,20 @@ end
 
 divexact(x::ZZPolyRingElem, y::Integer; check::Bool=true) = divexact(x, flintify(y); check=check)
 
+function mod!(f::ZZPolyRingElem, p::ZZRingElem)
+  for i = 0:degree(f)
+    setcoeff!(f, i, mod(coeff(f, i), p))
+  end
+end
+
+function mod(f::ZZPolyRingElem, p::ZZRingElem)
+  g = parent(f)()
+  for i = 0:degree(f)
+    setcoeff!(g, i, mod(coeff(f, i), p))
+  end
+  return g
+end
+
 ###############################################################################
 #
 #   Pseudodivision
