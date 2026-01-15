@@ -430,11 +430,11 @@ end
 @doc raw"""
     is_zero_det_probabilistic(M::QQMatrix; modulus_bitsize::Int = 100)
 
-Return `true` if `det(M) == 0`, and probably return `false` otherwise.
-The algorithm is heuristic, and may _very rarely_ return `true` when
-`det(M) != 0`.  It is faster than doing `is_zero(det(M))`.  The kwarg
-`modular_bitsize` must be between 20 and 1000; larger values decrease
-the probability of a false positive (but require more time).
+Same as `is_zero(det(M))` but faster, though may _very rarely_ erroneously
+return `true`.  The kwarg `modulus_bitsize` must be between 20 and 1000;
+larger values decrease the probability of a false positive (but require
+more computation time).  Under a "uniformity assumption" the probability
+of a false positive is about `2^(-modulus_bitsize)`.
 """
 function is_zero_det_probabilistic(M::QQMatrix; modulus_bitsize::Int = 100)
   @req  is_square(M)  "matrix must be square"
