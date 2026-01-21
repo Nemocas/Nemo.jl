@@ -100,6 +100,10 @@ end
 
 function coeff(a::ZZMPolyRingElem, i::Int)
   z = ZZRingElem()
+  return coeff!(z, a, i)
+end
+
+function coeff!(z::ZZRingElem, a::ZZMPolyRingElem, i::Int)
   n = length(a)
   # this check is not needed as fmpz_mpoly_get_term_coeff_fmpz throws
   (i < 1 || i > n) && error("Index must be between 1 and $(length(a))")
@@ -531,7 +535,7 @@ function (a::ZZMPolyRingElem)(vals::Integer...)
   return evaluate(a, [vals...])
 end
 
-function (a::ZZMPolyRingElem)(vals::Union{NCRingElem, RingElement}...)
+function (a::ZZMPolyRingElem)(vals::NCRingElement...)
   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
   R = base_ring(a)
   # The best we can do here is to cache previously used powers of the values
@@ -572,6 +576,7 @@ function (a::ZZMPolyRingElem)(vals::Union{NCRingElem, RingElement}...)
 end
 
 function evaluate(a::ZZMPolyRingElem, bs::Vector{ZZMPolyRingElem})
+  @req allequal(map(parent, bs)) "parents do not match"
   R = parent(a)
   S = parent(bs[1])
 
@@ -585,6 +590,7 @@ function evaluate(a::ZZMPolyRingElem, bs::Vector{ZZMPolyRingElem})
 end
 
 function evaluate(a::ZZMPolyRingElem, bs::Vector{ZZPolyRingElem})
+  @req allequal(map(parent, bs)) "parents do not match"
   R = parent(a)
   S = parent(bs[1])
 
@@ -872,6 +878,10 @@ end
 # Return the i-th term of the polynomial, as a polynomial
 function term(a::ZZMPolyRingElem, i::Int)
   z = parent(a)()
+  return term!(z, a, i)
+end
+
+function term!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, i::Int)
   @ccall libflint.fmpz_mpoly_get_term(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, (i - 1)::Int, a.parent::Ref{ZZMPolyRing})::Nothing
   return z
 end
@@ -961,7 +971,7 @@ function (R::ZZMPolyRing)(b::IntegerUnion)
 end
 
 function (R::ZZMPolyRing)(a::ZZMPolyRingElem)
-  parent(a) != R && error("Unable to coerce polynomial")
+  parent(a) != R && error("Coercion not supported; instead use `map_coefficients` with kwarg `parent`")
   return a
 end
 

@@ -1,6 +1,6 @@
 @testset "QQPolyRingElem.constructors" begin
-  S1 = PolyRing(QQ)
-  S2 = PolyRing(QQ)
+  S1 = polynomial_ring(QQ; cached=false)[1]
+  S2 = polynomial_ring(QQ; cached=false)[1]
 
   @test isa(S1, QQPolyRing)
   @test S1 !== S2
@@ -10,7 +10,7 @@
   @test elem_type(S) == QQPolyRingElem
   @test elem_type(QQPolyRing) == QQPolyRingElem
   @test parent_type(QQPolyRingElem) == QQPolyRing
-  @test dense_poly_type(QQFieldElem) == QQPolyRingElem
+  @test poly_type(QQFieldElem) == QQPolyRingElem
 
   @test isa(S, QQPolyRing)
 
@@ -48,7 +48,7 @@
 
   R, x = polynomial_ring(ZZ, "x")
 
-  m = S(3x^3 + 2x + 1)
+  m = change_base_ring(QQ, 3x^3 + 2x + 1; parent = S)
 
   @test isa(m, PolyRingElem)
 
@@ -641,12 +641,18 @@ end
             Native.GF(ZZ(13)),
             GF(13)]
     Rx, x = R["x"]
-    g = @inferred Rx(f)
+    g = @inferred change_base_ring(R, f; parent = Rx)
     @test g == 4*x^2 + 8*x + 2
   end
 
   R, x = polynomial_ring(ZZ, "x")
-  @test_throws ErrorException R(f)
+  @test_throws ErrorException change_base_ring(ZZ, f; parent = R)
   f = 7*y^2 + 3*y + 2
-  @test @inferred R(f) == 7*x^2 + 3*x + 2
+  @test 7*x^2 + 3*x + 2 == @inferred change_base_ring(ZZ, f; parent = R)
+end
+
+@testset "QQPolyRingElem.conversion" begin
+  S, y = polynomial_ring(QQ, "y")
+  f = 7//5*y^2 + 3//2*y + 2
+  @test digits(f) == [2, 3//2, 7//5]
 end

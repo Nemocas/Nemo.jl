@@ -18,7 +18,7 @@ elem_type(::Type{FpPolyRing}) = FpPolyRingElem
 
 parent_type(::Type{FpPolyRingElem}) = FpPolyRing
 
-dense_poly_type(::Type{FpFieldElem}) = FpPolyRingElem
+poly_type(::Type{FpFieldElem}) = FpPolyRingElem
 
 ###############################################################################
 #
@@ -403,52 +403,33 @@ promote_rule(::Type{FpPolyRingElem}, ::Type{ZZRingElem}) = FpPolyRingElem
 #
 ################################################################################
 
-function (R::FpPolyRing)()
-  z = FpPolyRingElem(base_ring(R))
-  z.parent = R
-  return z
-end
+(R::FpPolyRing)() = FpPolyRingElem(R)
 
-function (R::FpPolyRing)(x::ZZRingElem)
-  z = FpPolyRingElem(base_ring(R), x)
-  z.parent = R
-  return z
-end
+(R::FpPolyRing)(x::ZZRingElem) = FpPolyRingElem(R, x)
 
-function (R::FpPolyRing)(x::Integer)
-  z = FpPolyRingElem(base_ring(R), ZZRingElem(x))
-  z.parent = R
-  return z
-end
+(R::FpPolyRing)(x::Integer) = FpPolyRingElem(R, ZZRingElem(x))
 
 function (R::FpPolyRing)(x::FpFieldElem)
   base_ring(R) != parent(x) && error("Wrong parents")
-  z = FpPolyRingElem(base_ring(R), x.data)
-  z.parent = R
-  return z
+  return FpPolyRingElem(R, x.data)
 end
 
-function (R::FpPolyRing)(arr::Vector{ZZRingElem})
-  z = FpPolyRingElem(base_ring(R), arr)
-  z.parent = R
-  return z
-end
+(R::FpPolyRing)(arr::Vector{ZZRingElem}) = FpPolyRingElem(R, arr)
 
 function (R::FpPolyRing)(arr::Vector{FpFieldElem})
-  if length(arr) > 0
-    (base_ring(R) != parent(arr[1])) && error("Wrong parents")
-  end
-  z = FpPolyRingElem(base_ring(R), arr)
-  z.parent = R
-  return z
+  @req all(parent(e) == base_ring(R) for e in arr) "parents do not match"
+  return FpPolyRingElem(R, arr)
 end
 
 (R::FpPolyRing)(arr::Vector{T}) where {T <: Integer} = R(map(base_ring(R), arr))
 
-function (R::FpPolyRing)(x::ZZPolyRingElem)
-  z = FpPolyRingElem(base_ring(R), x)
-  z.parent = R
-  return z
+function AbstractAlgebra._map(K::FpField, x::ZZPolyRingElem, parent::FpPolyRing)
+  @assert base_ring(parent) == K
+  return FpPolyRingElem(parent, x)
+end
+
+function (R::FpPolyRing)(g::ZZPolyRingElem)
+  error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
 end
 
 function (R::FpPolyRing)(f::FpPolyRingElem)

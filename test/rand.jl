@@ -1,7 +1,7 @@
 using Nemo.Random
 using Nemo.RandomExtensions: make
 
-const rng = MersenneTwister()
+const _rng = MersenneTwister()
 
 # test if rand(rng, R, args...) gives reproducible results
 # also check that the Random API works as expected
@@ -56,7 +56,7 @@ function test_rand(@nospecialize(test::Union{Nothing,Function}),
   @test size(mM) == (2, 3)
   foreach(_test, mM)
 
-  Random.seed!(rng, rng.seed)
+  rng = copy(_rng)
   x = rand(rng, R, args...)
   @test x isa type
   _test(x)
@@ -84,13 +84,14 @@ function test_rand(@nospecialize(test::Union{Nothing,Function}),
   @test size(mM) == (2, 3)
   foreach(_test, mM)
 
-  Random.seed!(rng, rng.seed)
-  @test x == rand(rng, R, args...)
-  @test y == rand(rng, M)
+  # rng2 should reproduce the same random values as rng
+  rng2 = copy(_rng)
+  @test x == rand(rng2, R, args...)
+  @test y == rand(rng2, M)
   if isempty(args)
-    @test v == rand(rng, R, 2)
-    @test m == rand(rng, R, 2, 3)
+    @test v == rand(rng2, R, 2)
+    @test m == rand(rng2, R, 2, 3)
   end
-  @test vM == rand(rng, M, 2)
-  @test mM == rand(rng, M, 2, 3)
+  @test vM == rand(rng2, M, 2)
+  @test mM == rand(rng2, M, 2, 3)
 end

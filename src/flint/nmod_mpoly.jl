@@ -118,6 +118,11 @@ for (etype, rtype, ftype, ctype, utype) in (
       return base_ring(parent(a))(z)
     end
 
+    function coeff!(b::($ctype), a::($etype), i::Int)
+      # Cannot do anything inplace here because b is immutable
+      return coeff(a, i)
+    end
+
     function coeff(a::($etype), b::($etype))
       check_parent(a, b)
       !isone(length(b)) && error("Second argument must be a monomial")
@@ -588,7 +593,7 @@ for (etype, rtype, ftype, ctype, utype) in (
       return evaluate(a, [vals...])
     end
 
-    function (a::($etype))(vals::Union{NCRingElem, RingElement}...)
+    function (a::($etype))(vals::NCRingElement...)
       length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
       R = base_ring(a)
       # The best we can do here is to cache previously used powers of the values
@@ -629,6 +634,7 @@ for (etype, rtype, ftype, ctype, utype) in (
     end
 
     function evaluate(a::$(etype), bs::Vector{$etype})
+      @req allequal(map(parent, bs)) "parents do not match"
       R = parent(a)
       S = parent(bs[1])
       @assert base_ring(R) === base_ring(S)
@@ -644,6 +650,7 @@ for (etype, rtype, ftype, ctype, utype) in (
 
 
     function evaluate(a::($etype), bs::Vector{$utype})
+      @req allequal(map(parent, bs)) "parents do not match"
       R = parent(a)
       S = parent(bs[1])
       @assert base_ring(R) === base_ring(S)
@@ -832,6 +839,10 @@ for (etype, rtype, ftype, ctype, utype) in (
     # Return the i-th term of the polynomial, as a polynomial
     function term(a::($etype), i::Int)
       z = parent(a)()
+      return term!(z, a, i)
+    end
+
+    function term!(z::($etype), a::($etype), i::Int)
       @ccall libflint.nmod_mpoly_get_term(z::Ref{($etype)}, a::Ref{($etype)}, (i - 1)::Int, parent(a)::Ref{($rtype)})::Nothing
       return z
     end
@@ -839,8 +850,7 @@ for (etype, rtype, ftype, ctype, utype) in (
     # Return the i-th monomial of the polynomial, as a polynomial
     function monomial(a::($etype), i::Int)
       z = parent(a)()
-      @ccall libflint.nmod_mpoly_get_term_monomial(z::Ref{($etype)}, a::Ref{($etype)}, (i - 1)::Int, a.parent::Ref{($rtype)})::Nothing
-      return z
+      return monomial!(z, a, i)
     end
 
     # Sets the given polynomial m to the i-th monomial of the polynomial

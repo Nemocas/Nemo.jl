@@ -92,6 +92,6 @@ end
   end
 
   let
-    @test_throws "Flint Exception (General error):\nException (fmpz_divexact). Division by zero." divexact!(ZZ(), ZZ(5), ZZ(0))
+    @test_throws "Flint Exception (Divide by zero):\nException (fmpz_divexact). Division by zero." divexact!(ZZ(), ZZ(5), ZZ(0))
   end
 end

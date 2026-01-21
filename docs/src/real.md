@@ -4,7 +4,7 @@ CollapsedDocStrings = true
 DocTestSetup = Nemo.doctestsetup()
 ```
 
-# Arbitrary precision real balls
+# [Arbitrary precision real balls](@id real_field_section)
 
 Arbitrary precision real ball arithmetic is supplied by Arb which provides a
 ball representation which tracks error bounds rigorously. Real numbers are 
@@ -65,7 +65,7 @@ julia> a = RR("0.25")
 0.25000000000000000000
 
 julia> b = RR("0.1 +/- 0.001")
-[0.1 +/- 1.01e-3]
+[0.10 +/- 1.01e-3]
 
 julia> c = RR(0.5)
 0.50000000000000000000
@@ -232,12 +232,12 @@ julia> print(x, "\n", y, "\n", mid, "\n", rad)
 [2.0000000037252902985 +/- 3.81e-20]
 ```
 
-The first reason that `c` is not printed as `[1 +/- 2]` is that the
+The first reason that `x` is not printed as `[1 +/- 2]` is that the
 midpoint does not have a greater exponent than the radius in its scientific
 notation. For similar reasons `y` is not printed as `[12 +/- 2]`.
 
 The second reason is that we get an additional error term after our addition. As we
-see, `radius(c)` is not equal to $2$, which when printed rounds it up to a
+see, `radius(x)` is not equal to $2$, which when printed rounds it up to a
 reasonable decimal place. This is because real balls keep track of
 rounding errors of basic arithmetic.
 
@@ -259,7 +259,7 @@ contains(::RealFieldElem, ::RealFieldElem)
 contains(::RealFieldElem, ::Integer)
 contains(::RealFieldElem, ::ZZRingElem)
 contains(::RealFieldElem, ::QQFieldElem)
-contains{T <: Integer}(::RealFieldElem, ::Rational{T})
+contains(::RealFieldElem, ::Rational)
 contains(::RealFieldElem, ::BigFloat)
 ```
 

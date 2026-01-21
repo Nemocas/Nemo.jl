@@ -14,7 +14,7 @@ parent_type(::Type{fqPolyRepPolyRingElem}) = fqPolyRepPolyRing
 
 elem_type(::Type{fqPolyRepPolyRing}) = fqPolyRepPolyRingElem
 
-dense_poly_type(::Type{fqPolyRepFieldElem}) = fqPolyRepPolyRingElem
+poly_type(::Type{fqPolyRepFieldElem}) = fqPolyRepPolyRingElem
 
 base_ring(a::fqPolyRepPolyRing) = a.base_ring
 
@@ -700,7 +700,7 @@ end
 
 function (R::fqPolyRepPolyRing)(x::Vector{fqPolyRepFieldElem})
   length(x) == 0 && return zero(R)
-  base_ring(R) != parent(x[1]) && error("Coefficient rings must coincide")
+  @req all(parent(e) == base_ring(R) for e in x) "parents do not match"
   z = fqPolyRepPolyRingElem(x)
   z.parent = R
   return z

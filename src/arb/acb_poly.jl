@@ -14,7 +14,7 @@ parent_type(::Type{AcbPolyRingElem}) = AcbPolyRing
 
 elem_type(::Type{AcbPolyRing}) = AcbPolyRingElem
 
-dense_poly_type(::Type{AcbFieldElem}) = AcbPolyRingElem
+poly_type(::Type{AcbFieldElem}) = AcbPolyRingElem
 
 length(x::AcbPolyRingElem) = x.length
 
@@ -406,6 +406,15 @@ function derivative(x::AcbPolyRingElem)
   return z
 end
 
+function derivative(x::AcbPolyRingElem, n::Int64)
+  # TODO: reimplement using _acb_poly_nth_derivative
+  # and then do the equivalent for {Complex,Arb,Real}PolyRingElem
+  for i in (1:n)
+    x = derivative(x)
+  end
+  return x
+end
+
 function integral(x::AcbPolyRingElem)
   z = parent(x)()
   @ccall libflint.acb_poly_integral(z::Ref{AcbPolyRingElem}, x::Ref{AcbPolyRingElem}, precision(parent(x))::Int)::Nothing
@@ -588,13 +597,10 @@ function roots(x::AcbPolyRingElem; target=0, isolate_real=false, initial_prec=0,
   if isolated == deg
     @ccall libflint._acb_vec_sort_pretty(roots::Ptr{acb_struct}, deg::Int)::Nothing
     res = array(base_ring(parent(x)), roots, deg)
-  end
-
-  acb_vec_clear(roots, deg)
-
-  if isolated == deg
+    acb_vec_clear(roots, deg)
     return res
   else
+    acb_vec_clear(roots, deg)
     error("unable to isolate all roots (insufficient precision, or there is a multiple root)")
   end
 end

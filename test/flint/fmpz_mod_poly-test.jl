@@ -1,8 +1,8 @@
 @testset "ZZModPolyRingElem.constructors" begin
   R, = residue_ring(ZZ, 123456789012345678949)
 
-  S1 = PolyRing(R)
-  S2 = PolyRing(R)
+  S1 = polynomial_ring(R; cached=false)[1]
+  S2 = polynomial_ring(R; cached=false)[1]
 
   @test isa(S1, ZZModPolyRing)
   @test S1 !== S2
@@ -12,7 +12,7 @@
   @test elem_type(S) == ZZModPolyRingElem
   @test elem_type(ZZModPolyRing) == ZZModPolyRingElem
   @test parent_type(ZZModPolyRingElem) == ZZModPolyRing
-  @test dense_poly_type(ZZModRingElem) == ZZModPolyRingElem
+  @test poly_type(ZZModRingElem) == ZZModPolyRingElem
 
   @test S isa ZZModPolyRing
 
@@ -49,7 +49,7 @@
   T, y = polynomial_ring(ZZ, "y")
 
   p = 3y^3 + 2y - 1
-  q = S(p)
+  q = change_base_ring(R, p; parent = S)
 
   @test isa(q, PolyRingElem)
 

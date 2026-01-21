@@ -14,7 +14,7 @@ parent_type(::Type{ComplexPolyRingElem}) = ComplexPolyRing
 
 elem_type(::Type{ComplexPolyRing}) = ComplexPolyRingElem
 
-dense_poly_type(::Type{ComplexFieldElem}) = ComplexPolyRingElem
+poly_type(::Type{ComplexFieldElem}) = ComplexPolyRingElem
 
 length(x::ComplexPolyRingElem) = x.length
 
@@ -396,13 +396,13 @@ end
 #
 ###############################################################################
 
-function derivative(x::ComplexPolyRingElem, prec::Int = precision(Balls))
+function derivative(x::ComplexPolyRingElem; prec::Int = precision(Balls))
   z = parent(x)()
   @ccall libflint.acb_poly_derivative(z::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, prec::Int)::Nothing
   return z
 end
 
-function integral(x::ComplexPolyRingElem, prec::Int = precision(Balls))
+function integral(x::ComplexPolyRingElem; prec::Int = precision(Balls))
   z = parent(x)()
   @ccall libflint.acb_poly_integral(z::Ref{ComplexPolyRingElem}, x::Ref{ComplexPolyRingElem}, prec::Int)::Nothing
   return z
@@ -592,13 +592,10 @@ function roots(x::ComplexPolyRingElem; target=0, isolate_real=false, initial_pre
   if isolated == deg
     @ccall libflint._acb_vec_sort_pretty(roots::Ptr{acb_struct}, deg::Int)::Nothing
     res = array(base_ring(parent(x)), roots, deg)
-  end
-
-  acb_vec_clear(roots, deg)
-
-  if isolated == deg
+    acb_vec_clear(roots, deg)
     return res
   else
+    acb_vec_clear(roots, deg)
     error("unable to isolate all roots (insufficient precision, or there is a multiple root)")
   end
 end

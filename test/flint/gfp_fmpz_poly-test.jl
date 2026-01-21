@@ -1,8 +1,8 @@
 @testset "FpPolyRingElem.constructors" begin
   R = Native.GF(ZZRingElem(123456789012345678949))
 
-  S1 = PolyRing(R)
-  S2 = PolyRing(R)
+  S1 = polynomial_ring(R; cached=false)[1]
+  S2 = polynomial_ring(R; cached=false)[1]
 
   @test isa(S1, FpPolyRing)
   @test S1 !== S2
@@ -12,7 +12,7 @@
   @test elem_type(S) == FpPolyRingElem
   @test elem_type(FpPolyRing) == FpPolyRingElem
   @test parent_type(FpPolyRingElem) == FpPolyRing
-  @test dense_poly_type(FpFieldElem) == FpPolyRingElem
+  @test poly_type(FpFieldElem) == FpPolyRingElem
 
   @test Nemo.promote_rule(elem_type(S), ZZRingElem) == elem_type(S)
 
@@ -51,7 +51,7 @@
   T, y = polynomial_ring(ZZ, "y")
 
   p = 3y^3 + 2y - 1
-  q = S(p)
+  q = change_base_ring(R, p; parent = S)
 
   @test isa(q, PolyRingElem)
 

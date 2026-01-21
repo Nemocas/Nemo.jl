@@ -116,26 +116,19 @@ isequal(a::FqPolyRepMatrix, b::FqPolyRepMatrix) = ==(a, b)
 ################################################################################
 
 function transpose(a::FqPolyRepMatrix)
-  z = FqPolyRepMatrix(ncols(a), nrows(a), base_ring(a))
-  for i in 1:nrows(a)
-    for j in 1:ncols(a)
-      z[j, i] = a[i, j]
-    end
-  end
-  return z
+  z = similar(a, ncols(a), nrows(a))
+  return transpose!(z, a)
 end
 
-# There is no transpose for FqPolyRepMatrix
-#function transpose(a::FqPolyRepMatrix)
-#  z = FqPolyRepMatrixSpace(base_ring(a), ncols(a), nrows(a))()
-#  @ccall libflint.fq_mat_transpose(z::Ref{FqPolyRepMatrix}, a::Ref{FqPolyRepMatrix}, base_ring(a)::Ref{FqPolyRepField})::Nothing
-#  return z
-#end
-#
-#function transpose!(a::FqPolyRepMatrix)
-#  !is_square(a) && error("Matrix must be a square matrix")
-#  @ccall libflint.fq_mat_transpose(a::Ref{FqPolyRepMatrix}, a::Ref{FqPolyRepMatrix}, base_ring(a)::Ref{FqPolyRepField})::Nothing
-#end
+function transpose!(a::FqPolyRepMatrix)
+  @req is_square(a) "Matrix must be a square matrix"
+  return transpose!(a, a)
+end
+
+function transpose!(z::FqPolyRepMatrix, a::FqPolyRepMatrix)
+  @ccall libflint.fq_mat_transpose(z::Ref{FqPolyRepMatrix}, a::Ref{FqPolyRepMatrix}, base_ring(a)::Ref{FqPolyRepField})::Nothing
+  return z
+end
 
 ###############################################################################
 #
@@ -580,13 +573,13 @@ end
 
 function (a::FqPolyRepMatrixSpace)(arr::AbstractMatrix{FqPolyRepFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
-  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
+  @req all(parent(e) == base_ring(a) for e in arr) "parents do not match"
   return FqPolyRepMatrix(arr, base_ring(a))
 end
 
 function (a::FqPolyRepMatrixSpace)(arr::AbstractVector{FqPolyRepFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
-  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
+  @req all(parent(e) == base_ring(a) for e in arr) "parents do not match"
   return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
 end
 

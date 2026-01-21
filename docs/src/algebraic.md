@@ -4,7 +4,7 @@ CollapsedDocStrings = true
 DocTestSetup = Nemo.doctestsetup()
 ```
 
-# Algebraic closure of the rational numbers
+# [Algebraic closure of the rational numbers](@id qqbar_section)
 
 An implementation of the field of all algebraic numbers, that is, an algebraic closure of the field of rational numbers, is provided through the type `QQBarField` and the corresponding element type `QQBarFieldElem`.
 
@@ -347,6 +347,7 @@ julia> x = RR(0.1)       # note: 53-bit binary approximation of 1//10 without ra
 
 julia> guess(Qb, x, 1)
 ERROR: No suitable algebraic number found
+[...]
 
 julia> guess(Qb, x + RR("+/- 1e-10"), 1)
 {a1: 0.100000}

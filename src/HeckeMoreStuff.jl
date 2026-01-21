@@ -2,10 +2,6 @@ function round(::Type{Int}, a::QQFieldElem)
   return round(Int, Rational{BigInt}(a))
 end
 
-function prime_field(_::NumField)
-  return QQField()
-end
-
 function prime_field(F::fqPolyRepField; cached::Bool=true)
   return Native.GF(Int(characteristic(F)), cached=cached)
 end
@@ -208,28 +204,6 @@ end
 
 function is_squarefree(x::Generic.Poly{AbsSimpleNumFieldElem})
   return isone(gcd(x, derivative(x), true))
-end
-
-################################################################################
-#
-#  Base case for dot products
-#
-################################################################################
-
-dot(x::ZZRingElem, y::NumFieldElem) = x * y
-
-dot(x::Integer, y::NumFieldElem) = x * y
-
-dot(x::NumFieldElem, y::Integer) = x * y
-
-function dot(a::Vector{<:NumFieldElem}, b::Vector{ZZRingElem})
-  d = zero(parent(a[1]))
-  t = zero(d)
-  for i = 1:length(a)
-    mul!(t, a[i], b[i])
-    add!(d, d, t)
-  end
-  return d
 end
 
 function bits(x::ArbFieldElem)
@@ -790,14 +764,6 @@ function zeros(f::ZZPolyRingElem)
   return zeros
 end
 
-#This should probably go somewhere else. (Taking the nth derivative)
-function derivative(x::AcbPolyRingElem, n::Int64)
-  for i in (1:n)
-    x = derivative(x)
-  end
-  return x
-end
-
 function lift!(x::fpFieldElem, z::ZZRingElem)
   set!(z, x.data)
   return z
@@ -820,20 +786,9 @@ function mod_sym!(a::T, b::T) where {T}
   return mod!(a, b)
 end
 
-Base.replace!(::typeof(-), m::ZZMatrix) = -m
-
 function (A::AbsSimpleNumField)(a::ZZPolyRingElem)
-  return A(QQ["x"][1](a))
+  return A(QQPolyRingElem(parent(defining_polynomial(A)), a))
 end
-
-
-AbstractAlgebra.promote_rule(::Type{S}, ::Type{ZZRingElem}) where {S<:NumFieldElem} = S
-
-AbstractAlgebra.promote_rule(::Type{ZZRingElem}, ::Type{S}) where {S<:NumFieldElem} = S
-
-AbstractAlgebra.promote_rule(::Type{S}, ::Type{QQFieldElem}) where {S<:NumFieldElem} = S
-
-AbstractAlgebra.promote_rule(::Type{QQFieldElem}, ::Type{S}) where {S<:NumFieldElem} = S
 
 function is_positive(x::ZZRingElem, ::Union{PosInf,Vector{PosInf}})
   return sign(x) == 1
@@ -884,12 +839,10 @@ end
 
 Base.log2(a::ZZRingElem) = log2(BigInt(a)) # stupid: there has to be faster way
 
-is_cyclo_type(::NumField) = false
-
 
 function nf_elem_to_fmpz_mod_poly!(r::ZZModPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
   @ccall libflint.nf_elem_get_fmpz_mod_poly_den(r::Ref{ZZModPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint, r.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return nothing
+  return r
 end
 
 function (R::ZZModPolyRing)(a::AbsSimpleNumFieldElem)
@@ -900,7 +853,7 @@ end
 
 function nf_elem_to_gfp_poly!(r::fpPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
   @ccall libflint.nf_elem_get_nmod_poly_den(r::Ref{fpPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint)::Nothing
-  return nothing
+  return r
 end
 
 function (R::fpPolyRing)(a::AbsSimpleNumFieldElem)
@@ -911,7 +864,7 @@ end
 
 function nf_elem_to_nmod_poly!(r::zzModPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
   @ccall libflint.nf_elem_get_nmod_poly_den(r::Ref{zzModPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint)::Nothing
-  return nothing
+  return r
 end
 
 function (R::zzModPolyRing)(a::AbsSimpleNumFieldElem)
@@ -922,7 +875,7 @@ end
 
 function nf_elem_to_gfp_fmpz_poly!(r::FpPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
   @ccall libflint.nf_elem_get_fmpz_mod_poly_den(r::Ref{FpPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint, r.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return nothing
+  return r
 end
 
 function mod_sym!(f::ZZPolyRingElem, p::ZZRingElem)
@@ -936,32 +889,6 @@ function mod_sym(a::AbsSimpleNumFieldElem, b::ZZRingElem, b2::ZZRingElem)
   # TODO: this is not correct
   return mod_sym(a, b)
   return z
-end
-
-function ^(x::NumFieldElem, y::ZZRingElem)
-  if fits(Int, y)
-    return x^Int(y)
-  end
-
-  return _power(x, y)
-end
-
-# We test once if it fits, otherwise we would have to check for every ^-call
-function _power(x::NumFieldElem, y::ZZRingElem)
-  res = parent(x)()
-  if y < 0
-    res = _power(inv(x), -y)
-  elseif y == 0
-    res = parent(x)(1)
-  elseif y == 1
-    res = deepcopy(x)
-  elseif mod(y, 2) == 0
-    z = _power(x, Base.div(y, 2))
-    res = z * z
-  else
-    res = _power(x, y - 1) * x
-  end
-  return res
 end
 
 function (Rx::fpPolyRing)(a::fqPolyRepFieldElem)

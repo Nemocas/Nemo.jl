@@ -14,7 +14,7 @@ parent_type(::Type{ArbPolyRingElem}) = ArbPolyRing
 
 elem_type(::Type{ArbPolyRing}) = ArbPolyRingElem
 
-dense_poly_type(::Type{ArbFieldElem}) = ArbPolyRingElem
+poly_type(::Type{ArbFieldElem}) = ArbPolyRingElem
 
 length(x::ArbPolyRingElem) = x.length
 

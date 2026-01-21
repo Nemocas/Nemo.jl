@@ -32,7 +32,7 @@ end
   @test elem_type(RR) == RealFieldElem
   @test elem_type(RealField) == RealFieldElem
   @test parent_type(RealFieldElem) == RealField
-  @test base_ring(RR) == Union{}
+  @test base_ring_type(RR) == Union{}
 
   @test real_field() == real_field()
 end
@@ -185,6 +185,17 @@ end
   @test contains_positive(approx3 - 3)
   @test contains_nonpositive(approx3 - 3)
   @test contains_nonnegative(approx3 - 3)
+
+  x = RR("[1 +/- 0.5]")
+  y = RR("[1.1 +/- 0.2]")
+  z = max(x, y)
+  zz = maximum([x, y])
+  for i in 1:10
+    xx = Nemo._rand_rational_in_ball(x)
+    yy = Nemo._rand_rational_in_ball(y)
+    @test contains(z, max(xx, yy))
+    @test contains(zz, max(xx, yy))
+  end
 end
 
 @testset "RealFieldElem.adhoc_comparison" begin
@@ -585,7 +596,7 @@ end
 
 @testset "RealFieldElem.simplest_rational_inside" begin
   R = real_field()
-  @test @inferred simplest_rational_inside(R(1)) == 1
+  @test (@inferred simplest_rational_inside(R(1))) == 1
   @test simplest_rational_inside(R(1//2)) == 1//2
   @test simplest_rational_inside(R("0.1 +/- 0.01")) == 1//10
   @test simplest_rational_inside(const_pi(R)) == 8717442233//2774848045

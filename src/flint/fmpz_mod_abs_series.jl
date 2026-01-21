@@ -47,11 +47,10 @@ for (etype, rtype, ctype, mtype, brtype) in (
     max_precision(R::($rtype)) = R.prec_max
 
     function normalise(a::($etype), len::Int)
+      len <= 0 && return len
       p = a.parent.base_ring.ninv
-      if len > 0
-        c = ZZRingElem()
-        @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(c::Ref{ZZRingElem}, a::Ref{($etype)}, (len - 1)::Int, p::Ref{($ctype)})::Nothing
-      end
+      c = ZZRingElem()
+      @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(c::Ref{ZZRingElem}, a::Ref{($etype)}, (len - 1)::Int, p::Ref{($ctype)})::Nothing
       while len > 0 && iszero(c)
         len -= 1
         if len > 0
@@ -607,9 +606,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
     end
 
     function (a::($rtype))(b::Vector{($mtype)}, len::Int, prec::Int)
-      if length(b) > 0
-        (base_ring(a) != parent(b[1])) && error("Wrong parents")
-      end
+      @req all(parent(e) == base_ring(a) for e in b) "parents do not match"
       z = ($etype)(base_ring(a), b, len, prec)
       z.parent = a
       return z

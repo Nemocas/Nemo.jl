@@ -90,6 +90,7 @@ import Base: ldexp
 import Base: length
 import Base: log
 import Base: log1p
+import Base: max
 import Base: maximum
 import Base: minimum
 import Base: mod
@@ -197,6 +198,7 @@ import AbstractAlgebra: Set
 import AbstractAlgebra: set_attribute!
 import AbstractAlgebra: Solve
 import AbstractAlgebra: terse
+import AbstractAlgebra: transpose!
 import AbstractAlgebra: truncate!
 import AbstractAlgebra: add_verbosity_scope
 
@@ -215,6 +217,7 @@ include("Aliases.jl")
 using FLINT_jll: libflint
 
 const pkgdir = realpath(joinpath(dirname(@__DIR__)))
+
 
 ###############################################################################
 #
@@ -506,6 +509,8 @@ include("flint/adhoc.jl")
 include("embedding/embedding.jl")
 
 include("Rings.jl")
+
+include("NumFields.jl")
 
 include("matrix.jl")
 include("poly.jl")

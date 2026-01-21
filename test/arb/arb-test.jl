@@ -7,7 +7,7 @@ RR = ArbField(64)
   @test elem_type(RR) == ArbFieldElem
   @test elem_type(ArbField) == ArbFieldElem
   @test parent_type(ArbFieldElem) == ArbField
-  @test base_ring(RR) == Union{}
+  @test base_ring_type(RR) == Union{}
 
   @test ArbField(10, cached = true) === ArbField(10, cached = true)
   @test ArbField(11, cached = false) !== ArbField(11, cached = false)
@@ -143,6 +143,17 @@ end
   @test contains_positive(approx3 - 3)
   @test contains_nonpositive(approx3 - 3)
   @test contains_nonnegative(approx3 - 3)
+
+  x = RR("[1 +/- 0.5]")
+  y = RR("[1.1 +/- 0.2]")
+  z = max(x, y)
+  zz = maximum([x, y])
+  for i in 1:10
+    xx = Nemo._rand_rational_in_ball(x)
+    yy = Nemo._rand_rational_in_ball(y)
+    @test contains(z, max(xx, yy))
+    @test contains(zz, max(xx, yy))
+  end
 end
 
 @testset "ArbFieldElem.adhoc_comparison" begin
@@ -544,7 +555,7 @@ end
 
 @testset "ArbFieldElem.simplest_rational_inside" begin
   R = ArbField(64)
-  @test @inferred simplest_rational_inside(R(1)) == 1
+  @test (@inferred simplest_rational_inside(R(1))) == 1
   @test simplest_rational_inside(R(1//2)) == 1//2
   @test simplest_rational_inside(R("0.1 +/- 0.01")) == 1//10
   @test simplest_rational_inside(const_pi(R)) == 8717442233//2774848045

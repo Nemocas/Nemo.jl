@@ -85,7 +85,7 @@ end
 @inline function is_zero_entry(A::FqMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(A, i, j)
   GC.@preserve A begin
-    x = fq_default_mat_entry_ptr(A, i, j)
+    x = mat_entry_ptr(A, i, j)
     return @ccall libflint.fq_default_is_zero(x::Ptr{FqFieldElem}, base_ring(A)::Ref{FqField})::Bool
   end
 end
@@ -114,13 +114,17 @@ isequal(a::FqMatrix, b::FqMatrix) = ==(a, b)
 
 function transpose(a::FqMatrix)
   z = similar(a, ncols(a), nrows(a))
-  @ccall libflint.fq_default_mat_transpose(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
-  return z
+  return transpose!(z, a)
 end
 
 function transpose!(a::FqMatrix)
-  !is_square(a) && error("Matrix must be a square matrix")
-  @ccall libflint.fq_default_mat_transpose(a::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
+  @req is_square(a) "Matrix must be a square matrix"
+  return transpose!(a, a)
+end
+
+function transpose!(z::FqMatrix, a::FqMatrix)
+  @ccall libflint.fq_default_mat_transpose(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
+  return z
 end
 
 ###############################################################################
@@ -164,26 +168,22 @@ end
 ################################################################################
 
 function +(x::FqMatrix, y::FqMatrix)
-  check_parent(x,y)
+  check_parent(x, y)
   z = similar(x)
-  @ccall libflint.fq_default_mat_add(z::Ref{FqMatrix}, x::Ref{FqMatrix}, y::Ref{FqMatrix}, base_ring(x)::Ref{FqField})::Nothing
-  return z
+  return add!(z, x, y)
 end
 
 function -(x::FqMatrix, y::FqMatrix)
-  check_parent(x,y)
+  check_parent(x, y)
   z = similar(x)
-  @ccall libflint.fq_default_mat_sub(z::Ref{FqMatrix}, x::Ref{FqMatrix}, y::Ref{FqMatrix}, base_ring(x)::Ref{FqField})::Nothing
-
-  return z
+  return sub!(z, x, y)
 end
 
 function *(x::FqMatrix, y::FqMatrix)
   (base_ring(x) != base_ring(y)) && error("Base ring must be equal")
-  (ncols(x) != nrows(y)) && error("Dimensions are wrong")
+  ncols(x) != nrows(y) && error("Incompatible matrix dimensions")
   z = similar(x, nrows(x), ncols(y))
-  @ccall libflint.fq_default_mat_mul(z::Ref{FqMatrix}, x::Ref{FqMatrix}, y::Ref{FqMatrix}, base_ring(x)::Ref{FqField})::Nothing
-  return z
+  return mul!(z, x, y)
 end
 
 
@@ -208,6 +208,16 @@ function neg!(z::FqMatrix, a::FqMatrix)
   return z
 end
 
+function add!(a::FqMatrix, b::FqMatrix, c::FqMatrix)
+  @ccall libflint.fq_default_mat_add(a::Ref{FqMatrix}, b::Ref{FqMatrix}, c::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
+  return a
+end
+
+function sub!(a::FqMatrix, b::FqMatrix, c::FqMatrix)
+  @ccall libflint.fq_default_mat_sub(a::Ref{FqMatrix}, b::Ref{FqMatrix}, c::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
+  return a
+end
+
 function mul!(a::FqMatrix, b::FqMatrix, c::FqMatrix)
   @ccall libflint.fq_default_mat_mul(a::Ref{FqMatrix}, b::Ref{FqMatrix}, c::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
   return a
@@ -222,8 +232,8 @@ function mul!(a::FqMatrix, b::FqMatrix, c::FqFieldElem)
   GC.@preserve a begin
     for i in 1:nrows(a)
       for j in 1:ncols(a)
-        x = fq_default_mat_entry_ptr(a, i, j)
-        y = fq_default_mat_entry_ptr(b, i, j)
+        x = mat_entry_ptr(a, i, j)
+        y = mat_entry_ptr(b, i, j)
         @ccall libflint.fq_default_mul(x::Ptr{FqFieldElem}, y::Ptr{FqFieldElem}, c::Ref{FqFieldElem}, F::Ref{FqField})::Nothing
       end
     end
@@ -233,16 +243,11 @@ end
 
 mul!(a::FqMatrix, b::FqFieldElem, c::FqMatrix) = mul!(a, c, b)
 
-function add!(a::FqMatrix, b::FqMatrix, c::FqMatrix)
-  @ccall libflint.fq_default_mat_add(a::Ref{FqMatrix}, b::Ref{FqMatrix}, c::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
-  return a
-end
-
 function Generic.add_one!(a::FqMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   F = base_ring(a)
   GC.@preserve a begin
-    x = fq_default_mat_entry_ptr(a, i, j)
+    x = mat_entry_ptr(a, i, j)
     # There is no fq_default_add_one, but only ...sub_one
     @ccall libflint.fq_default_neg(x::Ptr{FqFieldElem}, x::Ptr{FqFieldElem}, F::Ref{FqField})::Nothing
     @ccall libflint.fq_default_sub_one(x::Ptr{FqFieldElem}, x::Ptr{FqFieldElem}, F::Ref{FqField})::Nothing
@@ -573,13 +578,13 @@ end
 
 function (a::FqMatrixSpace)(arr::AbstractMatrix{FqFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
-  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
+  @req all(parent(e) == base_ring(a) for e in arr) "parents do not match"
   return FqMatrix(arr, base_ring(a))
 end
 
 function (a::FqMatrixSpace)(arr::AbstractVector{FqFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
-  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
+  @req all(parent(e) == base_ring(a) for e in arr) "parents do not match"
   return FqMatrix(nrows(a), ncols(a), arr, base_ring(a))
 end
 
@@ -626,19 +631,18 @@ end
 #
 ################################################################################
 
-function fq_default_mat_entry_ptr(a::FqMatrix, i, j)
+function mat_entry_ptr(a::FqMatrix, i::Int, j::Int)
   t = _fq_default_ctx_type(base_ring(a))
-  ptr = pointer_from_objref(a)
   if t == _FQ_DEFAULT_FQ_ZECH
-    pptr = @ccall libflint.fq_zech_mat_entry(ptr::Ptr{Cvoid}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
+    pptr = @ccall libflint.fq_zech_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   elseif t == _FQ_DEFAULT_FQ_NMOD
-    pptr = @ccall libflint.fq_nmod_mat_entry(ptr::Ptr{Cvoid}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
+    pptr = @ccall libflint.fq_nmod_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   elseif t == _FQ_DEFAULT_FQ
-    pptr = @ccall libflint.fq_mat_entry(ptr::Ptr{Cvoid}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
+    pptr = @ccall libflint.fq_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   elseif t == _FQ_DEFAULT_NMOD
-    pptr = @ccall libflint.nmod_mat_entry_ptr(ptr::Ptr{Cvoid}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
+    pptr = @ccall libflint.nmod_mat_entry_ptr(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   else#if t == _FQ_DEFAULT_FMPZ_NMOD
-    pptr = @ccall libflint.fmpz_mod_mat_entry(ptr::Ptr{Cvoid}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
+    pptr = @ccall libflint.fmpz_mod_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   end
   return pptr
 end

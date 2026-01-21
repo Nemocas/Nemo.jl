@@ -789,7 +789,7 @@ end
 
   N = zero_matrix(QQ, 2, 1)
   C = solve_init(N)
-  b = zeros(QQ, 2)
+  b = [zero(QQ), zero(QQ)]
   fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b, side = :right)
   @test fl
   @test N*x == b
@@ -799,7 +799,7 @@ end
 
   N = zero_matrix(QQ, 1, 2)
   C = solve_init(N)
-  b = zeros(QQ, 1)
+  b = [zero(QQ)]
   fl, x, K = @inferred can_solve_with_solution_and_kernel(C, b, side = :right)
   @test fl
   @test N*x == b
@@ -927,5 +927,5 @@ end
 
 @testset "QQMatrix.denominator" begin
   M = QQ[1//2 3//4; 5//6 0]
-  @test @inferred denominator(M) == 12
+  @test 12 == @inferred denominator(M)
 end

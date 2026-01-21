@@ -40,17 +40,15 @@ var(a::ZZAbsPowerSeriesRing) = a.S
 max_precision(R::ZZAbsPowerSeriesRing) = R.prec_max
 
 function normalise(a::ZZAbsPowerSeriesRingElem, len::Int)
-  if len > 0
-    c = ZZRingElem()
-    @ccall libflint.fmpz_poly_get_coeff_fmpz(c::Ref{ZZRingElem}, a::Ref{ZZAbsPowerSeriesRingElem}, (len - 1)::Int)::Nothing
-  end
+  len <= 0 && return len
+  c = ZZRingElem()
+  @ccall libflint.fmpz_poly_get_coeff_fmpz(c::Ref{ZZRingElem}, a::Ref{ZZAbsPowerSeriesRingElem}, (len - 1)::Int)::Nothing
   while len > 0 && iszero(c)
     len -= 1
     if len > 0
       @ccall libflint.fmpz_poly_get_coeff_fmpz(c::Ref{ZZRingElem}, a::Ref{ZZAbsPowerSeriesRingElem}, (len - 1)::Int)::Nothing
     end
   end
-
   return len
 end
 

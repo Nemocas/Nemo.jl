@@ -5,8 +5,8 @@ coeff_types = [Int8, Int, UInt, BigInt,
                ZZRingElem, QQFieldElem]
 
 @testset "RealPolyRingElem.constructors" begin
-  S1 = PolyRing(RR)
-  S2 = PolyRing(RR)
+  S1 = polynomial_ring(RR; cached=false)[1]
+  S2 = polynomial_ring(RR; cached=false)[1]
 
   @test isa(S1, RealPolyRing)
   @test S1 !== S2
@@ -16,7 +16,7 @@ coeff_types = [Int8, Int, UInt, BigInt,
   @test elem_type(R) == RealPolyRingElem
   @test elem_type(RealPolyRing) == RealPolyRingElem
   @test parent_type(RealPolyRingElem) == RealPolyRing
-  @test dense_poly_type(RealFieldElem) == RealPolyRingElem
+  @test poly_type(RealFieldElem) == RealPolyRingElem
 
   @test R isa RealPolyRing
 

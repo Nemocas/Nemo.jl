@@ -18,7 +18,7 @@ elem_type(::Type{ZZModPolyRing}) = ZZModPolyRingElem
 
 parent_type(::Type{ZZModPolyRingElem}) = ZZModPolyRing
 
-dense_poly_type(::Type{ZZModRingElem}) = ZZModPolyRingElem
+poly_type(::Type{ZZModRingElem}) = ZZModPolyRingElem
 
 function _is_one_or_throw(f, y)
   R = base_ring(y)
@@ -58,14 +58,14 @@ one(R::ZmodNFmpzPolyRing) = R(1)
 
 gen(R::ZmodNFmpzPolyRing) = R([ZZRingElem(0), ZZRingElem(1)])
 
-is_gen(a::Zmodn_fmpz_poly) = (degree(a) == 1 &&
+is_gen(a::Zmodn_fmpz_poly) = (degree(a) <= 1 &&
                               iszero(coeff(a,0)) && isone(coeff(a,1)))
 
 var(R::ZmodNFmpzPolyRing) = R.S
 
-modulus(a::Zmodn_fmpz_poly) = a.parent.n
+modulus(a::Zmodn_fmpz_poly) = modulus(parent(a))
 
-modulus(R::ZmodNFmpzPolyRing) = R.n
+modulus(R::ZmodNFmpzPolyRing) = modulus(base_ring(R))
 
 function deepcopy_internal(a::T, dict::IdDict) where {T <: Zmodn_fmpz_poly}
   z = T(base_ring(parent(a)), a)
@@ -833,52 +833,33 @@ promote_rule(::Type{ZZModPolyRingElem}, ::Type{ZZModRingElem}) = ZZModPolyRingEl
 #
 ################################################################################
 
-function (R::ZZModPolyRing)()
-  z = ZZModPolyRingElem(base_ring(R))
-  z.parent = R
-  return z
-end
+(R::ZZModPolyRing)() = ZZModPolyRingElem(R)
 
-function (R::ZZModPolyRing)(x::ZZRingElem)
-  z = ZZModPolyRingElem(base_ring(R), x)
-  z.parent = R
-  return z
-end
+(R::ZZModPolyRing)(x::ZZRingElem) = ZZModPolyRingElem(R, x)
 
-function (R::ZZModPolyRing)(x::Integer)
-  z = ZZModPolyRingElem(base_ring(R), ZZRingElem(x))
-  z.parent = R
-  return z
-end
+(R::ZZModPolyRing)(x::Integer) = ZZModPolyRingElem(R, ZZRingElem(x))
 
 function (R::ZZModPolyRing)(x::ZZModRingElem)
   base_ring(R) != parent(x) && error("Wrong parents")
-  z = ZZModPolyRingElem(base_ring(R), x.data)
-  z.parent = R
-  return z
+  return ZZModPolyRingElem(R, x.data)
 end
 
-function (R::ZZModPolyRing)(arr::Vector{ZZRingElem})
-  z = ZZModPolyRingElem(base_ring(R), arr)
-  z.parent = R
-  return z
-end
+(R::ZZModPolyRing)(arr::Vector{ZZRingElem}) = ZZModPolyRingElem(R, arr)
 
 function (R::ZZModPolyRing)(arr::Vector{ZZModRingElem})
-  if length(arr) > 0
-    (base_ring(R) != parent(arr[1])) && error("Wrong parents")
-  end
-  z = ZZModPolyRingElem(base_ring(R), arr)
-  z.parent = R
-  return z
+  @req all(parent(e) == base_ring(R) for e in arr) "parents do not match"
+  return ZZModPolyRingElem(R, arr)
 end
 
 (R::ZZModPolyRing)(arr::Vector{T}) where {T <: Integer} = R(map(base_ring(R), arr))
 
-function (R::ZZModPolyRing)(x::ZZPolyRingElem)
-  z = ZZModPolyRingElem(base_ring(R), x)
-  z.parent = R
-  return z
+function (R::ZZModPolyRing)(g::ZZPolyRingElem)
+  error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
+end
+
+function AbstractAlgebra._map(K::ZZModRing, x::ZZPolyRingElem, parent::ZZModPolyRing)
+  @assert base_ring(parent) == K
+  return ZZModPolyRingElem(parent, x)
 end
 
 function (R::ZZModPolyRing)(f::ZZModPolyRingElem)

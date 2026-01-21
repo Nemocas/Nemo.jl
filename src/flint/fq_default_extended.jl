@@ -883,3 +883,18 @@ function _promote(a::FqFieldElem, b::FqFieldElem)
   end
   error("Cannot promote to common finite field")
 end
+
+################################################################################
+#
+#  Extension of given degree
+#
+################################################################################
+
+# create a degree n extension of K (as an absolute field)
+function _extension(K::FqField, n::Int)
+  n = absolute_degree(K) * n
+  p = characteristic(K)
+  L = GF(p, n; cached = false)
+  h = embed(K, L)
+  return L, h
+end

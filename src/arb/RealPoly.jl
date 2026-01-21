@@ -14,7 +14,7 @@ parent_type(::Type{RealPolyRingElem}) = RealPolyRing
 
 elem_type(::Type{RealPolyRing}) = RealPolyRingElem
 
-dense_poly_type(::Type{RealFieldElem}) = RealPolyRingElem
+poly_type(::Type{RealFieldElem}) = RealPolyRingElem
 
 length(x::RealPolyRingElem) = x.length
 
@@ -397,13 +397,13 @@ end
 #
 ###############################################################################
 
-function derivative(x::RealPolyRingElem, prec::Int = precision(Balls))
+function derivative(x::RealPolyRingElem; prec::Int = precision(Balls))
   z = parent(x)()
   @ccall libflint.arb_poly_derivative(z::Ref{RealPolyRingElem}, x::Ref{RealPolyRingElem}, prec::Int)::Nothing
   return z
 end
 
-function integral(x::RealPolyRingElem, prec::Int = precision(Balls))
+function integral(x::RealPolyRingElem; prec::Int = precision(Balls))
   z = parent(x)()
   @ccall libflint.arb_poly_integral(z::Ref{RealPolyRingElem}, x::Ref{RealPolyRingElem}, prec::Int)::Nothing
   return z

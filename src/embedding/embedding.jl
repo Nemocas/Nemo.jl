@@ -84,7 +84,7 @@ any_root(x::PolyRingElem) = -coeff(linear_factor(x), 0)
 Compute the minimal polynomial of a linear recurring sequence $a$.
 """
 function berlekamp_massey(a::Vector{Y}, n::Int) where Y <: FieldElem
-
+  @req allequal(map(parent, a)) "parents do not match"
   S, T = polynomial_ring(parent(a[1]), "T")
   m = 2*n - 1
   R0 = T^(2*n)

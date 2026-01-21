@@ -18,7 +18,7 @@ parent_type(::Type{zzModPolyRingElem}) = zzModPolyRing
 
 elem_type(::Type{zzModPolyRing}) = zzModPolyRingElem
 
-dense_poly_type(::Type{zzModRingElem}) = zzModPolyRingElem
+poly_type(::Type{zzModRingElem}) = zzModPolyRingElem
 
 ################################################################################
 #
@@ -76,14 +76,14 @@ one(R::zzModPolyRing) = R(UInt(1))
 
 gen(R::zzModPolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
-is_gen(a::T) where T <: Zmodn_poly = (degree(a) == 1 &&
+is_gen(a::T) where T <: Zmodn_poly = (degree(a) <= 1 &&
                                       iszero(coeff(a,0)) && isone(coeff(a,1)))
 
 iszero(a::T) where T <: Zmodn_poly = Bool(@ccall libflint.nmod_poly_is_zero(a::Ref{T})::Int32)
 
-modulus(a::T) where T <: Zmodn_poly = a.parent.n
+modulus(a::T) where T <: Zmodn_poly = modulus(parent(a))
 
-modulus(R::zzModPolyRing) = R.n
+modulus(R::zzModPolyRing) = modulus(base_ring(R))
 
 var(R::zzModPolyRing) = R.S
 
@@ -176,7 +176,7 @@ function *(x::T, y::ZZRingElem) where T <: Zmodn_poly
   z = parent(x)()
   t = ZZRingElem()
   tt = UInt(0)
-  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, y::Ref{ZZRingElem}, parent(x).n::UInt)::UInt
+  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, y::Ref{ZZRingElem}, modulus(x)::UInt)::UInt
   tt = @ccall libflint.fmpz_get_ui(t::Ref{ZZRingElem})::UInt
   return x*tt
 end
@@ -207,7 +207,7 @@ function +(x::T, y::ZZRingElem) where T <: Zmodn_poly
   z = parent(x)()
   t = ZZRingElem()
   tt = UInt(0)
-  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, y::Ref{ZZRingElem}, parent(x).n::UInt)::UInt
+  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, y::Ref{ZZRingElem}, modulus(x)::UInt)::UInt
   tt = @ccall libflint.fmpz_get_ui(t::Ref{ZZRingElem})::UInt
   return +(x,tt)
 end
@@ -238,7 +238,7 @@ function -(x::T, y::ZZRingElem) where T <: Zmodn_poly
   z = parent(x)()
   t = ZZRingElem()
   tt = UInt(0)
-  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, y::Ref{ZZRingElem}, parent(x).n::UInt)::UInt
+  @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, y::Ref{ZZRingElem}, modulus(x)::UInt)::UInt
   tt = @ccall libflint.fmpz_get_ui(t::Ref{ZZRingElem})::UInt
   return -(x,tt)
 end
@@ -739,7 +739,7 @@ end
 
 function roots(a::zzModPolyRingElem)
   R = parent(a)
-  n = R.n
+  n = modulus(R)
   fac = nmod_poly_factor(n)
   if is_prime(n)
     @ccall libflint.nmod_poly_roots(fac::Ref{nmod_poly_factor}, a::Ref{zzModPolyRingElem}, 0::Cint)::UInt
@@ -805,6 +805,7 @@ end
 
 function det(M::Generic.Mat{zzModPolyRingElem})
   nrows(M) != ncols(M) && error("Not a square matrix in det")
+  nrows(M) == 0 && return one(base_ring(M))
 
   if is_prime(modulus(base_ring(M)))
     return det_popov(M)
@@ -901,30 +902,14 @@ promote_rule(::Type{zzModPolyRingElem}, ::Type{zzModRingElem}) = zzModPolyRingEl
 #
 ################################################################################
 
-function (R::zzModPolyRing)()
-  z = zzModPolyRingElem(R.n)
-  z.parent = R
-  return z
-end
+(R::zzModPolyRing)() = zzModPolyRingElem(R)
 
 function (R::zzModPolyRing)(x::ZZRingElem)
-  r = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, R.n::UInt)::UInt
-  z = zzModPolyRingElem(R.n, r)
-  z.parent = R
-  return z
+  r = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, modulus(R)::UInt)::UInt
+  return zzModPolyRingElem(R, r)
 end
 
-function (R::zzModPolyRing)(x::UInt)
-  z = zzModPolyRingElem(R.n, x)
-  z.parent = R
-  return z
-end
-
-function (R::zzModPolyRing)(x::Integer)
-  z = zzModPolyRingElem(R.n, x)
-  z.parent = R
-  return z
-end
+(R::zzModPolyRing)(x::Integer) = zzModPolyRingElem(R, x)
 
 function (R::zzModPolyRing)(x::zzModPolyRingElem)
   R != parent(x) && error("Wrong parents")
@@ -933,30 +918,20 @@ end
 
 function (R::zzModPolyRing)(x::zzModRingElem)
   base_ring(R) != parent(x) && error("Wrong parents")
-  z = zzModPolyRingElem(R.n, x.data)
-  z.parent = R
-  return z
+  return zzModPolyRingElem(R, x.data)
 end
 
 function (R::zzModPolyRing)(arr::Vector{ZZRingElem})
-  z = zzModPolyRingElem(R.n, arr)
-  z.parent = R
-  return z
+  return zzModPolyRingElem(R, arr)
 end
 
 function (R::zzModPolyRing)(arr::Vector{UInt})
-  z = zzModPolyRingElem(R.n, arr)
-  z.parent = R
-  return z
+  return zzModPolyRingElem(R, arr)
 end
 
 (R::zzModPolyRing)(arr::Vector{T}) where {T <: Integer} = R(map(base_ring(R), arr))
 
 function (R::zzModPolyRing)(arr::Vector{zzModRingElem})
-  if length(arr) > 0
-    (base_ring(R) != parent(arr[1])) && error("Wrong parents")
-  end
-  z = zzModPolyRingElem(R.n, arr)
-  z.parent = R
-  return z
+  @req all(parent(e) == base_ring(R) for e in arr) "parents do not match"
+  return zzModPolyRingElem(R, arr)
 end

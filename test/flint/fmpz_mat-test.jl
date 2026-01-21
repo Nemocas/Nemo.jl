@@ -259,6 +259,12 @@ end
   C[1, 1] = 20
   @test B == matrix_space(ZZ, 2, 2)([10 2; 4 5])
   @test A == S([1 2 3; 4 5 6; 7 8 9])
+
+  m = ZZ[1 2 4; 5 6 7]
+  n = m[[1], [1, 3]]
+  @test n == ZZ[1 4]
+  n = m[1:2, 1:2]
+  @test n == ZZ[1 2; 5 6]
 end
 
 @testset "ZZMatrix.unary_ops" begin
@@ -347,7 +353,15 @@ end
 
   @test A^0 == one(S)
 
-  @test_throws DomainError A^-1
+  @test_throws ArgumentError A^-1
+
+  a = ZZ[1 2;0 1]
+  @test a^-2 == inv(a)^2
+  @test a^ZZ(-2) == inv(a)^2
+  n = -2
+  @test a^n == inv(a)^2
+  n = ZZ(-2)
+  @test a^n == inv(a)^2
 end
 
 @testset "ZZMatrix.adhoc_exact_division" begin
@@ -458,11 +472,11 @@ end
   @test inv(A)*A == one(S)
 
   a = ZZ[1 1;]
-  @test_throws ErrorException inv(a)
+  @test_throws ArgumentError inv(a)
   b = ZZ[1 0; 0 2]
-  @test_throws ErrorException inv(b)
+  @test_throws ArgumentError inv(b)
   c = ZZ[1 1; 1 1]
-  @test_throws ErrorException inv(c)
+  @test_throws ArgumentError inv(c)
 end
 
 @testset "ZZMatrix.pseudo_inversion" begin
@@ -658,6 +672,14 @@ end
   @test_throws ArgumentError lll_gram_with_transform(ZZ[1 0])
   @test_throws ArgumentError lll_gram(ZZ[1 0; 1 1])
   @test_throws ArgumentError lll_gram_with_transform(ZZ[1 0; 1 1])
+
+  # negative definit
+  
+  G = ZZ[-1;]
+  @test G == lll_gram(G)
+  H, T = lll_gram_with_transform(G)
+  @test H == G
+  @test T * G * transpose(T) == G
 end
 
 @testset "ZZMatrix.nullspace" begin
@@ -938,7 +960,25 @@ end
   @test Nemo.is_zero_row(A, 1)
 
   add_row!(A, ZZ(3), 1, 2)
-  @test A == ZZ[12 18 9; 4 6 3]
+  @test A == ZZ[0 0 0; 4 6 3]
+
+  add_row!(A, ZZ(-2), 2, 1, 1:2)
+  @test A == ZZ[-8 -12 0; 4 6 3]
+
+
+  A = ZZ[2 3 5; 4 6 3]
+
+  add_row!(A, 0, 1, 1)
+  @test A == ZZ[2 3 5; 4 6 3]
+
+  add_row!(A, -1, 1, 1)
+  @test Nemo.is_zero_row(A, 1)
+
+  add_row!(A, 3, 1, 2)
+  @test A == ZZ[0 0 0; 4 6 3]
+
+  add_row!(A, -2, 2, 1, 1:2)
+  @test A == ZZ[-8 -12 0; 4 6 3]
 end
 
 @testset "ZZMatrix.add_column!" begin
@@ -950,6 +990,9 @@ end
   add_column!(A, ZZ(-1), 1, 1)
   @test Nemo.is_zero_column(A, 1)
 
-  add_column!(A, ZZ(3), 1, 2)
-  @test A == ZZ[9 3 5; 18 6 3]
+  add_column!(A, ZZ(3), 2, 3)
+  @test A == ZZ[0 3 14; 0 6 21]
+
+  add_column!(A, -3, 2, 3, 1:1)
+  @test A == ZZ[0 3 5; 0 6 21]
 end

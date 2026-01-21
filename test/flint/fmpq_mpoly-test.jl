@@ -632,6 +632,8 @@ end
   r3 = evaluate(f + g, [xx + yy, yy + zz])
   @test r3 == r1 + r2
 
+  @test_throws ArgumentError evaluate(x, [x,xx])
+
   SS, z = polynomial_ring(R, "z")
   @test_throws ErrorException evaluate(x, [z])
   @test_throws ErrorException evaluate(x, [z, z, z])
@@ -859,4 +861,21 @@ end
 
   @test g == change_base_ring(R, f*84; parent = Rxy)
   @test g == map_coefficients(R, f*84; parent = Rxy)
+end
+
+@testset "QQMPolyRingElem.iterators" begin
+  R, (x, y, z) = polynomial_ring(QQ, [:x, :y, :z])
+  f = x * y + 2 * x - 3 * z
+
+  @test (@inferred collect(exponent_vectors(f))) == [[1, 1, 0], [1, 0, 0], [0, 0, 1]]
+  @test (@inferred collect(exponent_vectors(Vector{UInt}, f))) == [UInt[1, 1, 0], UInt[1, 0, 0], UInt[0, 0, 1]]
+  @test (@inferred collect(coefficients(f))) == [QQ(1), QQ(2), QQ(-3)]
+  @test (@inferred collect(terms(f))) == [x * y, 2 * x, -3 * z]
+  @test (@inferred collect(monomials(f))) == [x * y, x, z]
+
+  @test (@inferred first(exponent_vectors(f, inplace = true))) == [1, 1, 0]
+  @test (@inferred first(exponent_vectors(Vector{UInt}, f, inplace = true))) == UInt[1, 1, 0]
+  @test (@inferred first(coefficients(f, inplace = true))) == QQ(1)
+  @test (@inferred first(monomials(f, inplace = true))) == x * y
+  @test (@inferred first(terms(f, inplace = true))) == x * y
 end

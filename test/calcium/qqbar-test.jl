@@ -13,8 +13,8 @@ end
   @test elem_type(QQBarField) == QQBarFieldElem
   @test parent_type(QQBarFieldElem) == QQBarField
   @test is_domain_type(QQBarFieldElem) == true
-  @test base_ring(R) == Union{}
-  @test base_ring(QQBarFieldElem(3)) == Union{}
+  @test base_ring_type(R) == Union{}
+  @test base_ring_type(QQBarFieldElem(3)) == Union{}
 
   @test isa(R, QQBarField)
 

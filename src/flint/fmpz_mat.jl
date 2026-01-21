@@ -170,21 +170,25 @@ function -(x::ZZMatrix)
   return z
 end
 
-###############################################################################
+################################################################################
 #
-#   transpose
+#  Transpose
 #
-###############################################################################
+################################################################################
 
-function transpose(x::ZZMatrix)
-  z = similar(x, ncols(x), nrows(x))
-  @ccall libflint.fmpz_mat_transpose(z::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
-  return z
+function transpose(a::ZZMatrix)
+  z = similar(a, ncols(a), nrows(a))
+  return transpose!(z, a)
 end
 
-function transpose!(A::ZZMatrix, B::ZZMatrix)
-  @ccall libflint.fmpz_mat_transpose(A::Ref{ZZMatrix}, B::Ref{ZZMatrix})::Nothing
-  return A
+function transpose!(a::ZZMatrixOrPtr)
+  @req is_square(a) "Matrix must be a square matrix"
+  return transpose!(a, a)
+end
+
+function transpose!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr)
+  @ccall libflint.fmpz_mat_transpose(z::Ref{ZZMatrix}, a::Ref{ZZMatrix})::Nothing
+  return z
 end
 
 ###############################################################################
@@ -321,16 +325,19 @@ end
 
 # Cannot use IntegerUnion here to avoid ambiguity.
 
-function ^(x::ZZMatrix, y::Int)
-  is_negative(y) && throw(DomainError(y, "Exponent must be non-negative"))
-  nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
-  return pow!(similar(x), x, y)
-end
+^(x::ZZMatrix, y::Int) = _powpow(x, y)
 
-function ^(x::ZZMatrix, y::ZZRingElem)
-  is_negative(y) && throw(DomainError(y, "Exponent must be non-negative"))
-  nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
-  return pow!(similar(x), x, y)
+^(x::ZZMatrix, y::ZZRingElem) = _powpow(x, y)
+
+function _powpow(x, y)
+  @req nrows(x) == ncols(x) "Incompatible matrix dimensions"
+  if y >= 0
+    return pow!(similar(x), x, y)
+  else
+    fl, xi = is_invertible_with_inverse(x)
+    @req fl "Matrix must be invertible"
+    return pow!(xi, xi, -y)
+  end
 end
 
 ###############################################################################
@@ -388,18 +395,24 @@ end
 #
 ###############################################################################
 
-function inv(x::ZZMatrix)
-  !is_square(x) && error("Matrix not invertible")
+function is_invertible_with_inverse(x::ZZMatrix)
   z = similar(x)
   d = ZZRingElem()
   @ccall libflint.fmpz_mat_inv(z::Ref{ZZMatrix}, d::Ref{ZZRingElem}, x::Ref{ZZMatrix})::Nothing
   if isone(d)
-    return z
+    return true, z
   end
   if d == -1
-    return -z
+    return true, -z
   end
-  error("Matrix not invertible")
+  return false, x
+end
+
+function inv(x::ZZMatrix)
+  @req is_square(x) "Matrix not invertible"
+  fl, z = is_invertible_with_inverse(x)
+  @req fl "Matrix not invertible"
+  return z
 end
 
 ###############################################################################
@@ -1082,7 +1095,7 @@ function lll_gram_with_transform(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99,
   if _is_definitely_full_rank(x)
     u = identity_matrix(ZZ, nrows(x))
     if x[1, 1] < 0
-      y = neg(x)
+      y = -x
       _lll_gram_with_transform!(y, u, ctx)
       return neg!(y), u
     else
@@ -1159,7 +1172,7 @@ function lll_gram!(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
   # try to recognize the definite case
   if _is_definitely_full_rank(x)
     if x[1, 1] < 0
-      return neg!(_lll_gram!(!neg(x), ctx))
+      return neg!(_lll_gram!(neg!(x), ctx))
     else
       return _lll_gram!(x, ctx)
     end
@@ -1444,30 +1457,65 @@ end
 #
 ###############################################################################
 
-function AbstractAlgebra.add_row!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int)
+function AbstractAlgebra.multiply_row!(A::ZZMatrix, s::Union{Int, ZZRingElemOrPtr}, i::Int, cols::UnitRange{Int}=1:ncols(A))
+  @assert 1 <= i <= nrows(A)
+  @assert 1 <= first(cols) && last(cols) <= ncols(A)
+  c = first(cols)
+  GC.@preserve A begin
+    # these are Ptr{ZZRingElem}
+    i_ptr = mat_entry_ptr(A, i, c)
+    for k = cols
+      mul!(i_ptr, s, i_ptr)
+      i_ptr += sizeof(ZZRingElem)
+    end
+  end
+  return A
+end
+
+function AbstractAlgebra.multiply_column!(A::ZZMatrix, s::Union{Int, ZZRingElemOrPtr}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
+  @assert 1 <= j <= ncols(A)
+  @assert 1 <= first(rows)
+  @assert last(rows) <= nrows(A)
+  GC.@preserve A begin
+    for k = rows
+      i_ptr = mat_entry_ptr(A, k, i)
+      mul!(i_ptr, s, i_ptr)
+    end
+  end
+  return A
+end
+
+
+function AbstractAlgebra.add_row!(A::ZZMatrix, s::Union{ZZRingElemOrPtr, Int}, i::Int, j::Int, cols::UnitRange{Int}=1:ncols(A))
   @assert 1 <= i <= nrows(A)
   @assert 1 <= j <= nrows(A)
+  @assert 1 <= first(cols) && last(cols) <= ncols(A)
+  c = first(cols)
   GC.@preserve A begin
-    i_ptr = mat_entry_ptr(A, i, 1)
-    j_ptr = mat_entry_ptr(A, j, 1)
-    for k = 1:ncols(A)
-      addmul!(i_ptr, s, j_ptr)
+    i_ptr = mat_entry_ptr(A, i, c)
+    j_ptr = mat_entry_ptr(A, j, c)
+    for k = cols
+      addmul!(j_ptr, s, i_ptr)
       i_ptr += sizeof(ZZRingElem)
       j_ptr += sizeof(ZZRingElem)
     end
   end
+  return A
 end
 
-function AbstractAlgebra.add_column!(A::ZZMatrix, s::ZZRingElem, i::Int, j::Int)
+function AbstractAlgebra.add_column!(A::ZZMatrix, s::Union{ZZRingElemOrPtr, Int}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
   @assert 1 <= i <= ncols(A)
   @assert 1 <= j <= ncols(A)
+  @assert 1 <= first(rows)
+  @assert last(rows) <= nrows(A)
   GC.@preserve A begin
-    for k = 1:nrows(A)
+    for k = rows
       i_ptr = mat_entry_ptr(A, k, i)
       j_ptr = mat_entry_ptr(A, k, j)
-      addmul!(i_ptr, s, j_ptr)
+      addmul!(j_ptr, s, i_ptr)
     end
   end
+  return A
 end
 
 ###############################################################################
@@ -2149,24 +2197,38 @@ function (::Type{Base.Matrix{BigInt}})(A::ZZMatrix)
   return mat
 end
 
-function map_entries(R::zzModRing, M::ZZMatrix)
-  MR = zero_matrix(R, nrows(M), ncols(M))
-  @ccall libflint.fmpz_mat_get_nmod_mat(MR::Ref{zzModMatrix}, M::Ref{ZZMatrix})::Nothing
-  return MR
+function map_entries(R::zzModRing, A::ZZMatrix)
+  N = zero_matrix(R, nrows(A), ncols(A))
+  @ccall libflint.fmpz_mat_get_nmod_mat(N::Ref{zzModMatrix}, A::Ref{ZZMatrix})::Nothing
+  return N
 end
 
-function map_entries(F::fpField, M::ZZMatrix)
-  MR = zero_matrix(F, nrows(M), ncols(M))
-  @ccall libflint.fmpz_mat_get_nmod_mat(MR::Ref{fpMatrix}, M::Ref{ZZMatrix})::Nothing
-  return MR
+function map_entries!(R::zzModRing, N::zzModMatrix, A::ZZMatrix)
+  @ccall libflint.nmod_mat_set_mod(N::Ref{zzModMatrix}, R.n::UInt)::Cvoid
+  @ccall libflint.fmpz_mat_get_nmod_mat(N::Ref{zzModMatrix}, A::Ref{ZZMatrix})::Cvoid
+  N.base_ring = R  # exploiting that the internal repr is the indep of char
+  return N
 end
 
-function map_entries(R::ZZModRing, M::ZZMatrix)
-  N = zero_matrix(R, nrows(M), ncols(M))
-  GC.@preserve M N begin
-    for i = 1:nrows(M)
-      for j = 1:ncols(M)
-        m = mat_entry_ptr(M, i, j)
+function map_entries(R::fpField, A::ZZMatrix)
+  N = zero_matrix(R, nrows(A), ncols(A))
+  @ccall libflint.fmpz_mat_get_nmod_mat(N::Ref{fpMatrix}, A::Ref{ZZMatrix})::Nothing
+  return N
+end
+
+function map_entries!(R::fpField, N::fpMatrix, A::ZZMatrix)
+  @ccall libflint.nmod_mat_set_mod(N::Ref{fpMatrix}, R.n::UInt)::Cvoid
+  @ccall libflint.fmpz_mat_get_nmod_mat(N::Ref{fpMatrix}, A::Ref{ZZMatrix})::Cvoid
+  N.base_ring = R  # exploiting that the internal repr is the indep of char
+  return N
+end
+
+function map_entries(R::ZZModRing, A::ZZMatrix)
+  N = zero_matrix(R, nrows(A), ncols(A))
+  GC.@preserve A N begin
+    for i = 1:nrows(A)
+      for j = 1:ncols(A)
+        m = mat_entry_ptr(A, i, j)
         n = mat_entry_ptr(N, i, j)
         @ccall libflint.fmpz_mod(n::Ptr{ZZRingElem}, m::Ptr{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
       end
@@ -2174,6 +2236,11 @@ function map_entries(R::ZZModRing, M::ZZMatrix)
   end
   return N
 end
+
+change_base_ring(R::zzModRing, A::ZZMatrix) = map_entries(R, A)
+change_base_ring(R::fpMatrix, A::ZZMatrix) = map_entries(R, A)
+change_base_ring(R::ZZModRing, A::ZZMatrix) = map_entries(R, A)
+
 
 ###############################################################################
 #

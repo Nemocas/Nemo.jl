@@ -14,9 +14,7 @@ parent_type(::Type{fpFieldElem}) = fpField
 
 elem_type(::Type{fpField}) = fpFieldElem
 
-base_ring_type(::Type{fpField}) = typeof(Union{})
-
-base_ring(a::fpField) = Union{}
+base_ring_type(::Type{fpField}) = Union{}
 
 parent(a::fpFieldElem) = a.parent
 
@@ -419,10 +417,10 @@ function (R::fpField)(a::QQFieldElem)
   den = denominator(a, false)
   n = @ccall libflint.fmpz_fdiv_ui(num::Ref{ZZRingElem}, R.n::UInt)::UInt
   d = @ccall libflint.fmpz_fdiv_ui(den::Ref{ZZRingElem}, R.n::UInt)::UInt
-  V = [UInt(0)]
-  g = @ccall libflint.n_gcdinv(V::Ptr{UInt}, d::UInt, R.n::UInt)::UInt
+  V = Ref(UInt(0))
+  g = @ccall libflint.n_gcdinv(V::Ref{UInt}, d::UInt, R.n::UInt)::UInt
   g != 1 && error("Unable to coerce")
-  return R(n)*R(V[1])
+  return R(n)*R(V[])
 end
 
 function (R::fpField)(a::Union{fpFieldElem, zzModRingElem, FpFieldElem, ZZModRingElem})

@@ -1,8 +1,8 @@
 @testset "fqPolyRepPolyRingElem.constructors" begin
   R, x = Native.finite_field(23, 5, "x")
 
-  S1 = PolyRing(R)
-  S2 = PolyRing(R)
+  S1 = polynomial_ring(R; cached=false)[1]
+  S2 = polynomial_ring(R; cached=false)[1]
 
   @test isa(S1, fqPolyRepPolyRing)
   @test S1 !== S2
@@ -12,7 +12,7 @@
   @test elem_type(S) == fqPolyRepPolyRingElem
   @test elem_type(fqPolyRepPolyRing) == fqPolyRepPolyRingElem
   @test parent_type(fqPolyRepPolyRingElem) == fqPolyRepPolyRing
-  @test dense_poly_type(fqPolyRepFieldElem) == fqPolyRepPolyRingElem
+  @test poly_type(fqPolyRepFieldElem) == fqPolyRepPolyRingElem
 
   @test S isa fqPolyRepPolyRing
 

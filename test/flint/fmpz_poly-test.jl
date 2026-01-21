@@ -1,6 +1,6 @@
 @testset "ZZPolyRingElem.constructors" begin
-  S1 = PolyRing(ZZ)
-  S2 = PolyRing(ZZ)
+  S1 = polynomial_ring(ZZ; cached=false)[1]
+  S2 = polynomial_ring(ZZ; cached=false)[1]
 
   @test isa(S1, ZZPolyRing)
   @test S1 !== S2
@@ -10,7 +10,7 @@
   @test elem_type(R) == ZZPolyRingElem
   @test elem_type(ZZPolyRing) == ZZPolyRingElem
   @test parent_type(ZZPolyRingElem) == ZZPolyRing
-  @test dense_poly_type(ZZRingElem) == ZZPolyRingElem
+  @test poly_type(ZZRingElem) == ZZPolyRingElem
 
   @test R isa ZZPolyRing
 
@@ -525,7 +525,7 @@ end
   for R in [residue_ring(ZZ, 13)[1],
             Native.GF(13)]
     Rx, x = R["x"]
-    g = @inferred Rx(f)
+    g = @inferred change_base_ring(R, f; parent = Rx)
     @test g == 7*x^2 + 3*x + 2
   end
 end

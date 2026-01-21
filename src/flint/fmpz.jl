@@ -49,9 +49,7 @@ parent(a::ZZRingElem) = ZZ
 
 elem_type(::Type{ZZRing}) = ZZRingElem
 
-base_ring_type(::Type{ZZRing}) = typeof(Union{})
-
-base_ring(a::ZZRing) = Union{}
+base_ring_type(::Type{ZZRing}) = Union{}
 
 is_domain_type(::Type{ZZRingElem}) = true
 
@@ -100,6 +98,40 @@ in(x::IntegerUnion, r::ZZRingElemUnitRange) = first(r) <= x <= last(r)
 
 mod(i::IntegerUnion, r::ZZRingElemUnitRange) = mod(i - first(r), length(r)) + first(r)
 
+struct ZZOneTo <: AbstractUnitRange{ZZRingElem}
+  stop::ZZRingElem
+  function ZZOneTo(stop::ZZRingElem)
+    stop < 0 && (stop = ZZ(0))
+    new(stop)
+  end
+end
+
+Base.OneTo(n::ZZRingElem) = ZZOneTo(n)
+
+Base.eltype(::Type{ZZOneTo}) = ZZRingElem
+Base.first(::ZZOneTo) = one(ZZ)
+Base.last(r::ZZOneTo) = r.stop
+Base.length(r::ZZOneTo) = BigInt(r.stop)
+
+function Base.getindex(r::ZZOneTo, i::Integer)
+  @boundscheck 1 <= i <= r.stop || Base.throw_boundserror(r, i)
+  return ZZ(i)
+end
+
+Base.iterate(r::ZZOneTo) = r.stop >= one(ZZ) ? (one(ZZ), one(ZZ)) : nothing
+function Base.iterate(r::ZZOneTo, state::ZZRingElem)
+  if state < r.stop
+    state += 1
+    return (state, state)
+  else
+    return nothing
+  end
+end
+
+Base.in(x::IntegerUnion, r::ZZOneTo) = 1 <= x <= r.stop
+
+mod(x::IntegerUnion, r::ZZOneTo) = mod(x - 1, r.stop) + 1
+
 Base.:(:)(a::ZZRingElem, b::Integer) = (:)(promote(a, b)...)
 Base.:(:)(a::Integer, b::ZZRingElem) = (:)(promote(a, b)...)
 
@@ -138,11 +170,14 @@ end
 
 ################################################################################
 #
-#   Hashing
+#   Low-level direct access
 #
 ################################################################################
 
-# Similar to hash for BigInt found in julia/base
+@inline function __fmpz_is_small(a::Int)
+  return (unsigned(a) >> (Sys.WORD_SIZE - 2) != 1)
+end
+
 @inline function _fmpz_is_small(a::ZZRingElemOrPtr)
   return __fmpz_is_small(data(a))
 end
@@ -158,6 +193,12 @@ end
   return _fmpz_is_small(a) ? 1 : GC.@preserve a _as_bigint(a).size
 end
 
+################################################################################
+#
+#   Hashing
+#
+################################################################################
+
 function hash_integer(a::ZZRingElem, h::UInt)
   return GC.@preserve a _hash_integer(data(a), h)
 end
@@ -165,10 +206,6 @@ end
 function hash(a::ZZRingElem, h::UInt)
   _fmpz_is_small(a) && return Base.hash(data(a), h)
   return hash_integer(a, h)
-end
-
-@inline function __fmpz_is_small(a::Int)
-  return (unsigned(a) >> (Sys.WORD_SIZE - 2) != 1)
 end
 
 function _hash_integer(a::Int, h::UInt)
@@ -232,22 +269,29 @@ is_positive(n::ZZRingElemOrPtr) = sign(Int, n) > 0
 
 Return `true` if $a$ fits into an `Int`, otherwise return `false`.
 """
-fits(::Type{Int}, a::ZZRingElem) = @ccall libflint.fmpz_fits_si(a::Ref{ZZRingElem})::Bool
+function fits(::Type{Int}, a::ZZRingElem)
+  _fmpz_is_small(a) && return true
+  n = _fmpz_size(a)
+  n == 1 && return rem(a, UInt) <= typemax(Int)
+  n == -1 && return rem(a, UInt) >= reinterpret(UInt,typemin(Int))
+  return false
+end
 
 @doc raw"""
     fits(::Type{UInt}, a::ZZRingElem)
 
 Return `true` if $a$ fits into a `UInt`, otherwise return `false`.
 """
-@inline function fits(::Type{UInt}, a::ZZRingElem)
-  a < 0 && return false
-  return @ccall libflint.fmpz_abs_fits_ui(a::Ref{ZZRingElem})::Bool
+function fits(::Type{UInt}, a::ZZRingElem)
+  return !is_negative(a) && size(a) == 1
 end
 
-if Culong !== UInt
-  function fits(::Type{Culong}, a::ZZRingElem)
-    return 0 <= a && a <= UInt(typemax(Culong))
-  end
+function fits(::Type{T}, a::ZZRingElem) where {T <: Union{Int32,Int16,Int8,UInt32,UInt16,UInt8}}
+  return _fmpz_is_small(a) && typemin(T) <= data(a) <= typemax(T)
+end
+
+function fits(::Type{T}, a::ZZRingElem) where {T <: Integer}
+  return typemin(T) <= a <= typemax(T)
 end
 
 @doc raw"""
@@ -490,7 +534,7 @@ function is_divisible_by(x::Integer, y::ZZRingElem)
   return is_divisible_by(ZZRingElem(x), y)
 end
 
-function rem(x::ZZRingElemOrPtr, ::Type{UInt64})
+function rem(x::ZZRingElemOrPtr, ::Type{UInt})
   return _fmpz_is_small(x) ? (data(x) % UInt) : GC.@preserve x (_as_bigint(x) % UInt)
 end
 
@@ -821,7 +865,7 @@ end
 ###############################################################################
 
 function cmp(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
-  Int(@ccall libflint.fmpz_cmp(x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Cint)
+  @ccall libflint.fmpz_cmp(x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Cint
 end
 
 ==(x::ZZRingElem, y::ZZRingElem) = cmp(x,y) == 0
@@ -836,9 +880,9 @@ end
 
 isless(x::ZZRingElem, y::ZZRingElem) = x < y
 
-isless(x::ZZRingElem, y::Integer) = x < ZZRingElem(y)
+isless(x::ZZRingElem, y::Integer) = x < flintify(y)
 
-isless(x::Integer, y::ZZRingElem) = ZZRingElem(x) < y
+isless(x::Integer, y::ZZRingElem) = flintify(x) < y
 
 function Base.isapprox(x::ZZRingElem, y::ZZRingElem;
                        atol::Real=0, rtol::Real=0,
@@ -857,37 +901,28 @@ end
 ###############################################################################
 
 function cmp(x::ZZRingElemOrPtr, y::Int)
+  _fmpz_is_small(x) && return cmp(data(x), y)
   Int(@ccall libflint.fmpz_cmp_si(x::Ref{ZZRingElem}, y::Int)::Cint)
 end
 
-==(x::ZZRingElem, y::Int) = cmp(x,y) == 0
-
-<=(x::ZZRingElem, y::Int) = cmp(x,y) <= 0
-
-<(x::ZZRingElem, y::Int) = cmp(x,y) < 0
-
-==(x::Int, y::ZZRingElem) = cmp(y,x) == 0
-
-<=(x::Int, y::ZZRingElem) = cmp(y,x) >= 0
-
-<(x::Int, y::ZZRingElem) = cmp(y,x) > 0
-
 function cmp(x::ZZRingElemOrPtr, y::UInt)
+  _fmpz_is_small(x) && return cmp(data(x), y)
   Int(@ccall libflint.fmpz_cmp_ui(x::Ref{ZZRingElem}, y::UInt)::Cint)
 end
 
-==(x::ZZRingElem, y::UInt) = cmp(x,y) == 0
+cmp(x::ZZRingElemOrPtr, y::Integer) = cmp(x, flintify(y))
 
-<=(x::ZZRingElem, y::UInt) = cmp(x,y) <= 0
+for T in (Int, UInt, Integer)
+  @eval begin
+    ==(x::ZZRingElem, y::$T) = cmp(x,y) == 0
+    <=(x::ZZRingElem, y::$T) = cmp(x,y) <= 0
+    <(x::ZZRingElem, y::$T) = cmp(x,y) < 0
 
-<(x::ZZRingElem, y::UInt) = cmp(x,y) < 0
-
-==(x::UInt, y::ZZRingElem) = cmp(y,x) == 0
-
-<=(x::UInt, y::ZZRingElem) = cmp(y,x) >= 0
-
-<(x::UInt, y::ZZRingElem) = cmp(y,x) > 0
-
+    ==(x::$T, y::ZZRingElem) = cmp(y,x) == 0
+    <=(x::$T, y::ZZRingElem) = cmp(y,x) >= 0
+    <(x::$T, y::ZZRingElem) = cmp(y,x) > 0
+  end
+end
 
 ==(x::ZZRingElem, y::Rational) = isinteger(y) && x == numerator(y)
 
@@ -957,7 +992,7 @@ end
 #
 ###############################################################################
 
-function mod!(r::ZZRingElem, x::ZZRingElem, y::ZZRingElem)
+function mod!(r::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   @ccall libflint.fmpz_fdiv_r(r::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
   return r
 end
@@ -992,7 +1027,7 @@ end
 Return $x^p (\mod m)$. The remainder will be in the range $[0, m)$
 """
 function powermod(x::ZZRingElem, p::ZZRingElem, m::ZZRingElem)
-  m <= 0 && throw(DomainError(m, "Exponent must be non-negative"))
+  m <= 0 && throw(DomainError(m, "Modulus must be positive"))
   if p < 0
     x = invmod(x, m)
     p = -p
@@ -1008,7 +1043,7 @@ end
 Return $x^p (\mod m)$. The remainder will be in the range $[0, m)$
 """
 function powermod(x::ZZRingElem, p::Int, m::ZZRingElem)
-  m <= 0 && throw(DomainError(m, "Exponent must be non-negative"))
+  m <= 0 && throw(DomainError(m, "Modulus must be positive"))
   if p < 0
     x = invmod(x, m)
     p = -p
@@ -1076,6 +1111,41 @@ function sqrtmod(x::ZZRingElem, m::ZZRingElem)
     error("no square root exists or modulus is not prime")
   end
   return z
+end
+
+function sqrtmod_pk(a::IntegerUnion, p::IntegerUnion, k::Int)
+  @req a != 0 && valuation(a, p) == 0 "Element must be a unit modulo p^k"
+  return _sqrtmod_pk_big(ZZ(a), ZZ(p), k)
+end
+
+function _sqrtmod_pk_big(a::ZZRingElem, p::ZZRingElem, k::Int)
+  # must be unit modulo p
+  r = ZZ()
+  fl = @ccall libflint._padic_sqrt(r::Ref{ZZRingElem}, a::Ref{ZZRingElem}, p::Ref{ZZRingElem}, k::Int)::Bool
+  if !fl
+    error("No square root exists")
+  end
+  return r
+end
+
+function _sqrtmod_pk_small(a::Int, p::Int, k::Int)
+  # this is too expensive to check
+  #@req k < @ccall Nemo.libflint.n_flog((UInt(1) << 63)::UInt, p::Int)::Int
+  if a < 0
+    a = mod(a, p)
+  end
+  # must be unit modulo p
+  res = Ref(Ptr{UInt}())
+  n = @ccall libflint.n_sqrtmod_primepow(res::Ref{Ptr{UInt}}, a::Int, p::Int, k::Int)::Int
+
+  if n == 0
+    error("No square root exists")
+  end
+
+  ptr = res[]
+  b = unsafe_load(ptr, 1)
+  @ccall libflint.flint_free(ptr::Ptr{UInt})::Nothing
+  return b % Int
 end
 
 function _normalize_crt(r::ZZRingElem, m::ZZRingElem, signed)
@@ -2933,17 +3003,19 @@ function (::Type{BigInt})(a::ZZRingElem)
 end
 
 function (::Type{Int})(a::ZZRingElem)
-  (a > typemax(Int) || a < typemin(Int)) && throw(InexactError(:convert, Int, a))
+  _fmpz_is_small(a) && return data(a)
+  fits(Int, a) || throw(InexactError(:convert, Int, a))
   return @ccall libflint.fmpz_get_si(a::Ref{ZZRingElem})::Int
 end
 
 function (::Type{UInt})(a::ZZRingElem)
-  (a > typemax(UInt) || a < 0) && throw(InexactError(:convert, UInt, a))
-  return @ccall libflint.fmpz_get_ui(a::Ref{ZZRingElem})::UInt
+  fits(UInt, a) || throw(InexactError(:convert, UInt, a))
+  return rem(a, UInt)
 end
 
 if Culong !== UInt
   function (::Type{Culong})(a::ZZRingElem)
+    _fmpz_is_small(a) && return Culong(data(a))
     fits(Culong, a) || throw(InexactError(:convert, Culong, a))
     return (@ccall libflint.fmpz_get_ui(a::Ref{ZZRingElem})::UInt) % Culong
   end
@@ -2953,8 +3025,10 @@ end
 
 (::Type{T})(a::ZZRingElem) where T <: Union{UInt8, UInt16, UInt32} = T(UInt(a))
 
-(::Type{Int128})(a::ZZRingElem) = Int128(BigInt(a))
-(::Type{UInt128})(a::ZZRingElem) = UInt128(BigInt(a))
+function (::Type{T})(a::ZZRingElem) where T <: Union{Int128, UInt128}
+  _fmpz_is_small(a) && return T(data(a))
+  T(BigInt(a))
+end
 
 Base.Integer(a::ZZRingElem) = BigInt(a)
 
@@ -3188,7 +3262,7 @@ end
 is_prime_power(q::Integer) = is_prime_power(ZZRingElem(q))
 
 @doc raw"""
-    is_prime_power_with_data(q::IntegerUnion) -> Bool, ZZRingElem, Int
+    is_prime_power_with_data(q::T) where T <: IntegerUnion -> Bool, Int, T
 
 Returns a flag indicating whether $q$ is a prime power and integers $e, p$ such
 that $q = p^e$. If $q$ is a prime power, than $p$ is a prime.

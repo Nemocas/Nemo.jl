@@ -1,8 +1,8 @@
 @testset "zzModPolyRingElem.constructors" begin
   R, = residue_ring(ZZ, 17)
 
-  S1 = PolyRing(R)
-  S2 = PolyRing(R)
+  S1 = polynomial_ring(R; cached=false)[1]
+  S2 = polynomial_ring(R; cached=false)[1]
 
   @test isa(S1, zzModPolyRing)
   @test S1 !== S2
@@ -12,7 +12,7 @@
   @test elem_type(Rx) == zzModPolyRingElem
   @test elem_type(zzModPolyRing) == zzModPolyRingElem
   @test parent_type(zzModPolyRingElem) == zzModPolyRing
-  @test dense_poly_type(zzModRingElem) == zzModPolyRingElem
+  @test poly_type(zzModRingElem) == zzModPolyRingElem
 
   S, = residue_ring(ZZ, 19)
   Sy, y = polynomial_ring(R, "y")
@@ -73,7 +73,7 @@
 
   _a = polynomial_ring(ZZ, "y")[1]([ZZRingElem(1),ZZRingElem(2),ZZRingElem(3)])
 
-  k = Rx(_a)
+  k = change_base_ring(R, _a; parent = Rx)
 
   @test isa(k, PolyRingElem)
   @test parent(k) == Rx
@@ -583,7 +583,7 @@ end
   Zf = lift(Zy, f)
 
   @test Zf == y^6 + y^4 + 22*y^2
-  @test Rx(Zf) == f
+  @test change_base_ring(R, Zf; parent = Rx) == f
 end
 
 @testset "zzModPolyRingElem.is_irreducible" begin
