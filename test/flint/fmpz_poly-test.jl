@@ -525,7 +525,7 @@ end
   for R in [residue_ring(ZZ, 13)[1],
             Native.GF(13)]
     Rx, x = R["x"]
-    g = @inferred Rx(f)
+    g = @inferred change_base_ring(R, f; parent = Rx)
     @test g == 7*x^2 + 3*x + 2
   end
 end

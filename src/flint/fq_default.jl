@@ -825,7 +825,8 @@ function (a::FqField)(b::ZZPolyRingElem)
   if a.isstandard
     z = FqFieldElem(a, b)
   else
-    return a.forwardmap(parent(defining_polynomial(a))(b))
+    Fx = parent(defining_polynomial(a))
+    return a.forwardmap(change_base_ring(base_ring(Fx), b; parent = Fx))
   end
   return z
 end

@@ -73,7 +73,7 @@
 
   _a = polynomial_ring(ZZ, "y")[1]([ZZRingElem(1),ZZRingElem(2),ZZRingElem(3)])
 
-  k = Rx(_a)
+  k = change_base_ring(R, _a; parent = Rx)
 
   @test isa(k, PolyRingElem)
   @test parent(k) == Rx
@@ -550,7 +550,7 @@ end
   Zf = lift(Zy, f)
 
   @test Zf == y^6 + y^4 + 22*y^2
-  @test Rx(Zf) == f
+  @test change_base_ring(R, Zf; parent = Rx) == f
 end
 
 @testset "fpPolyRingElem.is_irreducible" begin

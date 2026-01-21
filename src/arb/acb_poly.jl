@@ -406,6 +406,15 @@ function derivative(x::AcbPolyRingElem)
   return z
 end
 
+function derivative(x::AcbPolyRingElem, n::Int64)
+  # TODO: reimplement using _acb_poly_nth_derivative
+  # and then do the equivalent for {Complex,Arb,Real}PolyRingElem
+  for i in (1:n)
+    x = derivative(x)
+  end
+  return x
+end
+
 function integral(x::AcbPolyRingElem)
   z = parent(x)()
   @ccall libflint.acb_poly_integral(z::Ref{AcbPolyRingElem}, x::Ref{AcbPolyRingElem}, precision(parent(x))::Int)::Nothing

@@ -853,7 +853,14 @@ end
 
 (R::ZZModPolyRing)(arr::Vector{T}) where {T <: Integer} = R(map(base_ring(R), arr))
 
-(R::ZZModPolyRing)(x::ZZPolyRingElem) = ZZModPolyRingElem(R, x)
+function (R::ZZModPolyRing)(g::ZZPolyRingElem)
+  error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
+end
+
+function AbstractAlgebra._map(K::ZZModRing, x::ZZPolyRingElem, parent::ZZModPolyRing)
+  @assert base_ring(parent) == K
+  return ZZModPolyRingElem(parent, x)
+end
 
 function (R::ZZModPolyRing)(f::ZZModPolyRingElem)
   parent(f) != R && error("Unable to coerce polynomial")

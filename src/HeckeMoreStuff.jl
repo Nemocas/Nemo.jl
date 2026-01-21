@@ -764,14 +764,6 @@ function zeros(f::ZZPolyRingElem)
   return zeros
 end
 
-#This should probably go somewhere else. (Taking the nth derivative)
-function derivative(x::AcbPolyRingElem, n::Int64)
-  for i in (1:n)
-    x = derivative(x)
-  end
-  return x
-end
-
 function lift!(x::fpFieldElem, z::ZZRingElem)
   set!(z, x.data)
   return z
@@ -794,12 +786,9 @@ function mod_sym!(a::T, b::T) where {T}
   return mod!(a, b)
 end
 
-Base.replace!(::typeof(-), m::ZZMatrix) = -m
-
 function (A::AbsSimpleNumField)(a::ZZPolyRingElem)
-  return A(QQ["x"][1](a))
+  return A(QQPolyRingElem(parent(defining_polynomial(A)), a))
 end
-
 
 function is_positive(x::ZZRingElem, ::Union{PosInf,Vector{PosInf}})
   return sign(x) == 1
@@ -859,7 +848,7 @@ Base.log2(a::ZZRingElem) = log2(BigInt(a)) # stupid: there has to be faster way
 
 function nf_elem_to_poly!(r::ZZModPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
   @ccall libflint.nf_elem_get_fmpz_mod_poly_den(r::Ref{ZZModPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint, r.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return nothing
+  return r
 end
 
 function (R::ZZModPolyRing)(a::AbsSimpleNumFieldElem)
@@ -870,7 +859,7 @@ end
 
 function nf_elem_to_poly!(r::fpPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
   @ccall libflint.nf_elem_get_nmod_poly_den(r::Ref{fpPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint)::Nothing
-  return nothing
+  return r
 end
 
 function (R::fpPolyRing)(a::AbsSimpleNumFieldElem)
@@ -881,7 +870,7 @@ end
 
 function nf_elem_to_poly!(r::zzModPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
   @ccall libflint.nf_elem_get_nmod_poly_den(r::Ref{zzModPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint)::Nothing
-  return nothing
+  return r
 end
 
 function (R::zzModPolyRing)(a::AbsSimpleNumFieldElem)
@@ -892,7 +881,7 @@ end
 
 function nf_elem_to_poly!(r::FpPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
   @ccall libflint.nf_elem_get_fmpz_mod_poly_den(r::Ref{FpPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint, r.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return nothing
+  return r
 end
 
 function (R::FpPolyRing)(a::AbsSimpleNumFieldElem)

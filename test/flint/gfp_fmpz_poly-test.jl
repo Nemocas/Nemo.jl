@@ -51,7 +51,7 @@
   T, y = polynomial_ring(ZZ, "y")
 
   p = 3y^3 + 2y - 1
-  q = S(p)
+  q = change_base_ring(R, p; parent = S)
 
   @test isa(q, PolyRingElem)
 

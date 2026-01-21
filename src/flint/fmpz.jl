@@ -1027,7 +1027,7 @@ end
 Return $x^p (\mod m)$. The remainder will be in the range $[0, m)$
 """
 function powermod(x::ZZRingElem, p::ZZRingElem, m::ZZRingElem)
-  m <= 0 && throw(DomainError(m, "Exponent must be non-negative"))
+  m <= 0 && throw(DomainError(m, "Modulus must be positive"))
   if p < 0
     x = invmod(x, m)
     p = -p
@@ -1043,7 +1043,7 @@ end
 Return $x^p (\mod m)$. The remainder will be in the range $[0, m)$
 """
 function powermod(x::ZZRingElem, p::Int, m::ZZRingElem)
-  m <= 0 && throw(DomainError(m, "Exponent must be non-negative"))
+  m <= 0 && throw(DomainError(m, "Modulus must be positive"))
   if p < 0
     x = invmod(x, m)
     p = -p

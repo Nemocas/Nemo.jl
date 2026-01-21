@@ -5048,7 +5048,7 @@ const _fq_default_mpoly_union = Union{AbstractAlgebra.Generic.MPoly{FqPolyRepFie
           Fqx = polynomial_ring(Fq, s, cached = cached, internal_ordering = internal_ordering)[1]
           return new(Fqx, R, 3)
         end
-        mm = polynomial_ring(Fq, "x")[1](lift(polynomial_ring(ZZ, "x")[1], m))
+        mm = change_base_ring(Fq, lift(polynomial_ring(ZZ, "x")[1], m); cached = false)
         Fq = Native.FiniteField(mm, R.var, cached = cached, check = false)[1]
         Fqx = polynomial_ring(Fq, s, cached = cached, internal_ordering = internal_ordering)[1]
         return new(Fqx, R, 2)
