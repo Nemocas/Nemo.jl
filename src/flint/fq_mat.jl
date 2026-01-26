@@ -317,7 +317,7 @@ function det(a::FqPolyRepMatrix)
   n = nrows(a)
   R = base_ring(a)
   if n == 0
-    return zero(R)
+    return one(R)
   end
   r, p, l, u = lu(a)
   if r < n
