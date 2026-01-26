@@ -10,9 +10,7 @@ function prime_field(F::FqPolyRepField; cached::Bool=true)
   return Native.GF(characteristic(F), cached=cached)
 end
 
-function prime_field(F::T; cached::Bool=true) where {T<:Union{fpField,FpField}}
-  return F
-end
+prime_field(F::FpField; cached::Bool=true) = F
 
 function evaluate(f::ZZPolyRingElem, r::fqPolyRepFieldElem)
   #Horner - stolen from Claus
@@ -94,6 +92,7 @@ function roots(f::ZZModPolyRingElem, p::ZZRingElem, e::Int)
   F[p] = e
   return roots(f, F)
 end
+
 function roots(f::ZZModPolyRingElem, fac::Fac{ZZRingElem})
   res = fmpz_mod_poly_factor(base_ring(f))
   _fac = fmpz_factor()
@@ -231,27 +230,6 @@ function evaluate(f::QQPolyRingElem, r::T) where {T<:RingElem}
   return s
 end
 
-function mod!(f::ZZPolyRingElem, p::ZZRingElem)
-  for i = 0:degree(f)
-    setcoeff!(f, i, mod(coeff(f, i), p))
-  end
-end
-
-function mod(f::ZZPolyRingElem, p::ZZRingElem)
-  g = parent(f)()
-  for i = 0:degree(f)
-    setcoeff!(g, i, mod(coeff(f, i), p))
-  end
-  return g
-end
-
-#Assuming that the denominator of a is one, reduces all the coefficients modulo p
-# non-symmetric (positive) residue system
-function mod!(a::AbsSimpleNumFieldElem, b::ZZRingElem)
-  @ccall libflint.nf_elem_mod_fmpz(a::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
-  return a
-end
-
 @doc raw"""
     numerator(a::AbsSimpleNumFieldElem) -> AbsSimpleNumFieldElem
 
@@ -264,14 +242,6 @@ function numerator(a::AbsSimpleNumFieldElem)
   z = deepcopy(a)
   @ccall libflint.nf_elem_set_den(z::Ref{AbsSimpleNumFieldElem}, _one::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
   return z
-end
-
-function lift(R::ZZAbsPowerSeriesRing, f::ZZModAbsPowerSeriesRingElem)
-  r = R()
-  for i = 0:length(f)-1
-    setcoeff!(r, i, lift(coeff(f, i)))
-  end
-  return r
 end
 
 function evaluate(f::fpPolyRingElem, v::Vector{fpFieldElem})
@@ -324,35 +294,11 @@ function inv(f::T) where {T<:Union{ZZModPolyRingElem,zzModPolyRingElem}}
   return g
 end
 
-function invmod(f::ZZModPolyRingElem, M::ZZModPolyRingElem)
-  if !is_unit(f)
-    r = parent(f)()
-    ff = ZZ()
-    i = @ccall libflint.fmpz_mod_poly_invmod_f(ff::Ref{ZZRingElem}, r::Ref{ZZModPolyRingElem}, f::Ref{ZZModPolyRingElem}, M::Ref{ZZModPolyRingElem}, f.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Int
-    if iszero(i)
-      error("not yet implemented")
-    else
-      return r
-    end
-  end
-  if !is_unit(leading_coefficient(M))
-    error("not yet implemented")
-  end
-  g = parent(f)(inv(constant_coefficient(f)))
-  #lifting: to invert a, start with an inverse b mod m, then
-  # then b -> b*(2-ab) is an inverse mod m^2
-  # starting with this g, and using the fact that all coeffs are nilpotent
-  # we have an inverse modulo s.th. nilpotent. Hence it works
-  c = f * g
-  rem!(c, c, M)
-  while !isone(c)
-    mul!(g, g, 2 - c)
-    rem!(g, g, M)
-    mul!(c, f, g)
-    rem!(c, c, M)
-  end
-  return g
-end
+################################################################################
+#
+#
+#
+################################################################################
 
 function round!(z::ArbFieldElem, x::ArbFieldElem, p::Int)
   @ccall libflint.arb_set_round(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, p::Int)::Nothing
@@ -436,10 +382,6 @@ end
 
 function size(F::FqField)
   return order(F)
-end
-
-function order(R::zzModRing)
-  return ZZRingElem(R.n)
 end
 
 #################################################
@@ -640,19 +582,6 @@ function image(M::Map{D,C}, a) where {D,C}
   end
 end
 
-function setcoeff!(x::fqPolyRepFieldElem, n::Int, u::UInt)
-  @ccall libflint.nmod_poly_set_coeff_ui(x::Ref{fqPolyRepFieldElem}, n::Int, u::UInt)::Nothing
-end
-
-function basis(k::fpField)
-  return [k(1)]
-end
-
-function basis(k::fpField, l::fpField)
-  @assert k == l
-  return [k(1)]
-end
-
 function basis(K::fqPolyRepField, k::fpField)
   @assert characteristic(K) == characteristic(k)
   return basis(K)
@@ -671,15 +600,6 @@ end
 
 function base_field(K::fqPolyRepField)
   return Native.GF(Int(characteristic(K)))
-end
-
-function gen(k::fpField)
-  return k(1)
-end
-
-function defining_polynomial(k::fpField)
-  kx, x = polynomial_ring(k, cached=false)
-  return x - k(1)
 end
 
 @doc raw"""
@@ -926,16 +846,6 @@ function (R::FqPolyRepField)(x::FpPolyRingElem)
   @ccall libflint.fq_set_fmpz_mod_poly(z::Ref{FqPolyRepFieldElem}, x::Ref{FpPolyRingElem}, R::Ref{FqPolyRepField})::Nothing
   @ccall libflint.fq_reduce(z::Ref{FqPolyRepFieldElem}, R::Ref{FqPolyRepField})::Nothing
   return z
-end
-
-function rem!(a::ZZModPolyRingElem, b::ZZModPolyRingElem, c::ZZModPolyRingElem)
-  @ccall libflint.fmpz_mod_poly_rem(a::Ref{ZZModPolyRingElem}, b::Ref{ZZModPolyRingElem}, c::Ref{ZZModPolyRingElem}, a.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return a
-end
-
-function rem!(a::FpPolyRingElem, b::FpPolyRingElem, c::FpPolyRingElem)
-  @ccall libflint.fmpz_mod_poly_rem(a::Ref{FpPolyRingElem}, b::Ref{FpPolyRingElem}, c::Ref{FpPolyRingElem}, a.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return a
 end
 
 ########################################
