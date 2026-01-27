@@ -91,6 +91,7 @@ import Base: length
 import Base: log
 import Base: log1p
 import Base: max
+import Base: min
 import Base: maximum
 import Base: minimum
 import Base: mod
