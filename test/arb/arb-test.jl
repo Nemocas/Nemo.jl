@@ -167,8 +167,6 @@ end
   end
 end
 
-
-
 @testset "ArbFieldElem.adhoc_comparison" begin
   a = RR(3)
 
