@@ -1373,7 +1373,7 @@ function gcd(x::Vector{ZZRingElem})
   if length(x) == 0
     error("Array must not be empty")
   elseif length(x) == 1
-    return x[1]
+    return abs(only(x))
   end
 
   z = ZZRingElem()
@@ -1416,7 +1416,7 @@ function lcm(x::Vector{ZZRingElem})
   if length(x) == 0
     error("Array must not be empty")
   elseif length(x) == 1
-    return x[1]
+    return abs(only(x))
   end
 
   z = ZZRingElem()
