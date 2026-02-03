@@ -371,3 +371,12 @@ end
   @test !Nemo.pretty_lt(1//2*a + 1, a)
 end
 
+@testset "AbsSimpleNumFieldElem.Misc" begin
+  k, = cyclotomic_field(5; cached = false)
+  @test Nemo.is_cyclo_type(k)
+  @test !Nemo.is_maxreal_type(k)
+
+  k, = cyclotomic_real_subfield(5; cached = false)
+  @test !Nemo.is_cyclo_type(k)
+  @test Nemo.is_maxreal_type(k)
+end
