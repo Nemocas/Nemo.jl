@@ -204,7 +204,7 @@ function is_cyclo_type(K::AbsSimpleNumField)
 end
 
 function is_maxreal_type(K::AbsSimpleNumField)
-  return get_attribute(K, :maxreal)::Bool
+  return has_attribute(K, :maxreal)
 end
 
 ###############################################################################
