@@ -28,8 +28,8 @@ function benchmark_gcdx()
 
   # small size
   range = ZZ(0):ZZ(2)^(Sys.WORD_SIZE - 2) - 1
-  x = [rand(range) for _ in 1:100]
-  y = [rand(range) for _ in 1:100]
+  x = rand(range, 100)
+  y = rand(range, 100)
 
   tt = @elapsed run_gcdx_bigint(x, y)
   println("Small sized integers for BigInt-solution: $tt")
@@ -38,8 +38,8 @@ function benchmark_gcdx()
 
   # mixed integers
   range = ZZ(0):ZZ(2)^Sys.WORD_SIZE
-  x = [rand(range) for _ in 1:100]
-  y = [rand(range) for _ in 1:100]
+  x = rand(range, 100)
+  y = rand(range, 100)
 
   tt = @elapsed run_gcdx_bigint(x, y)
   println("Mixed sized integers for BigInt-solution: $tt")
@@ -48,8 +48,8 @@ function benchmark_gcdx()
 
   # big integers
   range = ZZ(0):ZZ(2)^512
-  x = [rand(range) for _ in 1:100]
-  y = [rand(range) for _ in 1:100]
+  x = rand(range, 100)
+  y = rand(range, 100)
 
   tt = @elapsed run_gcdx_bigint(x, y)
   println("Large sized integers for BigInt-solution: $tt")
