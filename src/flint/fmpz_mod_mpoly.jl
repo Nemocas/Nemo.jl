@@ -576,6 +576,30 @@ for (etype, rtype, ftype, ctype) in (
 
     ###############################################################################
     #
+    #   Resultant, discriminant
+    #
+    ###############################################################################
+
+    function resultant(a::($etype), b::($etype), i::Int)
+      n = nvars(parent(a))
+      (i <= 0 || i > n) && error("Index must be between 1 and $n")
+      z = parent(a)()
+      r = @ccall libflint.fmpz_mod_mpoly_resultant(z::Ref{($etype)}, a::Ref{($etype)}, b::Ref{($etype)}, (i - 1)::Int, parent(a)::Ref{($rtype)})::Cint
+      r == 0 && error("Unable to compute resultant")
+      return z
+    end
+
+    function discriminant(a::($etype), i::Int)
+      n = nvars(parent(a))
+      (i <= 0 || i > n) && error("Index must be between 1 and $n")
+      z = parent(a)()
+      r = @ccall libflint.fmpz_mod_mpoly_discriminant(z::Ref{($etype)}, a::Ref{($etype)}, (i - 1)::Int, parent(a)::Ref{($rtype)})::Cint
+      r == 0 && error("Unable to compute discriminant")
+      return z
+    end
+
+    ###############################################################################
+    #
     #   Evaluation
     #
     ###############################################################################

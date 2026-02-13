@@ -712,6 +712,23 @@ end
   end
 end
 
+@testset "QQMPolyRingElem.resultant" begin
+  R, (x, y) = polynomial_ring(QQ, [:x, :y])
+
+  f = 3x*y^2 + (x + 1)*y + 3
+  g = 6(x + 1)*y + (x^3 + 2x + 2)
+
+  @test resultant(f, g, 2) == 3*x^7+6*x^5-6*x^3+96*x^2+192*x+96
+end
+
+@testset "QQMPolyRingElem.discriminant" begin
+  R, (x, y) = polynomial_ring(QQ, [:x, :y])
+
+  f = x*y^2 + (x + 1)*y + 3
+
+  @test discriminant(f, 2) == x^2-10*x+1
+end
+
 @testset "QQMPolyRingElem.combine_like_terms" begin
   for num_vars = 1:10
     var_names = ["x$j" for j in 1:num_vars]

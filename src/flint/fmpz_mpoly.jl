@@ -505,6 +505,30 @@ end
 
 ###############################################################################
 #
+#   Resultant, discriminant
+#
+###############################################################################
+
+function resultant(a::ZZMPolyRingElem, b::ZZMPolyRingElem, i::Int)
+  n = nvars(parent(a))
+  (i <= 0 || i > n) && error("Index must be between 1 and $n")
+  z = parent(a)()
+  r = @ccall libflint.fmpz_mpoly_resultant(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, b::Ref{ZZMPolyRingElem}, (i - 1)::Int, parent(a)::Ref{ZZMPolyRing})::Cint
+  r == 0 && error("Unable to compute resultant")
+  return z
+end
+
+function discriminant(a::ZZMPolyRingElem, i::Int)
+  n = nvars(parent(a))
+  (i <= 0 || i > n) && error("Index must be between 1 and $n")
+  z = parent(a)()
+  r = @ccall libflint.fmpz_mpoly_discriminant(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, (i - 1)::Int, parent(a)::Ref{ZZMPolyRing})::Cint
+  r == 0 && error("Unable to compute discriminant")
+  return z
+end
+
+###############################################################################
+#
 #   Evaluation
 #
 ###############################################################################
