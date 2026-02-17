@@ -3178,56 +3178,59 @@ function _is_perfect_power(a::ZZRingElem)
 end
 
 @doc raw"""
-    is_perfect_power(a::IntegerUnion)
+    is_perfect_power(a::IntegerUnion; algorithm::Symbol = :flint)
 
 Return whether $a$ is a perfect power, that is, whether $a = m^r$ for some
 integer $m$ and $r > 1$. Neither $m$ nor $r$ is returned.
+
+Optional keyword `algorithm`: `:flint` (default) uses FLINT's implementation; `:bernstein`
+uses the Bernstein-style exponent detection (see [`is_perfect_power_with_data_bernstein`]);
+`:auto` selects an algorithm based on input size (see [`is_perfect_power_with_data_auto`]).
+
 """
-function is_perfect_power(a::ZZRingElem)
-  _, ex = _is_perfect_power(a)
-  return ex > 0
+function is_perfect_power(a::ZZRingElem; algorithm::Symbol = :flint)
+  if algorithm === :flint || algorithm === :nemo
+    _, ex = _is_perfect_power(a)
+    return ex > 0
+  elseif algorithm === :bernstein
+    return is_perfect_power_with_data_bernstein(a)[1] > 1
+  elseif algorithm === :auto
+    return is_perfect_power_with_data_auto(a)[1] > 1
+  else
+    throw(ArgumentError("unknown algorithm=$(repr(algorithm)); use :flint, :bernstein, or :auto"))
+  end
 end
 
-is_perfect_power(a::Integer) = is_perfect_power(ZZRingElem(a))
+is_perfect_power(a::Integer; algorithm::Symbol = :flint) =
+  is_perfect_power(ZZRingElem(a); algorithm=algorithm)
 
 #compare to Oscar/examples/PerfectPowers.jl which is, for large input,
 #far superior over gmp/ fmpz_is_perfect_power
 
 @doc raw"""
-    is_perfect_power_with_data(a::ZZRingElem) -> Int, ZZRingElem
-    is_perfect_power_with_data(a::Integer) -> Int, Integer
+    is_perfect_power_with_data(a::ZZRingElem; algorithm::Symbol = :flint) -> Int, ZZRingElem
+    is_perfect_power_with_data(a::Integer; algorithm::Symbol = :flint) -> Int, Integer
 
 Return $e$, $r$ such that $a = r^e$ with $e$ maximal. Note: $1 = 1^0$.
+
+Optional keyword `algorithm`: `:flint` (default) uses FLINT and iterates until the exponent is maximal; `:bernstein` 
+uses the Bernstein-style exponent detection; `:auto` chooses based on `nbits(a)` (see [`is_perfect_power_with_data_auto`]).
+
 """
-function is_perfect_power_with_data(a::ZZRingElem)
-  if iszero(a)
-    error("must not be zero")
-  end
-  if isone(a)
-    return 0, a
-  end
-  if a < 0
-    e, r = is_perfect_power_with_data(-a)
-    if isone(e)
-      return 1, a
-    end
-    v, s = iszero(e) ? (0, 0) : remove(e, 2)
-    return s, -r^(2^v)
-  end
-  rt = ZZRingElem()
-  e = 1
-  while true
-    rt, ex = _is_perfect_power(a)
-    if ex == 1 || ex == 0
-      return e, a
-    end
-    e *= ex
-    a = rt
+function is_perfect_power_with_data(a::ZZRingElem; algorithm::Symbol = :flint)
+  if algorithm === :bernstein
+    return is_perfect_power_with_data_bernstein(a)
+  elseif algorithm === :auto
+    return is_perfect_power_with_data_auto(a)
+  elseif algorithm === :flint || algorithm === :nemo
+    return _is_perfect_power_with_data_flint(a)
+  else
+    throw(ArgumentError("unknown algorithm=$(repr(algorithm)); use :flint, :bernstein, or :auto"))
   end
 end
 
-function is_perfect_power_with_data(a::Integer)
-  e, r = is_perfect_power_with_data(ZZRingElem(a))
+function is_perfect_power_with_data(a::Integer; algorithm::Symbol = :flint)
+  e, r = is_perfect_power_with_data(ZZRingElem(a); algorithm=algorithm)
   return e, typeof(a)(r)
 end
 
@@ -3429,6 +3432,304 @@ end
 end
 
 using .BitsMod
+
+#Bernstein perfect-power detection
+@inline function _fmpz_trunc!(a::ZZRingElem, i::Int)
+  @ccall Nemo.libflint.fmpz_fdiv_r_2exp(a::Ref{ZZRingElem}, a::Ref{ZZRingElem}, i::Clong)::Nothing
+end
+
+struct _PrimeIter; n::Int; end
+Base.iterate(it::_PrimeIter) = it.n < 2 ? nothing : (2, 2)
+function Base.iterate(it::_PrimeIter, p::Int)
+  p == 2 && return (3 <= it.n ? (3, 3) : nothing)
+  q = next_prime(p)
+  return q <= it.n ? (q, q) : nothing
+end
+_primes_upto(n::Int) = _PrimeIter(n)
+
+function _coprime_base(v::Vector{ZZRingElem})
+  w = ZZRingElem[]
+  for x in v
+    x = abs(x)
+    isone(x) && continue
+    for y in w
+      g = gcd(x, y)
+      !isone(g) && (x = divexact(x, g; check=false))
+      isone(x) && break
+    end
+    isone(x) || push!(w, x)
+  end
+  return w
+end
+
+function root_exact(a::ZZRingElem, n::Int)
+  @assert n > 0
+  n == 1 && return a
+
+  k, a2 = remove(a, ZZRingElem(2))
+  (k % n != 0) && return ZZRingElem(1)
+  kn = div(k, n)
+  isone(a2) && return ZZRingElem(2)^kn
+
+  while !isone(a2) && iseven(n)
+    a2 = _root_exact(a2, Val(2))
+    n = div(n, 2)
+  end
+  (isone(a2) || isone(n)) && return a2
+
+  r = _root_exact(a2, n)
+  isone(r) && return r
+  return r * ZZRingElem(2)^kn
+end
+
+function _root_exact(a::ZZRingElem, ::Val{2})
+  @assert isodd(a)
+  s = div(nbits(a), 2) + 1
+
+  A = Limbs(a; MSW=false)
+  d = A[1]
+  (d % 8 != 1) && return ZZRingElem(1)
+  dd = d
+
+  b = d
+  for _ = 1:6
+    d = d * (1 + div((1 - b*d*d), 2))
+  end
+
+  if s < 63
+    d = (d << 1) >> 1
+    d *= dd
+    nbits(d) <= s && return ZZRingElem(d)
+    d = -d
+    nbits(d) <= s && return ZZRingElem(d)
+    return ZZRingElem(1)
+  end
+
+  B = mod(a, ZZRingElem(2)^(s + 3))
+  D = ZZRingElem(d)
+  M = ZZRingElem(2)^64
+  i = 64
+  onez = ZZRingElem(1)
+
+  while i < s
+    Nemo.mul!(M, M, M)
+    Nemo.shift_right!(M, M, 2)
+
+    T = powermod(D, 2, M)
+    Nemo.mul!(T, T, B)
+    mod!(T, T, M)
+    Nemo.sub!(T, onez, T)
+    Nemo.shift_right!(T, T, 1)
+    Nemo.add!(T, onez, T)
+    Nemo.mul!(D, D, T)
+    mod!(D, D, M)
+
+    i = 2*i - 2
+  end
+
+  M = ZZRingElem(2)^(s + 2)
+  Nemo.mul!(D, D, a)
+  mod!(D, D, M)
+
+  nbits(D) <= s && return ZZRingElem(D)
+
+  Nemo.mul!(D, D, -1)
+  Nemo.add!(D, D, M)
+  nbits(D) > s && return ZZRingElem(1)
+  return D
+end
+
+function _root_exact(a::ZZRingElem, p::Int, extra_s::Int=5, extra_w::Int=1)
+  @assert isodd(a)
+  p == 2 && return _root_exact(a, Val(2))
+
+  if iseven(p)
+    fl, r = is_power(a, p)
+    return fl ? r : ZZRingElem(1)
+  end
+
+  s = div(nbits(a), p) + 1
+  w = div(s, 64) + 1
+
+  A = Limbs(a)
+  d  = A[1]
+  dd = d
+
+  l = invmod(p, UInt(2^32))
+  l = l * (2 - l*p)
+
+  b = d^(p - 1)
+  pr = 1
+  for _ = 2:7
+    d = (1 + l)*d - l*b*d^(p + 1)
+    pr *= 2
+    pr > s + extra_s && break
+  end
+
+  if s + extra_s < 64
+    d *= dd
+    d = d % 2^min(pr, 63)
+    iseven(d) && return ZZRingElem(1)
+    nbits(d) <= s && return ZZRingElem(d)
+    return ZZRingElem(1)
+  end
+
+  B = powermod(a, p - 1, ZZRingElem(2)^(64*(w + extra_w)))
+  L = ZZRingElem(l)
+  D = ZZRingElem(d)
+
+  M = ZZRingElem(2)^64
+  i = 1
+  two = ZZRingElem(2)
+
+  while i < w + extra_w
+    i *= 2
+    Nemo.mul!(M, M, M)
+
+    T = L*p
+    Nemo.sub!(T, two, T)
+    Nemo.add!(T, T, M)
+    Nemo.mul!(L, L, T)
+    _fmpz_trunc!(L, i*64)
+
+    T = powermod(D, p + 1, M)
+    Nemo.mul!(T, T, B)
+    _fmpz_trunc!(T, i*64)
+
+    Nemo.mul!(T, T, L)
+    _fmpz_trunc!(T, i*64)
+
+    S = 1 + L
+    Nemo.mul!(S, S, D)
+    _fmpz_trunc!(S, i*64)
+
+    Nemo.sub!(D, S, T)
+    sign(D) < 0 && Nemo.add!(D, D, M)
+  end
+
+  Nemo.mul!(D, D, a)
+  _fmpz_trunc!(D, (w + extra_w)*64)
+
+  nbits(D) > s && return ZZRingElem(1)
+  return D
+end
+
+#Bernstein : return maximal exponent k
+function _is_power_bernstein(a::ZZRingElem)::Int
+  isone(a) && return 0
+
+  k, aa = remove(a, ZZRingElem(2)); isone(aa) && return Int(k)
+  l, aa = remove(aa, ZZRingElem(3)); g = gcd(k, l); isone(aa) && return Int(g)
+  h, aa = remove(aa, ZZRingElem(5)); g = gcd(h, g); isone(aa) && return Int(g)
+
+  p_test = next_prime(UInt(1) << 40)
+  a_test = aa % p_test
+
+  cands = ZZRingElem[aa]
+  cl = clog(aa, 7)
+  k > 0 && (cl = min(cl, Int(k)))
+
+  f = 1
+  for p in _primes_upto(cl)
+    (k % p != 0) && continue
+    (p > cl) && break
+
+    if p > 2 && p < 2^15
+      u = UInt(aa % p^2)
+      if u % p != 0 && powermod(u, p - 1, UInt(p^2)) != 1
+        continue
+      end
+    end
+
+    pp = p
+    d = _root_exact(aa, p, 10, 2)
+    if !isone(d)
+      if powermod(d, p, ZZRingElem(p_test)) == a_test && d^p == aa
+        f *= p
+        cl = min(cl, flog(d, 7))
+        aa = d
+        a_test = aa % p_test
+      else
+        d = ZZRingElem(1)
+      end
+    end
+
+    while !isone(d) && pp <= cl
+      push!(cands, d)
+      pp > div(cl, p) && break
+      pp *= p
+      d = root_exact(d, p)
+      if !isone(d) && d^p == aa
+        f *= p
+        cl = min(cl, flog(d, 7))
+        aa = d
+        a_test = aa % p_test
+      else
+        d = ZZRingElem(1)
+      end
+    end
+  end
+
+  cands = unique(cands)
+  cands = [gcd(aa, x) for x in cands]
+  cands = [x for x in cands if !isone(x)]
+  cands = _coprime_base(cands)
+
+  isempty(cands) && return f
+  ks = [valuation(aa, p) for p in cands]
+  return Int(gcd(ks)) * f
+end
+
+#FLINT "maximal exponent" helper
+function _is_perfect_power_with_data_flint(a::ZZRingElem)
+  iszero(a) && error("must not be zero")
+  isone(a)  && return 0, a
+
+  if a < 0
+    e, r = _is_perfect_power_with_data_flint(-a)
+    isone(e) && return 1, a
+    v, s = iszero(e) ? (0, 0) : remove(e, 2)
+    return s, -r^(2^v)
+  end
+
+  e = 1
+  while true
+    rt, ex = _is_perfect_power(a)
+    (ex == 0 || ex == 1) && return e, a
+    e *= ex
+    a = rt
+  end
+end
+
+@doc raw"""
+    is_perfect_power_with_data_bernstein(a::ZZRingElem)
+
+Return `e, r` such that `a = r^e` with `e` maximal, using a Bernstein-style
+perfect power detection algorithm.
+
+If `a` is not a nontrivial perfect power, return `(1, a)`.
+"""
+function is_perfect_power_with_data_bernstein(a::ZZRingElem)
+  iszero(a) && error("must not be zero")
+  isone(a)  && return (0, a)
+
+  if a < 0
+    e, r = is_perfect_power_with_data_bernstein(-a)
+    e <= 1 && return (1, a)
+    v, s = remove(e, 2)              
+    return (s, -(r^(2^v)))
+  end
+
+  k = _is_power_bernstein(a)
+  k <= 1 && return (1, a)
+  b = Nemo.root(a, k; check=false)
+  return (b^k == a) ? (k, b) : (1, a)
+end
+
+function is_perfect_power_with_data_auto(a::ZZRingElem; threshold_bits::Int=typemax(Int))
+  return nbits(a) < threshold_bits ? _is_perfect_power_with_data_flint(a) :
+                                     is_perfect_power_with_data_bernstein(a)
+end
 
 ###############################################################################
 #
