@@ -367,7 +367,7 @@ individual algebraic numbers, but it does not provide the best
 performance for field arithmetic.
 For fast calculation in $\overline{\mathbb{Q}}$,
 `CalciumField` should typically be used instead (see the section
-on *Exact real and complex numbers*).
+on [Exact real and complex numbers](@ref exact_real_complex)).
 Alternatively, to compute in a fixed subfield of $\overline{\mathbb{Q}}$,
 you may fix a generator $a$ and construct a number field to represent $\mathbb{Q}(a)$.
 
