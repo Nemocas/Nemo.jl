@@ -2535,11 +2535,13 @@ end
   @test k2 == 1
   @test r2 == b
 
+  c = -ZZ(3)^9
   k3, r3 = Nemo.is_perfect_power_with_data_bernstein(c)
   @test k3 == 9
   @test r3 == -ZZ(3)
   @test r3^k3 == c
 
+  d = -ZZ(3)^8
   k4, r4 = Nemo.is_perfect_power_with_data_bernstein(d)
   @test k4 == 1
   @test r4 == d

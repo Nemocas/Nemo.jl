@@ -3461,10 +3461,15 @@ function _is_perfect_power(a::ZZRingElem)
 end
 
 @doc raw"""
-    is_perfect_power(a::IntegerUnion)
+    is_perfect_power(a::IntegerUnion; algorithm::Symbol = :flint)
 
 Return whether $a$ is a perfect power, that is, whether $a = m^r$ for some
 integer $m$ and $r > 1$. Neither $m$ nor $r$ is returned.
+
+Optional keyword `algorithm`: `:flint` (default) uses FLINT's implementation; `:bernstein`
+uses the Bernstein-style exponent detection (see [`is_perfect_power_with_data_bernstein`]);
+`:auto` selects an algorithm based on input size (see [`is_perfect_power_with_data_auto`]).
+
 """
 function is_perfect_power(a::ZZRingElem; algorithm::Symbol = :auto)
   if iszero(a) || isone(abs(a))
@@ -3483,14 +3488,18 @@ function is_perfect_power(a::ZZRingElem; algorithm::Symbol = :auto)
 end
 
 is_perfect_power(a::Integer; algorithm::Symbol = :auto) =
-  is_perfect_power(ZZRingElem(a); algorithm=algorithm)
+  is_perfect_power(ZZRingElem(a); algorithm)
 
 
 @doc raw"""
-    is_perfect_power_with_data(a::ZZRingElem) -> Int, ZZRingElem
-    is_perfect_power_with_data(a::Integer) -> Int, Integer
+    is_perfect_power_with_data(a::ZZRingElem; algorithm::Symbol = :flint) -> Int, ZZRingElem
+    is_perfect_power_with_data(a::Integer; algorithm::Symbol = :flint) -> Int, Integer
 
 Return $e$, $r$ such that $a = r^e$ with $e$ maximal. Note: $1 = 1^0$.
+
+Optional keyword `algorithm`: `:flint` (default) uses FLINT and iterates until the exponent is maximal; `:bernstein` 
+uses the Bernstein-style exponent detection; `:auto` chooses based on `nbits(a)` (see [`is_perfect_power_with_data_auto`]).
+
 """
 function is_perfect_power_with_data(a::ZZRingElem; algorithm::Symbol = :auto)
   if algorithm === :bernstein
@@ -3754,7 +3763,7 @@ end
 @inline function _fmpz_trunc!(a::ZZRingElem, i::Int)
   @ccall Nemo.libflint.fmpz_fdiv_r_2exp(a::Ref{ZZRingElem}, a::Ref{ZZRingElem}, i::Clong)::Nothing
 end
-# Iterate primes ≤ n (simple helper,will be replaced by PrimesSet once available in a shared place)
+# Iterate primes <= n (simple helper, will be replaced by PrimesSet once available in a shared place)
 function _primes_upto(n::Int)
   return (p for p in _prime_list_upto(n))
 end
@@ -3781,7 +3790,7 @@ end
 """
     root_exact(a::ZZRingElem, n::Int)
 
-If `a` can be written as `b^n`, this functinos returns `b`.
+If `a` can be written as `b^n`, this function returns `b`.
 If this is not possible the returned result is arbitrary, roughly of size
  `1/n log a`.
 """
