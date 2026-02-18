@@ -3437,29 +3437,21 @@ using .BitsMod
 @inline function _fmpz_trunc!(a::ZZRingElem, i::Int)
   @ccall Nemo.libflint.fmpz_fdiv_r_2exp(a::Ref{ZZRingElem}, a::Ref{ZZRingElem}, i::Clong)::Nothing
 end
-
-struct _PrimeIter; n::Int; end
-Base.iterate(it::_PrimeIter) = it.n < 2 ? nothing : (2, 2)
-function Base.iterate(it::_PrimeIter, p::Int)
-  p == 2 && return (3 <= it.n ? (3, 3) : nothing)
-  q = next_prime(p)
-  return q <= it.n ? (q, q) : nothing
+# Iterate primes ≤ n (simple helper,will be replaced by PrimesSet once available in a shared place)
+function _primes_upto(n::Int)
+  return (p for p in _prime_list_upto(n))
 end
-_primes_upto(n::Int) = _PrimeIter(n)
 
-function _coprime_base(v::Vector{ZZRingElem})
-  w = ZZRingElem[]
-  for x in v
-    x = abs(x)
-    isone(x) && continue
-    for y in w
-      g = gcd(x, y)
-      !isone(g) && (x = divexact(x, g; check=false))
-      isone(x) && break
-    end
-    isone(x) || push!(w, x)
+function _prime_list_upto(n::Int)
+  ps = Int[]
+  n < 2 && return ps
+  push!(ps, 2)
+  p = 3
+  while p <= n
+    push!(ps, p)
+    p = next_prime(p)
   end
-  return w
+  return ps
 end
 
 function root_exact(a::ZZRingElem, n::Int)
@@ -3512,29 +3504,28 @@ function _root_exact(a::ZZRingElem, ::Val{2})
   onez = ZZRingElem(1)
 
   while i < s
-    Nemo.mul!(M, M, M)
-    Nemo.shift_right!(M, M, 2)
-
+    mul!(M, M, M)
+    shift_right!(M, M, 2)
+  
     T = powermod(D, 2, M)
-    Nemo.mul!(T, T, B)
+    mul!(T, T, B)
     mod!(T, T, M)
-    Nemo.sub!(T, onez, T)
-    Nemo.shift_right!(T, T, 1)
-    Nemo.add!(T, onez, T)
-    Nemo.mul!(D, D, T)
+    sub!(T, onez, T)
+    shift_right!(T, T, 1)
+    add!(T, onez, T)
+    mul!(D, D, T)
     mod!(D, D, M)
-
+  
     i = 2*i - 2
   end
-
+  
   M = ZZRingElem(2)^(s + 2)
-  Nemo.mul!(D, D, a)
+  mul!(D, D, a)
   mod!(D, D, M)
-
   nbits(D) <= s && return ZZRingElem(D)
 
-  Nemo.mul!(D, D, -1)
-  Nemo.add!(D, D, M)
+  mul!(D, D, -1)
+  add!(D, D, M)  
   nbits(D) > s && return ZZRingElem(1)
   return D
 end
@@ -3584,30 +3575,30 @@ function _root_exact(a::ZZRingElem, p::Int, extra_s::Int=5, extra_w::Int=1)
 
   while i < w + extra_w
     i *= 2
-    Nemo.mul!(M, M, M)
-
+    mul!(M, M, M)
+  
     T = L*p
-    Nemo.sub!(T, two, T)
-    Nemo.add!(T, T, M)
-    Nemo.mul!(L, L, T)
+    sub!(T, two, T)
+    add!(T, T, M)
+    mul!(L, L, T)
     _fmpz_trunc!(L, i*64)
-
+  
     T = powermod(D, p + 1, M)
-    Nemo.mul!(T, T, B)
+    mul!(T, T, B)
     _fmpz_trunc!(T, i*64)
-
-    Nemo.mul!(T, T, L)
+  
+    mul!(T, T, L)
     _fmpz_trunc!(T, i*64)
-
+  
     S = 1 + L
-    Nemo.mul!(S, S, D)
+    mul!(S, S, D)
     _fmpz_trunc!(S, i*64)
-
-    Nemo.sub!(D, S, T)
-    sign(D) < 0 && Nemo.add!(D, D, M)
+  
+    sub!(D, S, T)
+    sign(D) < 0 && add!(D, D, M)
   end
-
-  Nemo.mul!(D, D, a)
+  
+  mul!(D, D, a)  
   _fmpz_trunc!(D, (w + extra_w)*64)
 
   nbits(D) > s && return ZZRingElem(1)
@@ -3673,7 +3664,7 @@ function _is_power_bernstein(a::ZZRingElem)::Int
   cands = unique(cands)
   cands = [gcd(aa, x) for x in cands]
   cands = [x for x in cands if !isone(x)]
-  cands = _coprime_base(cands)
+  cands = AbstractAlgebra.coprime_base(cands)
 
   isempty(cands) && return f
   ks = [valuation(aa, p) for p in cands]
@@ -3722,11 +3713,10 @@ function is_perfect_power_with_data_bernstein(a::ZZRingElem)
 
   k = _is_power_bernstein(a)
   k <= 1 && return (1, a)
-  b = Nemo.root(a, k; check=false)
+  b = root(a, k; check=false)
   return (b^k == a) ? (k, b) : (1, a)
 end
-
-function is_perfect_power_with_data_auto(a::ZZRingElem; threshold_bits::Int=typemax(Int))
+function is_perfect_power_with_data_auto(a::ZZRingElem; threshold_bits::Int=100_000)
   return nbits(a) < threshold_bits ? _is_perfect_power_with_data_flint(a) :
                                      is_perfect_power_with_data_bernstein(a)
 end
@@ -3746,3 +3736,4 @@ function resultant(f::ZZPolyRingElem, g::ZZPolyRingElem, d::ZZRingElem, nb::Int)
   @ccall libflint.fmpz_poly_resultant_modular_div(z::Ref{ZZRingElem}, f::Ref{ZZPolyRingElem}, g::Ref{ZZPolyRingElem}, d::Ref{ZZRingElem}, nb::Int)::Nothing
   return z
 end
+

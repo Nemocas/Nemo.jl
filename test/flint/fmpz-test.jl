@@ -2518,28 +2518,38 @@ end
 
 @testset "Bernstein perfect power adapter" begin
   a = ZZ(12)^10
+  b = a + 1
+  c = -ZZ(3)^9
+  d = -ZZ(3)^8
+
   k, r = Nemo.is_perfect_power_with_data_bernstein(a)
   @test k == 10
   @test r == ZZ(12)
   @test r^k == a
 
-  b = a + 1
   k2, r2 = Nemo.is_perfect_power_with_data_bernstein(b)
   @test k2 == 1
   @test r2 == b
 
-  c = -ZZ(3)^9
   k3, r3 = Nemo.is_perfect_power_with_data_bernstein(c)
   @test k3 == 9
   @test r3 == -ZZ(3)
   @test r3^k3 == c
 
-  d = -ZZ(3)^8
   k4, r4 = Nemo.is_perfect_power_with_data_bernstein(d)
   @test k4 == 1
   @test r4 == d
 
   @test Nemo.is_perfect_power(a; algorithm=:bernstein) == true
   @test Nemo.is_perfect_power_with_data(b; algorithm=:bernstein) == (1, b)
-  @test Nemo.is_perfect_power_with_data_auto(a; threshold_bits=0) == (10, ZZ(12))
+
+  # Force FLINT
+  @test Nemo.is_perfect_power_with_data_auto(a; threshold_bits = 10^9) == (10, ZZ(12))
+  @test Nemo.is_perfect_power_with_data_auto(b; threshold_bits = 10^9)[1] == 1
+  @test Nemo.is_perfect_power_with_data_auto(c; threshold_bits = 10^9) == (9, ZZ(-3))
+
+  # Force Bernstein
+  @test Nemo.is_perfect_power_with_data_auto(a; threshold_bits = 0) == (10, ZZ(12))
+  @test Nemo.is_perfect_power_with_data_auto(b; threshold_bits = 0)[1] == 1
+  @test Nemo.is_perfect_power_with_data_auto(c; threshold_bits = 0) == (9, ZZ(-3))
 end
