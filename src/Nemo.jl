@@ -524,6 +524,8 @@ include("ZZMatrix-linalg.jl")
 include("HeckeMiscFiniteField.jl")
 include("HeckeMoreStuff.jl")
 
+include("Primes.jl")
+
 include("UnivPoly.jl")
 
 # More functionality for Julia types

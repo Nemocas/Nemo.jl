@@ -94,20 +94,15 @@ testlist = [
   "generic/Matrix-test.jl",
   "generic/Module-test.jl",
   "generic/AbsMSeries-test.jl",
-# Benchmark-test.jl
+# Miscellaneous tests
   "Benchmark-test.jl",
-# gaussiannumbers/continued_fraction-test.jl
   "gaussiannumbers/continued_fraction-test.jl",
-# Native-test.jl
   "Native-test.jl",
-# HeckeMiscLocalization-test.jl
   "HeckeMiscLocalization-test.jl",
-# matrix-test.jl
   "matrix-test.jl",
-# poly-test.jl
   "poly-test.jl",
-# ZZMatrix-linalg-test.jl
-  "ZZMatrix-linalg-test.jl"
+  "Primes-test.jl",
+  "ZZMatrix-linalg-test.jl",
 ]
 
 pmap(include, testlist)
