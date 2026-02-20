@@ -146,29 +146,14 @@ function degree(x::QQBarFieldElem)
   return @ccall libflint.qqbar_degree(x::Ref{QQBarFieldElem})::Int
 end
 
-@doc raw"""
-    iszero(x::QQBarFieldElem)
-
-Return whether `x` is the number 0.
-"""
 function iszero(x::QQBarFieldElem)
   return Bool(@ccall libflint.qqbar_is_zero(x::Ref{QQBarFieldElem})::Cint)
 end
 
-@doc raw"""
-    isone(x::QQBarFieldElem)
-
-Return whether `x` is the number 1.
-"""
 function isone(x::QQBarFieldElem)
   return Bool(@ccall libflint.qqbar_is_one(x::Ref{QQBarFieldElem})::Cint)
 end
 
-@doc raw"""
-    isinteger(x::QQBarFieldElem)
-
-Return whether `x` is an integer.
-"""
 function isinteger(x::QQBarFieldElem)
   return Bool(@ccall libflint.qqbar_is_integer(x::Ref{QQBarFieldElem})::Cint)
 end
