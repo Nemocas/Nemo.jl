@@ -791,12 +791,6 @@ function (R::ZZModPolyRing)(a::AbsSimpleNumFieldElem) = nf_elem_to_poly!(R(), a)
 function (R::fpPolyRing)(a::AbsSimpleNumFieldElem) = nf_elem_to_poly!(R(), a)
 function (R::FpPolyRing)(a::AbsSimpleNumFieldElem) = nf_elem_to_poly!(R(), a)
 
-# deprecate the following?
-nf_elem_to_nmod_poly!(r::zzModPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true) = nf_elem_to_poly!(r, a, useden)
-nf_elem_to_fmpz_mod_poly!(r::ZZModPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true) = nf_elem_to_poly!(r, a, useden)
-nf_elem_to_gfp_poly!(r::fpPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true) = nf_elem_to_poly!(r, a, useden)
-nf_elem_to_gfp_fmpz_poly!(r::FpPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true) = nf_elem_to_poly!(r, a, useden)
-
 ################################################################################
 #
 #

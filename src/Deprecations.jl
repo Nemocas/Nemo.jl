@@ -101,3 +101,9 @@ import Base: Array, view
 
 # to be deprecated in a future minor release
 fq_default_mat_entry_ptr(F::FqMatrix, i::Int, j::Int) = mat_entry_ptr(F, i, j)
+
+# Prepared for deprecation in 0.54
+nf_elem_to_nmod_poly!(r::zzModPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true) = nf_elem_to_poly!(r, a, useden)
+nf_elem_to_fmpz_mod_poly!(r::ZZModPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true) = nf_elem_to_poly!(r, a, useden)
+nf_elem_to_gfp_poly!(r::fpPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true) = nf_elem_to_poly!(r, a, useden)
+nf_elem_to_gfp_fmpz_poly!(r::FpPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true) = nf_elem_to_poly!(r, a, useden)
