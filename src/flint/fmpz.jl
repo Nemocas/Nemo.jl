@@ -683,7 +683,7 @@ mod(x::Integer, y::ZZRingElem) = mod(ZZRingElem(x), y)
 Return the remainder after division of $x$ by $y$. The remainder will be
 closer to zero than $y$ and have the same sign, or it will be zero.
 """
-mod(x::ZZRingElem, y::Integer) = mod(x, ZZRingElem(y))
+mod(x::ZZRingElemOrPtr, y::Integer) = mod(x, ZZRingElem(y))
 
 div(x::Integer, y::ZZRingElem) = div(ZZRingElem(x), y)
 
