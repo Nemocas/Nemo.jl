@@ -2515,3 +2515,90 @@ end
   @test length(rneg) == 0
   @test last(rneg) == ZZ(0)
 end
+
+@testset "ZZRingElem.divrem (both versions)" begin
+  for i in 1:5
+    x = rand(100:1000)
+    y = rand(5:100)
+
+    for (x, y) in ((x, y), (-x, y), (x, -y), (-x, -y))
+      Bdr = Base.divrem(x, y)
+      @test Bdr == (Base.div(x, y), Base.rem(x, y))
+      @test Bdr == Base.divrem(BigInt(x), y)
+      @test Bdr == (Base.div(BigInt(x), y), Base.rem(BigInt(x), y))
+      @test Bdr == Base.divrem(x, BigInt(y))
+      @test Bdr == (Base.div(x, BigInt(y)), Base.rem(x, BigInt(y)))
+      @test Bdr == Base.divrem(BigInt(x), BigInt(y))
+      @test Bdr == (Base.div(BigInt(x), BigInt(y)), Base.rem(BigInt(x), BigInt(y)))
+      @test Bdr == Base.divrem(ZZ(x), y)
+      @test Bdr == (Base.div(ZZ(x), y), Base.rem(ZZ(x), y))
+      @test Bdr == Base.divrem(x, ZZ(y))
+      @test Bdr == (Base.div(x, ZZ(y)), Base.rem(x, ZZ(y)))
+      @test Bdr == Base.divrem(ZZ(x), ZZ(y))
+      @test Bdr == (Base.div(ZZ(x), ZZ(y)), Base.rem(ZZ(x), ZZ(y)))
+      @test Bdr == Base.divrem(BigInt(x), ZZ(y))
+      @test Bdr == (Base.div(BigInt(x), ZZ(y)), Base.rem(BigInt(x), ZZ(y)))
+      @test Bdr == Base.divrem(ZZ(x), BigInt(y))
+      @test Bdr == (Base.div(ZZ(x), BigInt(y)), Base.rem(ZZ(x), BigInt(y)))
+      if x > 0
+        #@test Bdr == Base.divrem(UInt(x), y)
+        #@test Bdr == (Base.div(UInt(x), y), Base.rem(UInt(x), y))
+        @test Bdr == Base.divrem(UInt(x), BigInt(y))
+        @test Bdr == (Base.div(UInt(x), BigInt(y)), Base.rem(UInt(x), BigInt(y)))
+        @test Bdr == Base.divrem(UInt(x), ZZ(y))
+        @test Bdr == (Base.div(UInt(x), ZZ(y)), Base.rem(UInt(x), ZZ(y)))
+      end
+      if y > 0
+        @test Bdr == Base.divrem(x, UInt(y))
+        @test Bdr == (Base.div(x, UInt(y)), Base.rem(x, UInt(y)))
+        @test Bdr == Base.divrem(BigInt(x), UInt(y))
+        @test Bdr == (Base.div(BigInt(x), UInt(y)), Base.rem(BigInt(x), UInt(y)))
+        @test Bdr == Base.divrem(ZZ(x), UInt(y))
+        @test Bdr == (Base.div(ZZ(x), UInt(y)), Base.rem(ZZ(x), UInt(y)))
+        if x > 0
+          @test unsigned.(Bdr) == Base.divrem(UInt(x), UInt(y))
+          @test unsigned.(Bdr) == (Base.div(UInt(x), UInt(y)), Base.rem(UInt(x), UInt(y)))
+        end
+      end
+
+      Ndr = Nemo.divrem(x, y)
+      @test Ndr == (Nemo.div(x, y), mod(x, y))
+      @test Ndr == Nemo.divrem(BigInt(x), y)
+      @test Ndr == (Nemo.div(BigInt(x), y), mod(BigInt(x), y))
+      @test Ndr == Nemo.divrem(x, BigInt(y))
+      @test Ndr == (Nemo.div(x, BigInt(y)), mod(x, BigInt(y)))
+      @test Ndr == Nemo.divrem(BigInt(x), BigInt(y))
+      @test Ndr == (Nemo.div(BigInt(x), BigInt(y)), mod(BigInt(x), BigInt(y)))
+      @test Ndr == Nemo.divrem(ZZ(x), y)
+      @test Ndr == (Nemo.div(ZZ(x), y), mod(ZZ(x), y))
+      @test Ndr == Nemo.divrem(x, ZZ(y))
+      @test Ndr == (Nemo.div(x, ZZ(y)), mod(x, ZZ(y)))
+      @test Ndr == Nemo.divrem(ZZ(x), ZZ(y))
+      @test Ndr == (Nemo.div(ZZ(x), ZZ(y)), mod(ZZ(x), ZZ(y)))
+      @test Ndr == Nemo.divrem(BigInt(x), ZZ(y))
+      @test Ndr == (Nemo.div(BigInt(x), ZZ(y)), mod(BigInt(x), ZZ(y)))
+      @test Ndr == Nemo.divrem(ZZ(x), BigInt(y))
+      @test Ndr == (Nemo.div(ZZ(x), BigInt(y)), mod(ZZ(x), BigInt(y)))
+      if x > 0
+        #@test Ndr == Nemo.divrem(UInt(x), y)
+        #@test Ndr == (Nemo.div(UInt(x), y), mod(UInt(x), y))
+        @test Ndr == Nemo.divrem(UInt(x), BigInt(y))
+        @test Ndr == (Nemo.div(UInt(x), BigInt(y)), mod(UInt(x), BigInt(y)))
+        @test Ndr == Nemo.divrem(UInt(x), ZZ(y))
+        @test Ndr == (Nemo.div(UInt(x), ZZ(y)), mod(UInt(x), ZZ(y)))
+      end
+      if y > 0
+        #@test Ndr == Nemo.divrem(x, UInt(y))
+        #@test Ndr == (Nemo.div(x, UInt(y)), mod(x, UInt(y)))
+        @test Ndr == Nemo.divrem(BigInt(x), UInt(y))
+        @test Ndr == (Nemo.div(BigInt(x), UInt(y)), mod(BigInt(x), UInt(y)))
+        @test Ndr == Nemo.divrem(ZZ(x), UInt(y))
+        @test Ndr == (Nemo.div(ZZ(x), UInt(y)), mod(ZZ(x), UInt(y)))
+        if x > 0
+          @test unsigned.(Ndr) == Nemo.divrem(UInt(x), UInt(y))
+          @test unsigned.(Ndr) == (Nemo.div(UInt(x), UInt(y)), mod(UInt(x), UInt(y)))
+        end
+      end
+    end
+  end
+end
