@@ -683,7 +683,7 @@ mod(x::Integer, y::ZZRingElem) = mod(ZZRingElem(x), y)
 Return the remainder after division of $x$ by $y$. The remainder will be
 closer to zero than $y$ and have the same sign, or it will be zero.
 """
-mod(x::ZZRingElem, y::Integer) = mod(x, ZZRingElem(y))
+mod(x::ZZRingElemOrPtr, y::Integer) = mod(x, ZZRingElem(y))
 
 div(x::Integer, y::ZZRingElem) = div(ZZRingElem(x), y)
 
@@ -997,13 +997,13 @@ function mod!(r::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   return r
 end
 
-function mod(x::ZZRingElem, y::ZZRingElem)
+function mod(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   iszero(y) && throw(DivideError())
   r = ZZRingElem()
   return mod!(r, x, y)
 end
 
-function mod(x::ZZRingElem, c::UInt)
+function mod(x::ZZRingElemOrPtr, c::UInt)
   c == 0 && throw(DivideError())
   @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, c::UInt)::UInt
 end
