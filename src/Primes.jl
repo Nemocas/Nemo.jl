@@ -119,29 +119,28 @@ struct PrimesSet{T}
   end
 end
 
+# convenience constructors
+PrimesSet(f::T, t::T) where T = PrimesSet{T}(f, t)
+PrimesSet(f::T, t::T, mod::T, val::T) where T = PrimesSet{T}(f, t, mod, val)
+
 @doc raw"""
-    PrimesSet(f::Integer, t::Integer) -> PrimesSet
-    PrimesSet(f::ZZRingElem, t::ZZRingElem) -> PrimesSet
+    primes_set(f::Integer, t::Integer) -> PrimesSet
+    primes_set(f::ZZRingElem, t::ZZRingElem) -> PrimesSet
 
 Returns an iterable object $S$ representing the prime numbers $p$
 for $f \le p \le t$. If $t=-1$, then the upper bound is infinite.
 """
-function PrimesSet(f::T, t::T) where T
-  return PrimesSet{T}(f, t)
-end
+primes_set(f::T, t::T) where T = PrimesSet{T}(f, t)
 
 @doc raw"""
-    PrimesSet(f::Integer, t::Integer, mod::Integer, val::Integer)
-    PrimesSet(f::ZZRingElem, t::ZZRingElem, mod::ZZRingElem, val::ZZRingElem)
+    primes_set(f::Integer, t::Integer, mod::Integer, val::Integer)
+    primes_set(f::ZZRingElem, t::ZZRingElem, mod::ZZRingElem, val::ZZRingElem)
 
 Returns an iterable object $S$ representing the prime numbers $p$
 for $f \le p \le t$ and $p\equiv val \bmod mod$ (primes in arithmetic
-progression).
- If $t=-1$, then the upper bound is infinite.
+progression). If $t=-1$, then the upper bound is infinite.
 """
-function PrimesSet(f::T, t::T, mod::T, val::T) where {T}
-  return PrimesSet{T}(f, t, mod, val)
-end
+primes_set(f::T, t::T, mod::T, val::T) where T = PrimesSet{T}(f, t, mod, val)
 
 function Base.iterate(A::PrimesSet{T}) where {T <: Integer}
   if A.to != -1 && A.from > A.to
