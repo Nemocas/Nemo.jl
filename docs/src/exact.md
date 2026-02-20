@@ -321,12 +321,18 @@ may become configurable in the future.
 
 **Interface**
 
+Various properties are implemented, including `iszero`, `isone`, and `isinteger`:
+
+```jldoctest; setup = :(C = CalciumField())
+julia> iszero(C(0)), isone(C(1)), isinteger(C(2))
+(true, true, true)
+```
+
+The full interface includes:
+
 ```@docs
-iszero(a::CalciumFieldElem)
-isone(a::CalciumFieldElem)
 is_algebraic(a::CalciumFieldElem)
 is_rational(a::CalciumFieldElem)
-isinteger(a::CalciumFieldElem)
 isreal(a::CalciumFieldElem)
 is_imaginary(a::CalciumFieldElem)
 ```
@@ -536,4 +542,3 @@ erfc(a::CalciumFieldElem)
 ```@docs
 complex_normal_form(a::CalciumFieldElem; deep::Bool=true)
 ```
-
