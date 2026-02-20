@@ -490,6 +490,8 @@ export prevpow2
 export prime
 export prime_divisors
 export prime_field
+export primes_set
+export PrimesSet
 export primorial
 export prod_diagonal
 export pseudo_inv
