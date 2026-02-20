@@ -3693,12 +3693,16 @@ function _is_perfect_power_with_data_flint(a::ZZRingElem)
 end
 
 @doc raw"""
-    is_perfect_power_with_data_bernstein(a::ZZRingElem)
+    is_perfect_power_with_data_bernstein(a::ZZRingElem) -> (Int, ZZRingElem)
 
-Return `e, r` such that `a = r^e` with `e` maximal, using a Bernstein-style
-perfect power detection algorithm.
+Return `(e, r)` such that `a = r^e` with `e` maximal, using a Bernstein-style
+perfect power detection method.
 
-If `a` is not a nontrivial perfect power, return `(1, a)`.
+If `a` is not a nontrivial perfect power, return `(1, a)`. Note: `a == 1`
+returns `(0, 1)`.
+
+This implementation is based on:
+  https://cr.yp.to/lineartime/powers2-20060914-ams.pdf
 """
 function is_perfect_power_with_data_bernstein(a::ZZRingElem)
   iszero(a) && error("must not be zero")
@@ -3716,6 +3720,17 @@ function is_perfect_power_with_data_bernstein(a::ZZRingElem)
   b = root(a, k; check=false)
   return (b^k == a) ? (k, b) : (1, a)
 end
+
+@doc raw"""
+    is_perfect_power_with_data_auto(a::ZZRingElem; threshold_bits::Int=100_000)
+
+Return `(e, r)` as in `is_perfect_power_with_data`, choosing between the FLINT
+method and the Bernstein method depending on `nbits(a)`.
+
+The default crossover (`threshold_bits = 100_000`) was chosen empirically on local
+benchmarks comparing both methods on (1) random inputs and (2) true 5th powers.
+This value is expected to change if the prime iteration / coprime-base backend changes.
+"""
 function is_perfect_power_with_data_auto(a::ZZRingElem; threshold_bits::Int=100_000)
   return nbits(a) < threshold_bits ? _is_perfect_power_with_data_flint(a) :
                                      is_perfect_power_with_data_bernstein(a)
