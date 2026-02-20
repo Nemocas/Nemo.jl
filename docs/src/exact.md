@@ -4,7 +4,7 @@ CollapsedDocStrings = true
 DocTestSetup = Nemo.doctestsetup()
 ```
 
-# Exact real and complex numbers
+# [Exact real and complex numbers](@id exact_real_complex)
 
 Exact real and complex numbers are provided by Calcium.
 Internally, a number $z$ is represented as an element
