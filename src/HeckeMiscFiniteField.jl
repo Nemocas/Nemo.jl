@@ -60,11 +60,9 @@ function _nf_to_fq!(a::FqFieldElem, b::AbsSimpleNumFieldElem, K::FqField)#, a_tm
   # AbsSimpleNumFieldElem -> QQPolyRingElem
   z = QQPolyRingElem()
   @ccall libflint.nf_elem_get_fmpq_poly(z::Ref{QQPolyRingElem}, b::Ref{AbsSimpleNumFieldElem}, parent(b)::Ref{AbsSimpleNumField})::Nothing
-  z.parent = Globals.Qx
   # QQPolyRingElem -> ZZPolyRingElem, ZZRingElem
   zz = ZZPolyRingElem()
   @ccall libflint.fmpq_poly_get_numerator(zz::Ref{ZZPolyRingElem}, z::Ref{QQPolyRingElem})::Nothing
-  zz.parent = Globals.Zx
   zzz = ZZRingElem()
   @ccall libflint.fmpq_poly_get_denominator(zzz::Ref{ZZRingElem}, z::Ref{QQPolyRingElem})::Nothing
   @ccall libflint.fq_default_set_fmpz_poly(a::Ref{FqFieldElem}, zz::Ref{ZZPolyRingElem}, K::Ref{FqField})::Nothing
