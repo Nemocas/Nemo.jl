@@ -4062,17 +4062,16 @@ function is_perfect_power_with_data_bernstein(a::ZZRingElem)
 end
 
 @doc raw"""
-    is_perfect_power_with_data_auto(a::ZZRingElem; threshold_bits::Int = typemax(Int))
+    is_perfect_power_with_data_auto(a::ZZRingElem; threshold_bits::Int=100_000)
 
 Return `(e, r)` as in `is_perfect_power_with_data`, choosing between the FLINT
 method and the Bernstein method depending on `nbits(a)`.
 
-The default `threshold_bits` is conservative (so `:auto` defaults to FLINT).
-A small internal timing probe (`_perfect_power_auto_threshold_bits`) can be rerun
-when internals change; on the current setup it did not find a crossover on a small
-set of candidates.
+The default crossover (`threshold_bits = 100_000`) was chosen empirically on local
+benchmarks comparing both methods on (1) random inputs and (2) true 5th powers.
+This value is expected to change if the prime iteration / coprime-base backend changes.
 """
-function is_perfect_power_with_data_auto(a::ZZRingElem; threshold_bits::Int=typemax(Int))
+function is_perfect_power_with_data_auto(a::ZZRingElem; threshold_bits::Int=100_000)
   return nbits(a) < threshold_bits ? _is_perfect_power_with_data_flint(a) :
                                      is_perfect_power_with_data_bernstein(a)
 end
