@@ -2552,4 +2552,7 @@ end
   @test Nemo.is_perfect_power_with_data_auto(a; threshold_bits = 0) == (10, ZZ(12))
   @test Nemo.is_perfect_power_with_data_auto(b; threshold_bits = 0)[1] == 1
   @test Nemo.is_perfect_power_with_data_auto(c; threshold_bits = 0) == (9, ZZ(-3))
+
+  @test Nemo.is_perfect_power(a) == true
+  @test Nemo.is_perfect_power_with_data(a) == (10, ZZ(12))
 end

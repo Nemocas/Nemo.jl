@@ -3188,8 +3188,11 @@ uses the Bernstein-style exponent detection (see [`is_perfect_power_with_data_be
 `:auto` selects an algorithm based on input size (see [`is_perfect_power_with_data_auto`]).
 
 """
-function is_perfect_power(a::ZZRingElem; algorithm::Symbol = :flint)
-  if algorithm === :flint || algorithm === :nemo
+function is_perfect_power(a::ZZRingElem; algorithm::Symbol = :auto)
+  if iszero(a) || isone(abs(a))
+    return true
+  end
+  if algorithm === :flint
     _, ex = _is_perfect_power(a)
     return ex > 0
   elseif algorithm === :bernstein
@@ -3201,7 +3204,7 @@ function is_perfect_power(a::ZZRingElem; algorithm::Symbol = :flint)
   end
 end
 
-is_perfect_power(a::Integer; algorithm::Symbol = :flint) =
+is_perfect_power(a::Integer; algorithm::Symbol = :auto) =
   is_perfect_power(ZZRingElem(a); algorithm=algorithm)
 
 #compare to Oscar/examples/PerfectPowers.jl which is, for large input,
@@ -3217,19 +3220,19 @@ Optional keyword `algorithm`: `:flint` (default) uses FLINT and iterates until t
 uses the Bernstein-style exponent detection; `:auto` chooses based on `nbits(a)` (see [`is_perfect_power_with_data_auto`]).
 
 """
-function is_perfect_power_with_data(a::ZZRingElem; algorithm::Symbol = :flint)
+function is_perfect_power_with_data(a::ZZRingElem; algorithm::Symbol = :auto)
   if algorithm === :bernstein
     return is_perfect_power_with_data_bernstein(a)
   elseif algorithm === :auto
     return is_perfect_power_with_data_auto(a)
-  elseif algorithm === :flint || algorithm === :nemo
+  elseif algorithm === :flint
     return _is_perfect_power_with_data_flint(a)
   else
     throw(ArgumentError("unknown algorithm=$(repr(algorithm)); use :flint, :bernstein, or :auto"))
   end
 end
 
-function is_perfect_power_with_data(a::Integer; algorithm::Symbol = :flint)
+function is_perfect_power_with_data(a::Integer; algorithm::Symbol = :auto)
   e, r = is_perfect_power_with_data(ZZRingElem(a); algorithm=algorithm)
   return e, typeof(a)(r)
 end
@@ -3432,6 +3435,48 @@ end
 end
 
 using .BitsMod
+
+#small helper to decide a reasonable crossover point between FLINT and Bernstein.
+function _perfect_power_auto_threshold_bits(; candidates::Vector{Int} = [50_000, 75_000, 100_000, 125_000, 150_000],
+  trials::Int = 3)
+
+_zz_bits(nbits::Int, seed::Int) = begin
+a = ZZRingElem(1) << (nbits - 1)
+return a + ZZRingElem(0x9e3779b97f4a7c15 % UInt) * ZZRingElem(seed) + ZZRingElem(1234567)
+end
+
+_time_pair(a::ZZRingElem) = begin
+tF = @elapsed _is_perfect_power_with_data_flint(a)
+tB = @elapsed is_perfect_power_with_data_bernstein(a)
+return tF, tB
+end
+
+for b in candidates
+wins = 0
+total = 0
+
+for i in 1:trials
+a = _zz_bits(b + 17*i, i)
+tF, tB = _time_pair(a)
+wins += (tB < tF) ? 1 : 0
+total += 1
+
+# true 5th power near b bits
+base_bits = max(10, div(b, 5) + 3*i)
+r = _zz_bits(base_bits, 1000 + i)
+a5 = r^5
+tF2, tB2 = _time_pair(a5)
+wins += (tB2 < tF2) ? 1 : 0
+total += 1
+end
+
+if wins > trials ÷ 2
+  return b
+end
+end
+
+return nothing
+end
 
 #Bernstein perfect-power detection
 @inline function _fmpz_trunc!(a::ZZRingElem, i::Int)
@@ -3722,16 +3767,17 @@ function is_perfect_power_with_data_bernstein(a::ZZRingElem)
 end
 
 @doc raw"""
-    is_perfect_power_with_data_auto(a::ZZRingElem; threshold_bits::Int=100_000)
+    is_perfect_power_with_data_auto(a::ZZRingElem; threshold_bits::Int = typemax(Int))
 
 Return `(e, r)` as in `is_perfect_power_with_data`, choosing between the FLINT
 method and the Bernstein method depending on `nbits(a)`.
 
-The default crossover (`threshold_bits = 100_000`) was chosen empirically on local
-benchmarks comparing both methods on (1) random inputs and (2) true 5th powers.
-This value is expected to change if the prime iteration / coprime-base backend changes.
+The default `threshold_bits` is conservative (so `:auto` defaults to FLINT).
+A small internal timing probe (`_perfect_power_auto_threshold_bits`) can be rerun
+when internals change; on the current setup it did not find a crossover on a small
+set of candidates.
 """
-function is_perfect_power_with_data_auto(a::ZZRingElem; threshold_bits::Int=100_000)
+function is_perfect_power_with_data_auto(a::ZZRingElem; threshold_bits::Int=typemax(Int))
   return nbits(a) < threshold_bits ? _is_perfect_power_with_data_flint(a) :
                                      is_perfect_power_with_data_bernstein(a)
 end
