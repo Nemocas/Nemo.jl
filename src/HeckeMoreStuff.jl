@@ -664,26 +664,6 @@ function (R::QQPolyRing)(a::Generic.RationalFunctionFieldElem{QQFieldElem})
   return R(numerator(a))
 end
 
-@doc raw"""
-    zeros(f::ZZPolyRingElem) -> Vector{ZZRingElem}
-
-Computes the integer zeros of a given polynomial $f$.
-"""
-function zeros(f::ZZPolyRingElem)
-
-  fac = factor(f)
-  zeros = ZZRingElem[]
-
-  # check if there are monic linear factors <-> zeros
-  for i in fac
-    if degree(i[1]) == 1 && leading_coefficient(i[1]) == 1
-      push!(zeros, -coeff(i[1], 0))
-    end
-  end
-
-  return zeros
-end
-
 function lift!(x::fpFieldElem, z::ZZRingElem)
   set!(z, x.data)
   return z
