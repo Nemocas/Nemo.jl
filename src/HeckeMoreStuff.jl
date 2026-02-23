@@ -1,6 +1,18 @@
+################################################################################
+#
+#
+#
+################################################################################
+
 function round(::Type{Int}, a::QQFieldElem)
   return round(Int, Rational{BigInt}(a))
 end
+
+################################################################################
+#
+#
+#
+################################################################################
 
 function prime_field(F::fqPolyRepField; cached::Bool=true)
   return Native.GF(Int(characteristic(F)), cached=cached)
@@ -47,6 +59,12 @@ function evaluate!(z::fqPolyRepFieldElem, f::ZZPolyRingElem, r::fqPolyRepFieldEl
   return z
 end
 
+################################################################################
+#
+#
+#
+################################################################################
+
 function real(tau::AcbMatrix)
   return map(real, tau)
 end
@@ -76,6 +94,12 @@ function mul!(z::AcbFieldElem, x::AcbFieldElem, y::ArbFieldElem)
   @ccall libflint.acb_mul_arb(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{ArbFieldElem}, parent(z).prec::Int)::Nothing
   return z
 end
+
+################################################################################
+#
+#
+#
+################################################################################
 
 @doc raw"""
     valuation(G::QQMatrix, p)
@@ -114,12 +138,24 @@ ZZMatrix(M::Matrix{Int}) = matrix(ZZ, M)
 
 order(::ZZRingElem) = ZZ
 
+################################################################################
+#
+#
+#
+################################################################################
+
 function sub!(z::Vector{QQFieldElem}, x::Vector{QQFieldElem}, y::Vector{ZZRingElem})
   for i in 1:length(z)
     sub!(z[i], x[i], y[i])
   end
   return z
 end
+
+################################################################################
+#
+#
+#
+################################################################################
 
 function (Zx::ZZPolyRing)(a::AbsSimpleNumFieldElem)
   b = Zx()
@@ -161,6 +197,12 @@ function Base.round(::Type{ZZMatrix}, C::ArbMatrix)
   return v
 end
 
+################################################################################
+#
+#
+#
+################################################################################
+
 function discriminant(K::QQField)
   return one(K)
 end
@@ -172,6 +214,13 @@ real(x::QQFieldElem) = x
 norm(x::ZZRingElem) = abs(x)
 
 number_field(::ZZRing) = QQ
+
+################################################################################
+#
+#
+#
+################################################################################
+
 
 function Base.hash(f::zzModMPolyRingElem, h::UInt)
   return h # TODO: enhance or throw error
@@ -200,6 +249,12 @@ function Base.round(::Type{ZZRingElem}, a::ZZRingElem, b::ZZRingElem)
   #  @assert r == round(ZZRingElem, a//b)
   return r
 end
+
+################################################################################
+#
+#
+#
+################################################################################
 
 function is_squarefree(x::Generic.Poly{AbsSimpleNumFieldElem})
   return isone(gcd(x, derivative(x), true))
@@ -262,6 +317,12 @@ function basis(K::fqPolyRepField)
   return b
 end
 
+################################################################################
+#
+#
+#
+################################################################################
+
 function gcd(a::ResElem{T}, b::ResElem{T}) where {T<:IntegerUnion}
   m = modulus(a)
   return parent(a)(gcd(gcd(a.data, m), b.data))
@@ -274,6 +335,12 @@ function gcdx(a::ResElem{T}, b::ResElem{T}) where {T<:IntegerUnion}
   G, U, V = gcdx(g, ZZRingElem(m))
   return R(G), R(U) * R(u), R(U) * R(v)
 end
+
+################################################################################
+#
+#
+#
+################################################################################
 
 function inv(f::T) where {T<:Union{ZZModPolyRingElem,zzModPolyRingElem}}
   if !is_unit(f)
@@ -328,12 +395,20 @@ function bits(x::AcbFieldElem)
   return @ccall libflint.acb_bits(x::Ref{AcbFieldElem})::Int
 end
 
-function order(x::EuclideanRingResidueRingElem{ZZRingElem}, fp::Dict{ZZRingElem,Int64})
-  error("missing")
-end
+################################################################################
+#
+#
+#
+################################################################################
 
 fit!(::QQRelPowerSeriesRingElem, Int) = nothing
 fit!(::QQAbsPowerSeriesRingElem, Int) = nothing
+
+################################################################################
+#
+#
+#
+################################################################################
 
 function gen(R::Union{EuclideanRingResidueRing{fqPolyRepPolyRingElem},EuclideanRingResidueField{fqPolyRepPolyRingElem}}) ## this is not covered by above
   return R(gen(base_ring(R)))              ## and I don't know why
@@ -364,54 +439,8 @@ function size(R::Union{EuclideanRingResidueRing{fqPolyRepPolyRingElem},Euclidean
   return size(base_ring(base_ring(R)))^degree(R.modulus)
 end
 
-function size(R::FqPolyRepField)
-  return order(R)
-end
-
-function size(R::fqPolyRepField)
-  return order(R)
-end
-
-function size(F::fpField)
-  return order(F)
-end
-
-function size(F::FpField)
-  return order(F)
-end
-
-function size(F::FqField)
-  return order(F)
-end
-
-#################################################
-# in triplicate.... and probably cases missing...
-function elem_to_mat_row!(M::MatElem, i::Int, a::ResElem{T}) where {T<:PolyRingElem}
-  z = zero(parent(M[1, 1]))
-  for j = 0:degree(a.data)
-    M[i, j+1] = coeff(a.data, j)
-  end
-  for j = degree(a.data)+2:ncols(M)
-    M[i, j] = z
-  end
-end
-function elem_to_mat_row!(M::MatElem, i::Int, a::ResElem{FqPolyRepPolyRingElem})
-  z = zero(parent(M[1, 1]))
-  for j = 0:degree(a.data)
-    M[i, j+1] = coeff(a.data, j)
-  end
-  for j = degree(a.data)+2:ncols(M)
-    M[i, j] = z
-  end
-end
-function elem_to_mat_row!(M::MatElem, i::Int, a::ResElem{fqPolyRepPolyRingElem})
-  z = zero(parent(M[1, 1]))
-  for j = 0:degree(a.data)
-    M[i, j+1] = coeff(a.data, j)
-  end
-  for j = degree(a.data)+2:ncols(M)
-    M[i, j] = z
-  end
+function order(x::EuclideanRingResidueRingElem{ZZRingElem}, fp::Dict{ZZRingElem,Int64})
+  error("missing")
 end
 
 function rand(R::Union{EuclideanRingResidueRing{ZZRingElem},EuclideanRingResidueField{ZZRingElem}})
@@ -449,6 +478,55 @@ function rand(R::Union{EuclideanRingResidueRing{zzModPolyRingElem},EuclideanRing
   return r
 end
 
+characteristic(F::EuclideanRingResidueField{ZZRingElem}) = abs(F.modulus)
+
+degree(::EuclideanRingResidueField{ZZRingElem}) = 1
+
+################################################################################
+#
+#
+#
+################################################################################
+
+# discuss: size = order? order = size?
+size(F::FinField) = order(F)  # TODO: move this to AA
+
+#################################################
+# in triplicate.... and probably cases missing...
+function elem_to_mat_row!(M::MatElem, i::Int, a::ResElem{T}) where {T<:PolyRingElem}
+  z = zero(parent(M[1, 1]))
+  for j = 0:degree(a.data)
+    M[i, j+1] = coeff(a.data, j)
+  end
+  for j = degree(a.data)+2:ncols(M)
+    M[i, j] = z
+  end
+end
+function elem_to_mat_row!(M::MatElem, i::Int, a::ResElem{FqPolyRepPolyRingElem})
+  z = zero(parent(M[1, 1]))
+  for j = 0:degree(a.data)
+    M[i, j+1] = coeff(a.data, j)
+  end
+  for j = degree(a.data)+2:ncols(M)
+    M[i, j] = z
+  end
+end
+function elem_to_mat_row!(M::MatElem, i::Int, a::ResElem{fqPolyRepPolyRingElem})
+  z = zero(parent(M[1, 1]))
+  for j = 0:degree(a.data)
+    M[i, j+1] = coeff(a.data, j)
+  end
+  for j = degree(a.data)+2:ncols(M)
+    M[i, j] = z
+  end
+end
+
+################################################################################
+#
+#
+#
+################################################################################
+
 function rem!(f::zzModPolyRingElem, g::zzModPolyRingElem, h::zzModPolyRingElem)
   @ccall libflint.nmod_poly_rem(f::Ref{zzModPolyRingElem}, g::Ref{zzModPolyRingElem}, h::Ref{zzModPolyRingElem})::Nothing
   return f
@@ -468,7 +546,11 @@ function divexact(a::ZZModRingElem, y::ZZRingElem; check::Bool=true)
   return divexact(a, parent(a)(y), check=check)
 end
 
-characteristic(F::EuclideanRingResidueField{ZZRingElem}) = abs(F.modulus)
+################################################################################
+#
+#
+#
+################################################################################
 
 #@doc raw"""
 #    is_univariate(f::Generic.MPoly{T}) where T <: NumFieldElem -> Bool, PolyRingElem{T}
@@ -511,6 +593,12 @@ function (R::ZZMPolyRing)(f::QQMPolyRingElem)
   return map_coefficients(ZZ, f, parent=R)
 end
 
+################################################################################
+#
+#
+#
+################################################################################
+
 # mainly for testing
 function rand(L::LocalizedEuclideanRing{T}, num_scale=(1:1000), den_scale=(1:1000)) where {T<:ZZRingElem}
   num = rand(num_scale)
@@ -529,6 +617,12 @@ function rand(L::LocalizedEuclideanRing{T}, num_scale::Vector, den_scale::Intege
   end
   return L(num // den)
 end
+
+################################################################################
+#
+#
+#
+################################################################################
 
 function cmpabs(a::Int, b::Int)
   a = abs(a)
@@ -601,6 +695,12 @@ end
 function base_field(K::fqPolyRepField)
   return Native.GF(Int(characteristic(K)))
 end
+
+################################################################################
+#
+#
+#
+################################################################################
 
 @doc raw"""
     mod!(A::Generic.Mat{AbsSimpleNumFieldElem}, m::ZZRingElem)
@@ -684,17 +784,22 @@ function zeros(f::ZZPolyRingElem)
   return zeros
 end
 
-function lift!(x::fpFieldElem, z::ZZRingElem)
+function lift!(x::fpFieldElem, z::ZZRingElem)  # FIXME: wrong argument order?
   set!(z, x.data)
   return z
 end
 
-function lift!(x::EuclideanRingResidueFieldElem{ZZRingElem}, z::ZZRingElem)
+function lift!(x::EuclideanRingResidueFieldElem{ZZRingElem}, z::ZZRingElem)  # FIXME: wrong argument order?
   set!(z, x.data)
   return z
 end
 
-degree(::EuclideanRingResidueField{ZZRingElem}) = 1
+################################################################################
+#
+#
+#
+################################################################################
+
 degree(::QQField) = 1
 
 Base.:(*)(x::QQFieldElem, y::AbstractAlgebra.Generic.MatSpaceElem{AbsSimpleNumFieldElem}) = base_ring(y)(x) * y
@@ -709,6 +814,12 @@ end
 function (A::AbsSimpleNumField)(a::ZZPolyRingElem)
   return A(QQPolyRingElem(parent(defining_polynomial(A)), a))
 end
+
+################################################################################
+#
+#
+#
+################################################################################
 
 function is_positive(x::ZZRingElem, ::Union{PosInf,Vector{PosInf}})
   return sign(x) == 1
@@ -725,6 +836,12 @@ end
 function is_negative(x::QQFieldElem, ::Union{PosInf,Vector{PosInf}})
   return sign(x) == -1
 end
+
+################################################################################
+#
+#
+#
+################################################################################
 
 function (R::Generic.PolyRing{AbsSimpleNumFieldElem})(f::Generic.MPoly)
   if length(f) == 0
@@ -810,6 +927,12 @@ function mod_sym(a::AbsSimpleNumFieldElem, b::ZZRingElem, b2::ZZRingElem)
   return mod_sym(a, b)
   return z
 end
+
+################################################################################
+#
+#
+#
+################################################################################
 
 function (Rx::fpPolyRing)(a::fqPolyRepFieldElem)
   el = Rx()
