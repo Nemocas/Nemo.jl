@@ -179,22 +179,12 @@ function is_number(a::CalciumFieldElem)
   return truth_as_bool(t, :is_number)
 end
 
-@doc raw"""
-    iszero(a::CalciumFieldElem)
-
-Return whether `a` is the number 0.
-"""
 function iszero(a::CalciumFieldElem)
   C = a.parent
   t = @ccall libflint.ca_check_is_zero(a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
   return truth_as_bool(t, :iszero)
 end
 
-@doc raw"""
-    isone(a::CalciumFieldElem)
-
-Return whether `a` is the number 1.
-"""
 function isone(a::CalciumFieldElem)
   C = a.parent
   t = @ccall libflint.ca_check_is_one(a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
@@ -223,11 +213,6 @@ function is_rational(a::CalciumFieldElem)
   return truth_as_bool(t, :is_rational)
 end
 
-@doc raw"""
-    isinteger(a::CalciumFieldElem)
-
-Return whether `a` is an integer.
-"""
 function isinteger(a::CalciumFieldElem)
   C = a.parent
   t = @ccall libflint.ca_check_is_integer(a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
@@ -1391,4 +1376,3 @@ function (C::CalciumField)(x::Irrational)
     error("constant not supported")
   end
 end
-
