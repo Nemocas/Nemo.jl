@@ -658,7 +658,7 @@ function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::B
         fl, vv = can_solve_with_solution(forwardmat, w, side = :left)
         vvv = ww * forwardmatinv
         @assert fl
-        l = 1
+        local l = 1
         for i in 0:(degree(f) - 1)
           for b in Kabs
             _abs_gen_rel += eabs(vv[1, l]) * b * xi[i + 1]

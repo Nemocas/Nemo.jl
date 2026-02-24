@@ -204,7 +204,7 @@ function is_cyclo_type(K::AbsSimpleNumField)
 end
 
 function is_maxreal_type(K::AbsSimpleNumField)
-  return get_attribute(K, :maxreal)::Bool
+  return has_attribute(K, :maxreal)
 end
 
 ###############################################################################
@@ -1311,6 +1311,13 @@ base_field(::AbsSimpleNumField) = QQ
 #   mod
 #
 ###############################################################################
+
+#Assuming that the denominator of a is one, reduces all the coefficients modulo p
+# non-symmetric (positive) residue system
+function mod!(a::AbsSimpleNumFieldElem, b::ZZRingElem)
+  @ccall libflint.nf_elem_mod_fmpz(a::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
+  return a
+end
 
 function mod_sym!(a::AbsSimpleNumFieldElem, b::ZZRingElem)
   @ccall libflint.nf_elem_smod_fmpz(a::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing

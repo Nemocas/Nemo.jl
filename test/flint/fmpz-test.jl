@@ -398,6 +398,7 @@ end
   @test_throws ErrorException gcd(ZZRingElem[])
 
   @test gcd(ZZRingElem[8]) == 8
+  @test gcd(ZZRingElem[-3]) == 3
 
   @test gcd([ZZRingElem(10), ZZRingElem(2)]) == 2
 
@@ -420,6 +421,7 @@ end
   @test_throws ErrorException lcm(ZZRingElem[])
 
   @test lcm(ZZRingElem[2]) == 2
+  @test lcm(ZZRingElem[-3]) == 3
 
   @test lcm(ZZRingElem[2, 3]) == 6
 
