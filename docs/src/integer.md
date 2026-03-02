@@ -7,15 +7,7 @@ DocTestSetup = Nemo.doctestsetup()
 # Integers
 
 The default integer type in Nemo is provided by FLINT. The associated ring of
-integers is represented by the constant parent object called `ZZ`.
-
-For convenience we define
-
-```
-ZZ = ZZ
-```
-
-so that integers can be constructed using `ZZ` instead of `ZZ`. Note that
+integers is represented by the constant parent object called `ZZ`. Note that
 this is the name of a specific parent object, not the name of its type.
 
 The types of the integer ring parent objects and elements of the associated
