@@ -555,6 +555,7 @@ export round!
 export rref
 export rref!
 export rsqrt
+export set!
 export set_exponent_vector!
 export set_printing_mode
 export setbit!
