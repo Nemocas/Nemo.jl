@@ -706,7 +706,7 @@ end
 # we switch to larger 61-bit primes (which are faster amortized).
 
 @doc raw"""
-    is_zero_det_probabilistic(M::ZZMatrix; modulus_bitsize::Int = 100)
+    is_probably_zero_det(M::ZZMatrix; modulus_bitsize::Int = 100)
 
 Same as `is_zero(det(M))` but faster, though may _very rarely_ erroneously
 return `true`.  The kwarg `modulus_bitsize` must be between 20 and 1000;
@@ -714,7 +714,7 @@ larger values decrease the probability of a false positive (but require
 more computation time).  Under a "uniformity assumption" the probability
 of a false positive is about `2^(-modulus_bitsize)`.
 """
-function is_zero_det_probabilistic(M::ZZMatrix; modulus_bitsize::Int = 100)
+function is_probably_zero_det(M::ZZMatrix; modulus_bitsize::Int = 100)
   @req  is_square(M)  "matrix must be square"
   @req ((modulus_bitsize >= 20) && (modulus_bitsize <= 1000))  "modulus_bitsize must be between 20 and 1000 (but bigger than about 250 is usually senseless)"
   # Dispose of two trivial cases:

@@ -520,10 +520,10 @@ end
   @test det(A) == 27
 end
 
-@testset "QQMatrix.is_zero_det_probabilistic" begin
+@testset "QQMatrix.is_probably_zero_det" begin
   sz = 250
   M = matrix(QQ, sz,sz, (x->1//x).(1:sz*sz))
-  @time !is_zero_det_probabilistic(M)
+  @time !is_probably_zero_det(M)
 end
 
 @testset "QQMatrix.hilbert" begin

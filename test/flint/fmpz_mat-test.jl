@@ -525,17 +525,17 @@ end
   @test det_given_divisor(A, ZZRingElem(9)) == 27
 end
 
-@testset "ZZMatrix.is_zero_det_probabilistic" begin
+@testset "ZZMatrix.is_probably_zero_det" begin
   M00 = zero_matrix(ZZ, 0,0)
-  @test !is_zero_det_probabilistic(M00)
+  @test !is_probably_zero_det(M00)
 
   sz = 500
   V = zero_matrix(ZZ, sz,sz);
   for i in 1:sz  for j in 1:sz  V[i,j] = ZZ(j)^(i-1);  end;  end
-  @test !is_zero_det_probabilistic(V)
+  @test !is_probably_zero_det(V)
 
   V_reduced = mod(V, ZZ(499))
-  @test is_zero_det_probabilistic(V_reduced)
+  @test is_probably_zero_det(V_reduced)
 end
 
 @testset "ZZMatrix.hadamard" begin
