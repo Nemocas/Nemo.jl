@@ -1020,6 +1020,47 @@ function mod_sym!(a::ZZRingElem, b::ZZRingElem)
   return a
 end
 
+@doc raw"""
+    sym_mod!(z::ZZRingElem, a::ZZRingElem, b::ZZRingElem)
+
+Returns the signed remainder of $a$ mod $b$, that is the unique integer $x$ satisfying -$b$ < 2*$x$ <= $b$, possibly modifying the object $z$ in the process. See also Nemo.smod.
+
+# Examples
+
+```jldoctest
+julia> z = ZZ()
+0
+
+julia> sym_mod!(z, ZZ(12341), ZZ(312))
+-139
+
+julia> z
+-139
+
+```
+"""
+function sym_mod!(z::ZZRingElem, a::ZZRingElem, b::ZZRingElem)
+  @ccall libflint.fmpz_smod(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
+  return z
+end
+
+@doc raw"""
+    sym_mod!(a::ZZRingElem, b::ZZRingElem)
+
+Returns the signed remainder of $a$ mod $b$, that is the unique integer $x$ satisfying -$b$ < 2*$x$ <= $b$. See also Nemo.smod.
+
+# Examples
+
+```jldoctest
+julia> sym_mod!(ZZ(12341), ZZ(312))
+-139
+
+```
+"""
+function sym_mod!(a::ZZRingElem, b::ZZRingElem)
+  z = ZZRingElem()
+  return sym_mod!(z, a, b)
+end
 
 @doc raw"""
     powermod(x::ZZRingElem, p::ZZRingElem, m::ZZRingElem)
