@@ -1509,6 +1509,31 @@ function isqrt(x::ZZRingElem)
 end
 
 @doc raw"""
+    isqrt!(z::ZZRingElem, x::ZZRingElem)
+
+Return the floor of the square root of $x$, possibly modifying the object $z$ in the process.
+
+# Examples
+
+```jldoctest
+julia> z = ZZ()
+0
+
+julia> isqrt!(z, ZZ(13))
+3
+
+julia> z
+3
+
+```
+"""
+function isqrt!(z::ZZRingElem, x::ZZRingElem)
+  is_negative(x) && throw(DomainError(x, "Argument must be non-negative"))
+  @ccall libflint.fmpz_sqrt(z::Ref{ZZRingElem}, x::Ref{ZZRingElem})::Nothing
+  return z
+end
+
+@doc raw"""
     isqrtrem(x::ZZRingElem)
 
 Return a tuple $s, r$ consisting of the floor $s$ of the square root of $x$

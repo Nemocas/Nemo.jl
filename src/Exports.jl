@@ -385,6 +385,7 @@ export isinf
 export isinteger
 export isless
 export isqrt
+export isqrt!
 export isqrtrem
 export isreal
 export iszero
