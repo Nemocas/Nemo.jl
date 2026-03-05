@@ -1033,6 +1033,30 @@ function mod_sym!(z::ZZRingElem, a::ZZRingElem, b::ZZRingElem)
 end
 
 @doc raw"""
+    mod_sym!(a::ZZRingElem, b::ZZRingElem)
+
+Returns the signed remainder of $a$ mod $b$, that is the unique integer $x$ satisfying -$b$ < 2*$x$ <= $b$, possibly modifying the object $a$ in the process. See also Nemo.smod.
+This is a shorthand for mod_sym!(a, a, b).
+
+# Examples
+
+```jldoctest
+julia> a = ZZ(12341)
+12341
+
+julia> mod_sym!(a, ZZ(312))
+-139
+
+julia> a
+-139
+
+```
+"""
+function mod_sym!(a::ZZRingElem, b::ZZRingElem)
+  return mod_sym!(a, a, b)
+end
+
+@doc raw"""
     mod_sym(a::ZZRingElem, b::ZZRingElem)
 
 Returns the signed remainder of $a$ mod $b$, that is the unique integer $x$ satisfying -$b$ < 2*$x$ <= $b$. See also Nemo.smod.
