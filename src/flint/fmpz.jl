@@ -1045,19 +1045,19 @@ function sym_mod!(z::ZZRingElem, a::ZZRingElem, b::ZZRingElem)
 end
 
 @doc raw"""
-    sym_mod!(a::ZZRingElem, b::ZZRingElem)
+    sym_mod(a::ZZRingElem, b::ZZRingElem)
 
 Returns the signed remainder of $a$ mod $b$, that is the unique integer $x$ satisfying -$b$ < 2*$x$ <= $b$. See also Nemo.smod.
 
 # Examples
 
 ```jldoctest
-julia> sym_mod!(ZZ(12341), ZZ(312))
+julia> sym_mod(ZZ(12341), ZZ(312))
 -139
 
 ```
 """
-function sym_mod!(a::ZZRingElem, b::ZZRingElem)
+function sym_mod(a::ZZRingElem, b::ZZRingElem)
   z = ZZRingElem()
   return sym_mod!(z, a, b)
 end

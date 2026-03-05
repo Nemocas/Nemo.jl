@@ -604,6 +604,7 @@ export swap_rows!
 export swinnerton_dyer
 export symbols
 export SymmetricGroup
+export sym_mod
 export sym_mod!
 export tan
 export tanh
