@@ -1528,7 +1528,6 @@ julia> z
 ```
 """
 function isqrt!(z::ZZRingElem, x::ZZRingElem)
-  is_negative(x) && throw(DomainError(x, "Argument must be non-negative"))
   @ccall libflint.fmpz_sqrt(z::Ref{ZZRingElem}, x::Ref{ZZRingElem})::Nothing
   return z
 end
