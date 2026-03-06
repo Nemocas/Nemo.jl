@@ -508,6 +508,10 @@ function is_divisible_by(x::ZZRingElemOrPtr, y::Int)
   Bool(@ccall libflint.fmpz_divisible_si(x::Ref{ZZRingElem}, y::Int)::Cint)
 end
 
+function is_divisible_by(x::ZZRingElemOrPtr, y::UInt)
+  Bool(@ccall libflint.fmpz_divisible_si(x::Ref{ZZRingElem}, y::UInt)::Cint)
+end
+
 function is_divisible_by(x::Integer, y::ZZRingElem)
   return is_divisible_by(ZZRingElem(x), y)
 end
