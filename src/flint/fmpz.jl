@@ -1027,7 +1027,7 @@ julia> z
 
 ```
 """
-function mod_sym!(z::ZZRingElem, a::ZZRingElem, b::ZZRingElem)
+function mod_sym!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
   @ccall libflint.fmpz_smod(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
   return z
 end
