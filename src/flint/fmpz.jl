@@ -1033,7 +1033,7 @@ function mod_sym!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
 end
 
 @doc raw"""
-    mod_sym!(a::ZZRingElem, b::ZZRingElem)
+    mod_sym!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
 
 Returns the signed remainder of $a$ mod $b$, that is the unique integer $x$ satisfying -$b$ < 2*$x$ <= $b$, possibly modifying the object $a$ in the process. See also Nemo.smod.
 This is a shorthand for mod_sym!(a, a, b).
@@ -1052,7 +1052,7 @@ julia> a
 
 ```
 """
-function mod_sym!(a::ZZRingElem, b::ZZRingElem)
+function mod_sym!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
   return mod_sym!(a, a, b)
 end
 
