@@ -1535,7 +1535,6 @@ end
     isqrt!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr)
 
 Return the floor of the square root of $x$, possibly modifying the object $z$ in the process.
-Note that `isqrt!` does not perform a sanity check whether $x$ is non-negative.
 
 # Examples
 
