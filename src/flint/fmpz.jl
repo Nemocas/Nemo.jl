@@ -1009,7 +1009,7 @@ function mod(x::ZZRingElemOrPtr, c::UInt)
 end
 
 @doc raw"""
-    mod_sym!(z::ZZRingElem, a::ZZRingElem, b::ZZRingElem)
+    mod_sym!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
 
 Returns the signed remainder of $a$ mod $b$, that is the unique integer $x$ satisfying -$b$ < 2*$x$ <= $b$, possibly modifying the object $z$ in the process. See also Nemo.smod.
 
