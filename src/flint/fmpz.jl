@@ -1527,7 +1527,7 @@ julia> z
 
 ```
 """
-function isqrt!(z::ZZRingElem, x::ZZRingElem)
+function isqrt!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr)
   @ccall libflint.fmpz_sqrt(z::Ref{ZZRingElem}, x::Ref{ZZRingElem})::Nothing
   return z
 end
