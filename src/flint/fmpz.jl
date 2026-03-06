@@ -491,43 +491,21 @@ end
 divides(x::ZZRingElem, y::Integer) = divides(x, ZZRingElem(y))
 
 @doc raw"""
-    is_divisible_by(x::ZZRingElem, y::ZZRingElem)
+    is_divisible_by(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
 
 Return `true` if $x$ is divisible by $y$, otherwise return `false`.
 """
-function is_divisible_by(x::ZZRingElem, y::ZZRingElem)
-  if iszero(x)
-    return true
-  elseif iszero(y)
-    return false
-  elseif iseven(y) && isodd(x)
-    return false
-  elseif nbits(y) > nbits(x)
-    return false
-  else
-    flag, q = divides(x, y)
-    return flag
-  end
+function is_divisible_by(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+  Bool(@ccall libflint.fmpz_divisible(x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Cint)
 end
 
 @doc raw"""
-    is_divisible_by(x::ZZRingElem, y::ZZRingElem)
+    is_divisible_by(x::ZZRingElemOrPtr, y::Int)
 
 Return `true` if $x$ is divisible by $y$, otherwise return `false`.
 """
-function is_divisible_by(x::ZZRingElem, y::Integer)
-  if iszero(x)
-    return true
-  elseif iszero(y)
-    return false
-  elseif iseven(y) && isodd(x)
-    return false
-  elseif ndigits(y, base=2) > nbits(x)
-    return false
-  else
-    r = mod(x, y)
-    return r == 0
-  end
+function is_divisible_by(x::ZZRingElemOrPtr, y::Int)
+  Bool(@ccall libflint.fmpz_divisible_si(x::Ref{ZZRingElem}, y::Int)::Cint)
 end
 
 function is_divisible_by(x::Integer, y::ZZRingElem)
