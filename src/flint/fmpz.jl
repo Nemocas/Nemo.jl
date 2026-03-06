@@ -1011,7 +1011,8 @@ end
 @doc raw"""
     mod_sym!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
 
-Returns the signed remainder of $a$ mod $b$, that is the unique integer $x$ satisfying -$b$ < 2*$x$ <= $b$, possibly modifying the object $z$ in the process. See also Nemo.smod.
+Return the signed remainder of $a$ mod $b$, that is, the unique integer $x$ satisfying
+$-b < 2x \le b$, possibly modifying the object $z$ in the process.
 
 # Examples
 
@@ -1035,7 +1036,8 @@ end
 @doc raw"""
     mod_sym!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
 
-Returns the signed remainder of $a$ mod $b$, that is the unique integer $x$ satisfying -$b$ < 2*$x$ <= $b$, possibly modifying the object $a$ in the process. See also Nemo.smod.
+Return the signed remainder of $a$ mod $b$, that is, the unique integer $x$ satisfying
+$-b < 2x \le b$, possibly modifying the object $z$ in the process.
 This is a shorthand for mod_sym!(a, a, b).
 
 # Examples
@@ -1059,7 +1061,8 @@ end
 @doc raw"""
     mod_sym(a::ZZRingElem, b::ZZRingElem)
 
-Returns the signed remainder of $a$ mod $b$, that is the unique integer $x$ satisfying -$b$ < 2*$x$ <= $b$. See also Nemo.smod.
+Return the signed remainder of $a$ mod $b$, that is,
+the unique integer $x$ satisfying $-b < 2x \le b$.
 
 # Examples
 
