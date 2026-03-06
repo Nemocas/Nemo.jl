@@ -1508,6 +1508,30 @@ function isqrt(x::ZZRingElem)
 end
 
 @doc raw"""
+    isqrt!(x::ZZRingElemOrPtr)
+
+Return the floor of the square root of $x$, possibly modifying the object $x$ in the process.
+This is a shorthand for isqrt!(x, x).
+
+# Examples
+
+```jldoctest
+julia> a = ZZ(13)
+13
+
+julia> isqrt!(a)
+3
+
+julia> a
+3
+
+```
+"""
+function isqrt!(x::ZZRingElemOrPtr)
+  return isqrt!(x,x)
+end
+
+@doc raw"""
     isqrt!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr)
 
 Return the floor of the square root of $x$, possibly modifying the object $z$ in the process.
