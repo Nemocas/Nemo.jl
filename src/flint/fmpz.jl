@@ -1037,7 +1037,7 @@ end
     mod_sym!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
 
 Return the signed remainder of $a$ mod $b$, that is, the unique integer $x$ satisfying
-$-b < 2x \le b$, possibly modifying the object $z$ in the process.
+$-b < 2x \le b$, possibly modifying the object $a$ in the process.
 This is a shorthand for mod_sym!(a, a, b).
 
 # Examples
