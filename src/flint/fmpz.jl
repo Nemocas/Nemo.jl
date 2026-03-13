@@ -622,6 +622,75 @@ divexact(x::Integer, y::ZZRingElem; check::Bool=true) = divexact(ZZRingElem(x), 
 #
 ###############################################################################
 
+@doc raw"""
+    div(f::ZZRingElem, g::Int)
+
+Return the euclidean quotient of $f / g$ (truncation rounding).
+
+# Examples
+
+```jldoctest
+julia> div(ZZ(100), 7)
+14
+
+```
+"""
+function div(f::ZZRingElem, g::Int)
+  g == 0 && throw(DivideError())
+  z = ZZRingElem()
+  div!(z, f, g)
+end
+
+@doc raw"""
+    div!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+
+Return the euclidean quotient of $f / g$ (truncation rounding),
+possibly modifying the object $z$ in the process.
+
+# Examples
+
+```jldoctest
+julia> z = ZZ()
+0
+
+julia> div!(z, ZZ(100), 7)
+14
+
+julia> z
+14
+
+```
+"""
+function div!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+  @ccall libflint.fmpz_tdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
+  z
+end
+
+@doc raw"""
+    div!(f::ZZRingElemOrPtr, g::Int)
+
+Return the euclidean quotient of $f / g$ (truncation rounding),
+possibly modifying the object $f$ in the process.
+This is a shorthand for div!(f, f, g).
+
+# Examples
+
+```jldoctest
+julia> f = ZZ(100)
+100
+
+julia> div!(f, 7)
+14
+
+julia> f
+14
+
+```
+"""
+function div!(f::ZZRingElemOrPtr, g::Int)
+  div!(f, f, g)
+end
+
 function tdivpow2(x::ZZRingElem, c::Int)
   c < 0 && throw(DomainError(c, "Exponent must be non-negative"))
   z = ZZRingElem()
@@ -663,11 +732,7 @@ julia> tdiv(ZZ(100), 7)
 
 ```
 """
-function tdiv(f::ZZRingElem, g::Int)
-  g == 0 && throw(DivideError())
-  z = ZZRingElem()
-  tdiv!(z, f, g)
-end
+tdiv(f::ZZRingElem, g::Int) = div(f, g)
 
 @doc raw"""
     tdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
@@ -689,10 +754,7 @@ julia> z
 
 ```
 """
-function tdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
-  @ccall libflint.fmpz_tdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
-  z
-end
+tdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int) = div!(z, f, g)
 
 @doc raw"""
     tdiv!(f::ZZRingElemOrPtr, g::Int)
@@ -715,9 +777,7 @@ julia> f
 
 ```
 """
-function tdiv!(f::ZZRingElemOrPtr, g::Int)
-  tdiv!(f, f, g)
-end
+tdiv!(f::ZZRingElemOrPtr, g::Int) = tdiv!(f, f, g)
 
 @doc raw"""
     fdiv(f::ZZRingElem, g::Int)
