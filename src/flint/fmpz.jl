@@ -622,6 +622,75 @@ divexact(x::Integer, y::ZZRingElem; check::Bool=true) = divexact(ZZRingElem(x), 
 #
 ###############################################################################
 
+@doc raw"""
+    div(f::ZZRingElem, g::Int)
+
+Return the euclidean quotient of $f / g$ (truncation rounding).
+
+# Examples
+
+```jldoctest
+julia> div(ZZ(100), 7)
+14
+
+```
+"""
+function div(f::ZZRingElem, g::Int)
+  g == 0 && throw(DivideError())
+  z = ZZRingElem()
+  div!(z, f, g)
+end
+
+@doc raw"""
+    div!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+
+Return the euclidean quotient of $f / g$ (truncation rounding),
+possibly modifying the object $z$ in the process.
+
+# Examples
+
+```jldoctest
+julia> z = ZZ()
+0
+
+julia> div!(z, ZZ(100), 7)
+14
+
+julia> z
+14
+
+```
+"""
+function div!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+  @ccall libflint.fmpz_tdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
+  z
+end
+
+@doc raw"""
+    div!(f::ZZRingElemOrPtr, g::Int)
+
+Return the euclidean quotient of $f / g$ (truncation rounding),
+possibly modifying the object $f$ in the process.
+This is a shorthand for div!(f, f, g).
+
+# Examples
+
+```jldoctest
+julia> f = ZZ(100)
+100
+
+julia> div!(f, 7)
+14
+
+julia> f
+14
+
+```
+"""
+function div!(f::ZZRingElemOrPtr, g::Int)
+  div!(f, f, g)
+end
+
 function tdivpow2(x::ZZRingElem, c::Int)
   c < 0 && throw(DomainError(c, "Exponent must be non-negative"))
   z = ZZRingElem()
@@ -650,25 +719,202 @@ function cdivpow2(x::ZZRingElem, c::Int)
   return z
 end
 
-function tdiv(x::ZZRingElem, c::Int)
-  c == 0 && throw(DivideError())
+@doc raw"""
+    tdiv(f::ZZRingElem, g::Int)
+
+Return the euclidean quotient of $f / g$ (truncation rounding).
+
+# Examples
+
+```jldoctest
+julia> tdiv(ZZ(100), 7)
+14
+
+```
+"""
+tdiv(f::ZZRingElem, g::Int) = div(f, g)
+
+@doc raw"""
+    tdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+
+Return the euclidean quotient of $f / g$ (truncation rounding),
+possibly modifying the object $z$ in the process.
+
+# Examples
+
+```jldoctest
+julia> z = ZZ()
+0
+
+julia> tdiv!(z, ZZ(100), 7)
+14
+
+julia> z
+14
+
+```
+"""
+tdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int) = div!(z, f, g)
+
+@doc raw"""
+    tdiv!(f::ZZRingElemOrPtr, g::Int)
+
+Return the euclidean quotient of $f / g$ (truncation rounding),
+possibly modifying the object $f$ in the process.
+This is a shorthand for tdiv!(f, f, g).
+
+# Examples
+
+```jldoctest
+julia> f = ZZ(100)
+100
+
+julia> tdiv!(f, 7)
+14
+
+julia> f
+14
+
+```
+"""
+tdiv!(f::ZZRingElemOrPtr, g::Int) = tdiv!(f, f, g)
+
+@doc raw"""
+    fdiv(f::ZZRingElem, g::Int)
+
+Return the euclidean quotient of $f / g$ (floor rounding).
+
+# Examples
+
+```jldoctest
+julia> fdiv(ZZ(100), 7)
+14
+
+```
+"""
+function fdiv(f::ZZRingElem, g::Int)
+  g == 0 && throw(DivideError())
   z = ZZRingElem()
-  @ccall libflint.fmpz_tdiv_q_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, c::Int)::Nothing
-  return z
+  fdiv!(z, f, g)
 end
 
-function fdiv(x::ZZRingElem, c::Int)
-  c == 0 && throw(DivideError())
-  z = ZZRingElem()
-  @ccall libflint.fmpz_fdiv_q_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, c::Int)::Nothing
-  return z
+@doc raw"""
+    fdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+
+Return the euclidean quotient of $f / g$ (floor rounding),
+possibly modifying the object $z$ in the process.
+
+# Examples
+
+```jldoctest
+julia> z = ZZ()
+0
+
+julia> fdiv!(z, ZZ(100), 7)
+14
+
+julia> z
+14
+
+```
+"""
+function fdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+  @ccall libflint.fmpz_fdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
+  z
 end
 
-function cdiv(x::ZZRingElem, c::Int)
-  c == 0 && throw(DivideError())
+@doc raw"""
+    fdiv!(f::ZZRingElemOrPtr, g::Int)
+
+Return the euclidean quotient of $f / g$ (floor rounding),
+possibly modifying the object $f$ in the process.
+This is a shorthand for fdiv!(f, f, g).
+
+# Examples
+
+```jldoctest
+julia> f = ZZ(100)
+100
+
+julia> fdiv!(f, 7)
+14
+
+julia> f
+14
+
+```
+"""
+function fdiv!(f::ZZRingElemOrPtr, g::Int)
+  fdiv!(f, f, g)
+end
+
+@doc raw"""
+    cdiv(f::ZZRingElem, g::Int)
+
+Return the euclidean quotient of $f / g$ (ceil rounding).
+
+# Examples
+
+```jldoctest
+julia> cdiv(ZZ(100), 7)
+15
+
+```
+"""
+function cdiv(f::ZZRingElem, g::Int)
+  g == 0 && throw(DivideError())
   z = ZZRingElem()
-  @ccall libflint.fmpz_cdiv_q_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, c::Int)::Nothing
-  return z
+  cdiv!(z, f, g)
+end
+
+@doc raw"""
+    cdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+
+Return the euclidean quotient of $f / g$ (ceil rounding),
+possibly modifying the object $z$ in the process.
+
+# Examples
+
+```jldoctest
+julia> z = ZZ()
+0
+
+julia> cdiv!(z, ZZ(100), 7)
+15
+
+julia> z
+15
+
+```
+"""
+function cdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+  @ccall libflint.fmpz_cdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
+  z
+end
+
+@doc raw"""
+    cdiv!(f::ZZRingElemOrPtr, g::Int)
+
+Return the euclidean quotient of $f / g$ (ceil rounding),
+possibly modifying the object $f$ in the process.
+This is a shorthand for cdiv!(f, f, g).
+
+# Examples
+
+```jldoctest
+julia> f = ZZ(100)
+100
+
+julia> cdiv!(f, 7)
+15
+
+julia> f
+15
+
+```
+"""
+function cdiv!(f::ZZRingElemOrPtr, g::Int)
+  cdiv!(f, f, g)
 end
 
 rem(x::Integer, y::ZZRingElem) = rem(ZZRingElem(x), y)

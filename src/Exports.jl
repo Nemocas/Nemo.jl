@@ -63,6 +63,7 @@ export CalciumField
 export CalciumFieldElem
 export canonical_unit
 export cdiv
+export cdiv!
 export cdivpow2
 export cdivrem
 export ceil
@@ -190,6 +191,7 @@ export factor_shape
 export factor_squarefree
 export factorial
 export fdiv
+export fdiv!
 export fdivpow2
 export fdivrem
 export fibonacci
@@ -608,6 +610,7 @@ export tan
 export tanh
 export tanpi
 export tdiv
+export tdiv!
 export tdivpow2
 export tdivpow2!
 export tdivrem
