@@ -63,6 +63,7 @@ export CalciumField
 export CalciumFieldElem
 export canonical_unit
 export cdiv
+export cdiv!
 export cdivpow2
 export cdivrem
 export ceil

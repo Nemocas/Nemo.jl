@@ -667,8 +667,57 @@ end
 function cdiv(x::ZZRingElem, c::Int)
   c == 0 && throw(DivideError())
   z = ZZRingElem()
-  @ccall libflint.fmpz_cdiv_q_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, c::Int)::Nothing
-  return z
+  cdiv!(z, x, c)
+end
+
+@doc raw"""
+    cdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+
+Return the euclidean quotient of $f / g$ (ceil rounding),
+possibly modifying the object $z$ in the process.
+
+# Examples
+
+```jldoctest
+julia> z = ZZ()
+0
+
+julia> cdiv!(z, ZZ(100), 7)
+15
+
+julia> z
+15
+
+```
+"""
+function cdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+  @ccall libflint.fmpz_cdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
+  z
+end
+
+@doc raw"""
+    cdiv!(f::ZZRingElemOrPtr, g::Int)
+
+Return the euclidean quotient of $f / g$ (ceil rounding),
+possibly modifying the object $f$ in the process.
+This is a shorthand for cdiv!(f, f, g).
+
+# Examples
+
+```jldoctest
+julia> f = ZZ(100)
+100
+
+julia> cdiv!(f, 7)
+15
+
+julia> f
+15
+
+```
+"""
+function cdiv!(f::ZZRingElem, g::Int)
+  cdiv!(f, f, g)
 end
 
 rem(x::Integer, y::ZZRingElem) = rem(ZZRingElem(x), y)
