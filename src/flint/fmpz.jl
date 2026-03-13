@@ -664,6 +664,19 @@ function fdiv(x::ZZRingElem, c::Int)
   return z
 end
 
+@doc raw"""
+    cdiv(f::ZZRingElem, g::Int)
+
+Return the euclidean quotient of $f / g$ (ceil rounding).
+
+# Examples
+
+```jldoctest
+julia> cdiv(ZZ(100), 7)
+15
+
+```
+"""
 function cdiv(x::ZZRingElem, c::Int)
   c == 0 && throw(DivideError())
   z = ZZRingElem()
