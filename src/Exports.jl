@@ -609,6 +609,7 @@ export tan
 export tanh
 export tanpi
 export tdiv
+export tdiv!
 export tdivpow2
 export tdivpow2!
 export tdivrem
