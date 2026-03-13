@@ -191,6 +191,7 @@ export factor_shape
 export factor_squarefree
 export factorial
 export fdiv
+export fdiv!
 export fdivpow2
 export fdivrem
 export fibonacci
