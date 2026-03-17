@@ -63,8 +63,7 @@ ZZ(n::BigFloat)
 Coerce the given floating point number into the integer ring, assuming that it
 can be exactly represented as an integer.
 
-### Basic manipulation
-
+### [Basic manipulation](@id basic_manipulation_of_integers)
 ```@docs
 sign(::ZZRingElem)
 ```
@@ -84,6 +83,14 @@ denominator(::ZZRingElem)
 
 ```@docs
 numerator(::ZZRingElem)
+```
+
+```@docs
+set!(::ZZRingElemOrPtr, ::ZZRingElemOrPtr)
+```
+
+```@docs
+set!(::ZZRingElemOrPtr, ::Int)
 ```
 
 **Examples**

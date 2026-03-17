@@ -2495,11 +2495,70 @@ function neg!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
   return z
 end
 
+@doc raw"""
+    set!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
+
+Change `z` to be equal to `a` and return `z`.
+
+The command `set!(z, a)` has the same effect as `z = ZZ(a)`, however,
+`set!(z, a)` is allocation-free and, thus, usually faster than `z = ZZ(a)`.
+
+In contrast to `z = a`, the command `set!` copies the value of `a` instead
+of turning `z` into a new label of `a`.
+
+# Examples
+
+```jldoctest
+julia> a = ZZ(304)
+304
+
+julia> z = ZZ(936)
+936
+
+julia> set!(z, a)
+304
+
+julia> z += 3
+307
+
+julia> z, a
+(307, 304)
+
+```
+"""
 function set!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
   @ccall libflint.fmpz_set(z::Ref{ZZRingElem}, a::Ref{ZZRingElem})::Nothing
   return z
 end
 
+@doc raw"""
+    set!(z::ZZRingElemOrPtr, a::Int)
+
+Change `z` to be equal to the value of `a`, casted into a `ZZRingElem`, and return `z`.
+
+The command `set!(z, a)` has the same effect as `z = ZZ(a)`, however,
+`set!(z, a)` is allocation-free and, thus, usually faster than `z = ZZ(a)`.
+
+In contrast to `z = a`, the command `set!` copies the value of `a` and
+keeps `z` of type `ZZRingElem` instead of turning `z` into an `Int`.
+
+# Examples
+
+```jldoctest
+julia> z = ZZ(936)
+936
+
+julia> set!(z, 304)
+304
+
+julia> z
+304
+
+julia> typeof(z)
+ZZRingElem
+
+```
+"""
 function set!(z::ZZRingElemOrPtr, a::Int)
   @ccall libflint.fmpz_set_si(z::Ref{ZZRingElem}, a::Int)::Nothing
   return z
