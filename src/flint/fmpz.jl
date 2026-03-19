@@ -628,54 +628,7 @@ function div(f::ZZRingElem, g::Int)
   div!(z, f, g)
 end
 
-@doc raw"""
-    div!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
-
-Return the quotient of $f$ by $g$ via floor rounding, possibly modifying the
-object $z$ in the process.
-
-# Examples
-
-```jldoctest
-julia> z = ZZ()
-0
-
-julia> div!(z, ZZ(100), 7)
-14
-
-julia> z
-14
-```
-"""
-function div!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
-  # must match Nemo.div, which uses fdiv
-  @ccall libflint.fmpz_fdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
-  z
-end
-
-@doc raw"""
-    div!(f::ZZRingElemOrPtr, g::Int)
-
-Return the quotient of $f$ by $g$ via floor rounding, possibly modifying the
-object $z$ in the process, possibly modifying the object $f$ in the process.
-This is a shorthand for `div!(f, f, g)`.
-
-# Examples
-
-```jldoctest
-julia> f = ZZ(100)
-100
-
-julia> div!(f, 7)
-14
-
-julia> f
-14
-```
-"""
-function div!(f::ZZRingElemOrPtr, g::Int)
-  div!(f, f, g)
-end
+div!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int) = fdiv!(z, f, g)
 
 function tdivpow2(x::ZZRingElem, c::Int)
   c < 0 && throw(DomainError(c, "Exponent must be non-negative"))
