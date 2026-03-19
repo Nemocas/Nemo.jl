@@ -688,7 +688,7 @@ the object $z$ in the process.
 julia> z = ZZ()
 0
 
-julia> tdiv!(z, ZZ(100), 7)
+julia> z = tdiv!(z, ZZ(100), 7)
 14
 
 julia> z
@@ -712,7 +712,7 @@ the object $f$ in the process. This is a shorthand for `tdiv!(f, f, g)`.
 julia> f = ZZ(100)
 100
 
-julia> tdiv!(f, 7)
+julia> f = tdiv!(f, 7)
 14
 
 julia> f
@@ -752,7 +752,7 @@ object $z$ in the process.
 julia> z = ZZ()
 0
 
-julia> fdiv!(z, ZZ(100), 7)
+julia> z = fdiv!(z, ZZ(100), 7)
 14
 
 julia> z
@@ -776,7 +776,7 @@ object $f$ in the process. This is a shorthand for `fdiv!(f, f, g)`.
 julia> f = ZZ(100)
 100
 
-julia> fdiv!(f, 7)
+julia> f = fdiv!(f, 7)
 14
 
 julia> f
@@ -818,7 +818,7 @@ object $z$ in the process.
 julia> z = ZZ()
 0
 
-julia> cdiv!(z, ZZ(100), 7)
+julia> z = cdiv!(z, ZZ(100), 7)
 15
 
 julia> z
@@ -842,7 +842,7 @@ object $f$ in the process. This is a shorthand for `cdiv!(f, f, g)`.
 julia> f = ZZ(100)
 100
 
-julia> cdiv!(f, 7)
+julia> f = cdiv!(f, 7)
 15
 
 julia> f
