@@ -690,9 +690,6 @@ julia> z = ZZ()
 
 julia> z = tdiv!(z, ZZ(100), 7)
 14
-
-julia> z
-14
 ```
 """
 function tdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
@@ -713,9 +710,6 @@ julia> f = ZZ(100)
 100
 
 julia> f = tdiv!(f, 7)
-14
-
-julia> f
 14
 ```
 """
@@ -754,9 +748,6 @@ julia> z = ZZ()
 
 julia> z = fdiv!(z, ZZ(100), 7)
 14
-
-julia> z
-14
 ```
 """
 function fdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
@@ -778,10 +769,6 @@ julia> f = ZZ(100)
 
 julia> f = fdiv!(f, 7)
 14
-
-julia> f
-14
-
 ```
 """
 function fdiv!(f::ZZRingElemOrPtr, g::Int)
@@ -820,9 +807,6 @@ julia> z = ZZ()
 
 julia> z = cdiv!(z, ZZ(100), 7)
 15
-
-julia> z
-15
 ```
 """
 function cdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
@@ -843,9 +827,6 @@ julia> f = ZZ(100)
 100
 
 julia> f = cdiv!(f, 7)
-15
-
-julia> f
 15
 ```
 """
