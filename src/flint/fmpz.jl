@@ -2500,11 +2500,13 @@ end
 
 Change `z` to be equal to `a` and return `z`.
 
-The command `set!(z, a)` has the same effect as `z = ZZ(a)`, however,
-`set!(z, a)` is allocation-free and, thus, usually faster than `z = ZZ(a)`.
+The command `set!(z, a)` has the same effect as `z = ZZ(a)`,
+but `set!(z, a)` is usually faster. This is because the latter
+always allocates, whereas the former does not if `a` is small
+enough to fit in the pre-allocated space for `z`.
 
-In contrast to `z = a`, the command `set!` copies the value of `a` instead
-of turning `z` into a new label of `a`.
+In contrast to `z = a`, the command `set!` copies the value
+of `a` instead of turning `z` into a new label of `a`.
 
 # Examples
 
