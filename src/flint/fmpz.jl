@@ -2525,7 +2525,6 @@ julia> z += 3
 
 julia> z, a
 (307, 304)
-
 ```
 """
 function set!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
@@ -2536,7 +2535,7 @@ end
 @doc raw"""
     set!(z::ZZRingElemOrPtr, a::Int)
 
-Change `z` to be equal to the value of `a`, casted into a `ZZRingElem`, and return `z`.
+Change `z` to be equal to `a` and return `z`.
 
 The command `set!(z, a)` has the same effect as `z = ZZ(a)`, however,
 `set!(z, a)` is allocation-free and, thus, usually faster than `z = ZZ(a)`.
@@ -2558,7 +2557,6 @@ julia> z
 
 julia> typeof(z)
 ZZRingElem
-
 ```
 """
 function set!(z::ZZRingElemOrPtr, a::Int)
