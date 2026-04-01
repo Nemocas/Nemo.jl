@@ -610,6 +610,8 @@ function div(f::ZZRingElem, g::Int)
   div!(z, f, g)
 end
 
+div!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr) = fdiv!(z, f, g)
+
 div!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int) = fdiv!(z, f, g)
 
 function tdivpow2(x::ZZRingElem, c::Int)
@@ -659,6 +661,27 @@ function tdiv(f::ZZRingElem, g::Int)
 end
 
 @doc raw"""
+    tdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+
+Return the quotient of $f$ by $g$ via truncation rounding, possibly modifying
+the object $z$ in the process.
+
+# Examples
+
+```jldoctest
+julia> z = ZZ()
+0
+
+julia> z = tdiv!(z, ZZ(100), ZZ(7))
+14
+```
+"""
+function tdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_tdiv_q(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Ref{ZZRingElem})::Nothing
+  return z
+end
+
+@doc raw"""
     tdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
 
 Return the quotient of $f$ by $g$ via truncation rounding, possibly modifying
@@ -678,6 +701,24 @@ function tdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
   @ccall libflint.fmpz_tdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
   return z
 end
+
+@doc raw"""
+    tdiv!(f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+
+Return the quotient of $f$ by $g$ via truncation rounding, possibly modifying
+the object $f$ in the process. This is a shorthand for `tdiv!(f, f, g)`.
+
+# Examples
+
+```jldoctest
+julia> f = ZZ(100)
+100
+
+julia> f = tdiv!(f, ZZ(7))
+14
+```
+"""
+tdiv!(f::ZZRingElemOrPtr, g::ZZRingElemOrPtr) = tdiv!(f, f, g)
 
 @doc raw"""
     tdiv!(f::ZZRingElemOrPtr, g::Int)
@@ -717,6 +758,27 @@ function fdiv(f::ZZRingElem, g::Int)
 end
 
 @doc raw"""
+    fdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+
+Return the quotient of $f$ by $g$ via floor rounding, possibly modifying the
+object $z$ in the process.
+
+# Examples
+
+```jldoctest
+julia> z = ZZ()
+0
+
+julia> z = fdiv!(z, ZZ(100), ZZ(7))
+14
+```
+"""
+function fdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_fdiv_q(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Ref{ZZRingElem})::Nothing
+  return z
+end
+
+@doc raw"""
     fdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
 
 Return the quotient of $f$ by $g$ via floor rounding, possibly modifying the
@@ -735,6 +797,26 @@ julia> z = fdiv!(z, ZZ(100), 7)
 function fdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
   @ccall libflint.fmpz_fdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
   return z
+end
+
+@doc raw"""
+    fdiv!(f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+
+Return the quotient of $f$ by $g$ via floor rounding, possibly modifying the
+object $f$ in the process. This is a shorthand for `fdiv!(f, f, g)`.
+
+# Examples
+
+```jldoctest
+julia> f = ZZ(100)
+100
+
+julia> f = fdiv!(f, ZZ(7))
+14
+```
+"""
+function fdiv!(f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+  return fdiv!(f, f, g)
 end
 
 @doc raw"""
@@ -776,6 +858,27 @@ function cdiv(f::ZZRingElem, g::Int)
 end
 
 @doc raw"""
+    cdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+
+Return the quotient of $f$ by $g$ via ceil rounding, possibly modifying the
+object $z$ in the process.
+
+# Examples
+
+```jldoctest
+julia> z = ZZ()
+0
+
+julia> z = cdiv!(z, ZZ(100), ZZ(7))
+15
+```
+"""
+function cdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_cdiv_q(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Ref{ZZRingElem})::Nothing
+  return z
+end
+
+@doc raw"""
     cdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
 
 Return the quotient of $f$ by $g$ via ceil rounding, possibly modifying the
@@ -794,6 +897,26 @@ julia> z = cdiv!(z, ZZ(100), 7)
 function cdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
   @ccall libflint.fmpz_cdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
   return z
+end
+
+@doc raw"""
+    cdiv!(f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+
+Return the quotient of $f$ by $g$ via ceil rounding, possibly modifying the
+object $f$ in the process. This is a shorthand for `cdiv!(f, f, g)`.
+
+# Examples
+
+```jldoctest
+julia> f = ZZ(100)
+100
+
+julia> f = cdiv!(f, ZZ(7))
+15
+```
+"""
+function cdiv!(f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+  return cdiv!(f, f, g)
 end
 
 @doc raw"""
