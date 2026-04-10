@@ -562,47 +562,6 @@ end
 
 evaluate(a::QQMPolyRingElem, b::Vector{<:Union{ZZRingElem, Integer}}) = evaluate(a, QQFieldElem.(b))
 
-function evaluate(a::QQMPolyRingElem, vals::Vector{<:NCRingElement})
-  iszero(length(vals)) && error("need at least one value")
-  length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
-  R = base_ring(a)
-  # The best we can do here is to cache previously used powers of the values
-  # being substituted, as we cannot assume anything about the relative
-  # performance of powering vs multiplication. The function should not try
-  # to optimise computing new powers in any way.
-  # Note that this function accepts values in a non-commutative ring, so operations
-  # must be done in a certain order.
-  powers = [Dict{Int, Any}() for i in 1:length(vals)]
-  # First work out types of products
-  r = R()
-  c = zero(R)
-  U = Vector{Any}(undef, length(vals))
-  for j = 1:length(vals)
-    W = typeof(vals[j])
-    if ((W <: Integer && W != BigInt) ||
-        (W <: Rational && W != Rational{BigInt}))
-      c = c*zero(W)
-      U[j] = parent(c)
-    else
-      U[j] = parent(vals[j])
-      c = c*zero(parent(vals[j]))
-    end
-  end
-  for i = 1:length(a)
-    v = exponent_vector(a, i)
-    t = coeff(a, i)
-    for j = 1:length(vals)
-      exp = v[j]
-      if !haskey(powers[j], exp)
-        powers[j][exp] = (U[j](vals[j]))^exp
-      end
-      t = t*powers[j][exp]
-    end
-    r += t
-  end
-  return r
-end
-
 function evaluate(a::QQMPolyRingElem, bs::Vector{QQMPolyRingElem})
   @req allequal(map(parent, bs)) "parents do not match"
   R = parent(a)
