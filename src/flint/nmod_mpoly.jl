@@ -544,41 +544,38 @@ for (etype, rtype, ftype, ctype, utype) in (
     #
     ###############################################################################
 
-    function evaluate(a::($etype), b::Vector{$ctype})
-      length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
-      b2 = [d.data for d in b]
-      z = @ccall libflint.nmod_mpoly_evaluate_all_ui(a::Ref{($etype)}, b2::Ptr{UInt}, parent(a)::Ref{($rtype)})::UInt
-      return base_ring(parent(a))(z)
+    function evaluate(a::($etype), vals::Vector{$ctype})
+      R = parent(a)
+      @req length(vals) == nvars(R) "Number of variables does not match number of values"
+      vals2 = [val.data for val in vals]
+      z = @ccall libflint.nmod_mpoly_evaluate_all_ui(a::Ref{($etype)}, vals2::Ptr{UInt}, R::Ref{($rtype)})::UInt
+      return base_ring(R)(z)
     end
 
-    evaluate(a::($etype), b::Vector{<:IntegerUnion}) = evaluate(a, coefficient_ring(a).(b))
+    evaluate(a::($etype), vals::Vector{<:IntegerUnion}) = evaluate(a, coefficient_ring(a).(vals))
 
-    function evaluate(a::$(etype), bs::Vector{$etype})
-      @req allequal(map(parent, bs)) "parents do not match"
+    function evaluate(a::$(etype), vals::Vector{$etype})
       R = parent(a)
-      S = parent(bs[1])
+      @req length(vals) == nvars(R) "Number of variables does not match number of values"
+      @req allequal(map(parent, vals)) "Parents do not match"
+      S = parent(vals[1])
       @assert base_ring(R) === base_ring(S)
 
-      length(bs) != nvars(R) &&
-      error("Number of variables does not match number of values")
-
       c = S()
-      fl = @ccall libflint.nmod_mpoly_compose_nmod_mpoly(c::Ref{$etype}, a::Ref{$etype}, bs::Ptr{Ref{$etype}}, R::Ref{$rtype}, S::Ref{$rtype})::Cint
+      fl = @ccall libflint.nmod_mpoly_compose_nmod_mpoly(c::Ref{$etype}, a::Ref{$etype}, vals::Ptr{Ref{$etype}}, R::Ref{$rtype}, S::Ref{$rtype})::Cint
       fl == 0 && error("Something wrong in evaluation.")
       return c
     end
 
-    function evaluate(a::($etype), bs::Vector{$utype})
-      @req allequal(map(parent, bs)) "parents do not match"
+    function evaluate(a::($etype), vals::Vector{$utype})
       R = parent(a)
-      S = parent(bs[1])
+      @req length(vals) == nvars(R) "Number of variables does not match number of values"
+      @req allequal(map(parent, vals)) "Parents do not match"
+      S = parent(vals[1])
       @assert base_ring(R) === base_ring(S)
 
-      length(bs) != nvars(R) &&
-      error("Number of variables does not match number of values")
-
       c = S()
-      fl = @ccall libflint.nmod_mpoly_compose_nmod_poly(c::Ref{$utype}, a::Ref{$etype}, bs::Ptr{Ref{$utype}}, R::Ref{$rtype})::Cint
+      fl = @ccall libflint.nmod_mpoly_compose_nmod_poly(c::Ref{$utype}, a::Ref{$etype}, vals::Ptr{Ref{$utype}}, R::Ref{$rtype})::Cint
       fl == 0 && error("Something wrong in evaluation.")
       return c
     end

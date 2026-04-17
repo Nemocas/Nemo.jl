@@ -533,39 +533,36 @@ end
 #
 ###############################################################################
 
-function evaluate(a::ZZMPolyRingElem, b::Vector{ZZRingElem})
-  length(b) != nvars(parent(a)) && error("Number of variables does not match number of values")
+function evaluate(a::ZZMPolyRingElem, vals::Vector{ZZRingElem})
+  R = parent(a)
+  @req length(vals) == nvars(R) "Number of variables does not match number of values"
   z = ZZRingElem()
-  GC.@preserve b @ccall libflint.fmpz_mpoly_evaluate_all_fmpz(z::Ref{ZZRingElem}, a::Ref{ZZMPolyRingElem}, b::Ptr{ZZRingElem}, parent(a)::Ref{ZZMPolyRing})::Nothing
+  GC.@preserve vals @ccall libflint.fmpz_mpoly_evaluate_all_fmpz(z::Ref{ZZRingElem}, a::Ref{ZZMPolyRingElem}, vals::Ptr{ZZRingElem}, R::Ref{ZZMPolyRing})::Nothing
   return z
 end
 
-evaluate(a::ZZMPolyRingElem, b::Vector{<:Integer}) = evaluate(a, ZZRingElem.(b))
+evaluate(a::ZZMPolyRingElem, vals::Vector{<:Integer}) = evaluate(a, ZZRingElem.(vals))
 
-function evaluate(a::ZZMPolyRingElem, bs::Vector{ZZMPolyRingElem})
-  @req allequal(map(parent, bs)) "parents do not match"
+function evaluate(a::ZZMPolyRingElem, vals::Vector{ZZMPolyRingElem})
   R = parent(a)
-  S = parent(bs[1])
-
-  length(bs) != nvars(R) &&
-  error("Number of variables does not match number of values")
+  @req length(vals) == nvars(R) "Number of variables does not match number of values"
+  @req allequal(map(parent, vals)) "Parents do not match"
+  S = parent(vals[1])
 
   c = S()
-  fl = @ccall libflint.fmpz_mpoly_compose_fmpz_mpoly(c::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, bs::Ptr{Ref{ZZMPolyRingElem}}, R::Ref{ZZMPolyRing}, S::Ref{ZZMPolyRing})::Cint
+  fl = @ccall libflint.fmpz_mpoly_compose_fmpz_mpoly(c::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, vals::Ptr{Ref{ZZMPolyRingElem}}, R::Ref{ZZMPolyRing}, S::Ref{ZZMPolyRing})::Cint
   fl == 0 && error("Something wrong in evaluation.")
   return c
 end
 
-function evaluate(a::ZZMPolyRingElem, bs::Vector{ZZPolyRingElem})
-  @req allequal(map(parent, bs)) "parents do not match"
+function evaluate(a::ZZMPolyRingElem, vals::Vector{ZZPolyRingElem})
   R = parent(a)
-  S = parent(bs[1])
-
-  length(bs) != nvars(R) &&
-  error("Number of variables does not match number of values")
+  @req length(vals) == nvars(R) "Number of variables does not match number of values"
+  @req allequal(map(parent, vals)) "Parents do not match"
+  S = parent(vals[1])
 
   c = S()
-  fl = @ccall libflint.fmpz_mpoly_compose_fmpz_poly(c::Ref{ZZPolyRingElem}, a::Ref{ZZMPolyRingElem}, bs::Ptr{Ref{ZZPolyRingElem}}, R::Ref{ZZMPolyRing})::Cint
+  fl = @ccall libflint.fmpz_mpoly_compose_fmpz_poly(c::Ref{ZZPolyRingElem}, a::Ref{ZZMPolyRingElem}, vals::Ptr{Ref{ZZPolyRingElem}}, R::Ref{ZZMPolyRing})::Cint
   fl == 0 && error("Something wrong in evaluation.")
   return c
 end
