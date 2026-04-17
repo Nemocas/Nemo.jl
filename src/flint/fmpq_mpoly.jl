@@ -563,6 +563,7 @@ end
 evaluate(a::QQMPolyRingElem, vals::Vector{<:IntegerUnion}) = evaluate(a, QQFieldElem.(vals))
 
 function evaluate(a::QQMPolyRingElem, vals::Vector{QQMPolyRingElem})
+  @req !isempty(vals) "No values supplied"
   R = parent(a)
   @req length(vals) == nvars(R) "Number of variables does not match number of values"
   @req allequal(map(parent, vals)) "Parents do not match"
@@ -575,6 +576,7 @@ function evaluate(a::QQMPolyRingElem, vals::Vector{QQMPolyRingElem})
 end
 
 function evaluate(a::QQMPolyRingElem, vals::Vector{QQPolyRingElem})
+  @req !isempty(vals) "No values supplied"
   R = parent(a)
   @req length(vals) == nvars(R) "Number of variables does not match number of values"
   @req allequal(map(parent, vals)) "Parents do not match"

@@ -544,6 +544,7 @@ end
 evaluate(a::ZZMPolyRingElem, vals::Vector{<:Integer}) = evaluate(a, ZZRingElem.(vals))
 
 function evaluate(a::ZZMPolyRingElem, vals::Vector{ZZMPolyRingElem})
+  @req !isempty(vals) "No values supplied"
   R = parent(a)
   @req length(vals) == nvars(R) "Number of variables does not match number of values"
   @req allequal(map(parent, vals)) "Parents do not match"
@@ -556,6 +557,7 @@ function evaluate(a::ZZMPolyRingElem, vals::Vector{ZZMPolyRingElem})
 end
 
 function evaluate(a::ZZMPolyRingElem, vals::Vector{ZZPolyRingElem})
+  @req !isempty(vals) "No values supplied"
   R = parent(a)
   @req length(vals) == nvars(R) "Number of variables does not match number of values"
   @req allequal(map(parent, vals)) "Parents do not match"

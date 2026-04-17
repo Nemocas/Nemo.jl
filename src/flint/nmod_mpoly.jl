@@ -555,6 +555,7 @@ for (etype, rtype, ftype, ctype, utype) in (
     evaluate(a::($etype), vals::Vector{<:IntegerUnion}) = evaluate(a, coefficient_ring(a).(vals))
 
     function evaluate(a::$(etype), vals::Vector{$etype})
+      @req !isempty(vals) "No values supplied"
       R = parent(a)
       @req length(vals) == nvars(R) "Number of variables does not match number of values"
       @req allequal(map(parent, vals)) "Parents do not match"
@@ -567,6 +568,7 @@ for (etype, rtype, ftype, ctype, utype) in (
     end
 
     function evaluate(a::($etype), vals::Vector{$utype})
+      @req !isempty(vals) "No values supplied"
       R = parent(a)
       @req length(vals) == nvars(R) "Number of variables does not match number of values"
       @req allequal(map(parent, vals)) "Parents do not match"
