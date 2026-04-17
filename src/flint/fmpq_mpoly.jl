@@ -559,7 +559,7 @@ function evaluate(a::QQMPolyRingElem, b::Vector{QQFieldElem})
   return z
 end
 
-evaluate(a::QQMPolyRingElem, b::Vector{<:Union{ZZRingElem, Integer}}) = evaluate(a, QQFieldElem.(b))
+evaluate(a::QQMPolyRingElem, b::Vector{<:IntegerUnion}) = evaluate(a, QQFieldElem.(b))
 
 function evaluate(a::QQMPolyRingElem, bs::Vector{QQMPolyRingElem})
   @req allequal(map(parent, bs)) "parents do not match"

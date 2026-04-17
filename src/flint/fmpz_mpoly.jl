@@ -540,10 +540,7 @@ function evaluate(a::ZZMPolyRingElem, b::Vector{ZZRingElem})
   return z
 end
 
-function evaluate(a::ZZMPolyRingElem, b::Vector{<:Integer})
-  fmpz_vec = [ZZRingElem(s) for s in b]
-  return evaluate(a, fmpz_vec)
-end
+evaluate(a::ZZMPolyRingElem, b::Vector{<:Integer}) = evaluate(a, ZZRingElem.(b))
 
 function evaluate(a::ZZMPolyRingElem, bs::Vector{ZZMPolyRingElem})
   @req allequal(map(parent, bs)) "parents do not match"

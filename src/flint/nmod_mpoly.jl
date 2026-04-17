@@ -551,33 +551,7 @@ for (etype, rtype, ftype, ctype, utype) in (
       return base_ring(parent(a))(z)
     end
 
-    function evaluate(a::($etype), b::Vector{Int})
-      length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
-      R = base_ring(parent(a))
-      b2 = [R(d) for d in b]
-      return evaluate(a, b2)
-    end
-
-    function evaluate(a::($etype), b::Vector{T}) where T <: Integer
-      length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
-      R = base_ring(parent(a))
-      b2 = [R(d) for d in b]
-      return evaluate(a, b2)
-    end
-
-    function evaluate(a::($etype), b::Vector{ZZRingElem})
-      length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
-      R = base_ring(parent(a))
-      b2 = [R(d) for d in b]
-      return evaluate(a, b2)
-    end
-
-    function evaluate(a::($etype), b::Vector{UInt})
-      length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
-      R = base_ring(parent(a))
-      b2 = [R(d) for d in b]
-      return evaluate(a, b2)
-    end
+    evaluate(a::($etype), b::Vector{<:IntegerUnion}) = evaluate(a, coefficient_ring(a).(b))
 
     function evaluate(a::$(etype), bs::Vector{$etype})
       @req allequal(map(parent, bs)) "parents do not match"
@@ -593,7 +567,6 @@ for (etype, rtype, ftype, ctype, utype) in (
       fl == 0 && error("Something wrong in evaluation.")
       return c
     end
-
 
     function evaluate(a::($etype), bs::Vector{$utype})
       @req allequal(map(parent, bs)) "parents do not match"

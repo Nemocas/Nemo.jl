@@ -504,12 +504,7 @@ function evaluate(a::fqPolyRepMPolyRingElem, b::Vector{fqPolyRepFieldElem})
   return z
 end
 
-function evaluate(a::fqPolyRepMPolyRingElem, b::Vector{T}) where T <: IntegerUnion
-  length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
-  R = base_ring(parent(a))
-  b2 = [R(d) for d in b]
-  return evaluate(a, b2)
-end
+evaluate(a::fqPolyRepMPolyRingElem, b::Vector{<:IntegerUnion}) = evaluate(a, coefficient_ring(a).(b))
 
 function evaluate(a::fqPolyRepMPolyRingElem, bs::Vector{fqPolyRepMPolyRingElem})
   @req allequal(map(parent, bs)) "parents do not match"
