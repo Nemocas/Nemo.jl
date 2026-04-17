@@ -534,7 +534,6 @@ end
 ###############################################################################
 
 function evaluate(a::ZZMPolyRingElem, b::Vector{ZZRingElem})
-  iszero(length(b)) && error("need at least one value")
   length(b) != nvars(parent(a)) && error("Number of variables does not match number of values")
   z = ZZRingElem()
   GC.@preserve b @ccall libflint.fmpz_mpoly_evaluate_all_fmpz(z::Ref{ZZRingElem}, a::Ref{ZZMPolyRingElem}, b::Ptr{ZZRingElem}, parent(a)::Ref{ZZMPolyRing})::Nothing

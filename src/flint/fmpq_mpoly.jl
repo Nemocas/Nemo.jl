@@ -553,7 +553,6 @@ end
 ###############################################################################
 
 function evaluate(a::QQMPolyRingElem, b::Vector{QQFieldElem})
-  iszero(length(b)) && error("need at least one value")
   length(b) != nvars(parent(a)) && error("Number of variables does not match number of values")
   z = QQFieldElem()
   GC.@preserve b @ccall libflint.fmpq_mpoly_evaluate_all_fmpq(z::Ref{QQFieldElem}, a::Ref{QQMPolyRingElem}, b::Ptr{QQFieldElem}, parent(a)::Ref{QQMPolyRing})::Nothing
