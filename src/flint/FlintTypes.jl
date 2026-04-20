@@ -1123,6 +1123,7 @@ mutable struct ZZMPolyRingElem <: MPolyRingElem{ZZRingElem}
   end
 
   function ZZMPolyRingElem(ctx::ZZMPolyRing, a::Vector{ZZRingElem}, b::Vector{Vector{Int}})
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.fmpz_mpoly_init2(z::Ref{ZZMPolyRingElem}, length(a)::Int, ctx::Ref{ZZMPolyRing})::Nothing
     z.parent = ctx
@@ -1138,6 +1139,7 @@ mutable struct ZZMPolyRingElem <: MPolyRingElem{ZZRingElem}
   end
 
   function ZZMPolyRingElem(ctx::ZZMPolyRing, a::Vector{ZZRingElem}, b::Vector{Vector{ZZRingElem}})
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.fmpz_mpoly_init2(z::Ref{ZZMPolyRingElem}, length(a)::Int, ctx::Ref{ZZMPolyRing})::Nothing
     z.parent = ctx
@@ -1252,6 +1254,7 @@ mutable struct QQMPolyRingElem <: MPolyRingElem{QQFieldElem}
   end
 
   function QQMPolyRingElem(ctx::QQMPolyRing, a::Vector{QQFieldElem}, b::Vector{Vector{Int}})
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.fmpq_mpoly_init2(z::Ref{QQMPolyRingElem}, length(a)::Int, ctx::Ref{QQMPolyRing})::Nothing
     z.parent = ctx
@@ -1267,6 +1270,7 @@ mutable struct QQMPolyRingElem <: MPolyRingElem{QQFieldElem}
   end
 
   function QQMPolyRingElem(ctx::QQMPolyRing, a::Vector{QQFieldElem}, b::Vector{Vector{ZZRingElem}})
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.fmpq_mpoly_init2(z::Ref{QQMPolyRingElem}, length(a)::Int, ctx::Ref{QQMPolyRing})::Nothing
     z.parent = ctx
@@ -1390,6 +1394,7 @@ mutable struct zzModMPolyRingElem <: MPolyRingElem{zzModRingElem}
   end
 
   function zzModMPolyRingElem(ctx::zzModMPolyRing, a::Vector{zzModRingElem}, b::Vector{Vector{Int}})
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.nmod_mpoly_init2(z::Ref{zzModMPolyRingElem}, length(a)::Int, ctx::Ref{zzModMPolyRing})::Nothing
     z.parent = ctx
@@ -1405,6 +1410,7 @@ mutable struct zzModMPolyRingElem <: MPolyRingElem{zzModRingElem}
   end
 
   function zzModMPolyRingElem(ctx::zzModMPolyRing, a::Vector{zzModRingElem}, b::Vector{Vector{ZZRingElem}})
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.nmod_mpoly_init2(z::Ref{zzModMPolyRingElem}, length(a)::Int, ctx::Ref{zzModMPolyRing})::Nothing
     z.parent = ctx
@@ -1533,6 +1539,7 @@ mutable struct fpMPolyRingElem <: MPolyRingElem{fpFieldElem}
   end
 
   function fpMPolyRingElem(ctx::fpMPolyRing, a::Vector{fpFieldElem}, b::Vector{Vector{Int}})
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.nmod_mpoly_init2(z::Ref{fpMPolyRingElem}, length(a)::Int, ctx::Ref{fpMPolyRing})::Nothing
     z.parent = ctx
@@ -1548,6 +1555,7 @@ mutable struct fpMPolyRingElem <: MPolyRingElem{fpFieldElem}
   end
 
   function fpMPolyRingElem(ctx::fpMPolyRing, a::Vector{fpFieldElem}, b::Vector{Vector{ZZRingElem}})
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.nmod_mpoly_init2(z::Ref{fpMPolyRingElem}, length(a)::Int, ctx::Ref{fpMPolyRing})::Nothing
     z.parent = ctx
@@ -1668,6 +1676,7 @@ mutable struct FpMPolyRingElem <: MPolyRingElem{FpFieldElem}
   end
 
   function FpMPolyRingElem(ctx::FpMPolyRing, a::Vector{FpFieldElem}, b::Vector{Vector{T}}) where T <: Union{UInt, Int, ZZRingElem}
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.fmpz_mod_mpoly_init2(z::Ref{FpMPolyRingElem}, length(a)::Int, ctx::Ref{FpMPolyRing})::Nothing
     z.parent = ctx
