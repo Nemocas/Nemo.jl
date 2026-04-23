@@ -111,7 +111,10 @@ end
 
 iszero(a::ZZMatrix) = @ccall libflint.fmpz_mat_is_zero(a::Ref{ZZMatrix})::Bool
 
-isone(a::ZZMatrix) = @ccall libflint.fmpz_mat_is_one(a::Ref{ZZMatrix})::Bool
+function isone(a::ZZMatrix)
+  is_square(a) || return false
+  return @ccall libflint.fmpz_mat_is_one(a::Ref{ZZMatrix})::Bool
+end
 
 @inline function is_zero_entry(A::ZZMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(A, i, j)
