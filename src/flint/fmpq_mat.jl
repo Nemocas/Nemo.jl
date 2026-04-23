@@ -94,7 +94,10 @@ number_of_columns(a::QQMatrix) = a.c
 
 iszero(a::QQMatrix) = @ccall libflint.fmpq_mat_is_zero(a::Ref{QQMatrix})::Bool
 
-isone(a::QQMatrix) = @ccall libflint.fmpq_mat_is_one(a::Ref{QQMatrix})::Bool
+function isone(a::QQMatrix)
+  is_square(a) || return false
+  return @ccall libflint.fmpq_mat_is_one(a::Ref{QQMatrix})::Bool
+end
 
 @inline function is_zero_entry(A::QQMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(A, i, j)
