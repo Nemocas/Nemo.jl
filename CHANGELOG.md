@@ -9,6 +9,25 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.54.2](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.54.2) - 2026-04-24
+
+### New or extended functionality
+
+- [#2268](https://github.com/Nemocas/Nemo.jl/pull/2268) Add `isqrt!` for inplace floor square roots
+- [#2269](https://github.com/Nemocas/Nemo.jl/pull/2269) Add allocation-free signed remainder `mod_sym!`
+- [#2272](https://github.com/Nemocas/Nemo.jl/pull/2272) Add inplace operations for / improved performance of `div, cdiv, tdiv, fdiv` with inputs of the form `(ZZRingElem, Int)`
+
+### Performance improvements or improved testing
+
+- [#2270](https://github.com/Nemocas/Nemo.jl/pull/2270) Improve performance of `is_divisible_by`
+
+### Fixed bugs that returned incorrect results
+
+- [#2249](https://github.com/Nemocas/Nemo.jl/pull/2249) Fix `gcd`/`lcm` of a singleton ZZ vector to be non-negative
+- [#2252](https://github.com/Nemocas/Nemo.jl/pull/2252) Fix `is_maxreal_type` for number fields
+- [#2277](https://github.com/Nemocas/Nemo.jl/pull/2277) Fix MPoly constructors to enforce exponents being nonnegative
+- [#2278](https://github.com/Nemocas/Nemo.jl/pull/2278) Unify behavior of `isone` for truncated identity matrices
+
 ## [0.54.1](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.54.1) - 2026-01-28
 
 ### Fixed bugs
