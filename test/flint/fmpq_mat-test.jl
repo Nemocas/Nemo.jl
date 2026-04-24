@@ -520,6 +520,12 @@ end
   @test det(A) == 27
 end
 
+@testset "QQMatrix.is_probably_zero_det" begin
+  sz = 250
+  M = matrix(QQ, sz,sz, (x->1//x).(1:sz*sz))
+  @time !is_probably_zero_det(M)
+end
+
 @testset "QQMatrix.hilbert" begin
   S = matrix_space(QQ, 4, 4)
 
