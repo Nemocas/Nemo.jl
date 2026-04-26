@@ -840,10 +840,19 @@ end
 @doc raw"""
     qadic_field(p::Integer, d::Int, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
     qadic_field(p::ZZRingElem, d::Int, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
+    qadic_field(f::ZZModPolyRingElem, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
+    qadic_field(f::FpPolyRingElem, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
+    qadic_field(f::zzModPolyRingElem, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
+    qadic_field(f::fpPolyRingElem, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
+    qadic_field(f::FqPolyRingElem, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
 
 Return an unramified extension $K$ of degree $d$ of a $p$-adic field for the given
 prime $p$.
 The generator of $K$ is printed as `var`.
+
+If a polynomial $f \in \mathbf{F}_p[X]$ is given instead, the unramified extension
+$K = \mathbf{Q}_p[X]/(f)$ defined by $f$ is returned. The polynomial $f$ must be
+irreducible.
 
 The default absolute precision of elements of $K$ may be set with `precision`.
 
@@ -859,18 +868,43 @@ function qadic_field(p::ZZRingElem, d::Int, var::String = "a"; precision::Int=64
   return QadicField(p, d, precision, var; cached=cached, check=check)
 end
 
+function qadic_field(f::T, var::String = "a";
+                     precision::Int = 64, cached::Bool = true, check::Bool = true
+                    ) where T <: Union{ZZModPolyRingElem,FpPolyRingElem,zzModPolyRingElem,fpPolyRingElem}
+  return QadicField(f, precision, var; cached=cached, check=check)
+end
+
+# The qadic_field(::FqPolyRingElem, ...) overload lives in
+# flint/fq_default_poly.jl, since FqPolyRingElem is not yet defined here.
+
 @doc raw"""
     unramified_extension(Qp::PadicField, d::Int, var::String = "a"; precision::Int=64, cached::Bool=true)
+    unramified_extension(Qp::PadicField, f::ZZModPolyRingElem, var::String = "a"; precision::Int=precision(Qp), cached::Bool=true, check::Bool=true)
+    unramified_extension(Qp::PadicField, f::FpPolyRingElem, var::String = "a"; precision::Int=precision(Qp), cached::Bool=true, check::Bool=true)
+    unramified_extension(Qp::PadicField, f::zzModPolyRingElem, var::String = "a"; precision::Int=precision(Qp), cached::Bool=true, check::Bool=true)
+    unramified_extension(Qp::PadicField, f::fpPolyRingElem, var::String = "a"; precision::Int=precision(Qp), cached::Bool=true, check::Bool=true)
+    unramified_extension(Qp::PadicField, f::FqPolyRingElem, var::String = "a"; precision::Int=precision(Qp), cached::Bool=true, check::Bool=true)
 
 Return an unramified extension $K$ of degree $d$ of the given $p$-adic field `Qp`.
 The generator of $K$ is printed as `var`.
 
+If a polynomial $f$ over the residue field of `Qp` is provided, the unramified
+extension defined by $f$ is returned; $f$ must be irreducible.
+
 The default absolute precision of elements of $K$ may be set with `precision`.
 """
 function unramified_extension(K::PadicField, d::Int, var::String = "a"; precision::Int=precision(K), cached::Bool = true)
-  L, a = QadicField(prime(K), d, precision, var, cached = cached, check = false, base_field = K)
-  return L, a
+  return QadicField(prime(K), d, precision, var, cached = cached, check = false, base_field = K)
 end
+
+function unramified_extension(K::PadicField, f::T, var::String = "a";
+                              precision::Int = precision(K), cached::Bool = true, check::Bool = true
+                             ) where T <: Union{ZZModPolyRingElem,FpPolyRingElem,zzModPolyRingElem,fpPolyRingElem}
+  return QadicField(f, precision, var; cached = cached, check = check, base_field = K)
+end
+
+# The unramified_extension(::PadicField, ::FqPolyRingElem, ...) overload lives
+# in flint/fq_default_poly.jl, since FqPolyRingElem is not yet defined here.
 
 ###############################################################################
 #
