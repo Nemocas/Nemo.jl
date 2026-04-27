@@ -2533,33 +2533,6 @@ function set!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
   return z
 end
 
-@doc raw"""
-    set!(z::ZZRingElemOrPtr, a::Int)
-
-Change `z` to be equal to `a` and return `z`.
-
-The command `set!(z, a)` has the same effect as `z = ZZ(a)`, however,
-`set!(z, a)` is allocation-free and, thus, usually faster than `z = ZZ(a)`.
-
-In contrast to `z = a`, the command `set!` copies the value of `a` and
-keeps `z` of type `ZZRingElem` instead of turning `z` into an `Int`.
-
-# Examples
-
-```jldoctest
-julia> z = ZZ(936)
-936
-
-julia> set!(z, 304)
-304
-
-julia> z
-304
-
-julia> typeof(z)
-ZZRingElem
-```
-"""
 function set!(z::ZZRingElemOrPtr, a::Int)
   @ccall libflint.fmpz_set_si(z::Ref{ZZRingElem}, a::Int)::Nothing
   return z
