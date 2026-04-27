@@ -2514,20 +2514,39 @@ other variable references the same object as `z`.
 # Examples
 
 ```jldoctest
-julia> a = ZZ(304)
-304
-
-julia> z = ZZ(936)
+julia> a = ZZ(304); z = ZZ(936); x = z
 936
 
 julia> set!(z, a)
 304
 
-julia> z += 3
-307
+julia> add!(z, 123)
+427
 
-julia> z, a
-(307, 304)
+julia> (a, x, z)
+(304, 427, 427)
+
+julia> x === z
+true
+
+julia> A = zeros(ZZRingElem, 2, 2) # All entries of `A` point to the same object.
+2×2 Matrix{ZZRingElem}:
+ 0  0
+ 0  0
+
+julia> A[1,1] = ZZ(5) # Create a new object and let `A[1,1]` point to it.
+5
+
+julia> set!(A[1,1], 8) # So, changing `A[1,1]` using `set!` does not change the other entries of `A`.
+8
+
+julia> set!(A[1,2], 3) # The other three matrix entries are still pointing to the same object. Changing one of them using `set!` changes all of them.
+3
+
+julia> A
+2×2 Matrix{ZZRingElem}:
+ 8  3
+ 3  3
 ```
 """
 function set!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
