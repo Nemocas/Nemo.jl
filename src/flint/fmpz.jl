@@ -2497,6 +2497,7 @@ end
 
 @doc raw"""
     set!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
+    set!(z::ZZRingElemOrPtr, a::Integer)
 
 Change `z` to be equal to `a` and return `z`.
 
