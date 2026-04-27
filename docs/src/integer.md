@@ -86,13 +86,8 @@ numerator(::ZZRingElem)
 ```
 
 ```@docs
-set!(::ZZRingElemOrPtr, ::ZZRingElemOrPtr)
+set!(::ZZRingElemOrPtr, ::Integer)
 ```
-
-```@docs
-set!(::ZZRingElemOrPtr, ::Int)
-```
-
 **Examples**
 
 ```jldoctest
