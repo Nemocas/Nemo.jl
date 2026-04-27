@@ -86,7 +86,7 @@ numerator(::ZZRingElem)
 ```
 
 ```@docs
-set!(::ZZRingElemOrPtr, ::Integer)
+set!(::ZZRingElemOrPtr, ::ZZRingElemOrPtr)
 ```
 **Examples**
 
