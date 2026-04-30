@@ -990,3 +990,318 @@ function _to_base!(a::ZZMatrix, _b::ZZRingElem)
   return a
 end
 
+##################################################################
+## New function for computing determinant of non-singular ZZMatrix
+##################################################################
+
+# !!! THIS CODE IS STILL EXPERIMENTAL !!!
+# export det_hcol_hnf  # good if the matrix has large size and many non-trivial Smith invariant factors
+
+# Original version by Suri
+# 2025-06  MANY revisions by John Abbott
+# 2025-12  extended polishing by John Abbott
+
+add_verbosity_scope(:det)  # levels 1 and 2
+
+#######################################################
+# (hcol is an auxiliary algorithm - not suitable for public consumption)
+# SOURCE: Pauderis+Storjohann (Proc ISSAC 2013)  Section 2 in
+# "Computing the Invariant Structure of Integer Matrices: Fast Algorithms into Practice"
+#
+# Triangular denominator:
+# input is a ZZMatrix A and positive denominator d such that
+# there are integer column matrices b and x with A*x = d*b
+# and gcd(d, gcd(x)) = 1.
+# NOTE: mod(,) seems to return least-non-negative remainder
+function hcol(A::ZZMatrix, d::ZZRingElem)
+  @req  (d > 0)  "Common denominator must be positive"
+  @req  (ncols(A) == 1)  "Must be a single column"
+  n = nrows(A)
+  w = deepcopy(A)
+  g = d
+  t = Array(ZZ,n)
+  h = zero_matrix(ZZ,n,n)
+  for i = 1:n
+    k = n-(i-1)
+    gg,_,f = gcdx(g,A[k,1])  # have gg > 0
+    t[k] = f
+    h[k,k] = divexact(g,gg)
+    g = gg
+  end
+  for i = 1:n
+    if h[i,i] == 1
+      continue
+    end
+    for k = 1:i-1
+      h[k,i] = mod(-t[i]*w[k,1], h[i,i])    # result of mod is >= 0
+      w[k,1] = mod(w[k,1]+h[k,i]*w[i,1], d) # result of mod is >= 0
+    end
+    w[i,1] *= h[i,i]
+    divexact!(d,h[i,i])
+    divexact!(w,h[i,i])
+  end
+  return h
+end
+
+
+
+##################################################################
+## Functions for computing the determinant
+##################################################################
+
+
+# This is a direct implementation of the algorithm in Section 3 of
+# Pauderis+Storjohann (Proc ISSAC 2013) mentioned above.
+# This method works well for matrices with uniform random entries
+# and having only a few non-trivial Smith invariant factors.
+# Result is ABSOLUTE VALUE OF DETERMINANT
+function det_PauderisStorjohann(A::ZZMatrix, U::AbstractArray= -100:100)
+  n = ncols(A)
+  DetFactor = ZZ(1)
+  while true
+    b = rand(matrix_space(ZZ,n,1),U); 
+    @vprintln(:det,1,"Solving random lin sys using dixon method");
+    @vtime :det 2  s,d = Nemo.dixon_solve(A,b)
+    if d == 1
+      @vprintln(:det,1,"DOING is_unimodular");
+      @vtime :det 2  fl = is_unimodular(A)
+      if fl
+        return DetFactor; # SIGN MIGHT BE WRONG
+      end
+      @vprintln(:det,1,"*** NOT UNIMODULAR ***");  # extremely unlikely to reach here
+    else
+      @vprintln(:det,1,"Doing HCOL reduction");
+      T1 = hcol(s, d)  
+      det_fac_from_hcol = prod_diagonal(T1);
+      new_mat = AbstractAlgebra._solve_triu_left(T1,A)
+      @vprintln(:det,1,"orig_mat biggest entry: $(nbits(maximum(abs,A)))");
+      A = new_mat;
+      @vprintln(:det,1,"reduced mat: biggest entry: $(nbits(maximum(abs,A)))");
+      @vprintln(:det,1,"revised Hadamard bound bitsize $(nbits(hadamard_bound2(new_mat)))");
+      DetFactor *= det_fac_from_hcol;
+    end
+  end
+end
+
+
+#######################################################
+# A new algorithm for computing the non-zero determinant of a general,
+# "unstructured"  dense ZZ matrix.  It is better than
+# det_PauderisStorjohann when there are "many" non-trivial
+# Smith invariant factors.
+# kwarg solver is to choose the linear system solver for
+# solving random linear systems (:JOHN not yet available).
+function det_hcol_hnf(A::ZZMatrix, U::AbstractArray= -100:100; solver=:NEMO_DIXON)
+(solver in [:NEMO_DIXON, :JOHN, :OSCAR]) || error("solver must be one of NEMO_DIXON, JOHN, OSCAR");
+  n = ncols(A)
+  Hrow = hadamard_bound2(A);
+  Hcol = hadamard_bound2(transpose(A));
+  if (Hrow == 0 || Hcol == 0)
+    return ZZ(0);
+  end
+  Hbits = div(1+min(nbits(Hrow), nbits(Hcol)),2);
+  @vprintln(:det,1,"Hadamard bound in bits $(Hbits)");
+  entry_size = maximum(nbits, A);
+  @vprintln(:det,1,"entry_size = $(entry_size)");
+  HNF_UPB_BITS = max(60, round(Int, 0.5*Hbits/sqrt(n))); # !!needs reconsideration!!
+  @vprintln(:det,1,"HNF_UPB_BITS = $(HNF_UPB_BITS)");
+  # Compute det mod M -- may later include some more primes
+  CRT_BITSIZE = min(Hbits, 110);
+  @vprintln(:det,1,"Computing det by crt up to about $(CRT_BITSIZE) bits");
+  p::Int = 2^59; # start point of primes
+  M = ZZ(1);  det_mod_m = ZZ(0);
+  iter_count = 0
+  while nbits(M) < CRT_BITSIZE
+    iter_count += 1
+    (iter_count%10 == 0) && @vprint(:det,1,".");
+    p = next_prime(p)
+    ZZmodP = Nemo.Native.GF(p)
+    det_mod_p = lift(det(map_entries(ZZmodP, A))) # symmetric lift?  handle 0 specially?
+    # if det_mod_p == 0
+    #   ## THIS BLOCK SHOULD PROBABLY BE IN AN AUX FN
+    #   rk = rref!(A_mod_p)  # can we use the rank at all?
+    #   H = lift(A_mod_p)
+    #   det_fac_from_hnf = ZZ(p)^rk;
+    #   HH = parent(H)(p);  # p times identity matrix
+    #   PivotCol = 1;
+    #   for i in 1:n
+    #     while PivotCol <= n && H[i, PivotCol] == 0
+    #       PivotCol += 1;
+    #     end
+    #     if PivotCol == n  break; end;
+    #     for j in PivotCol:n
+    #       HH[PivotCol,j] = H[i,j];
+    #     end;
+    #   end
+    #   # HH is now p-modular HNF of A
+    #   A = Strassen_Claus.solve_triu_left(HH,A)
+    #   DetFactor *= det_fac_from_hnf
+    #   det_mod_m /= det_fac_from_hnf  # modulo m ???????
+    #   continue
+    # end
+    det_mod_m = crt(det_mod_m,M, det_mod_p,ZZ(p))
+    M *= p
+  end
+  # ensure the modular det is as symmetric repr
+  if 2*det_mod_m > M
+    det_mod_m -= M
+  end
+  
+  CRT_climb_threshold = 5*Int(floor(Hbits/sqrt(n)))    # constant 5 is empirical (on my computer)
+  DetFactor = ZZ(1)
+  ZZmodM,_ = residue_ring(ZZ,M);
+  #main loop
+  IterCounter = 0;
+  HCOL_IterCounter = 0;  HCOL_bits_gained = 0;
+  while true
+    @vprintln(:det,1,"----- Main loop -----");
+    if abs(det_mod_m) == 1
+      @vprintln(:det,1,"Doing is_unimodular");
+      @vtime :det 2  fl = Nemo._is_unimodular_given_det_mod_m(A, Int(det_mod_m), M)
+      if fl
+        return DetFactor*det_mod_m
+      end
+      @assert  false && "How did I get here? (possible but *very* unlikely)"
+      # NYI wasn't unimodular so ADD ANOTHER MODULUS ???
+    end
+    @vprintln(:det,1,"bitsize ModularDet=$(nbits(det_mod_m))    bitsize M=$(nbits(M))");
+    if nbits(abs(det_mod_m)) < nbits(M)-30  &&  nbits(abs(det_mod_m)) < HNF_UPB_BITS
+      @vprintln(:det,1,"HNF because ModularDet is below threshold");
+      @vtime :det 2  H = hnf_modular_eldiv(A, abs(det_mod_m))
+      det_fac_from_hnf = prod_diagonal(H)
+      @vprintln(:det,1,"  det_fac_from_hnf (bits) = $(nbits(det_fac_from_hnf))");
+      if det_fac_from_hnf > 1
+        @vprintln(:det,2,"  [HNF] About to solve triangular system")
+#SLOWER THAN solve          @vtime :det 2   new_mat = AbstractAlgebra._solve_triu_left(H,A)
+        @vtime :det 2  new_mat = solve(H,A;side=:left);
+##SLOW        @vtime :det 2  junk = Nemo.dixon_solve(H,A;side=:left);
+#        new_mat2 = map_entries(ZZ, A*inv(map_entries(QQ,H)))  # USE triangular solving !!
+        @vprintln(:det,2,"  orig_mat biggest entry (bits): $(maximum(nbits,A))");
+        @vprintln(:det,2,"  new_mat biggest entry (bits): $(maximum(nbits,new_mat))");
+        DetFactor *= det_fac_from_hnf
+        A = new_mat
+        # Next block divides det_mod_m by det_fac_from_hnf ensuring that he result is symmetric remainder
+        det_mod_m *= invmod(det_fac_from_hnf,M); # could fail with low probability ?????
+        det_mod_m = mod(det_mod_m,M);
+        if det_mod_m < 0
+          if 2*det_mod_m <= -M
+            det_mod_m += M;
+          end
+        else
+          if 2*det_mod_m >= M
+            det_mod_m -= M;
+          end
+        end
+        @vprintln(:det,1,"  Updated det_mod_m is $(det_mod_m)");
+        continue;
+      end
+    end
+    @vprintln(:det,1,"Solving a random linear system...");
+    b = rand(matrix_space(ZZ,n,1),U); 
+    if solver == :NEMO_DIXON
+      @vprintln(:det,2,"  ...solving by Nemo.dixon_solve");
+      @vtime :det 2   soln2 = Nemo.dixon_solve(A, b);
+      d = soln2[2];
+      s = soln2[1];
+    elseif solver == :JOHN
+      @vprintln(:det,2,"  ...solving using LinSolve");
+      ctx = LinSolveCtx(A);
+      @vtime :det 2  s,d = LinSolve(ctx,b);
+    else # solver == :OSCAR
+      @vprintln(:det,2,"  ...solving using OSCAR solve function");
+      @vtime :det 2  x = solve(matrix(QQ,A),matrix(QQ,b); side = :right);
+      d = lcm(denominator.(collect(x)));
+      s = ZZ.(d * x);
+    end
+    if nbits(d) < 100
+      @vprintln(:det,1,"Soln of lin sys gave det factor $(d)");
+    else
+      @vprintln(:det,1,"Soln of lin sys gave det factor with $(nbits(d)) bits");
+    end
+    # If known factor is "close" to Hadamard bound then climb out with CRT
+    CRT_bits_to_climb = Hbits - nbits(M) - nbits(d) - nbits(DetFactor)
+    if CRT_bits_to_climb < CRT_climb_threshold
+      @vprintln(:det,1,"CRT is worthwhile");
+      DetFactor *= d
+      @vprintln(:det,1,"  nbits(DetFactor) = $(nbits(DetFactor))");
+      @vprintln(:det,1,"  Expected num iters: $(ceil(Int64,(Hbits-Float64(log2(DetFactor)))/log2(p)))");
+      det_mod_m = lift(ZZmodM(det_mod_m)/d)
+      iter_count = 0
+      while nbits(M) < Hbits - nbits(DetFactor)
+        iter_count += 1
+        (iter_count%100 == 0) && @vprint(:det,2,"  ...$(iter_count)...\r");
+        # [loop below] Get next prime which does not divide d
+        while true
+          p = next_prime(p)
+          if d%p != 0
+            break;
+          end
+        end
+        ZZmodP = Nemo.Native.GF(p)
+        det_mod_p = lift(det(map_entries(ZZmodP, A))/d) # symmetric lift?
+        det_mod_m = crt(det_mod_m,M, det_mod_p,ZZ(p))
+        M *= p
+      end
+      if 2*det_mod_m > M
+        det_mod_m -= M
+      end
+      return det_mod_m*DetFactor;
+    end
+    if d == 1
+      @vprintln(:det,1,"Denom was 1 so do new iter [?VERY RARE OCCURRENCE?]");
+      #      println("det_mod_m is $(det_mod_m)");
+      continue;  # neither HNF nor hcol can help here; probably det is 1 or -1
+    end
+    @vprintln(:det,1,"CRT not worthwhile: must climb $(CRT_bits_to_climb); exceeds threshold $(CRT_climb_threshold)")
+##    @vprintln(:det,1,"Main loop: bitsize of d = $(nbits(d))");
+    if nbits(d) <= HNF_UPB_BITS
+      # NOTE: this "then" branch always exits via "continue", it does not "drop through"
+      @vprintln(:det,1,"HNF because lin soln denom is below threshold");
+      if nbits(d) < 60
+        @vprintln(:det,1,"  (indeed denom d = $(d))");
+      end
+      # d may be missing some small prime factors in the largest Smith invariant factor, so
+      # if d is "very small", we can increase it by multiplying by powers of 2, 3, 5 or 7:
+      quot = div(2^60,d);
+      for p in [2,2,2,2,3,3,5,7,11,13,17,19]
+        if p > quot  break;  end
+        d *= p;
+        quot = div(quot,p);
+      end
+      @vprintln(:det,1, "  Doing hnf_modular with modulus $(d)");
+      @vtime :det 2  H = hnf_modular_eldiv(A, d)
+      det_fac_from_hnf = prod_diagonal(H)
+      @vprintln(:det,1,"  det_fac_from_hnf (bits) = $(nbits(det_fac_from_hnf))");
+      #MUST BE > 1      if det_fac_from_hnf > 1
+      @vprintln(:det,2, "  [HNF] about to solve triangular system")
+# SLOWER THAN solve    @vtime :det 2  new_mat = AbstractAlgebra._solve_triu_left(H,A);
+      @vtime :det 2  new_mat = solve(H,A;side=:left);
+      @vprintln(:det,2,"  orig_mat biggest entry: $(maximum(nbits,A))");
+      @vprintln(:det,2,"  new_mat biggest entry: $(maximum(nbits,new_mat))");
+      DetFactor *= det_fac_from_hnf
+      det_mod_m = lift(ZZmodM(det_mod_m)/ZZmodM(det_fac_from_hnf));
+      if 2*det_mod_m >= M
+        det_mod_m -= M
+      end
+      A = new_mat
+      continue;
+    end
+    # denom was too big so do hcol jive
+    HCOL_IterCounter += 1;
+    @vprintln(:det,1,"HCOL (iter = $(HCOL_IterCounter))");
+    T1 = hcol(s, d)  
+    det_fac_from_hcol = prod_diagonal(T1);
+    @vprintln(:det,1,"  det_fac_from_hcol (bits) = $(nbits(det_fac_from_hcol))");
+    @vprintln(:det,2, "  [HCOL] about to solve triangular system")
+#SLOWER THAN solve    @vtime :det 2  new_mat = AbstractAlgebra._solve_triu_left(T1,A)
+    @vtime :det 2  new_mat = solve(T1,A;side=:left);
+    A = new_mat;
+    DetFactor *= det_fac_from_hcol;
+    HCOL_bits_gained += nbits(det_fac_from_hcol);
+    @vprintln(:det,1,"  Total HCOL bits gained: $(HCOL_bits_gained)");
+    det_mod_m = lift(ZZmodM(det_mod_m)/ZZmodM(det_fac_from_hcol));
+    if 2*det_mod_m >= M
+      det_mod_m -= M
+    end
+  end
+end
