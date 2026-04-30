@@ -2761,6 +2761,60 @@ function neg!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
   return z
 end
 
+@doc raw"""
+    set!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
+    set!(z::ZZRingElemOrPtr, a::Integer)
+
+Change `z` to be equal to `a` and return `z`.
+
+The command `set!(z, a)` has essentially the same effect as `z = ZZ(a)`,
+except that in the former case, the existing object `z` references is modified
+while in the latter `z` is changed to point to a new object.
+
+A benefit of this that it generally is faster and avoids allocations,
+at least if `a` is small enough to fit in the already allocated storage of `z`.
+
+However, this can also have unintended consequences if for example some
+other variable references the same object as `z`.
+
+# Examples
+
+```jldoctest
+julia> a = ZZ(304); z = ZZ(936); x = z
+936
+
+julia> set!(z, a)
+304
+
+julia> add!(z, 123)
+427
+
+julia> (a, x, z)
+(304, 427, 427)
+
+julia> x === z
+true
+
+julia> A = zeros(ZZRingElem, 2, 2) # All entries of `A` point to the same object.
+2×2 Matrix{ZZRingElem}:
+ 0  0
+ 0  0
+
+julia> A[1,1] = ZZ(5) # Create a new object and let `A[1,1]` point to it.
+5
+
+julia> set!(A[1,1], 8) # So, changing `A[1,1]` using `set!` does not change the other entries of `A`.
+8
+
+julia> set!(A[1,2], 3) # The other three matrix entries are still pointing to the same object. Changing one of them using `set!` changes all of them.
+3
+
+julia> A
+2×2 Matrix{ZZRingElem}:
+ 8  3
+ 3  3
+```
+"""
 function set!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
   @ccall libflint.fmpz_set(z::Ref{ZZRingElem}, a::Ref{ZZRingElem})::Nothing
   return z
