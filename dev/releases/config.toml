@@ -2,6 +2,7 @@ majorversion = 0
 reponame = "Nemocas/Nemo.jl"
 enabletwolevel = false
 requiretwolevel = false
+linearhistory = true
 
 [topics]
 "release notes: highlight" = "Highlights"
