@@ -9,6 +9,21 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.55.0](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.55.0) - 2026-04-30
+
+### Breaking changes
+
+> !These changes break compatibility from previous versions!
+
+- [#2283](https://github.com/Nemocas/Nemo.jl/pull/2283) Update AbstractAlgebra to v0.49
+- [#2228](https://github.com/Nemocas/Nemo.jl/pull/2228) Remove `zeros(::ZZPolyRingElem)` that should have been a `roots` method
+
+### New or extended functionality
+
+- [#2259](https://github.com/Nemocas/Nemo.jl/pull/2259) Add `primes_set`
+- [#2275](https://github.com/Nemocas/Nemo.jl/pull/2275) Add inplace operations for integer divisions with divisors of type `ZZRingElem`
+- [#2282](https://github.com/Nemocas/Nemo.jl/pull/2282) Update FLINT to v3.5.0
+
 ## [0.54.2](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.54.2) - 2026-04-24
 
 ### New or extended functionality
