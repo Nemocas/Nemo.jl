@@ -9,6 +9,55 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.55.0](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.55.0) - 2026-04-30
+
+### Breaking changes
+
+> !These changes break compatibility from previous versions!
+
+#### New or extended functionality
+
+- [#2283](https://github.com/Nemocas/Nemo.jl/pull/2283) Update AbstractAlgebra to v0.49
+
+#### Other fixed bugs
+
+- [#2228](https://github.com/Nemocas/Nemo.jl/pull/2228) Remove `zeros(::ZZPolyRingElem)` that should have been a `roots` method
+
+### New or extended functionality
+
+- [#2259](https://github.com/Nemocas/Nemo.jl/pull/2259) Add `primes_set`
+- [#2268](https://github.com/Nemocas/Nemo.jl/pull/2268) Add `isqrt!` for inplace floor square roots
+- [#2269](https://github.com/Nemocas/Nemo.jl/pull/2269) Add allocation-free signed remainder `mod_sym!`
+- [#2272](https://github.com/Nemocas/Nemo.jl/pull/2272) Add inplace operations for / improved performance of `div, cdiv, tdiv, fdiv` with inputs of the form `(ZZRingElem, Int)`
+- [#2275](https://github.com/Nemocas/Nemo.jl/pull/2275) Add inplace operations for integer divisions with divisors of type `ZZRingElem`
+- [#2282](https://github.com/Nemocas/Nemo.jl/pull/2282) Update FLINT to v3.5.0
+
+### Performance improvements or improved testing
+
+- [#2270](https://github.com/Nemocas/Nemo.jl/pull/2270) Improve performance of `is_divisible_by`
+
+### Fixed bugs that returned incorrect results
+
+- [#2249](https://github.com/Nemocas/Nemo.jl/pull/2249) Fix `gcd`/`lcm` of a singleton ZZ vector to be non-negative
+- [#2252](https://github.com/Nemocas/Nemo.jl/pull/2252) Fix `is_maxreal_type` for number fields
+- [#2277](https://github.com/Nemocas/Nemo.jl/pull/2277) Fix `MPoly` constructors to enforce exponents being nonnegative
+- [#2278](https://github.com/Nemocas/Nemo.jl/pull/2278) Unify behavior of `isone` for truncated identity matrices
+
+### Other fixed bugs
+
+- [#2242](https://github.com/Nemocas/Nemo.jl/pull/2242) Ensure `det` for 0x0 matrices returns 1
+- [#2243](https://github.com/Nemocas/Nemo.jl/pull/2243) Add proper `min` for `Arb`s and `RealFieldElem`s
+
+### **TODO** Uncategorized PR
+
+If there are any PRs listed below, either apply the same steps
+as above, or change their label to "release notes: not needed".
+
+- [#2236](https://github.com/Nemocas/Nemo.jl/pull/2236) Bump version to 0.54.0
+- [#2238](https://github.com/Nemocas/Nemo.jl/pull/2238) Try to fix TagBot config
+- [#2240](https://github.com/Nemocas/Nemo.jl/pull/2240) Trivial whitespace change
+- [#2244](https://github.com/Nemocas/Nemo.jl/pull/2244) Bump version to 0.54.1
+
 ## [0.54.2](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.54.2) - 2026-04-24
 
 ### New or extended functionality
