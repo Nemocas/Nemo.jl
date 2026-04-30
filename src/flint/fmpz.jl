@@ -610,6 +610,8 @@ function div(f::ZZRingElem, g::Int)
   div!(z, f, g)
 end
 
+div!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr) = fdiv!(z, f, g)
+
 div!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int) = fdiv!(z, f, g)
 
 function tdivpow2(x::ZZRingElem, c::Int)
@@ -658,32 +660,24 @@ function tdiv(f::ZZRingElem, g::Int)
   return tdiv!(z, f, g)
 end
 
-@doc raw"""
-    tdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+function tdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_tdiv_q(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Ref{ZZRingElem})::Nothing
+  return z
+end
 
-Return the quotient of $f$ by $g$ via truncation rounding, possibly modifying
-the object $z$ in the process.
-
-# Examples
-
-```jldoctest
-julia> z = ZZ()
-0
-
-julia> z = tdiv!(z, ZZ(100), 7)
-14
-```
-"""
 function tdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
   @ccall libflint.fmpz_tdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
   return z
 end
 
+tdiv!(f::ZZRingElemOrPtr, g::ZZRingElemOrPtr) = tdiv!(f, f, g)
+
 @doc raw"""
-    tdiv!(f::ZZRingElemOrPtr, g::Int)
+    tdiv!(z, f, g)
+    tdiv!(f, g)
 
 Return the quotient of $f$ by $g$ via truncation rounding, possibly modifying
-the object $f$ in the process. This is a shorthand for `tdiv!(f, f, g)`.
+the object $z$ in the process. `tdiv!(f, g)` is a shorthand for `tdiv!(f, f, g)`.
 
 # Examples
 
@@ -716,32 +710,24 @@ function fdiv(f::ZZRingElem, g::Int)
   return z
 end
 
-@doc raw"""
-    fdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+function fdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_fdiv_q(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Ref{ZZRingElem})::Nothing
+  return z
+end
 
-Return the quotient of $f$ by $g$ via floor rounding, possibly modifying the
-object $z$ in the process.
-
-# Examples
-
-```jldoctest
-julia> z = ZZ()
-0
-
-julia> z = fdiv!(z, ZZ(100), 7)
-14
-```
-"""
 function fdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
   @ccall libflint.fmpz_fdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
   return z
 end
 
+fdiv!(f::ZZRingElemOrPtr, g::ZZRingElemOrPtr) = fdiv!(f, f, g)
+
 @doc raw"""
-    fdiv!(f::ZZRingElemOrPtr, g::Int)
+    fdiv!(z, f, g)
+    fdiv!(f, g)
 
 Return the quotient of $f$ by $g$ via floor rounding, possibly modifying the
-object $f$ in the process. This is a shorthand for `fdiv!(f, f, g)`.
+object $z$ in the process. `fdiv!(f, g)` is a shorthand for `fdiv!(f, f, g)`.
 
 # Examples
 
@@ -753,9 +739,7 @@ julia> f = fdiv!(f, 7)
 14
 ```
 """
-function fdiv!(f::ZZRingElemOrPtr, g::Int)
-  return fdiv!(f, f, g)
-end
+fdiv!(f::ZZRingElemOrPtr, g::Int) = fdiv!(f, f, g)
 
 @doc raw"""
     cdiv(f::ZZRingElem, g::Int)
@@ -775,32 +759,24 @@ function cdiv(f::ZZRingElem, g::Int)
   return cdiv!(z, f, g)
 end
 
-@doc raw"""
-    cdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+function cdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_cdiv_q(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Ref{ZZRingElem})::Nothing
+  return z
+end
 
-Return the quotient of $f$ by $g$ via ceil rounding, possibly modifying the
-object $z$ in the process.
-
-# Examples
-
-```jldoctest
-julia> z = ZZ()
-0
-
-julia> z = cdiv!(z, ZZ(100), 7)
-15
-```
-"""
 function cdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
   @ccall libflint.fmpz_cdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
   return z
 end
 
+cdiv!(f::ZZRingElemOrPtr, g::ZZRingElemOrPtr) = cdiv!(f, f, g)
+
 @doc raw"""
-    cdiv!(f::ZZRingElemOrPtr, g::Int)
+    cdiv!(z, f, g)
+    cdiv!(f, g)
 
 Return the quotient of $f$ by $g$ via ceil rounding, possibly modifying the
-object $f$ in the process. This is a shorthand for `cdiv!(f, f, g)`.
+object $z$ in the process. `cdiv!(f, g)` is a shorthand for `cdiv!(f, f, g)`.
 
 # Examples
 
@@ -812,9 +788,7 @@ julia> f = cdiv!(f, 7)
 15
 ```
 """
-function cdiv!(f::ZZRingElemOrPtr, g::Int)
-  return cdiv!(f, f, g)
-end
+cdiv!(f::ZZRingElemOrPtr, g::Int) = cdiv!(f, f, g)
 
 rem(x::Integer, y::ZZRingElem) = rem(ZZRingElem(x), y)
 
