@@ -614,8 +614,8 @@ end
   # Individual tests
 
   S, (x, y) = polynomial_ring(R, ["x", "y"])
-  @test_throws ErrorException evaluate(x, [x])
-  @test_throws ErrorException evaluate(x, [x, x, x])
+  @test_throws ArgumentError evaluate(x, [x])
+  @test_throws ArgumentError evaluate(x, [x, x, x])
 
   f = x + y
   g = x - y
@@ -635,8 +635,8 @@ end
   @test_throws ArgumentError evaluate(x, [x,xx])
 
   SS, z = polynomial_ring(R, "z")
-  @test_throws ErrorException evaluate(x, [z])
-  @test_throws ErrorException evaluate(x, [z, z, z])
+  @test_throws ArgumentError evaluate(x, [z])
+  @test_throws ArgumentError evaluate(x, [z, z, z])
   w = [z, (z + 1)^2]
   r1 = @inferred evaluate(f, w)
   r2 = evaluate(g, w)
