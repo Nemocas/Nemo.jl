@@ -506,6 +506,23 @@ function Base.sqrt(a::QadicFieldElem; check::Bool=true)
   return z
 end
 
+# Internal: square root in characteristic 2 using a precomputed Artin-Schreier LUP decomposition.
+function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bool=true)
+  ctx = parent(a)
+  ctx === data.parent || throw(ArgumentError("precomputation belongs to a different qadic field"))
+  av = valuation(a)
+  check && (av % 2) != 0 && error("Unable to take qadic square root")
+  z = QadicFieldElem(a.N - div(av, 2))
+  z.parent = ctx
+
+  GC.@preserve data begin
+    res = Bool(@ccall libflint._qadic_char2_sqrt_with_precomp(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField}, data.ptr::Ptr{Nothing})::Cint)
+  end
+
+  check && !res && error("Square root of p-adic does not exist")
+  return z
+end
+
 ###############################################################################
 #
 #   Special functions

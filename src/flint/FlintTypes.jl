@@ -2436,6 +2436,25 @@ mutable struct QadicFieldElem <: FlintLocalFieldElem
   end
 end
 
+@doc raw"""
+    Qadic2SqrtPrecomp
+
+Opaque precomputation used to speed up square roots in a $q$-adic field of
+characteristic 2. Wraps a FLINT `struct qadic2_sqrt_precomp *`.
+"""
+mutable struct Qadic2SqrtPrecomp
+  ptr::Ptr{Nothing}
+  parent::QadicField
+
+  function Qadic2SqrtPrecomp(R::QadicField)
+    prime(R) == 2 || throw(DomainError(prime(R), "characteristic must be 2"))
+    ptr = @ccall libflint._qadic_char2_sqrt_precomp_init(R::Ref{QadicField})::Ptr{Nothing}
+    z = new(ptr, R)
+    finalizer(_qadic_char2_sqrt_precomp_clear_fn, z)
+    return z
+  end
+end
+
 ###############################################################################
 #
 #   ZZRelPowerSeriesRing / ZZRelPowerSeriesRingElem
@@ -5313,6 +5332,10 @@ end
 
 function _qadic_ctx_clear_fn(a::QadicField)
   @ccall libflint.qadic_ctx_clear(a::Ref{QadicField})::Nothing
+end
+
+function _qadic_char2_sqrt_precomp_clear_fn(a::Qadic2SqrtPrecomp)
+  @ccall libflint._qadic_char2_sqrt_precomp_clear(a.ptr::Ptr{Nothing})::Nothing
 end
 
 function _rand_ctx_clear_fn(a::rand_ctx)
