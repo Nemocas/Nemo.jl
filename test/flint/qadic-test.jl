@@ -345,6 +345,20 @@ end
   @test_throws ArgumentError Nemo._qadic_char2_sqrt(S(1), user_data)
 end
 
+@testset "QadicFieldElem.square_root_char2" begin
+  R, _ = QadicField(2, 3)
+
+  a = 1 + 2^3 + O(R, 2^4)
+  @test sqrt(a)^2 == a
+  @test has_attribute(R, :char2_sqrt_precomp)
+
+  precomp = get_attribute(R, :char2_sqrt_precomp)
+
+  a = 1 + 2^3 + 2^4 + O(R, 2^10)
+  @test sqrt(a)^2 == a
+  @test precomp === get_attribute(R, :char2_sqrt_precomp)
+end
+
 @testset "QadicFieldElem.special_functions" begin
   R, _ = QadicField(7, 1, 30)
 

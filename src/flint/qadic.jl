@@ -496,9 +496,17 @@ end
 ###############################################################################
 
 function Base.sqrt(a::QadicFieldElem; check::Bool=true)
+  ctx = parent(a)
+  if prime(ctx) == 2
+    precomp_data = get_attribute!(ctx, :char2_sqrt_precomp) do
+      Qadic2SqrtPrecomp(ctx)
+    end::Qadic2SqrtPrecomp
+
+    return _qadic_char2_sqrt(a, precomp_data; check=check)
+  end
+
   av = valuation(a)
   check && (av % 2) != 0 && error("Unable to take qadic square root")
-  ctx = parent(a)
   z = QadicFieldElem(a.N - div(av, 2))
   z.parent = ctx
   res = Bool(@ccall libflint.qadic_sqrt(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Cint)
