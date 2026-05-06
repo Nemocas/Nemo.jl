@@ -3023,14 +3023,6 @@ end
 
 (::ZZRing)(a::ZZRingElem) = a
 
-(::ZZRing)(a::Float64) = ZZRingElem(a)
-
-(::ZZRing)(a::Float32) = ZZRingElem(Float64(a))
-
-(::ZZRing)(a::Float16) = ZZRingElem(Float64(a))
-
-(::ZZRing)(a::BigFloat) = ZZRingElem(BigInt(a))
-
 @doc raw"""
     (ZZ::ZZRing)(x)
 
