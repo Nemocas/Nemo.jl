@@ -3911,6 +3911,43 @@ end
 
 ###############################################################################
 #
+#   ZZPolyRingMatrix
+#
+###############################################################################
+
+mutable struct ZZPolyRingMatrix <: MatElem{ZZPolyRingElem}
+  entries::Ptr{ZZPolyRingElem}
+  r::Int
+  c::Int
+  stride::Int
+  # end flint struct
+  base_ring::ZZPolyRing
+
+  # MatElem interface
+  function ZZPolyRingMatrix(R::ZZPolyRing, ::UndefInitializer, r::Int, c::Int)
+    z = ZZPolyRingMatrix(r, c, R)
+    return z
+  end
+
+  function ZZPolyRingMatrix(r::Int, c::Int, R::ZZPolyRing)
+    z = new()
+    @ccall libflint.fmpz_poly_mat_init(z::Ref{ZZPolyRingMatrix}, r::Int, c::Int)::Nothing
+    finalizer(_fmpz_poly_mat_clear_fn, z)
+    z.base_ring = R
+    return z
+  end
+
+  function ZZPolyRingMatrix(m::ZZPolyRingMatrix)
+    z = new()
+    @ccall libflint.fmpz_poly_mat_init_set(z::Ref{ZZPolyRingMatrix}, m::Ref{ZZPolyRingMatrix})::Nothing
+    finalizer(_fmpz_poly_mat_clear_fn, z)
+    z.base_ring = m.base_ring
+    return z
+  end
+end
+
+###############################################################################
+#
 #   zzModMatrixSpace / zzModMatrix
 #
 ###############################################################################
@@ -5166,6 +5203,10 @@ function _fmpz_mat_clear_fn(a::ZZMatrix)
   @ccall libflint.fmpz_mat_clear(a::Ref{ZZMatrix})::Nothing
 end
 
+function _fmpz_poly_mat_clear_fn(a::ZZPolyRingMatrix)
+  @ccall libflint.fmpz_poly_mat_clear(a::Ref{ZZPolyRingMatrix})::Nothing
+end
+
 function _fmpz_mod_ctx_clear_fn(a::fmpz_mod_ctx_struct)
   @ccall libflint.fmpz_mod_ctx_clear(a::Ref{fmpz_mod_ctx_struct})::Nothing
 end
@@ -5418,6 +5459,7 @@ const FqAbsPowerSeriesRingElemOrPtr = Union{FqAbsPowerSeriesRingElem, Ref{FqAbsP
 
 const ZZMatrixOrPtr = Union{ZZMatrix, Ref{ZZMatrix}, Ptr{ZZMatrix}}
 const QQMatrixOrPtr = Union{QQMatrix, Ref{QQMatrix}, Ptr{QQMatrix}}
+const ZZPolyRingMatrixOrPtr = Union{ZZPolyRingMatrix, Ref{ZZPolyRingMatrix}, Ptr{ZZPolyRingMatrix}}
 const zzModMatrixOrPtr = Union{zzModMatrix, Ref{zzModMatrix}, Ptr{zzModMatrix}}
 const ZZModMatrixOrPtr = Union{ZZModMatrix, Ref{ZZModMatrix}, Ptr{ZZModMatrix}}
 const fpMatrixOrPtr = Union{fpMatrix, Ref{fpMatrix}, Ptr{fpMatrix}}
