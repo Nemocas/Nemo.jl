@@ -12,7 +12,7 @@
 
 base_ring(a::ZZPolyRingMatrix) = a.base_ring
 
-dense_matrix_type(::Type{ZZPolyRingElem}) = ZZPolyRingMatrix
+#dense_matrix_type(::Type{ZZPolyRingElem}) = ZZPolyRingMatrix
 
 is_zero_initialized(::Type{ZZPolyRingMatrix}) = true
 
@@ -50,6 +50,16 @@ end
   GC.@preserve a begin
     z = mat_entry_ptr(a, r, c)
     set!(z, d)
+  end
+end
+
+@inline function is_zero_entry(A::ZZPolyRingMatrix, i::Int, j::Int)
+  @boundscheck _checkbounds(A, i, j)
+  GC.@preserve A begin
+    x = mat_entry_ptr(A, i, j)
+    # fmpz_poly_is_zero is an inline C function that checks length == 0
+    # length is the 3rd field of fmpz_poly_struct (at offset 2*sizeof(Int))
+    return unsafe_load(Ptr{Int}(x), 3) == 0
   end
 end
 
