@@ -203,6 +203,20 @@ function det(a::ZZPolyRingMatrix)
   return z
 end
 
+function _det_fflu(a::ZZPolyRingMatrix)
+  @req is_square(a) "Matrix must be a square matrix"
+  z = base_ring(a)()
+  @ccall libflint.fmpz_poly_mat_det_fflu(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingMatrix})::Nothing
+  return z
+end
+
+function _det_interpolate(a::ZZPolyRingMatrix)
+  @req is_square(a) "Matrix must be a square matrix"
+  z = base_ring(a)()
+  @ccall libflint.fmpz_poly_mat_det_interpolate(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingMatrix})::Nothing
+  return z
+end
+
 ###############################################################################
 #
 #   Rank
