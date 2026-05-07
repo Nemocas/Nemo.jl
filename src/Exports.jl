@@ -159,6 +159,7 @@ export eigenvalues_with_multiplicities
 export eisenstein_g
 export elem_to_mat_row!
 export elem_type
+export elementary_divisors
 export elliptic_e
 export elliptic_k
 export embed
