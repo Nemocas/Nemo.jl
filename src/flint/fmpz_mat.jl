@@ -1292,6 +1292,26 @@ function is_snf(x::ZZMatrix)
   return @ccall libflint.fmpz_mat_is_in_snf(x::Ref{ZZMatrix})::Bool
 end
 
+@doc raw"""
+    elementary_divisors(x::ZZMatrix) -> Vector{ZZRingElem}
+
+Return the elementary divisors $d_1 \mid d_2 \mid \cdots \mid d_r$ of $x$,
+where $r$ is the rank of $x$.
+"""
+function elementary_divisors(x::ZZMatrix)
+  m = min(nrows(x), ncols(x))
+  buf = @ccall libflint._fmpz_vec_init(m::Int)::Ptr{ZZRingElem}
+  r = @ccall libflint.fmpz_mat_elementary_divisors(buf::Ptr{ZZRingElem}, x::Ref{ZZMatrix})::Int
+  z = Vector{ZZRingElem}(undef, r)
+  for i in 1:r
+    ei = ZZRingElem()
+    @ccall libflint.fmpz_set(ei::Ref{ZZRingElem}, (buf + (i - 1) * sizeof(ZZRingElem))::Ptr{ZZRingElem})::Nothing
+    z[i] = ei
+  end
+  @ccall libflint._fmpz_vec_clear(buf::Ptr{ZZRingElem}, m::Int)::Nothing
+  return z
+end
+
 ################################################################################
 #
 #  Smith normal form with trafo
