@@ -409,6 +409,20 @@ function det(x::ArbMatrix)
   return z
 end
 
+function _det_lu(x::ArbMatrix)
+  ncols(x) != nrows(x) && error("Matrix must be square")
+  z = base_ring(x)()
+  @ccall libflint.arb_mat_det_lu(z::Ref{ArbFieldElem}, x::Ref{ArbMatrix}, precision(base_ring(x))::Int)::Nothing
+  return z
+end
+
+function _det_precond(x::ArbMatrix)
+  ncols(x) != nrows(x) && error("Matrix must be square")
+  z = base_ring(x)()
+  @ccall libflint.arb_mat_det_precond(z::Ref{ArbFieldElem}, x::Ref{ArbMatrix}, precision(base_ring(x))::Int)::Nothing
+  return z
+end
+
 ################################################################################
 #
 #   Exponential function
