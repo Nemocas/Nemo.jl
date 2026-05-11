@@ -71,6 +71,7 @@ testlist = [
   "flint/fq_default_mat-test.jl",
   "flint/fmpz_mat-test.jl",
   "flint/fmpq_mat-test.jl",
+  "flint/fmpz_poly_mat-test.jl",
   "arb/arb_poly-test.jl",
   "arb/RealPoly-test.jl",
   "arb/acb_poly-test.jl",
