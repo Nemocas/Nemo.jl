@@ -736,6 +736,30 @@ end
   @test is_snf(snf_diagonal(B))
 end
 
+@testset "ZZMatrix.elementary_divisors" begin
+  S = matrix_space(ZZ, 3, 3)
+
+  # Full-rank square matrix; elementary divisors equal the SNF diagonal.
+  A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
+  @test elementary_divisors(A) == ZZRingElem[1, 1, 27]
+
+  # Rank-deficient square matrix.
+  C = matrix(ZZ, 2, 2, [1, 0, 0, 0])
+  @test elementary_divisors(C) == ZZRingElem[1]
+
+  # Zero matrix — rank 0, no elementary divisors.
+  @test elementary_divisors(zero_matrix(ZZ, 2, 3)) == ZZRingElem[]
+
+  # Empty matrices.
+  @test elementary_divisors(zero_matrix(ZZ, 0, 0)) == ZZRingElem[]
+  @test elementary_divisors(zero_matrix(ZZ, 0, 2)) == ZZRingElem[]
+  @test elementary_divisors(zero_matrix(ZZ, 2, 0)) == ZZRingElem[]
+
+  # Non-square matrix.
+  D = matrix(ZZ, 2, 3, [1, 0, 0, 0, 2, 0])
+  @test elementary_divisors(D) == ZZRingElem[1, 2]
+end
+
 @testset "ZZMatrix._solve_rational" begin
   S = matrix_space(ZZ, 3, 3)
 
