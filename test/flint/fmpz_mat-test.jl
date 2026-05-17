@@ -726,14 +726,57 @@ end
   S = matrix_space(ZZ, 3, 3)
 
   A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
-
+  D, U, V = snf_with_transform(A)
   @test snf(A) == S([1 0 0; 0 1 0; 0 0 27])
+  @test U * A * V == D
+  @test D == S([1 0 0; 0 1 0; 0 0 27])
+  @test abs(det(U)) == abs(det(V)) == 1
 
   @test is_snf(snf(A))
 
   B = S([ZZRingElem(2) 0 0; 0 4 0; 0 0 7])
-
+  D, U, V = snf_with_transform(B)
+  @test U * B * V == D
+  @test D == snf(B)
   @test is_snf(snf_diagonal(B))
+  @test abs(det(U)) == abs(det(V)) == 1
+
+  # tests for snf_with_transform
+  for i in 1:10
+    r = rand(0:10)
+    c = rand(0:10)
+    rr = rand(0:min(r, c))
+    C = zero_matrix(ZZ, r, c)
+    if !isempty(C) && rr > 1
+      C[1, 1] = rand(0:10)
+      for i in 2:(rr - 1)
+        C[i, i] = rand(1:10) * C[i - 1, i - 1]
+      end
+    end
+    U = AbstractAlgebra.randmat_triu(matrix_space(ZZ, r, r), -10:10)
+    for i in 1:r
+      U[i, i] = 1
+    end
+    V = AbstractAlgebra.randmat_triu(matrix_space(ZZ, c, c), -10:10)
+    for i in 1:c
+      V[i, i] = 1
+    end
+    A = U * C * V
+    SS, UU, VV = snf_with_transform(A)
+    @test UU * A * VV == SS 
+    @test abs(det(UU)) == abs(det(VV)) == 1
+    @test diagonal(SS) == diagonal(C)
+    SS, UU, VV = snf_with_transform(A, true, false)
+    @test abs(det(UU)) == 1
+    @test diagonal(SS) == diagonal(C)
+    SS, UU, VV = snf_with_transform(A, false, true)
+    @test diagonal(SS) == diagonal(C)
+    @test abs(det(VV)) == 1
+  end
+
+  M = ZZ[1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; 0 0 1 0 0 0 0 0 0 0 0 0 0 1 1 0 0 0 0 0; 0 0 0 1 0 0 0 0 0 0 0 0 0 0 1 7 0 0 0 0; 0 0 0 0 1 0 0 0 0 0 0 0 0 1 1 4 0 0 0 0; 0 0 0 0 0 1 0 0 0 0 1 1 3 1 1 1 0 0 0 0; 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 1 0 1 3; 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 1 0 5; 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 1 17; 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 9; 0 0 0 0 0 0 0 0 0 0 2 0 4 0 0 0 0 0 0 4; 0 0 0 0 0 0 0 0 0 0 0 2 2 0 0 2 0 0 0 14; 0 0 0 0 0 0 0 0 0 0 0 0 6 0 0 2 0 0 0 6; 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 2 0 0 0 0; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 6 0 0 0 0; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 8 0 0 0 0; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 0 8; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 2; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 16; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 18]
+  S, _, V = snf_with_transform(M, false, true)
+  @assert abs(det(V)) == 1
 end
 
 @testset "ZZMatrix.elementary_divisors" begin

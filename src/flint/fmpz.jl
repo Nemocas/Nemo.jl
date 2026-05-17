@@ -1618,6 +1618,11 @@ lcm(a::Integer, b::ZZRingElem) = lcm(ZZRingElem(a), b)
 #
 ###############################################################################
 
+function gcdx!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::ZZRingElemOrPtr, d::ZZRingElemOrPtr, e::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_xgcd_canonical_bezout(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ref{ZZRingElem}, d::Ref{ZZRingElem}, e::Ref{ZZRingElem})::Nothing
+  return a, b, c
+end
+
 @doc raw"""
     gcdx(a::ZZRingElem, b::ZZRingElem)
 
@@ -1633,7 +1638,7 @@ function gcdx(a::ZZRingElem, b::ZZRingElem)
   d = ZZ()
   x = ZZ()
   y = ZZ()
-  @ccall libflint.fmpz_xgcd_canonical_bezout(d::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
+  gcdx!(d, x, y, a, b)
   return d, x, y
 end
 
