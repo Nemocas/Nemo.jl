@@ -9,7 +9,16 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
-## [0.55.2](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.55.2) - 2026-05-18
+## [0.55.1](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.55.1) - 2026-05-16
+
+### New or extended functionality
+- [#2287](https://github.com/Nemocas/Nemo.jl/pull/2287) Added QadicField constructors from a defining polynomial (new in FLINT 3.5.0)
+- [#2293](https://github.com/Nemocas/Nemo.jl/pull/2293) Wrap `elementary_divisors` from FLINT
+- [#2294](https://github.com/Nemocas/Nemo.jl/pull/2294) Wrap `det_lu` and `det_precomp` for `arb_mat`
+
+
+### Performance improvements or improved testing
+- [#2289](https://github.com/Nemocas/Nemo.jl/pull/2289) Added precomputed Artin-Schreier LUP for characteristic 2 qadic sqrt (new in FLINT 3.5.0)
 
 ## [0.55.0](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.55.0) - 2026-04-30
 
