@@ -264,7 +264,7 @@ julia> convolution([1, 2, 3, 4], [5, 6, 7])
 """
 function convolution(a::Vector{T}, b::Vector{T}) where T<:RingElem
   (isempty(a) || isempty(b)) && return T[]
-  R, _ = polynomial_ring(parent(a[1]))
+  R, _ = polynomial_ring(parent(a[1]); cached = false)
   return collect(coefficients(R(a) * R(b)))
 end
 
