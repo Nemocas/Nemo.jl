@@ -236,3 +236,36 @@ function partial_fractions(a::Generic.FracFieldElem{<:PolyRingElem{<:FieldElem}}
   return partial_fractions(numerator(a), denominator(a))
 end  
 
+################################################################################
+#
+#  Convolution
+#
+################################################################################
+
+@doc raw"""
+    convolution(a::Vector{T}, b::Vector{T}) where T<:RingElem
+    convolution(a::Vector{T}, b::Vector{T}) where T<:Integer
+
+Return the convolution of a and b, that is the vector `c`
+such that `c[i]` is the sum of `a[k] * b[i-k+1]` for all `k`.
+
+# Examples
+
+```jldoctest
+julia> convolution([1, 2, 3, 4], [5, 6, 7])
+6-element Vector{Int64}:
+  5
+ 16
+ 34
+ 52
+ 45
+ 28
+```
+"""
+function convolution(a::Vector{T}, b::Vector{T}) where T<:RingElem
+  (isempty(a) || isempty(b)) && return T[]
+  R, _ = polynomial_ring(parent(a[1]))
+  return collect(coefficients(R(a) * R(b)))
+end
+
+convolution(a::Vector{T}, b::Vector{T}) where T<:Integer = T.(convolution(ZZ.(a), ZZ.(b)))
