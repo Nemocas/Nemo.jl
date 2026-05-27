@@ -74,7 +74,7 @@ end
                        0, 0, 0, 0, 0, 4, 3, 0,
                        0, 0, 0, 0, 0, 0, 4, 2,
                        0, 0, 0, 0, 0, 0, 0, 4*ZZ(3)^99]);
-  d = det_hcol_hnf(A);
+  d = Nemo.det_hcol_hnf(A);
   @test d == ZZ(2)^10 * ZZ(3)^99;
   end
 end
