@@ -148,10 +148,18 @@ julia> conjugates(Qb(1+2im))
 
 **Interface**
 
+Various properties are implemented, including `iszero`, `isone`, and `isinteger`:
+
+```jldoctest
+julia> Qb = algebraic_closure(QQ);
+
+julia> iszero(Qb(0)), isone(Qb(1)), isinteger(Qb(3//1))
+(true, true, true)
+```
+
+The full interface includes:
+
 ```@docs
-iszero(x::QQBarFieldElem)
-isone(x::QQBarFieldElem)
-isinteger(x::QQBarFieldElem)
 is_rational(x::QQBarFieldElem)
 isreal(x::QQBarFieldElem)
 degree(x::QQBarFieldElem)
@@ -367,7 +375,6 @@ individual algebraic numbers, but it does not provide the best
 performance for field arithmetic.
 For fast calculation in $\overline{\mathbb{Q}}$,
 `CalciumField` should typically be used instead (see the section
-on *Exact real and complex numbers*).
+on [Exact real and complex numbers](@ref exact_real_complex)).
 Alternatively, to compute in a fixed subfield of $\overline{\mathbb{Q}}$,
 you may fix a generator $a$ and construct a number field to represent $\mathbb{Q}(a)$.
-

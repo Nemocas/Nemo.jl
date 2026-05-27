@@ -668,6 +668,25 @@ end
   end
 end
 
+@testset "FpMPolyRingElem.resultant" begin
+  F = Native.GF(ZZ(23))
+  R, (x, y) = polynomial_ring(F, [:x, :y])
+
+  f = 3x*y^2 + (x + 1)*y + 3
+  g = 6(x + 1)*y + (x^3 + 2x + 2)
+
+  @test resultant(f, g, 2) == 3*x^7+6*x^5+17*x^3+4*x^2+8*x+4
+end
+
+@testset "FpMPolyRingElem.discriminant" begin
+  F = Native.GF(ZZ(23))
+  R, (x, y) = polynomial_ring(F, [:x, :y])
+
+  f = x*y^2 + (x + 1)*y + 3
+
+  @test discriminant(f, 2) == x^2+13*x+1
+end
+
 @testset "FpMPolyRingElem.unsafe" begin
   R23 = Native.GF(ZZRingElem(23))
 

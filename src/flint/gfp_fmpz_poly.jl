@@ -417,15 +417,20 @@ end
 (R::FpPolyRing)(arr::Vector{ZZRingElem}) = FpPolyRingElem(R, arr)
 
 function (R::FpPolyRing)(arr::Vector{FpFieldElem})
-  if length(arr) > 0
-    (base_ring(R) != parent(arr[1])) && error("Wrong parents")
-  end
+  @req all(parent(e) == base_ring(R) for e in arr) "parents do not match"
   return FpPolyRingElem(R, arr)
 end
 
 (R::FpPolyRing)(arr::Vector{T}) where {T <: Integer} = R(map(base_ring(R), arr))
 
-(R::FpPolyRing)(x::ZZPolyRingElem) = FpPolyRingElem(R, x)
+function AbstractAlgebra._map(K::FpField, x::ZZPolyRingElem, parent::FpPolyRing)
+  @assert base_ring(parent) == K
+  return FpPolyRingElem(parent, x)
+end
+
+function (R::FpPolyRing)(g::ZZPolyRingElem)
+  error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
+end
 
 function (R::FpPolyRing)(f::FpPolyRingElem)
   parent(f) != R && error("Unable to coerce polynomial")

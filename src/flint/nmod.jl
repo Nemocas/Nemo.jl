@@ -54,6 +54,8 @@ isone(a::zzModRingElem) = (a.parent.n == 1) || (a.data == 1)
 
 modulus(R::zzModRing) = R.n
 
+order(R::zzModRing) = ZZRingElem(R.n)
+
 function krull_dim(R::zzModRing)
   is_trivial(R) && return -inf
   return 0

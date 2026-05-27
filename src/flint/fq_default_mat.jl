@@ -114,13 +114,17 @@ isequal(a::FqMatrix, b::FqMatrix) = ==(a, b)
 
 function transpose(a::FqMatrix)
   z = similar(a, ncols(a), nrows(a))
-  @ccall libflint.fq_default_mat_transpose(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
-  return z
+  return transpose!(z, a)
 end
 
 function transpose!(a::FqMatrix)
-  !is_square(a) && error("Matrix must be a square matrix")
-  @ccall libflint.fq_default_mat_transpose(a::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
+  @req is_square(a) "Matrix must be a square matrix"
+  return transpose!(a, a)
+end
+
+function transpose!(z::FqMatrix, a::FqMatrix)
+  @ccall libflint.fq_default_mat_transpose(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
+  return z
 end
 
 ###############################################################################
@@ -574,13 +578,13 @@ end
 
 function (a::FqMatrixSpace)(arr::AbstractMatrix{FqFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
-  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
+  @req all(parent(e) == base_ring(a) for e in arr) "parents do not match"
   return FqMatrix(arr, base_ring(a))
 end
 
 function (a::FqMatrixSpace)(arr::AbstractVector{FqFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
-  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
+  @req all(parent(e) == base_ring(a) for e in arr) "parents do not match"
   return FqMatrix(nrows(a), ncols(a), arr, base_ring(a))
 end
 

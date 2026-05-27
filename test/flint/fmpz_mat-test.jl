@@ -659,6 +659,14 @@ end
   @test_throws ArgumentError lll_gram_with_transform(ZZ[1 0])
   @test_throws ArgumentError lll_gram(ZZ[1 0; 1 1])
   @test_throws ArgumentError lll_gram_with_transform(ZZ[1 0; 1 1])
+
+  # negative definit
+  
+  G = ZZ[-1;]
+  @test G == lll_gram(G)
+  H, T = lll_gram_with_transform(G)
+  @test H == G
+  @test T * G * transpose(T) == G
 end
 
 @testset "ZZMatrix.nullspace" begin
@@ -718,14 +726,81 @@ end
   S = matrix_space(ZZ, 3, 3)
 
   A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
-
+  D, U, V = snf_with_transform(A)
   @test snf(A) == S([1 0 0; 0 1 0; 0 0 27])
+  @test U * A * V == D
+  @test D == S([1 0 0; 0 1 0; 0 0 27])
+  @test abs(det(U)) == abs(det(V)) == 1
 
   @test is_snf(snf(A))
 
   B = S([ZZRingElem(2) 0 0; 0 4 0; 0 0 7])
-
+  D, U, V = snf_with_transform(B)
+  @test U * B * V == D
+  @test D == snf(B)
   @test is_snf(snf_diagonal(B))
+  @test abs(det(U)) == abs(det(V)) == 1
+
+  # tests for snf_with_transform
+  for i in 1:10
+    r = rand(0:10)
+    c = rand(0:10)
+    rr = rand(0:min(r, c))
+    C = zero_matrix(ZZ, r, c)
+    if !isempty(C) && rr > 1
+      C[1, 1] = rand(0:10)
+      for i in 2:(rr - 1)
+        C[i, i] = rand(1:10) * C[i - 1, i - 1]
+      end
+    end
+    U = AbstractAlgebra.randmat_triu(matrix_space(ZZ, r, r), -10:10)
+    for i in 1:r
+      U[i, i] = 1
+    end
+    V = AbstractAlgebra.randmat_triu(matrix_space(ZZ, c, c), -10:10)
+    for i in 1:c
+      V[i, i] = 1
+    end
+    A = U * C * V
+    SS, UU, VV = snf_with_transform(A)
+    @test UU * A * VV == SS 
+    @test abs(det(UU)) == abs(det(VV)) == 1
+    @test diagonal(SS) == diagonal(C)
+    SS, UU, VV = snf_with_transform(A, true, false)
+    @test abs(det(UU)) == 1
+    @test diagonal(SS) == diagonal(C)
+    SS, UU, VV = snf_with_transform(A, false, true)
+    @test diagonal(SS) == diagonal(C)
+    @test abs(det(VV)) == 1
+  end
+
+  M = ZZ[1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0; 0 0 1 0 0 0 0 0 0 0 0 0 0 1 1 0 0 0 0 0; 0 0 0 1 0 0 0 0 0 0 0 0 0 0 1 7 0 0 0 0; 0 0 0 0 1 0 0 0 0 0 0 0 0 1 1 4 0 0 0 0; 0 0 0 0 0 1 0 0 0 0 1 1 3 1 1 1 0 0 0 0; 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 1 0 1 3; 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 1 0 5; 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 1 17; 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 9; 0 0 0 0 0 0 0 0 0 0 2 0 4 0 0 0 0 0 0 4; 0 0 0 0 0 0 0 0 0 0 0 2 2 0 0 2 0 0 0 14; 0 0 0 0 0 0 0 0 0 0 0 0 6 0 0 2 0 0 0 6; 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 2 0 0 0 0; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 6 0 0 0 0; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 8 0 0 0 0; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 0 8; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 2; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 16; 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 18]
+  S, _, V = snf_with_transform(M, false, true)
+  @assert abs(det(V)) == 1
+end
+
+@testset "ZZMatrix.elementary_divisors" begin
+  S = matrix_space(ZZ, 3, 3)
+
+  # Full-rank square matrix; elementary divisors equal the SNF diagonal.
+  A = S([ZZRingElem(2) 3 5; 1 4 7; 19 3 7])
+  @test elementary_divisors(A) == ZZRingElem[1, 1, 27]
+
+  # Rank-deficient square matrix.
+  C = matrix(ZZ, 2, 2, [1, 0, 0, 0])
+  @test elementary_divisors(C) == ZZRingElem[1]
+
+  # Zero matrix — rank 0, no elementary divisors.
+  @test elementary_divisors(zero_matrix(ZZ, 2, 3)) == ZZRingElem[]
+
+  # Empty matrices.
+  @test elementary_divisors(zero_matrix(ZZ, 0, 0)) == ZZRingElem[]
+  @test elementary_divisors(zero_matrix(ZZ, 0, 2)) == ZZRingElem[]
+  @test elementary_divisors(zero_matrix(ZZ, 2, 0)) == ZZRingElem[]
+
+  # Non-square matrix.
+  D = matrix(ZZ, 2, 3, [1, 0, 0, 0, 2, 0])
+  @test elementary_divisors(D) == ZZRingElem[1, 2]
 end
 
 @testset "ZZMatrix._solve_rational" begin
@@ -751,19 +826,23 @@ end
 end
 
 @testset "ZZMatrix.solve" begin
-  A = matrix(ZZ, 2, 2, [1,2,3,4])
+  # Test matrices have size (at least) 3x3 -- smaller failed to detect a bug.
+  U_triang = matrix(ZZ, 3, 3, [1,2,3, 0,4,5, 0,0,6])
+  L_triang = matrix(ZZ, 3, 3, [1,0,0, 2,3,0, 4,5,6])
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(ZZ) === AbstractAlgebra.Solve.HermiteFormTrait()
-  @test AbstractAlgebra.Solve.matrix_normal_form_type(A) === AbstractAlgebra.Solve.HermiteFormTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(U_triang) === AbstractAlgebra.Solve.HermiteFormTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(L_triang) === AbstractAlgebra.Solve.HermiteFormTrait()
 
-  b = matrix(ZZ, 1, 2, [1, 6])
-  @test AbstractAlgebra._solve_triu_left(A, b) == matrix(ZZ, 1, 2, [1, 1])
-  b = matrix(ZZ, 2, 1, [3, 4])
-  @test AbstractAlgebra._solve_triu(A, b; side = :right) == matrix(ZZ, 2, 1, [1, 1])
-  b = matrix(ZZ, 2, 1, [1, 7])
-  c = similar(b)
-  AbstractAlgebra._solve_tril!(c, A, b)
-  @test c == matrix(ZZ, 2, 1, [1, 1])
+  X = matrix(ZZ, 3, 2, [3,1, 4,1, 5,9])
+  trX = transpose(X)
+  @test AbstractAlgebra._solve_triu_left(U_triang, trX*U_triang) == trX
+  @test AbstractAlgebra._solve_triu(U_triang, trX*U_triang; side = :left) == trX
+  @test AbstractAlgebra._solve_triu(U_triang, U_triang*X; side = :right) == X
+
+  c = similar(X)
+  AbstractAlgebra._solve_tril!(c, L_triang, L_triang*X)
+  @test c == X
 
   S = matrix_space(ZZ, 3, 3)
 

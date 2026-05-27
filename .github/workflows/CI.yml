@@ -47,11 +47,11 @@ jobs:
           # be able to properly deal with PRs / merges
           fetch-depth: 2
       - name: "Set up Julia"
-        uses: julia-actions/setup-julia@v2
+        uses: julia-actions/setup-julia@v3
         with:
           version: ${{ matrix.julia-version }}
       - name: "Cache artifacts"
-        uses: julia-actions/cache@v2
+        uses: julia-actions/cache@v3
       - name: "Build package"
         uses: julia-actions/julia-buildpkg@v1
       - name: "Run tests"
@@ -74,7 +74,7 @@ jobs:
         uses: julia-actions/julia-processcoverage@v1
       - name: "Upload coverage data to Codecov"
         continue-on-error: true
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -83,10 +83,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: julia-actions/setup-julia@v2
+      - uses: julia-actions/setup-julia@v3
         with:
           version: '1.10'
-      - uses: julia-actions/cache@v2
+      - uses: julia-actions/cache@v3
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-docdeploy@v1
         env:

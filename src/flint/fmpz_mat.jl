@@ -111,7 +111,10 @@ end
 
 iszero(a::ZZMatrix) = @ccall libflint.fmpz_mat_is_zero(a::Ref{ZZMatrix})::Bool
 
-isone(a::ZZMatrix) = @ccall libflint.fmpz_mat_is_one(a::Ref{ZZMatrix})::Bool
+function isone(a::ZZMatrix)
+  is_square(a) || return false
+  return @ccall libflint.fmpz_mat_is_one(a::Ref{ZZMatrix})::Bool
+end
 
 @inline function is_zero_entry(A::ZZMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(A, i, j)
@@ -170,21 +173,25 @@ function -(x::ZZMatrix)
   return z
 end
 
-###############################################################################
+################################################################################
 #
-#   transpose
+#  Transpose
 #
-###############################################################################
+################################################################################
 
-function transpose(x::ZZMatrix)
-  z = similar(x, ncols(x), nrows(x))
-  @ccall libflint.fmpz_mat_transpose(z::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
-  return z
+function transpose(a::ZZMatrix)
+  z = similar(a, ncols(a), nrows(a))
+  return transpose!(z, a)
 end
 
-function transpose!(A::ZZMatrix, B::ZZMatrix)
-  @ccall libflint.fmpz_mat_transpose(A::Ref{ZZMatrix}, B::Ref{ZZMatrix})::Nothing
-  return A
+function transpose!(a::ZZMatrixOrPtr)
+  @req is_square(a) "Matrix must be a square matrix"
+  return transpose!(a, a)
+end
+
+function transpose!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr)
+  @ccall libflint.fmpz_mat_transpose(z::Ref{ZZMatrix}, a::Ref{ZZMatrix})::Nothing
+  return z
 end
 
 ###############################################################################
@@ -861,7 +868,7 @@ function __hnf(x)
 end
 
 function hnf!(x::ZZMatrix)
-  if nrows(x) * ncols(x) > 100
+  if !(nrows(x) <= 50 && ncols(x) <= 50) && nrows(x) * ncols(x) > 100
     z = hnf(x)
     @ccall libflint.fmpz_mat_set(x::Ref{ZZMatrix}, z::Ref{ZZMatrix})::Nothing
 
@@ -1045,7 +1052,7 @@ function lll_gram_with_transform(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99,
   if _is_definitely_full_rank(x)
     u = identity_matrix(ZZ, nrows(x))
     if x[1, 1] < 0
-      y = neg(x)
+      y = -x
       _lll_gram_with_transform!(y, u, ctx)
       return neg!(y), u
     else
@@ -1122,7 +1129,7 @@ function lll_gram!(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
   # try to recognize the definite case
   if _is_definitely_full_rank(x)
     if x[1, 1] < 0
-      return neg!(_lll_gram!(!neg(x), ctx))
+      return neg!(_lll_gram!(neg!(x), ctx))
     else
       return _lll_gram!(x, ctx)
     end
@@ -1285,11 +1292,55 @@ function is_snf(x::ZZMatrix)
   return @ccall libflint.fmpz_mat_is_in_snf(x::Ref{ZZMatrix})::Bool
 end
 
+@doc raw"""
+    elementary_divisors(x::ZZMatrix) -> Vector{ZZRingElem}
+
+Return the elementary divisors $d_1 \mid d_2 \mid \cdots \mid d_r$ of $x$,
+where $r$ is the rank of $x$.
+"""
+function elementary_divisors(x::ZZMatrix)
+  m = min(nrows(x), ncols(x))
+  buf = @ccall libflint._fmpz_vec_init(m::Int)::Ptr{ZZRingElem}
+  r = @ccall libflint.fmpz_mat_elementary_divisors(buf::Ptr{ZZRingElem}, x::Ref{ZZMatrix})::Int
+  z = Vector{ZZRingElem}(undef, r)
+  for i in 1:r
+    ei = ZZRingElem()
+    @ccall libflint.fmpz_set(ei::Ref{ZZRingElem}, (buf + (i - 1) * sizeof(ZZRingElem))::Ptr{ZZRingElem})::Nothing
+    z[i] = ei
+  end
+  @ccall libflint._fmpz_vec_clear(buf::Ptr{ZZRingElem}, m::Int)::Nothing
+  return z
+end
+
 ################################################################################
 #
 #  Smith normal form with trafo
 #
 ################################################################################
+
+function _snf_with_transform(A::ZZMatrix, l::Bool = true, r::Bool = true)
+  S = similar(A)
+  if l
+    U = zero_matrix(ZZ, nrows(A), nrows(A))
+    if r
+      V = zero_matrix(ZZ, ncols(A), ncols(A))
+      @ccall libflint.fmpz_mat_snf_transform(S::Ref{ZZMatrix}, U::Ref{ZZMatrix}, V::Ref{ZZMatrix}, A::Ref{ZZMatrix})::Nothing
+      return S, U, V
+    else
+      @ccall libflint.fmpz_mat_snf_transform(S::Ref{ZZMatrix}, U::Ref{ZZMatrix}, C_NULL::Ptr{Nothing}, A::Ref{ZZMatrix})::Nothing
+      return S, U, U
+    end
+  else
+    if r
+      V = zero_matrix(ZZ, ncols(A), ncols(A))
+      @ccall libflint.fmpz_mat_snf_transform(S::Ref{ZZMatrix}, C_NULL::Ptr{Nothing}, V::Ref{ZZMatrix}, A::Ref{ZZMatrix})::Nothing
+      return S, V, V
+    else
+      @ccall libflint.fmpz_mat_snf_transform(S::Ref{ZZMatrix}, C_NULL::Ptr{Nothing}, C_NULL::Ptr{Nothing}, A::Ref{ZZMatrix})::Nothing
+      return S, S, S
+    end
+  end
+end
 
 #=
 g, e,f = gcdx(a, b)
@@ -1305,96 +1356,149 @@ Given some integer matrix $A$, compute the Smith normal form (elementary
 divisor normal form) of $A$. If `l` and/ or `r` are true, then the corresponding
 left and/ or right transformation matrices are computed as well.
 """
-function snf_with_transform(A::ZZMatrix, l::Bool=true, r::Bool=true)
+function snf_with_transform(A::ZZMatrix, l::Bool=true, r::Bool=true; is_hnf::Bool = false)
+  # always need R and L defined for the GC.@preserve block below
   if r
     R = identity_matrix(ZZ, ncols(A))
+  else
+    R = A
   end
 
   if l
     L = identity_matrix(ZZ, nrows(A))
+  else
+    L = A
   end
-  # TODO: if only one trafo is required, start with the HNF that does not
-  #       compute the trafo
-  #       Rationale: most of the work is on the 1st HNF..
+
   S = deepcopy(A)
+  Stra = is_square(S) ? S : zero_matrix(ZZ, ncols(S), nrows(S))
+  first = true
   while !is_diagonal(S)
-    if l
-      S, T = hnf_with_transform(S)
-      L = T * L
-    else
-      S = hnf!(S)
+    # Most of the work seems to be done for the first HNF
+    # Since we can always choose the side we start with
+    # in case only one transformation is requested, we start with the side where no
+    # transformation is request.
+    # r && !l (this is the standard)
+    #   l -> r (with transform) -> l -> r (with transform) -> ...
+    # l && !r
+    #   r -> l (with transform) -> r -> l (with_transform)
+    if !(first && l && !r)
+      if l
+        S, T = hnf_with_transform(S)
+        L = T * L
+      else
+        S = hnf!(S)
+      end
     end
+    first = false
 
     if is_diagonal(S)
       break
     end
+
     if r
-      S, T = hnf_with_transform(transpose(S))
+      #S, T = hnf_with_transform(transpose(S))
+      Stra, T = hnf_with_transform(transpose!(Stra, S))
+      Stra, S = S, Stra
       R = T * R
     else
-      S = hnf!(transpose(S))
+      #S = hnf!(transpose(S))
+      Stra = hnf!(transpose!(Stra, S))
+      Stra, S = S, Stra
     end
-    S = transpose(S)
+    #S = transpose(S)
+    Stra = transpose!(Stra, S)
+    Stra, S = S, Stra
   end
   #this is probably not really optimal...
-  for i = 1:min(nrows(S), ncols(S))
-    if S[i, i] == 1
-      continue
+  a = ZZRingElem()
+  b = ZZRingElem()
+  g = ZZRingElem()
+  e = ZZRingElem()
+  f = ZZRingElem()
+  x = ZZRingElem()
+  y = ZZRingElem()
+  z = ZZRingElem()
+  GC.@preserve S L R begin
+    for i = 1:min(nrows(S), ncols(S))
+      if is_one(mat_entry_ptr(S, i, i))
+        continue
+      end
+      for j = i+1:min(nrows(S), ncols(S))
+        #if S[j, j] == 0 
+        if is_zero_entry(S, j, j)
+          continue
+        end
+        if !is_zero_entry(S, i, i) && is_divisible_by(mat_entry_ptr(S, j, j), mat_entry_ptr(S, i, i))
+        #if S[i, i] != 0 && S[j, j] % S[i, i] == 0 #is_divisible_by(mat_entry_ptr(S, j, j), mat_entry_ptr(S, i, i))
+          continue
+        end
+        g, e, f = gcdx!(g, e, f, mat_entry_ptr(S, i, i), mat_entry_ptr(S, j, j))
+        #a = divexact(S[i, i], g)
+        a = divexact!(a, mat_entry_ptr(S, i, i), g)
+        S[i, i] = g
+        #b = divexact(S[j, j], g)
+        b = divexact!(b, mat_entry_ptr(S, j, j), g)
+        #S[j, j] *= a
+        mul!(mat_entry_ptr(S, j, j), a)
+        b = neg!(b)
+        if l
+          # U = [1 0; -b*f 1] * [ 1 1; 0 1] = [1 1; -b*f -b*f+1]
+          # so row i and j of L will be transformed. We do it naively
+          # those 2x2 transformations of 2 rows should be a c-primitive
+          # or at least a Nemo/Hecke primitive
+          for k = 1:ncols(L)
+            #x = -b * f
+            x = mul!(x, b, f)
+            #L[i, k], L[j, k] = L[i, k] + L[j, k], x * (L[i, k] + L[j, k]) + L[j, k]
+            add!(mat_entry_ptr(L, i, k), mat_entry_ptr(L, j, k))
+            addmul!(mat_entry_ptr(L, j, k), x, mat_entry_ptr(L, i, k))
+          end
+          #b = neg!(b)
+        end
+        if r
+          # V = [e -b ; f a];
+          # so col i and j of R will be transformed. We do it naively
+          # careful: at this point, R is still transposed
+          for k = 1:nrows(R)
+            #R[i, k], R[j, k] = e * R[i, k] + f * R[j, k], -b * R[i, k] + a * R[j, k]
+            set!(x, mat_entry_ptr(R, j, k))
+            set!(z, mat_entry_ptr(R, i, k))
+
+            mul!(y, f, x)
+            mul!(mat_entry_ptr(R, i, k), e, mat_entry_ptr(R, i, k))
+            add!(mat_entry_ptr(R, i, k), y)
+
+            mul!(mat_entry_ptr(R, j, k), a, mat_entry_ptr(R, j, k))
+            mul!(z, z, b)
+            add!(mat_entry_ptr(R, j, k), z)
+          end
+        end
+      end
     end
-    for j = i+1:min(nrows(S), ncols(S))
-      if S[j, j] == 0
-        continue
-      end
-      if S[i, i] != 0 && S[j, j] % S[i, i] == 0
-        continue
-      end
-      g, e, f = gcdx(S[i, i], S[j, j])
-      a = divexact(S[i, i], g)
-      S[i, i] = g
-      b = divexact(S[j, j], g)
-      S[j, j] *= a
-      if l
-        # U = [1 0; -b*f 1] * [ 1 1; 0 1] = [1 1; -b*f -b*f+1]
-        # so row i and j of L will be transformed. We do it naively
-        # those 2x2 transformations of 2 rows should be a c-primitive
-        # or at least a Nemo/Hecke primitive
-        for k = 1:ncols(L)
-          x = -b * f
-          #          L[i,k], L[j,k] = L[i,k]+L[j,k], x*L[i,k]+(x+1)*L[j,k]
-          L[i, k], L[j, k] = L[i, k] + L[j, k], x * (L[i, k] + L[j, k]) + L[j, k]
+
+    # It might be the case that S was diagonal with negative diagonal entries.
+    mone = ZZ(-1)
+    for i in 1:min(nrows(S), ncols(S))
+      if is_negative_entry(S, i, i)
+        if l
+          multiply_row!(L, mone, i)
         end
-      end
-      if r
-        # V = [e -b ; f a];
-        # so col i and j of R will be transformed. We do it naively
-        # careful: at this point, R is still transposed
-        for k = 1:nrows(R)
-          R[i, k], R[j, k] = e * R[i, k] + f * R[j, k], -b * R[i, k] + a * R[j, k]
-        end
+        neg!(mat_entry_ptr(S, i, i))
+        #S[i, i] = -S[i, i]
       end
     end
   end
-
-  # It might be the case that S was diagonal with negative diagonal entries.
-  for i in 1:min(nrows(S), ncols(S))
-    if S[i, i] < 0
-      if l
-        multiply_row!(L, ZZRingElem(-1), i)
-      end
-      S[i, i] = -S[i, i]
-    end
-  end
-
   if l
     if r
-      return S, L, transpose(R)
+      return S, L, transpose!(R)
     else
       # last is dummy
       return S, L, L
     end
   elseif r
     # second is dummy
-    return S, R, transpose(R)
+    return S, R, transpose!(R)
   else
     # last two are dummy
     return S, S, S
@@ -1669,7 +1773,7 @@ function _solve_dixon(a::ZZMatrix, b::ZZMatrix)
   return z, d
 end
 
-#XU = B. only the upper triangular part of U is used
+# Solve XU = B for X given U & B.  Only the upper triangular part of U is used.
 function AbstractAlgebra._solve_triu_left(U::ZZMatrix, b::ZZMatrix; unipotent::Bool = false)
   n = ncols(U)
   m = nrows(b)
@@ -1715,9 +1819,9 @@ function AbstractAlgebra._solve_triu_left(U::ZZMatrix, b::ZZMatrix; unipotent::B
   return X
 end
 
-#UX = B, U has to be upper triangular
-#I think due to the Strassen calling path, where Strasse.solve(side = :left) 
-#call directly AA.solve_left, this has to be in AA and cannot be independent.
+# Solve UX = B for X given U & B: U has to be upper triangular.
+# I think due to the Strassen calling path, where Strasse.solve(side = :left) 
+# call directly AA.solve_left, this has to be in AA and cannot be independent.
 function AbstractAlgebra._solve_triu(U::ZZMatrix, b::ZZMatrix; side::Symbol=:left, unipotent::Bool = false) 
   if side == :left
     return AbstractAlgebra._solve_triu_left(U, b; unipotent)
@@ -1728,20 +1832,22 @@ function AbstractAlgebra._solve_triu(U::ZZMatrix, b::ZZMatrix; side::Symbol=:lef
   X = zero(b)
   tmp = zero_matrix(ZZ, 1, n)
   s = ZZ()
+  # We build up the solution column by column
   GC.@preserve U b X tmp begin
-    for i = 1:m
+    for i = 1:m  # i indexes the columns
       tmp_ptr = mat_entry_ptr(tmp, 1, 1)
       for j = 1:n
         X_ptr = mat_entry_ptr(X, j, i)
         set!(tmp_ptr, X_ptr)
         tmp_ptr += sizeof(ZZRingElem)
       end
-      for j = n:-1:1
+      # At this point tmp is full of zeroes
+      for j = n:-1:1 # j indexes the rows (in i-th column)
         zero!(s)
         tmp_ptr = mat_entry_ptr(tmp, 1, j+1)
         for k = j + 1:n
           U_ptr = mat_entry_ptr(U, j, k)
-          mul!(s, U_ptr, tmp_ptr)
+          addmul!(s, U_ptr, tmp_ptr)
           tmp_ptr += sizeof(ZZRingElem)
           #           s = addmul!(s, U[j, k], tmp[k])
         end
@@ -1768,35 +1874,35 @@ function AbstractAlgebra._solve_triu(U::ZZMatrix, b::ZZMatrix; side::Symbol=:lef
   return X
 end
 
-#solves Ax = B for A lower triagular. if f != 0 (f is true), the diagonal
-#is assumed to be 1 and not actually used.
-#the upper part of A is not used/ touched.
-#one cannot assert is_lower_triangular as this is used for the inplace
-#lu decomposition where the matrix is full, encoding an upper triangular
-#using the diagonal and a lower triangular with trivial diagonal
-function AbstractAlgebra._solve_tril!(A::ZZMatrix, B::ZZMatrix, C::ZZMatrix, f::Int = 0) 
+# Solves Lx = B for L lower triangular.  If unipotent is true, the diagonal
+# is assumed to be 1 and not actually used.
+# The upper part of L is not used/ touched.
+# One cannot assert is_lower_triangular as this is used for the inplace
+# lu decomposition where the matrix is full, encoding an upper triangular
+# using the diagonal and a lower triangular with trivial diagonal
+function AbstractAlgebra._solve_tril!(X::ZZMatrix, L::ZZMatrix, B::ZZMatrix; unipotent::Bool = false) 
 
   # a       x   u      ax = u
   # b c   * y = v      bx + cy = v
   # d e f   z   w      ....
 
-  @assert ncols(A) == ncols(C)
+  @assert ncols(X) == ncols(B)
   s = ZZ(0)
-  GC.@preserve A B C begin
-    for i=1:ncols(A)
-      for j = 1:nrows(A)
-        t = C[j, i]
-        B_ptr = mat_entry_ptr(B, j, 1)
+  GC.@preserve X L B begin
+    for i=1:ncols(X)
+      for j = 1:nrows(X)
+        t = B[j, i]
+        L_ptr = mat_entry_ptr(L, j, 1)
         for k = 1:j-1
-          A_ptr = mat_entry_ptr(B, k, i)
-          mul!(s, A_ptr, B_ptr)
-          B_ptr += sizeof(ZZRingElem)
+          X_ptr = mat_entry_ptr(X, k, i)
+          mul!(s, X_ptr, L_ptr)
+          L_ptr += sizeof(ZZRingElem)
           sub!(t, t, s)
         end
-        if f == 1
-          A[j,i] = t
+        if unipotent
+          X[j,i] = t
         else
-          A[j,i] = divexact(t, B[j, j])
+          X[j,i] = divexact(t, L[j, j])
         end
       end
     end
@@ -2147,24 +2253,38 @@ function (::Type{Base.Matrix{BigInt}})(A::ZZMatrix)
   return mat
 end
 
-function map_entries(R::zzModRing, M::ZZMatrix)
-  MR = zero_matrix(R, nrows(M), ncols(M))
-  @ccall libflint.fmpz_mat_get_nmod_mat(MR::Ref{zzModMatrix}, M::Ref{ZZMatrix})::Nothing
-  return MR
+function map_entries(R::zzModRing, A::ZZMatrix)
+  N = zero_matrix(R, nrows(A), ncols(A))
+  @ccall libflint.fmpz_mat_get_nmod_mat(N::Ref{zzModMatrix}, A::Ref{ZZMatrix})::Nothing
+  return N
 end
 
-function map_entries(F::fpField, M::ZZMatrix)
-  MR = zero_matrix(F, nrows(M), ncols(M))
-  @ccall libflint.fmpz_mat_get_nmod_mat(MR::Ref{fpMatrix}, M::Ref{ZZMatrix})::Nothing
-  return MR
+function map_entries!(R::zzModRing, N::zzModMatrix, A::ZZMatrix)
+  @ccall libflint.nmod_mat_set_mod(N::Ref{zzModMatrix}, R.n::UInt)::Cvoid
+  @ccall libflint.fmpz_mat_get_nmod_mat(N::Ref{zzModMatrix}, A::Ref{ZZMatrix})::Cvoid
+  N.base_ring = R  # exploiting that the internal repr is the indep of char
+  return N
 end
 
-function map_entries(R::ZZModRing, M::ZZMatrix)
-  N = zero_matrix(R, nrows(M), ncols(M))
-  GC.@preserve M N begin
-    for i = 1:nrows(M)
-      for j = 1:ncols(M)
-        m = mat_entry_ptr(M, i, j)
+function map_entries(R::fpField, A::ZZMatrix)
+  N = zero_matrix(R, nrows(A), ncols(A))
+  @ccall libflint.fmpz_mat_get_nmod_mat(N::Ref{fpMatrix}, A::Ref{ZZMatrix})::Nothing
+  return N
+end
+
+function map_entries!(R::fpField, N::fpMatrix, A::ZZMatrix)
+  @ccall libflint.nmod_mat_set_mod(N::Ref{fpMatrix}, R.n::UInt)::Cvoid
+  @ccall libflint.fmpz_mat_get_nmod_mat(N::Ref{fpMatrix}, A::Ref{ZZMatrix})::Cvoid
+  N.base_ring = R  # exploiting that the internal repr is the indep of char
+  return N
+end
+
+function map_entries(R::ZZModRing, A::ZZMatrix)
+  N = zero_matrix(R, nrows(A), ncols(A))
+  GC.@preserve A N begin
+    for i = 1:nrows(A)
+      for j = 1:ncols(A)
+        m = mat_entry_ptr(A, i, j)
         n = mat_entry_ptr(N, i, j)
         @ccall libflint.fmpz_mod(n::Ptr{ZZRingElem}, m::Ptr{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
       end
@@ -2172,6 +2292,11 @@ function map_entries(R::ZZModRing, M::ZZMatrix)
   end
   return N
 end
+
+change_base_ring(R::zzModRing, A::ZZMatrix) = map_entries(R, A)
+change_base_ring(R::fpMatrix, A::ZZMatrix) = map_entries(R, A)
+change_base_ring(R::ZZModRing, A::ZZMatrix) = map_entries(R, A)
+
 
 ###############################################################################
 #

@@ -1,8 +1,8 @@
 @testset "FqPolyRepPolyRingElem.constructors" begin
   R, x = Native.finite_field(ZZRingElem(23), 5, "x")
 
-  S1 = PolyRing(R)
-  S2 = PolyRing(R)
+  S1 = polynomial_ring(R; cached=false)[1]
+  S2 = polynomial_ring(R; cached=false)[1]
 
   @test isa(S1, FqPolyRepPolyRing)
   @test S1 !== S2

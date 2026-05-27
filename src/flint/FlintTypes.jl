@@ -1123,6 +1123,7 @@ mutable struct ZZMPolyRingElem <: MPolyRingElem{ZZRingElem}
   end
 
   function ZZMPolyRingElem(ctx::ZZMPolyRing, a::Vector{ZZRingElem}, b::Vector{Vector{Int}})
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.fmpz_mpoly_init2(z::Ref{ZZMPolyRingElem}, length(a)::Int, ctx::Ref{ZZMPolyRing})::Nothing
     z.parent = ctx
@@ -1138,6 +1139,7 @@ mutable struct ZZMPolyRingElem <: MPolyRingElem{ZZRingElem}
   end
 
   function ZZMPolyRingElem(ctx::ZZMPolyRing, a::Vector{ZZRingElem}, b::Vector{Vector{ZZRingElem}})
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.fmpz_mpoly_init2(z::Ref{ZZMPolyRingElem}, length(a)::Int, ctx::Ref{ZZMPolyRing})::Nothing
     z.parent = ctx
@@ -1252,6 +1254,7 @@ mutable struct QQMPolyRingElem <: MPolyRingElem{QQFieldElem}
   end
 
   function QQMPolyRingElem(ctx::QQMPolyRing, a::Vector{QQFieldElem}, b::Vector{Vector{Int}})
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.fmpq_mpoly_init2(z::Ref{QQMPolyRingElem}, length(a)::Int, ctx::Ref{QQMPolyRing})::Nothing
     z.parent = ctx
@@ -1267,6 +1270,7 @@ mutable struct QQMPolyRingElem <: MPolyRingElem{QQFieldElem}
   end
 
   function QQMPolyRingElem(ctx::QQMPolyRing, a::Vector{QQFieldElem}, b::Vector{Vector{ZZRingElem}})
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.fmpq_mpoly_init2(z::Ref{QQMPolyRingElem}, length(a)::Int, ctx::Ref{QQMPolyRing})::Nothing
     z.parent = ctx
@@ -1390,6 +1394,7 @@ mutable struct zzModMPolyRingElem <: MPolyRingElem{zzModRingElem}
   end
 
   function zzModMPolyRingElem(ctx::zzModMPolyRing, a::Vector{zzModRingElem}, b::Vector{Vector{Int}})
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.nmod_mpoly_init2(z::Ref{zzModMPolyRingElem}, length(a)::Int, ctx::Ref{zzModMPolyRing})::Nothing
     z.parent = ctx
@@ -1405,6 +1410,7 @@ mutable struct zzModMPolyRingElem <: MPolyRingElem{zzModRingElem}
   end
 
   function zzModMPolyRingElem(ctx::zzModMPolyRing, a::Vector{zzModRingElem}, b::Vector{Vector{ZZRingElem}})
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.nmod_mpoly_init2(z::Ref{zzModMPolyRingElem}, length(a)::Int, ctx::Ref{zzModMPolyRing})::Nothing
     z.parent = ctx
@@ -1533,6 +1539,7 @@ mutable struct fpMPolyRingElem <: MPolyRingElem{fpFieldElem}
   end
 
   function fpMPolyRingElem(ctx::fpMPolyRing, a::Vector{fpFieldElem}, b::Vector{Vector{Int}})
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.nmod_mpoly_init2(z::Ref{fpMPolyRingElem}, length(a)::Int, ctx::Ref{fpMPolyRing})::Nothing
     z.parent = ctx
@@ -1548,6 +1555,7 @@ mutable struct fpMPolyRingElem <: MPolyRingElem{fpFieldElem}
   end
 
   function fpMPolyRingElem(ctx::fpMPolyRing, a::Vector{fpFieldElem}, b::Vector{Vector{ZZRingElem}})
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.nmod_mpoly_init2(z::Ref{fpMPolyRingElem}, length(a)::Int, ctx::Ref{fpMPolyRing})::Nothing
     z.parent = ctx
@@ -1668,6 +1676,7 @@ mutable struct FpMPolyRingElem <: MPolyRingElem{FpFieldElem}
   end
 
   function FpMPolyRingElem(ctx::FpMPolyRing, a::Vector{FpFieldElem}, b::Vector{Vector{T}}) where T <: Union{UInt, Int, ZZRingElem}
+    @req all(x -> all(!is_negative, x), b) "Negative exponents are not allowed"
     z = new()
     @ccall libflint.fmpz_mod_mpoly_init2(z::Ref{FpMPolyRingElem}, length(a)::Int, ctx::Ref{FpMPolyRing})::Nothing
     z.parent = ctx
@@ -2387,9 +2396,8 @@ A $p^n$-adic field for some prime power $p^n$.
   prec_max::Int
 
   function QadicField(p::ZZRingElem, d::Int, prec::Int = 64, var::String = "a"; cached::Bool = true, check::Bool = true, base_field::PadicField = PadicField(p, prec, cached = cached))
-
-    @assert p == prime(base_field)
-    check && !is_probable_prime(p) && throw(DomainError(p, "Integer must be prime"))
+    @req p == prime(base_field) "prime of base_field does not match p"
+    check && @req is_probable_prime(p) "Integer must be prime"
 
     z = get_cached!(QadicBase, (base_field, d), cached) do
       zz = new()
@@ -2402,9 +2410,53 @@ A $p^n$-adic field for some prime power $p^n$.
 
     return z, gen(z)
   end
+
+  function QadicField(f::T, prec::Int = 64, var::String = "a";
+                      cached::Bool = true, check::Bool = true,
+                      base_field::PadicField = PadicField(modulus(f), prec, cached = cached)
+                     ) where T <: Union{zzModPolyRingElem,fpPolyRingElem,ZZModPolyRingElem,FpPolyRingElem}
+    p = modulus(f)
+    @req p == prime(base_field) "prime of base_field does not match modulus of f"
+    check && @req is_irreducible(f) "Defining polynomial must be irreducible"
+    check && @req is_monic(f) "Defining polynomial must be monic"
+
+    z = get_cached!(_qadic_modulus_cache(T), (base_field, f), cached) do
+      zz = new()
+      _qadic_ctx_init_modulus!(zz, p, f, var)
+      finalizer(_qadic_ctx_clear_fn, zz)
+      return zz
+    end
+    z.prec_max = prec
+    set_attribute!(z, :base_field, base_field)
+
+    return z, gen(z)
+  end
+
+  # The QadicField(::FqPolyRingElem, ...) outer constructor lives in
+  # flint/fq_default_poly.jl, since FqPolyRingElem is not yet defined here.
 end
 
 const QadicBase = CacheDictType{Tuple{PadicField, Int}, QadicField}()
+
+const QadicBaseFmpzPol = CacheDictType{Tuple{PadicField, ZZModPolyRingElem}, QadicField}()
+const QadicBaseGFPPol = CacheDictType{Tuple{PadicField, FpPolyRingElem}, QadicField}()
+const QadicBaseNmodPol = CacheDictType{Tuple{PadicField, zzModPolyRingElem}, QadicField}()
+const QadicBaseGFPNmodPol = CacheDictType{Tuple{PadicField, fpPolyRingElem}, QadicField}()
+
+# Simple helper to pick correct cache on underlying poly type
+_qadic_modulus_cache(::Type{ZZModPolyRingElem}) = QadicBaseFmpzPol
+_qadic_modulus_cache(::Type{FpPolyRingElem}) = QadicBaseGFPPol
+_qadic_modulus_cache(::Type{zzModPolyRingElem}) = QadicBaseNmodPol
+_qadic_modulus_cache(::Type{fpPolyRingElem}) = QadicBaseGFPNmodPol
+
+# Function-barrier helper to get concrete type T
+function _qadic_ctx_init_modulus!(zz::QadicField, p::ZZRingElem, f::T, var::String) where {T}
+  @ccall libflint.qadic_ctx_init_modulus(zz::Ref{QadicField}, p::Ref{ZZRingElem}, f::Ref{T}, 0::Int, 0::Int, var::Cstring, 0::Cint)::Nothing
+end
+function _qadic_ctx_init_modulus!(zz::QadicField, p::UInt, f::T, var::String) where {T}
+  @ccall libflint.qadic_ctx_init_modulus_nmod(zz::Ref{QadicField}, p::UInt, f::Ref{T}, 0::Int, 0::Int, var::Cstring, 0::Cint)::Nothing
+end
+
 
 @doc raw"""
     QadicFieldElem <: FlintLocalFieldElem <: NonArchLocalFieldElem <: FieldElem
@@ -2423,6 +2475,25 @@ mutable struct QadicFieldElem <: FlintLocalFieldElem
     z = new()
     @ccall libflint.qadic_init2(z::Ref{QadicFieldElem}, prec::Int)::Nothing
     finalizer(_qadic_clear_fn, z)
+    return z
+  end
+end
+
+@doc raw"""
+    Qadic2SqrtPrecomp
+
+Opaque precomputation used to speed up square roots in a $q$-adic field of
+characteristic 2. Wraps a FLINT `struct qadic2_sqrt_precomp *`.
+"""
+mutable struct Qadic2SqrtPrecomp
+  ptr::Ptr{Nothing}
+  parent::QadicField
+
+  function Qadic2SqrtPrecomp(R::QadicField)
+    prime(R) == 2 || throw(DomainError(prime(R), "characteristic must be 2"))
+    ptr = @ccall libflint._qadic_char2_sqrt_precomp_init(R::Ref{QadicField})::Ptr{Nothing}
+    z = new(ptr, R)
+    finalizer(_qadic_char2_sqrt_precomp_clear_fn, z)
     return z
   end
 end
@@ -3883,6 +3954,43 @@ end
 
 ###############################################################################
 #
+#   ZZPolyRingMatrix
+#
+###############################################################################
+
+mutable struct ZZPolyRingMatrix <: MatElem{ZZPolyRingElem}
+  entries::Ptr{ZZPolyRingElem}
+  r::Int
+  c::Int
+  stride::Int
+  # end flint struct
+  base_ring::ZZPolyRing
+
+  # MatElem interface
+  function ZZPolyRingMatrix(R::ZZPolyRing, ::UndefInitializer, r::Int, c::Int)
+    z = ZZPolyRingMatrix(r, c, R)
+    return z
+  end
+
+  function ZZPolyRingMatrix(r::Int, c::Int, R::ZZPolyRing)
+    z = new()
+    @ccall libflint.fmpz_poly_mat_init(z::Ref{ZZPolyRingMatrix}, r::Int, c::Int)::Nothing
+    finalizer(_fmpz_poly_mat_clear_fn, z)
+    z.base_ring = R
+    return z
+  end
+
+  function ZZPolyRingMatrix(m::ZZPolyRingMatrix)
+    z = new()
+    @ccall libflint.fmpz_poly_mat_init_set(z::Ref{ZZPolyRingMatrix}, m::Ref{ZZPolyRingMatrix})::Nothing
+    finalizer(_fmpz_poly_mat_clear_fn, z)
+    z.base_ring = m.base_ring
+    return z
+  end
+end
+
+###############################################################################
+#
 #   zzModMatrixSpace / zzModMatrix
 #
 ###############################################################################
@@ -4598,6 +4706,7 @@ mutable struct FqPolyRepPolyRingElem <: PolyRingElem{FqPolyRepFieldElem}
 
   function FqPolyRepPolyRingElem(a::Vector{FqPolyRepFieldElem})
     z = new()
+    @req allequal(map(parent, a)) "parents do not match"
     ctx = parent(a[1])
     @ccall libflint.fq_poly_init2(z::Ref{FqPolyRepPolyRingElem}, length(a)::Int, ctx::Ref{FqPolyRepField})::Nothing
     for i = 1:length(a)
@@ -4699,6 +4808,7 @@ mutable struct fqPolyRepPolyRingElem <: PolyRingElem{fqPolyRepFieldElem}
 
   function fqPolyRepPolyRingElem(a::Vector{fqPolyRepFieldElem})
     z = new()
+    @req allequal(map(parent, a)) "parents do not match"
     ctx = parent(a[1])
     @ccall libflint.fq_nmod_poly_init2(z::Ref{fqPolyRepPolyRingElem}, length(a)::Int, ctx::Ref{fqPolyRepField})::Nothing
     for i = 1:length(a)
@@ -5046,7 +5156,7 @@ const _fq_default_mpoly_union = Union{AbstractAlgebra.Generic.MPoly{FqPolyRepFie
           Fqx = polynomial_ring(Fq, s, cached = cached, internal_ordering = internal_ordering)[1]
           return new(Fqx, R, 3)
         end
-        mm = polynomial_ring(Fq, "x")[1](lift(polynomial_ring(ZZ, "x")[1], m))
+        mm = change_base_ring(Fq, lift(polynomial_ring(ZZ, "x")[1], m); cached = false)
         Fq = Native.FiniteField(mm, R.var, cached = cached, check = false)[1]
         Fqx = polynomial_ring(Fq, s, cached = cached, internal_ordering = internal_ordering)[1]
         return new(Fqx, R, 2)
@@ -5134,6 +5244,10 @@ end
 
 function _fmpz_mat_clear_fn(a::ZZMatrix)
   @ccall libflint.fmpz_mat_clear(a::Ref{ZZMatrix})::Nothing
+end
+
+function _fmpz_poly_mat_clear_fn(a::ZZPolyRingMatrix)
+  @ccall libflint.fmpz_poly_mat_clear(a::Ref{ZZPolyRingMatrix})::Nothing
 end
 
 function _fmpz_mod_ctx_clear_fn(a::fmpz_mod_ctx_struct)
@@ -5304,6 +5418,10 @@ function _qadic_ctx_clear_fn(a::QadicField)
   @ccall libflint.qadic_ctx_clear(a::Ref{QadicField})::Nothing
 end
 
+function _qadic_char2_sqrt_precomp_clear_fn(a::Qadic2SqrtPrecomp)
+  @ccall libflint._qadic_char2_sqrt_precomp_clear(a.ptr::Ptr{Nothing})::Nothing
+end
+
 function _rand_ctx_clear_fn(a::rand_ctx)
   @ccall libflint.flint_rand_clear(a::Ref{rand_ctx})::Nothing
 end
@@ -5384,6 +5502,7 @@ const FqAbsPowerSeriesRingElemOrPtr = Union{FqAbsPowerSeriesRingElem, Ref{FqAbsP
 
 const ZZMatrixOrPtr = Union{ZZMatrix, Ref{ZZMatrix}, Ptr{ZZMatrix}}
 const QQMatrixOrPtr = Union{QQMatrix, Ref{QQMatrix}, Ptr{QQMatrix}}
+const ZZPolyRingMatrixOrPtr = Union{ZZPolyRingMatrix, Ref{ZZPolyRingMatrix}, Ptr{ZZPolyRingMatrix}}
 const zzModMatrixOrPtr = Union{zzModMatrix, Ref{zzModMatrix}, Ptr{zzModMatrix}}
 const ZZModMatrixOrPtr = Union{ZZModMatrix, Ref{ZZModMatrix}, Ptr{ZZModMatrix}}
 const fpMatrixOrPtr = Union{fpMatrix, Ref{fpMatrix}, Ptr{fpMatrix}}

@@ -37,11 +37,10 @@ var(a::FqPolyRepRelPowerSeriesRing) = a.S
 max_precision(R::FqPolyRepRelPowerSeriesRing) = R.prec_max
 
 function normalise(a::FqPolyRepRelPowerSeriesRingElem, len::Int)
+  len <= 0 && return len
   ctx = base_ring(a)
-  if len > 0
-    c = base_ring(a)()
-    @ccall libflint.fq_poly_get_coeff(c::Ref{FqPolyRepFieldElem}, a::Ref{FqPolyRepRelPowerSeriesRingElem}, (len - 1)::Int, ctx::Ref{FqPolyRepField})::Nothing
-  end
+  c = base_ring(a)()
+  @ccall libflint.fq_poly_get_coeff(c::Ref{FqPolyRepFieldElem}, a::Ref{FqPolyRepRelPowerSeriesRingElem}, (len - 1)::Int, ctx::Ref{FqPolyRepField})::Nothing
   while len > 0 && iszero(c)
     len -= 1
     if len > 0
