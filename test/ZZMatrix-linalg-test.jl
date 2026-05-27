@@ -76,7 +76,6 @@ end
                        0, 0, 0, 0, 0, 0, 0, 4*ZZ(3)^99]);
   d = Nemo.det_hcol_hnf(A);
   @test d == ZZ(2)^10 * ZZ(3)^99;
-  end
 end
 
 @testset "CrtCtx test" begin
