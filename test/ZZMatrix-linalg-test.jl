@@ -93,9 +93,10 @@ end
                        0, 0, 0, 0, 0, 0, 0, N^2*ZZ(3)^99]);
   A = U1*S*U2;
   d = Nemo.det_hcol_hnf(A); 
-  @test d == ZZ(2)^10 * ZZ(3)^99;
+  @test d == ZZ(2)^1000 * ZZ(3)^99;
   AA = kronecker_product(A,A);
   d = Nemo.det_hcol_hnf(AA);
+  @test d == ZZ(2)^16000 * ZZ(3)^1584;
   A = matrix(ZZ, rand(-ZZ(2)^256:ZZ(2)^256, 8,8));
   AA = kronecker_product(A,A);
   d = Nemo.det_hcol_hnf(AA); # this will (very likely) test the HCOL branch
