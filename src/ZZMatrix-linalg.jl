@@ -1275,7 +1275,7 @@ function det_hcol_hnf(A::ZZMatrix, U::AbstractArray= -100:100; solver=:NEMO_DIXO
         d *= p;
         quot = div(quot,p);
       end
-      @vprintln(:det,1, "  Doing hnf_modular with modulus $(d)");
+      @vprintln(:det,1, "  Doing hnf_modular with modulus of size $(nbits(d)) bits");
       @vtime :det 2  H = hnf_modular_eldiv(A, d)
       det_fac_from_hnf = prod_diagonal(H)
       @vprintln(:det,1,"  det_fac_from_hnf (bits) = $(nbits(det_fac_from_hnf))");
