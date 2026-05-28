@@ -31,19 +31,6 @@ function getindex_raw(a::T, i::Int, j::Int) where T <: Zmodn_mat
   return GC.@preserve a unsafe_load(mat_entry_ptr(a, i, j))
 end
 
-@inline function _nmod_reduce_int(u::Int, n::UInt, ninv::UInt)
-  if reinterpret(Int, n) > 0 && u < 0
-    u %= Int(n)
-  end
-  d = reinterpret(UInt, u)
-  if u < 0
-    d += n
-  end
-  if d >= n
-    d = @ccall libflint.n_mod2_preinv(d::UInt, n::UInt, ninv::UInt)::UInt
-  end
-  return d
-end
 
 @inline function setindex!(a::T, u::UInt, i::Int, j::Int) where T <: Zmodn_mat
   @boundscheck _checkbounds(a, i, j)
@@ -53,7 +40,7 @@ end
 
 @inline function setindex!(a::T, u::Int, i::Int, j::Int) where T <: Zmodn_mat
   @boundscheck _checkbounds(a, i, j)
-  setindex_raw!(a, _nmod_reduce_int(u, a.n, a.ninv), i, j)
+  setindex_raw!(a, mod(u, a.n), i, j)
 end
 
 @inline function setindex!(a::T, u::ZZRingElem, i::Int, j::Int) where T <: Zmodn_mat
