@@ -1020,7 +1020,7 @@ function hcol(A::ZZMatrix, d::ZZRingElem)
   n = nrows(A)
   w = deepcopy(A)
   g = d
-  t = Array{ZZRingElem}(ZZ(0),n)  # better to fill with `undef`?
+  t = Array{ZZRingElem}(undef,n)
   h = zero_matrix(ZZ,n,n)
   for i = 1:n
     k = n-(i-1)
