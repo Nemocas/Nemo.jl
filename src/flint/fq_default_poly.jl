@@ -692,7 +692,7 @@ end
 
 function (R::FqPolyRing)(x::Vector{FqFieldElem})
   length(x) == 0 && return zero(R)
-  base_ring(R) != parent(x[1]) && error("Coefficient rings must coincide")
+  @req all(parent(e) == base_ring(R) for e in x) "parents do not match"
   z = FqPolyRingElem(x, base_ring(R))
   z.parent = R
   return z
@@ -710,25 +710,41 @@ function (R::FqPolyRing)(x::Vector{T}) where {T <: Integer}
   return R(map(ZZRingElem, x))
 end
 
-function (R::FqPolyRing)(x::ZZPolyRingElem)
-  z = FqPolyRingElem(x, base_ring(R))
-  z.parent = R
+function (R::FqPolyRing)(g::ZZPolyRingElem)
+  error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
   return z
 end
 
-function (R::FqPolyRing)(x::Union{zzModPolyRingElem, fpPolyRingElem})
-  characteristic(base_ring(x)) != characteristic(base_ring(R)) &&
-  error("Incompatible characteristic")
-  z = FqPolyRingElem(x, base_ring(R))
-  z.parent = R
+function AbstractAlgebra._map(K::FqField, x::ZZPolyRingElem, parent::FqPolyRing)
+  @assert base_ring(parent) === K
+  z = FqPolyRingElem(x, K)
+  z.parent = parent
   return z
 end
 
-function (R::FqPolyRing)(x::Union{ZZModPolyRingElem, FpPolyRingElem})
-  characteristic(base_ring(x)) != characteristic(base_ring(R)) &&
-  error("Incompatible characteristic")
-  z = FqPolyRingElem(x, base_ring(R))
-  z.parent = R
+function (R::FqPolyRing)(g::Union{zzModPolyRingElem, fpPolyRingElem})
+  error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
+end
+
+function AbstractAlgebra._map(K::FqField, x::Union{zzModPolyRingElem, fpPolyRingElem}, parent::FqPolyRing)
+  @assert base_ring(parent) === K
+  characteristic(base_ring(x)) != characteristic(base_ring(parent)) &&
+    error("Incompatible characteristic")
+  z = FqPolyRingElem(x, K)
+  z.parent = parent
+  return z
+end
+
+function (R::FqPolyRing)(g::Union{ZZModPolyRingElem, FpPolyRingElem})
+  error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
+end
+
+function AbstractAlgebra._map(K::FqField, x::Union{ZZModPolyRingElem, FpPolyRingElem}, parent::FqPolyRing)
+  @assert base_ring(parent) === K
+  characteristic(base_ring(x)) != characteristic(base_ring(parent)) &&
+    error("Incompatible characteristic")
+  z = FqPolyRingElem(x, K)
+  z.parent = parent
   return z
 end
 
@@ -756,4 +772,41 @@ function lift(R::ZZPolyRing, f::FqPolyRingElem)
     @ccall libflint.fmpz_mod_poly_get_fmpz_poly(z::Ref{ZZPolyRingElem}, f::Ref{FqPolyRingElem}, (pointer_from_objref(F) + 2 * sizeof(Cint))::Ptr{Nothing})::Nothing
     return z
   end
+end
+
+################################################################################
+#
+#  QadicField from FqPolyRingElem
+#
+################################################################################
+
+function QadicField(f::FqPolyRingElem, prec::Int = 64, var::String = "a"; cached::Bool = true, check::Bool = true, base_field::PadicField = PadicField(characteristic(base_ring(f)), prec, cached = cached))
+  K = base_ring(f)
+  absolute_degree(K) == 1 || throw(ArgumentError("base ring of polynomial must be a prime field"))
+
+  z = get_cached!(QadicBaseFqPol, (base_field, f), cached) do
+    ctx_type = _fq_default_ctx_type(K)
+    if ctx_type == _FQ_DEFAULT_NMOD
+      _K = _get_raw_type(fpField, K)
+    else
+      @assert ctx_type == _FQ_DEFAULT_FMPZ_NMOD
+      _K = _get_raw_type(FpField, K)
+    end
+    ff = map_coefficients(c -> _K(lift(ZZ, c)), f; cached = false)
+    return QadicField(ff, prec, var; cached = false, check = check, base_field = base_field)[1]
+  end
+  z.prec_max = prec
+  set_attribute!(z, :base_field, base_field)
+
+  return z, gen(z)
+end
+
+const QadicBaseFqPol = CacheDictType{Tuple{PadicField, FqPolyRingElem}, QadicField}()
+
+function qadic_field(f::FqPolyRingElem, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
+  return QadicField(f, precision, var; cached = cached, check = check)
+end
+
+function unramified_extension(K::PadicField, f::FqPolyRingElem, var::String = "a"; precision::Int=precision(K), cached::Bool = true, check::Bool = true)
+  return QadicField(f, precision, var; cached = cached, check = check, base_field = K)
 end

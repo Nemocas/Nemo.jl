@@ -250,7 +250,7 @@ contains(::ArbFieldElem, ::ArbFieldElem)
 contains(::ArbFieldElem, ::Integer)
 contains(::ArbFieldElem, ::ZZRingElem)
 contains(::ArbFieldElem, ::QQFieldElem)
-contains{T <: Integer}(::ArbFieldElem, ::Rational{T})
+contains(::ArbFieldElem, ::Rational)
 contains(::ArbFieldElem, ::BigFloat)
 ```
 

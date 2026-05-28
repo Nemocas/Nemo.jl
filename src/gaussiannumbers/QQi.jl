@@ -432,13 +432,11 @@ for (A, Bs) in [
                 [ZZRingElem, [Complex{<:Rational}]]]
   for B in Bs
     # need Type{<:Integer} not Type{Integer} and we can't type <:Integer above
-    TA = @eval Type{<:($(A))}
-    TB = @eval Type{<:($(B))}
     @eval begin
-      function AbstractAlgebra.promote_rule(::($TA), ::($TB))
+      function AbstractAlgebra.promote_rule(::Type{<:$A}, ::Type{<:$B})
         return QQiFieldElem
       end
-      function AbstractAlgebra.promote_rule(::($TB), ::($TA))
+      function AbstractAlgebra.promote_rule(::Type{<:$B}, ::Type{<:$A})
         return QQiFieldElem
       end
       function +(a::($A), b::($B))

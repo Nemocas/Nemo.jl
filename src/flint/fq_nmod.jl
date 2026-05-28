@@ -55,11 +55,16 @@ function coeffs_raw(x::fqPolyRepFieldElem)
   return Vcopy
 end
 
+function setcoeff!(x::fqPolyRepFieldElem, n::Int, u::UInt)
+  @ccall libflint.nmod_poly_set_coeff_ui(x::Ref{fqPolyRepFieldElem}, n::Int, u::UInt)::Nothing
+  return x
+end
+
 # set the i-th coeff of x to c, internal use only
 function setindex_raw!(x::fqPolyRepFieldElem, c::UInt, i::Int)
   len = degree(parent(x))
   i > len - 1 && error("Index out of range")
-  @ccall libflint.nmod_poly_set_coeff_ui(x::Ref{fqPolyRepFieldElem}, i::Int, c::UInt)::Nothing
+  setcoeff!(x, i, c)
   return x
 end
 
@@ -67,15 +72,15 @@ zero(a::fqPolyRepField) = zero!(a())
 
 one(a::fqPolyRepField) = one!(a())
 
+iszero(a::fqPolyRepFieldElem) = @ccall libflint.fq_nmod_is_zero(a::Ref{fqPolyRepFieldElem}, a.parent::Ref{fqPolyRepField})::Bool
+
+isone(a::fqPolyRepFieldElem) = @ccall libflint.fq_nmod_is_one(a::Ref{fqPolyRepFieldElem}, a.parent::Ref{fqPolyRepField})::Bool
+
 function gen(a::fqPolyRepField)
   d = a()
   @ccall libflint.fq_nmod_gen(d::Ref{fqPolyRepFieldElem}, a::Ref{fqPolyRepField})::Nothing
   return d
 end
-
-iszero(a::fqPolyRepFieldElem) = @ccall libflint.fq_nmod_is_zero(a::Ref{fqPolyRepFieldElem}, a.parent::Ref{fqPolyRepField})::Bool
-
-isone(a::fqPolyRepFieldElem) = @ccall libflint.fq_nmod_is_one(a::Ref{fqPolyRepFieldElem}, a.parent::Ref{fqPolyRepField})::Bool
 
 is_gen(a::fqPolyRepFieldElem) = a == gen(parent(a)) # there is no is_gen in flint
 

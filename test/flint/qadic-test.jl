@@ -1,3 +1,54 @@
+@testset "QadicField.constructors" begin
+  # we have two cubic irreducible polynomials over F_2
+  # x^3 + x + 1 (conway polynomial)
+  # x^3 + x^2 + 1
+  # we do the most simple test: create qadic with custom modulus and check
+  #  that generator satisfies the polynomial relation provided
+  x1 = polynomial_ring(GF(2), :x; cached = false)[2]
+  x2 = polynomial_ring(GF(ZZ(2)), :x; cached = false)[2]
+  x3 = polynomial_ring(Native.GF(2), :x; cached = false)[2]
+  x4 = polynomial_ring(Native.GF(ZZ(2)), :x; cached = false)[2]
+  x5 = polynomial_ring(residue_ring(ZZ, 2)[1], :x; cached = false)[2]
+  x6 = polynomial_ring(residue_ring(ZZ, ZZ(2))[1], :x; cached = false)[2]
+
+  F, t = QadicField(2, 3, 1; cached = false)
+  @test is_zero(t^3 + t + 1) && !is_zero(t^3 + t^2 + 1)
+
+  for x in (x1, x2, x3, x4, x5, x6)
+    f = x^3 + x^2 + 1
+
+    F, t = QadicField(f, 1; cached = false)
+    @test !is_zero(t^3 + t + 1) && is_zero(t^3 + t^2 + 1)
+
+    F, t = qadic_field(f; precision = 1, cached = false)
+    @test !is_zero(t^3 + t + 1) && is_zero(t^3 + t^2 + 1)
+
+    K = padic_field(ZZ(2); cached = false)
+    F, t = unramified_extension(K, f; precision = 1, cached = false)
+    @test !is_zero(t^3 + t + 1) && is_zero(t^3 + t^2 + 1)
+  end
+
+  x = polynomial_ring(GF(5), :x; cached = false)[2]
+  @test_throws ArgumentError QadicField(x^5 + 1, 1; cached = false)
+  @test_throws ArgumentError QadicField(2*x^2 + 1, 1; cached = false)
+
+  K = padic_field(5; cached = false)
+  for x in (x1, x2, x3, x4, x5, x6)
+    f = x^3 + x^2 + 1
+    @test_throws ArgumentError unramified_extension(K, f)
+  end
+
+  # large characteristic
+  let p = ZZRingElem(2)^100 + 277
+    y = polynomial_ring(GF(p), :y; cached = false)[2]
+    f = y^2 + y + 1                    # irreducible since p == 2 (mod 3)
+    @assert is_irreducible(f)
+
+    F, t = QadicField(f, 1; cached = false)
+    @test is_zero(t^2 + t + 1)
+  end
+end
+
 @testset "QadicFieldElem.constructors" begin
   R, _     = @inferred QadicField(7, 1, 30)
   K, _     = @inferred QadicField(7, 3, 30) 
@@ -328,6 +379,35 @@ end
   @test sqrt(c)^2 == c
 
   @test sqrt(R(121))^2 == R(121)
+end
+
+@testset "QadicFieldElem.square_root_char2_precomp" begin
+  R, _ = QadicField(2, 3)
+  user_data = Nemo.Qadic2SqrtPrecomp(R)
+
+  a = 1 + 2^3 + O(R, 2^4)
+  @test Nemo._qadic_char2_sqrt(a, user_data)^2 == a
+
+  a = 1 + 2^3 + 2^4 + O(R, 2^10)
+  @test Nemo._qadic_char2_sqrt(a, user_data)^2 == a
+
+  @test_throws DomainError Nemo.Qadic2SqrtPrecomp(QadicField(3, 2)[1])
+  S, _ = QadicField(2, 5)
+  @test_throws ArgumentError Nemo._qadic_char2_sqrt(S(1), user_data)
+end
+
+@testset "QadicFieldElem.square_root_char2" begin
+  R, _ = QadicField(2, 3)
+
+  a = 1 + 2^3 + O(R, 2^4)
+  @test sqrt(a)^2 == a
+  @test has_attribute(R, :char2_sqrt_precomp)
+
+  precomp = get_attribute(R, :char2_sqrt_precomp)
+
+  a = 1 + 2^3 + 2^4 + O(R, 2^10)
+  @test sqrt(a)^2 == a
+  @test precomp === get_attribute(R, :char2_sqrt_precomp)
 end
 
 @testset "QadicFieldElem.special_functions" begin

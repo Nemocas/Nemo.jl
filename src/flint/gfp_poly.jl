@@ -516,8 +516,6 @@ end
 (R::fpPolyRing)(arr::Vector{T}) where {T <: Integer} = R(map(base_ring(R), arr))
 
 function (R::fpPolyRing)(arr::Vector{fpFieldElem})
-  if length(arr) > 0
-    (base_ring(R) != parent(arr[1])) && error("Wrong parents")
-  end
+  @req all(parent(e) == base_ring(R) for e in arr) "parents do not match"
   return fpPolyRingElem(R, arr)
 end

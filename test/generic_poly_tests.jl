@@ -1,8 +1,8 @@
 function test_poly_constructors(R)
 
   @testset "poly.constructors for $(R) of type $(typeof(R))" begin
-    S1 = PolyRing(R)
-    S2 = PolyRing(R)
+    S1 = polynomial_ring(R; cached=false)[1]
+    S2 = polynomial_ring(R; cached=false)[1]
 
     #@test isa(S1, GFPPolyRing)
     @test S1 !== S2

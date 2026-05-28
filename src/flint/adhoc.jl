@@ -502,7 +502,7 @@ function divexact(a::ZZRingElem, b::FracElem; check::Bool=true)
   return parent(b)(n, d)
 end
 
-function (a::Generic.FracField{T})(b::ZZRingElem) where {T <: RingElement}
+function (a::Generic.FracField{T})(b::ZZRingElem) where {T <: RingElem}
   z = Generic.FracFieldElem{T}(base_ring(a)(b), one(base_ring(a)))
   z.parent = a
   return z

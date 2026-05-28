@@ -7,8 +7,8 @@ coeff_types = [Int8, Int, UInt, BigInt,
                ZZRingElem, QQFieldElem]
 
 @testset "ComplexPolyRingElem.constructors" begin
-  S1 = PolyRing(CC)
-  S2 = PolyRing(CC)
+  S1 = polynomial_ring(CC; cached=false)[1]
+  S2 = polynomial_ring(CC; cached=false)[1]
 
   @test isa(S1, ComplexPolyRing)
   @test S1 !== S2

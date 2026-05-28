@@ -614,8 +614,8 @@ end
   # Individual tests
 
   S, (x, y) = polynomial_ring(R, ["x", "y"])
-  @test_throws ErrorException evaluate(x, [x])
-  @test_throws ErrorException evaluate(x, [x, x, x])
+  @test_throws ArgumentError evaluate(x, [x])
+  @test_throws ArgumentError evaluate(x, [x, x, x])
 
   f = x + y
   g = x - y
@@ -632,11 +632,11 @@ end
   r3 = evaluate(f + g, [xx + yy, yy + zz])
   @test r3 == r1 + r2
 
-  @test_throws ErrorException evaluate(x, [x,xx])
+  @test_throws ArgumentError evaluate(x, [x,xx])
 
   SS, z = polynomial_ring(R, "z")
-  @test_throws ErrorException evaluate(x, [z])
-  @test_throws ErrorException evaluate(x, [z, z, z])
+  @test_throws ArgumentError evaluate(x, [z])
+  @test_throws ArgumentError evaluate(x, [z, z, z])
   w = [z, (z + 1)^2]
   r1 = @inferred evaluate(f, w)
   r2 = evaluate(g, w)
@@ -710,6 +710,23 @@ end
       end
     end
   end
+end
+
+@testset "QQMPolyRingElem.resultant" begin
+  R, (x, y) = polynomial_ring(QQ, [:x, :y])
+
+  f = 3x*y^2 + (x + 1)*y + 3
+  g = 6(x + 1)*y + (x^3 + 2x + 2)
+
+  @test resultant(f, g, 2) == 3*x^7+6*x^5-6*x^3+96*x^2+192*x+96
+end
+
+@testset "QQMPolyRingElem.discriminant" begin
+  R, (x, y) = polynomial_ring(QQ, [:x, :y])
+
+  f = x*y^2 + (x + 1)*y + 3
+
+  @test discriminant(f, 2) == x^2-10*x+1
 end
 
 @testset "QQMPolyRingElem.combine_like_terms" begin

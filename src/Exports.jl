@@ -63,6 +63,7 @@ export CalciumField
 export CalciumFieldElem
 export canonical_unit
 export cdiv
+export cdiv!
 export cdivpow2
 export cdivrem
 export ceil
@@ -158,6 +159,7 @@ export eigenvalues_with_multiplicities
 export eisenstein_g
 export elem_to_mat_row!
 export elem_type
+export elementary_divisors
 export elliptic_e
 export elliptic_k
 export embed
@@ -190,6 +192,7 @@ export factor_shape
 export factor_squarefree
 export factorial
 export fdiv
+export fdiv!
 export fdivpow2
 export fdivrem
 export fibonacci
@@ -385,6 +388,7 @@ export isinf
 export isinteger
 export isless
 export isqrt
+export isqrt!
 export isqrtrem
 export isreal
 export iszero
@@ -490,6 +494,8 @@ export prevpow2
 export prime
 export prime_divisors
 export prime_field
+export primes_set
+export PrimesSet
 export primorial
 export prod_diagonal
 export pseudo_inv
@@ -555,6 +561,7 @@ export round!
 export rref
 export rref!
 export rsqrt
+export set!
 export set_exponent_vector!
 export set_printing_mode
 export setbit!
@@ -608,6 +615,7 @@ export tan
 export tanh
 export tanpi
 export tdiv
+export tdiv!
 export tdivpow2
 export tdivpow2!
 export tdivrem
@@ -671,6 +679,7 @@ export zzModRingElem
 export ZZModRingElem
 export ZZMPolyRing
 export ZZMPolyRingElem
+export ZZOneTo
 export ZZPolyRing
 export ZZPolyRingElem
 export ZZRelPowerSeriesRing

@@ -94,7 +94,10 @@ number_of_columns(a::QQMatrix) = a.c
 
 iszero(a::QQMatrix) = @ccall libflint.fmpq_mat_is_zero(a::Ref{QQMatrix})::Bool
 
-isone(a::QQMatrix) = @ccall libflint.fmpq_mat_is_one(a::Ref{QQMatrix})::Bool
+function isone(a::QQMatrix)
+  is_square(a) || return false
+  return @ccall libflint.fmpq_mat_is_one(a::Ref{QQMatrix})::Bool
+end
 
 @inline function is_zero_entry(A::QQMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(A, i, j)
@@ -170,23 +173,25 @@ function denominator(M::QQMatrix)
   return d
 end
 
-###############################################################################
+################################################################################
 #
-#   transpose
+#  Transpose
 #
-###############################################################################
+################################################################################
 
-function transpose(x::QQMatrix)
-  z = similar(x, ncols(x), nrows(x))
-  transpose!(z, x)
-  return z
+function transpose(a::QQMatrix)
+  z = similar(a, ncols(a), nrows(a))
+  return transpose!(z, a)
 end
 
-transpose!(A::Union{ZZMatrix,QQMatrix}) = is_square(A) ? transpose!(A, A) : transpose(A)
+function transpose!(a::QQMatrixOrPtr)
+  @req is_square(a) "Matrix must be a square matrix"
+  return transpose!(a, a)
+end
 
-function transpose!(A::QQMatrixOrPtr, B::QQMatrixOrPtr)
-  @ccall libflint.fmpq_mat_transpose(A::Ref{QQMatrix}, B::Ref{QQMatrix})::Nothing
-  return A
+function transpose!(z::QQMatrixOrPtr, a::QQMatrixOrPtr)
+  @ccall libflint.fmpq_mat_transpose(z::Ref{QQMatrix}, a::Ref{QQMatrix})::Nothing
+  return z
 end
 
 ###############################################################################

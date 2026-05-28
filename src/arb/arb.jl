@@ -445,6 +445,13 @@ function max(x::ArbFieldElem, y::ArbFieldElem)
   return z
 end
 
+function min(x::ArbFieldElem, y::ArbFieldElem)
+  z = parent(x)()
+  prec = precision(parent(x))
+  @ccall libflint.arb_min(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Ref{ArbFieldElem}, prec::Int)::Cvoid
+  return z
+end
+
 ################################################################################
 #
 #  Predicates

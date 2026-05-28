@@ -68,6 +68,32 @@ characteristic(R::fpField) = ZZRingElem(R.n)
 
 degree(::fpField) = 1
 
+function gen(k::fpField)
+  return k(1)
+end
+
+prime_field(F::fpField; cached::Bool=true) = F
+
+function defining_polynomial(k::fpField)
+  kx, x = polynomial_ring(k, cached=false)
+  return x - k(1)
+end
+
+################################################################################
+#
+#  Basis
+#
+################################################################################
+
+function basis(k::fpField)
+  return [k(1)]
+end
+
+function basis(k::fpField, l::fpField)
+  @assert k == l
+  return [k(1)]
+end
+
 ###############################################################################
 #
 #   AbstractString I/O
@@ -417,10 +443,10 @@ function (R::fpField)(a::QQFieldElem)
   den = denominator(a, false)
   n = @ccall libflint.fmpz_fdiv_ui(num::Ref{ZZRingElem}, R.n::UInt)::UInt
   d = @ccall libflint.fmpz_fdiv_ui(den::Ref{ZZRingElem}, R.n::UInt)::UInt
-  V = [UInt(0)]
-  g = @ccall libflint.n_gcdinv(V::Ptr{UInt}, d::UInt, R.n::UInt)::UInt
+  V = Ref(UInt(0))
+  g = @ccall libflint.n_gcdinv(V::Ref{UInt}, d::UInt, R.n::UInt)::UInt
   g != 1 && error("Unable to coerce")
-  return R(n)*R(V[1])
+  return R(n)*R(V[])
 end
 
 function (R::fpField)(a::Union{fpFieldElem, zzModRingElem, FpFieldElem, ZZModRingElem})

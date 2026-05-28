@@ -279,6 +279,13 @@ performance characteristics of a new object being created per operation will
 result, meaning that the developer will not be able to reason about the likely
 performance of unsafe operators.
 
+The function `set!` changes the value of an element to be the value of another
+element of the same mutable type and returns that value. Moreover, `set!` also
+provides type casting, that is, the types of the inputs may differ. For example,
+often ring elements can be set to values of type `Int`. More information on using
+`set!` in the context of `ZZRingElem` and `Int` can be found [here](@ref basic_manipulation_of_integers). Warning: Bad things
+can happen if this method is used incorrectly, including memory corruption and crashes.
+
 ### Interaction of unsafe operators and immutable types
 
 Because not all objects in Nemo are mutable, the unsafe operators somehow have

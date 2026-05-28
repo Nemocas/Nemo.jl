@@ -196,6 +196,17 @@ end
     @test contains(z, max(xx, yy))
     @test contains(zz, max(xx, yy))
   end
+
+  x = RR("[1 +/- 0.5]")
+  y = RR("[0.6 +/- 0.2]")
+  z = min(x, y)
+  zz = minimum([x, y])
+  for i in 1:10
+    xx = Nemo._rand_rational_in_ball(x)
+    yy = Nemo._rand_rational_in_ball(y)
+    @test contains(z, min(xx, yy))
+    @test contains(zz, min(xx, yy))
+  end
 end
 
 @testset "RealFieldElem.adhoc_comparison" begin

@@ -98,6 +98,40 @@ in(x::IntegerUnion, r::ZZRingElemUnitRange) = first(r) <= x <= last(r)
 
 mod(i::IntegerUnion, r::ZZRingElemUnitRange) = mod(i - first(r), length(r)) + first(r)
 
+struct ZZOneTo <: AbstractUnitRange{ZZRingElem}
+  stop::ZZRingElem
+  function ZZOneTo(stop::ZZRingElem)
+    stop < 0 && (stop = ZZ(0))
+    new(stop)
+  end
+end
+
+Base.OneTo(n::ZZRingElem) = ZZOneTo(n)
+
+Base.eltype(::Type{ZZOneTo}) = ZZRingElem
+Base.first(::ZZOneTo) = one(ZZ)
+Base.last(r::ZZOneTo) = r.stop
+Base.length(r::ZZOneTo) = BigInt(r.stop)
+
+function Base.getindex(r::ZZOneTo, i::Integer)
+  @boundscheck 1 <= i <= r.stop || Base.throw_boundserror(r, i)
+  return ZZ(i)
+end
+
+Base.iterate(r::ZZOneTo) = r.stop >= one(ZZ) ? (one(ZZ), one(ZZ)) : nothing
+function Base.iterate(r::ZZOneTo, state::ZZRingElem)
+  if state < r.stop
+    state += 1
+    return (state, state)
+  else
+    return nothing
+  end
+end
+
+Base.in(x::IntegerUnion, r::ZZOneTo) = 1 <= x <= r.stop
+
+mod(x::IntegerUnion, r::ZZOneTo) = mod(x - 1, r.stop) + 1
+
 Base.:(:)(a::ZZRingElem, b::Integer) = (:)(promote(a, b)...)
 Base.:(:)(a::Integer, b::ZZRingElem) = (:)(promote(a, b)...)
 
@@ -457,43 +491,25 @@ end
 divides(x::ZZRingElem, y::Integer) = divides(x, ZZRingElem(y))
 
 @doc raw"""
-    is_divisible_by(x::ZZRingElem, y::ZZRingElem)
+    is_divisible_by(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
 
 Return `true` if $x$ is divisible by $y$, otherwise return `false`.
 """
-function is_divisible_by(x::ZZRingElem, y::ZZRingElem)
-  if iszero(x)
-    return true
-  elseif iszero(y)
-    return false
-  elseif iseven(y) && isodd(x)
-    return false
-  elseif nbits(y) > nbits(x)
-    return false
-  else
-    flag, q = divides(x, y)
-    return flag
-  end
+function is_divisible_by(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+  return Bool(@ccall libflint.fmpz_divisible(x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Cint)
 end
 
 @doc raw"""
-    is_divisible_by(x::ZZRingElem, y::ZZRingElem)
+    is_divisible_by(x::ZZRingElemOrPtr, y::Int)
 
 Return `true` if $x$ is divisible by $y$, otherwise return `false`.
 """
-function is_divisible_by(x::ZZRingElem, y::Integer)
-  if iszero(x)
-    return true
-  elseif iszero(y)
-    return false
-  elseif iseven(y) && isodd(x)
-    return false
-  elseif ndigits(y, base=2) > nbits(x)
-    return false
-  else
-    r = mod(x, y)
-    return r == 0
-  end
+function is_divisible_by(x::ZZRingElemOrPtr, y::Int)
+  return Bool(@ccall libflint.fmpz_divisible_si(x::Ref{ZZRingElem}, y::Int)::Cint)
+end
+
+function is_divisible_by(x::ZZRingElemOrPtr, y::Integer)
+  return is_divisible_by(x, flintify(y))
 end
 
 function is_divisible_by(x::Integer, y::ZZRingElem)
@@ -588,6 +604,16 @@ divexact(x::Integer, y::ZZRingElem; check::Bool=true) = divexact(ZZRingElem(x), 
 #
 ###############################################################################
 
+function div(f::ZZRingElem, g::Int)
+  g == 0 && throw(DivideError())
+  z = ZZRingElem()
+  div!(z, f, g)
+end
+
+div!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr) = fdiv!(z, f, g)
+
+div!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int) = fdiv!(z, f, g)
+
 function tdivpow2(x::ZZRingElem, c::Int)
   c < 0 && throw(DomainError(c, "Exponent must be non-negative"))
   z = ZZRingElem()
@@ -616,26 +642,153 @@ function cdivpow2(x::ZZRingElem, c::Int)
   return z
 end
 
-function tdiv(x::ZZRingElem, c::Int)
-  c == 0 && throw(DivideError())
+@doc raw"""
+    tdiv(f::ZZRingElem, g::Int)
+
+Return the quotient of $f$ by $g$ via truncation rounding.
+
+# Examples
+
+```jldoctest
+julia> tdiv(ZZ(100), 7)
+14
+```
+"""
+function tdiv(f::ZZRingElem, g::Int)
+  g == 0 && throw(DivideError())
   z = ZZRingElem()
-  @ccall libflint.fmpz_tdiv_q_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, c::Int)::Nothing
+  return tdiv!(z, f, g)
+end
+
+function tdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_tdiv_q(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function fdiv(x::ZZRingElem, c::Int)
-  c == 0 && throw(DivideError())
-  z = ZZRingElem()
-  @ccall libflint.fmpz_fdiv_q_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, c::Int)::Nothing
+function tdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+  @ccall libflint.fmpz_tdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
   return z
 end
 
-function cdiv(x::ZZRingElem, c::Int)
-  c == 0 && throw(DivideError())
+tdiv!(f::ZZRingElemOrPtr, g::ZZRingElemOrPtr) = tdiv!(f, f, g)
+
+@doc raw"""
+    tdiv!(z, f, g)
+    tdiv!(f, g)
+
+Return the quotient of $f$ by $g$ via truncation rounding, possibly modifying
+the object $z$ in the process. `tdiv!(f, g)` is a shorthand for `tdiv!(f, f, g)`.
+
+# Examples
+
+```jldoctest
+julia> f = ZZ(100)
+100
+
+julia> f = tdiv!(f, 7)
+14
+```
+"""
+tdiv!(f::ZZRingElemOrPtr, g::Int) = tdiv!(f, f, g)
+
+@doc raw"""
+    fdiv(f::ZZRingElem, g::Int)
+
+Return the quotient of $f$ by $g$ via floor rounding.
+
+# Examples
+
+```jldoctest
+julia> fdiv(ZZ(100), 7)
+14
+```
+"""
+function fdiv(f::ZZRingElem, g::Int)
+  g == 0 && throw(DivideError())
   z = ZZRingElem()
-  @ccall libflint.fmpz_cdiv_q_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, c::Int)::Nothing
+  z = fdiv!(z, f, g)
   return z
 end
+
+function fdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_fdiv_q(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Ref{ZZRingElem})::Nothing
+  return z
+end
+
+function fdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+  @ccall libflint.fmpz_fdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
+  return z
+end
+
+fdiv!(f::ZZRingElemOrPtr, g::ZZRingElemOrPtr) = fdiv!(f, f, g)
+
+@doc raw"""
+    fdiv!(z, f, g)
+    fdiv!(f, g)
+
+Return the quotient of $f$ by $g$ via floor rounding, possibly modifying the
+object $z$ in the process. `fdiv!(f, g)` is a shorthand for `fdiv!(f, f, g)`.
+
+# Examples
+
+```jldoctest
+julia> f = ZZ(100)
+100
+
+julia> f = fdiv!(f, 7)
+14
+```
+"""
+fdiv!(f::ZZRingElemOrPtr, g::Int) = fdiv!(f, f, g)
+
+@doc raw"""
+    cdiv(f::ZZRingElem, g::Int)
+
+Return the quotient of $f$ by $g$ via ceil rounding.
+
+# Examples
+
+```jldoctest
+julia> cdiv(ZZ(100), 7)
+15
+```
+"""
+function cdiv(f::ZZRingElem, g::Int)
+  g == 0 && throw(DivideError())
+  z = ZZRingElem()
+  return cdiv!(z, f, g)
+end
+
+function cdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_cdiv_q(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Ref{ZZRingElem})::Nothing
+  return z
+end
+
+function cdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+  @ccall libflint.fmpz_cdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
+  return z
+end
+
+cdiv!(f::ZZRingElemOrPtr, g::ZZRingElemOrPtr) = cdiv!(f, f, g)
+
+@doc raw"""
+    cdiv!(z, f, g)
+    cdiv!(f, g)
+
+Return the quotient of $f$ by $g$ via ceil rounding, possibly modifying the
+object $z$ in the process. `cdiv!(f, g)` is a shorthand for `cdiv!(f, f, g)`.
+
+# Examples
+
+```jldoctest
+julia> f = ZZ(100)
+100
+
+julia> f = cdiv!(f, 7)
+15
+```
+"""
+cdiv!(f::ZZRingElemOrPtr, g::Int) = cdiv!(f, f, g)
 
 rem(x::Integer, y::ZZRingElem) = rem(ZZRingElem(x), y)
 
@@ -649,7 +802,7 @@ mod(x::Integer, y::ZZRingElem) = mod(ZZRingElem(x), y)
 Return the remainder after division of $x$ by $y$. The remainder will be
 closer to zero than $y$ and have the same sign, or it will be zero.
 """
-mod(x::ZZRingElem, y::Integer) = mod(x, ZZRingElem(y))
+mod(x::ZZRingElemOrPtr, y::Integer) = mod(x, ZZRingElem(y))
 
 div(x::Integer, y::ZZRingElem) = div(ZZRingElem(x), y)
 
@@ -963,29 +1116,85 @@ function mod!(r::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   return r
 end
 
-function mod(x::ZZRingElem, y::ZZRingElem)
+function mod(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
   iszero(y) && throw(DivideError())
   r = ZZRingElem()
   return mod!(r, x, y)
 end
 
-function mod(x::ZZRingElem, c::UInt)
+function mod(x::ZZRingElemOrPtr, c::UInt)
   c == 0 && throw(DivideError())
   @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, c::UInt)::UInt
 end
 
+@doc raw"""
+    mod_sym!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
+
+Return the signed remainder of $a$ mod $b$, that is, the unique integer $x$ satisfying
+$-b < 2x \le b$, possibly modifying the object $z$ in the process.
+
+# Examples
+
+```jldoctest
+julia> z = ZZ()
+0
+
+julia> mod_sym!(z, ZZ(12341), ZZ(312))
+-139
+
+julia> z
+-139
+
+```
+"""
+function mod_sym!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_smod(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
+  return z
+end
+
+@doc raw"""
+    mod_sym!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
+
+Return the signed remainder of $a$ mod $b$, that is, the unique integer $x$ satisfying
+$-b < 2x \le b$, possibly modifying the object $a$ in the process.
+This is a shorthand for `mod_sym!(a, a, b)`.
+
+# Examples
+
+```jldoctest
+julia> a = ZZ(12341)
+12341
+
+julia> mod_sym!(a, ZZ(312))
+-139
+
+julia> a
+-139
+
+```
+"""
+function mod_sym!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
+  return mod_sym!(a, a, b)
+end
+
+@doc raw"""
+    mod_sym(a::ZZRingElem, b::ZZRingElem)
+
+Return the signed remainder of $a$ mod $b$, that is,
+the unique integer $x$ satisfying $-b < 2x \le b$.
+
+# Examples
+
+```jldoctest
+julia> mod_sym(ZZ(12341), ZZ(312))
+-139
+
+```
+"""
 function mod_sym(a::ZZRingElem, b::ZZRingElem)
-  return mod_sym!(deepcopy(a), b)
+  z = ZZRingElem()
+  return mod_sym!(z, a, b)
 end
-
-function mod_sym!(a::ZZRingElem, b::ZZRingElem)
-  mod!(a, a, b)
-  if (b > 0 && a > div(b, 2)) || (b < 0 && a < div(b, 2))
-    sub!(a, a, b)
-  end
-  return a
-end
-
 
 @doc raw"""
     powermod(x::ZZRingElem, p::ZZRingElem, m::ZZRingElem)
@@ -993,7 +1202,7 @@ end
 Return $x^p (\mod m)$. The remainder will be in the range $[0, m)$
 """
 function powermod(x::ZZRingElem, p::ZZRingElem, m::ZZRingElem)
-  m <= 0 && throw(DomainError(m, "Exponent must be non-negative"))
+  m <= 0 && throw(DomainError(m, "Modulus must be positive"))
   if p < 0
     x = invmod(x, m)
     p = -p
@@ -1009,7 +1218,7 @@ end
 Return $x^p (\mod m)$. The remainder will be in the range $[0, m)$
 """
 function powermod(x::ZZRingElem, p::Int, m::ZZRingElem)
-  m <= 0 && throw(DomainError(m, "Exponent must be non-negative"))
+  m <= 0 && throw(DomainError(m, "Modulus must be positive"))
   if p < 0
     x = invmod(x, m)
     p = -p
@@ -1339,7 +1548,7 @@ function gcd(x::Vector{ZZRingElem})
   if length(x) == 0
     error("Array must not be empty")
   elseif length(x) == 1
-    return x[1]
+    return abs(only(x))
   end
 
   z = ZZRingElem()
@@ -1382,7 +1591,7 @@ function lcm(x::Vector{ZZRingElem})
   if length(x) == 0
     error("Array must not be empty")
   elseif length(x) == 1
-    return x[1]
+    return abs(only(x))
   end
 
   z = ZZRingElem()
@@ -1409,6 +1618,11 @@ lcm(a::Integer, b::ZZRingElem) = lcm(ZZRingElem(a), b)
 #
 ###############################################################################
 
+function gcdx!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::ZZRingElemOrPtr, d::ZZRingElemOrPtr, e::ZZRingElemOrPtr)
+  @ccall libflint.fmpz_xgcd_canonical_bezout(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ref{ZZRingElem}, d::Ref{ZZRingElem}, e::Ref{ZZRingElem})::Nothing
+  return a, b, c
+end
+
 @doc raw"""
     gcdx(a::ZZRingElem, b::ZZRingElem)
 
@@ -1424,7 +1638,7 @@ function gcdx(a::ZZRingElem, b::ZZRingElem)
   d = ZZ()
   x = ZZ()
   y = ZZ()
-  @ccall libflint.fmpz_xgcd_canonical_bezout(d::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
+  gcdx!(d, x, y, a, b)
   return d, x, y
 end
 
@@ -1470,6 +1684,53 @@ julia> isqrt(ZZ(13))
 function isqrt(x::ZZRingElem)
   is_negative(x) && throw(DomainError(x, "Argument must be non-negative"))
   z = ZZRingElem()
+  return isqrt!(z,x)
+end
+
+@doc raw"""
+    isqrt!(x::ZZRingElemOrPtr)
+
+Return the floor of the square root of $x$, possibly modifying the object $x$ in the process.
+This is a shorthand for isqrt!(x, x).
+
+# Examples
+
+```jldoctest
+julia> a = ZZ(13)
+13
+
+julia> isqrt!(a)
+3
+
+julia> a
+3
+
+```
+"""
+function isqrt!(x::ZZRingElemOrPtr)
+  return isqrt!(x,x)
+end
+
+@doc raw"""
+    isqrt!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr)
+
+Return the floor of the square root of $x$, possibly modifying the object $z$ in the process.
+
+# Examples
+
+```jldoctest
+julia> z = ZZ()
+0
+
+julia> isqrt!(z, ZZ(13))
+3
+
+julia> z
+3
+
+```
+"""
+function isqrt!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr)
   @ccall libflint.fmpz_sqrt(z::Ref{ZZRingElem}, x::Ref{ZZRingElem})::Nothing
   return z
 end
@@ -2479,6 +2740,60 @@ function neg!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
   return z
 end
 
+@doc raw"""
+    set!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
+    set!(z::ZZRingElemOrPtr, a::Integer)
+
+Change `z` to be equal to `a` and return `z`.
+
+The command `set!(z, a)` has essentially the same effect as `z = ZZ(a)`,
+except that in the former case, the existing object `z` references is modified
+while in the latter `z` is changed to point to a new object.
+
+A benefit of this that it generally is faster and avoids allocations,
+at least if `a` is small enough to fit in the already allocated storage of `z`.
+
+However, this can also have unintended consequences if for example some
+other variable references the same object as `z`.
+
+# Examples
+
+```jldoctest
+julia> a = ZZ(304); z = ZZ(936); x = z
+936
+
+julia> set!(z, a)
+304
+
+julia> add!(z, 123)
+427
+
+julia> (a, x, z)
+(304, 427, 427)
+
+julia> x === z
+true
+
+julia> A = zeros(ZZRingElem, 2, 2) # All entries of `A` point to the same object.
+2×2 Matrix{ZZRingElem}:
+ 0  0
+ 0  0
+
+julia> A[1,1] = ZZ(5) # Create a new object and let `A[1,1]` point to it.
+5
+
+julia> set!(A[1,1], 8) # So, changing `A[1,1]` using `set!` does not change the other entries of `A`.
+8
+
+julia> set!(A[1,2], 3) # The other three matrix entries are still pointing to the same object. Changing one of them using `set!` changes all of them.
+3
+
+julia> A
+2×2 Matrix{ZZRingElem}:
+ 8  3
+ 3  3
+```
+"""
 function set!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
   @ccall libflint.fmpz_set(z::Ref{ZZRingElem}, a::Ref{ZZRingElem})::Nothing
   return z
@@ -3228,7 +3543,7 @@ end
 is_prime_power(q::Integer) = is_prime_power(ZZRingElem(q))
 
 @doc raw"""
-    is_prime_power_with_data(q::IntegerUnion) -> Bool, ZZRingElem, Int
+    is_prime_power_with_data(q::T) where T <: IntegerUnion -> Bool, Int, T
 
 Returns a flag indicating whether $q$ is a prime power and integers $e, p$ such
 that $q = p^e$. If $q$ is a prime power, than $p$ is a prime.

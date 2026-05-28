@@ -80,8 +80,8 @@ julia> g = L(ZZ(11))
 julia> h = L(ZZ(11)//3)
 11//3
 
-julia> k = M(x)
-c
+julia> k = M(5)
+5
 ```
 
 ### Number field element constructors
