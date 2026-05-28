@@ -1001,7 +1001,8 @@ end
 # 2025-06  MANY revisions by John Abbott
 # 2025-12  extended polishing by John Abbott
 
-add_verbosity_scope(:det)  # levels 1 and 2
+#  add_verbosity_scope(:det) -- see func __init__ in src/Nemo.jl
+#  Verbosity has levels 1 and 2
 
 #######################################################
 # (hcol is an auxiliary algorithm - not suitable for public consumption)
