@@ -971,7 +971,7 @@ similar(F::FqField, deg::Int, s::VarName = :o; cached::Bool = true) = finite_fie
 ################################################################################
 
 function residue_field(R::ZZRing, p::IntegerUnion; cached::Bool = true, check::Bool = true)
-  check && !is_prime(p) && error("Integer must be prime")
+  check && @req is_prime(p) "Integer must be prime"
   S = finite_field(p, 1; cached = cached, check = false)[1]
   f = Generic.EuclideanRingResidueMap(R, S)
   return S, f
