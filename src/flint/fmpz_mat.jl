@@ -2293,10 +2293,20 @@ function map_entries(R::ZZModRing, A::ZZMatrix)
   return N
 end
 
+function set!(z::QQMatrixOrPtr, x::ZZMatrixOrPtr)
+  @ccall libflint.fmpq_mat_set_fmpz_mat(z::Ref{QQMatrixOrPtr}, x::Ref{ZZMatrixOrPtr})::Nothing
+  return z
+end
+
+function map_entries(P::QQField, x::ZZMatrix)
+  z = zero_matrix(QQ, nrows(x), ncols(x))
+  return set!(z, x)
+end
+
 change_base_ring(R::zzModRing, A::ZZMatrix) = map_entries(R, A)
 change_base_ring(R::fpMatrix, A::ZZMatrix) = map_entries(R, A)
 change_base_ring(R::ZZModRing, A::ZZMatrix) = map_entries(R, A)
-
+change_base_ring(R::QQField, A::ZZMatrix) = map_entries(R, A)
 
 ###############################################################################
 #
