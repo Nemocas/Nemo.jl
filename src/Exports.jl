@@ -113,6 +113,7 @@ export continued_fraction
 export continued_fraction_with_matrix
 export convergents
 export convert
+export convolution
 export cos
 export cos_integral
 export cos_minpoly
