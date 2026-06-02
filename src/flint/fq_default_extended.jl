@@ -700,7 +700,8 @@ function (a::FqField)(b::FqFieldElem)
   if k === a
     return b
   end
-
+  ck = characteristic(k)
+  ck ≠ 0 && ck ≠ characteristic(a) && error("Coercion impossible")
   if is_absolute(a)
     da = degree(a)
     dk = degree(k)
