@@ -353,7 +353,7 @@ end
   @test x isa ZZRingElem && x == 1
   
   # issue #2303
-  @test_throws ErrorException residue_field(ZZ, 4)
+  @test_throws ArgumentError residue_field(ZZ, 4)
 end
 
 @testset "FqFieldElem.krull_dim" begin
