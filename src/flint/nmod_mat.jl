@@ -40,7 +40,8 @@ end
 
 @inline function setindex!(a::T, u::Int, i::Int, j::Int) where T <: Zmodn_mat
   @boundscheck _checkbounds(a, i, j)
-  setindex_raw!(a, mod(u, a.n), i, j)
+  R = base_ring(a)
+  setindex_raw!(a, mod(u, R.n), i, j)
 end
 
 @inline function setindex!(a::T, u::ZZRingElem, i::Int, j::Int) where T <: Zmodn_mat
