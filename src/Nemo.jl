@@ -445,6 +445,7 @@ function __init__()
   @ccall libflint.flint_set_throw(@cfunction(flint_throw, Nothing, (FlintExceptionType, Cstring, Ptr{Cvoid}))::Ptr{Nothing})::Nothing
 
   add_verbosity_scope(:UnimodVerif)
+  add_verbosity_scope(:det)
 
   if AbstractAlgebra.should_show_banner() && get(ENV, "NEMO_PRINT_BANNER", "true") != "false"
     show_banner()
