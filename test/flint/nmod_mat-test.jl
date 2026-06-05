@@ -257,6 +257,14 @@ end
   @test a[1,2] == Z10(5)
   @test_throws BoundsError a[-2,2] = 5
 
+  a[1,2] = -17
+
+  @test a[1,2] == Z10(-17)
+
+  a[1,2] = typemax(Int)
+
+  @test a[1,2] == Z10(typemax(Int))
+
   @test a != b
 
   d = one(R)

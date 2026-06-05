@@ -31,7 +31,14 @@ function getindex_raw(a::T, i::Int, j::Int) where T <: Zmodn_mat
   return GC.@preserve a unsafe_load(mat_entry_ptr(a, i, j))
 end
 
+
 @inline function setindex!(a::T, u::UInt, i::Int, j::Int) where T <: Zmodn_mat
+  @boundscheck _checkbounds(a, i, j)
+  R = base_ring(a)
+  setindex_raw!(a, mod(u, R.n), i, j)
+end
+
+@inline function setindex!(a::T, u::Int, i::Int, j::Int) where T <: Zmodn_mat
   @boundscheck _checkbounds(a, i, j)
   R = base_ring(a)
   setindex_raw!(a, mod(u, R.n), i, j)
