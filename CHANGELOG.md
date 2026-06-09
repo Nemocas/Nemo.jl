@@ -17,26 +17,12 @@ which we think might affect some users directly.
 - [#2296](https://github.com/Nemocas/Nemo.jl/pull/2296) Improve conversion from ZZMatrix to QQMatrix
 - [#2297](https://github.com/Nemocas/Nemo.jl/pull/2297) Improve snf_with_transform for ZZMatrix
 - [#2299](https://github.com/Nemocas/Nemo.jl/pull/2299) Add discrete `convolution` of two vectors
+- [#2212](https://github.com/Nemocas/Nemo.jl/pull/2212) New determinant function `det_hcol_hnf` for ZZMatrix
 
 ### Fixed bugs that returned incorrect results
 
 - [#2302](https://github.com/Nemocas/Nemo.jl/pull/2302) Throw error when calling ill-defined FqFieldElem coercion
 - [#2304](https://github.com/Nemocas/Nemo.jl/pull/2304) Throw an error when calling `residue_field(ZZ, n)` if  `n` is not a prime number
-
-### **TODO** insufficient labels for automatic classification
-
-The following PRs have neither a topic label assigned to them, nor a PR type. 
-**Manual intervention required.**
-
-- [#2212](https://github.com/Nemocas/Nemo.jl/pull/2212) New determinant function `det_hcol_hnf` for ZZMatrix
-
-
-### **TODO** Uncategorized PR
-
-If there are any PRs listed below, either apply the same steps
-as above, or change their label to "release notes: not needed".
-
-- [#2301](https://github.com/Nemocas/Nemo.jl/pull/2301) set gfp_mat or nmod_mat entry with Int value
 
 ## [0.55.1](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.55.1) - 2026-05-16
 
