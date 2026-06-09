@@ -96,6 +96,10 @@ function show(io::IO, a::FpFieldElem)
   print(io, a.data)
 end
 
+function Base.alignment(io::IO, a::FpFieldElem)
+  return (Base.alignment_from_show(io, a), 0)
+end
+
 pretty_lt(x::FpFieldElem, y::FpFieldElem) = isless(x.data, y.data)
 pretty_eq(x::FpFieldElem, y::FpFieldElem) = (x == y)
 

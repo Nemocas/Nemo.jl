@@ -123,6 +123,10 @@ function show(io::IO, a::zzModRingElem)
   print(io, signed(widen(a.data)))
 end
 
+function Base.alignment(io::IO, a::zzModRingElem)
+  return (Base.alignment_from_show(io, a), 0)
+end
+
 ###############################################################################
 #
 #   Unary operations

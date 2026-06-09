@@ -369,6 +369,9 @@ function show(io::IO, a::ZZRing)
   end
 end
 
+function Base.alignment(io::IO, x::ZZRingElem)
+  return (Base.alignment_from_show(io, x), 0)
+end
 
 
 ###############################################################################
