@@ -435,6 +435,25 @@ end
   @test_throws ErrorException Z2(1)*a
 end
 
+@testset "zzModMatrix.scalar_mul!" begin
+  R, = residue_ring(ZZ, 101)
+
+  a = matrix(R, [1 2; 3 4])
+
+  # scalar mul! must mutate in place and reach FLINT for every integer scalar
+  # type. Previously only UInt was specialized; Int/Int32/ZZRingElem/Bool fell
+  # through to AbstractAlgebra's `mul!(z, x, y) = x*y`, which allocates a fresh
+  # matrix and leaves the destination untouched.
+  for s in (3, -3, big(3), ZZ(3), UInt(3), R(3))
+    c = zero(a)
+    d = mul!(c, a, s)
+    @test d === c && c == a * s
+    c = zero(a)
+    d = mul!(c, s, a)
+    @test d === c && c == a * s
+  end
+end
+
 @testset "zzModMatrix.comparison" begin
   Z17, = residue_ring(ZZ,17)
 
