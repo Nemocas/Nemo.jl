@@ -237,7 +237,7 @@ function mul!(z::Vector{UInt}, a::Vector{UInt}, b::T) where T <: Zmodn_mat
   return z
 end
 
-# entries of c required to be in [0,n)
+# c required to be in [0,n)
 function mul!(a::T, b::T, c::UInt) where T <: Zmodn_mat
   @ccall libflint.nmod_mat_scalar_mul(a::Ref{T}, b::Ref{T}, c::UInt)::Nothing
   return a
