@@ -290,6 +290,11 @@ function add!(a::T, b::T, c::T) where T <: Zmod_fmpz_mat
   return a
 end
 
+function sub!(a::T, b::T, c::T) where T <: Zmod_fmpz_mat
+  @ccall libflint.fmpz_mod_mat_sub(a::Ref{T}, b::Ref{T}, c::Ref{T}, base_ring(b).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return a
+end
+
 function Generic.add_one!(a::ZZModMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   GC.@preserve a begin
