@@ -238,6 +238,7 @@ function mul!(z::Vector{UInt}, a::Vector{UInt}, b::T) where T <: Zmodn_mat
 end
 
 function mul!(a::T, b::T, c::UInt) where T <: Zmodn_mat
+  c = @ccall libflint.n_mod2_preinv(c::UInt, b.n::UInt, b.ninv::UInt)::UInt
   @ccall libflint.nmod_mat_scalar_mul(a::Ref{T}, b::Ref{T}, c::UInt)::Nothing
   return a
 end
