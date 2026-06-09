@@ -1116,3 +1116,11 @@ end
   mul!(C, b, A)
   @test C == b * A
 end
+
+@testset "#2309" begin
+  F = Native.GF(13)
+  x = matrix(F, 1, 1, [1])
+  s = 0x0678e92a8604bc8e
+  r = F(s)
+  @test x * s == x * r
+end

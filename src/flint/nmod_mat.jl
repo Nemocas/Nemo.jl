@@ -244,6 +244,7 @@ function mul!(z::Vector{UInt}, a::Vector{UInt}, b::T) where T <: Zmodn_mat
   return z
 end
 
+# c required to be in [0,n)
 function mul!(a::T, b::T, c::UInt) where T <: Zmodn_mat
   @ccall libflint.nmod_mat_scalar_mul(a::Ref{T}, b::Ref{T}, c::UInt)::Nothing
   return a
@@ -292,6 +293,7 @@ end
 ################################################################################
 
 function *(x::T, y::UInt) where T <: Zmodn_mat
+  y = @ccall libflint.n_mod2_preinv(y::UInt, x.n::UInt, x.ninv::UInt)::UInt
   return mul!(similar(x), x, y)
 end
 
