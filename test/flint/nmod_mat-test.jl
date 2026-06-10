@@ -441,9 +441,7 @@ end
   a = matrix(R, [1 2; 3 4])
 
   # scalar mul! reaches the FLINT-backed specialization for every integer scalar
-  # type. Previously only UInt was specialized; Int/Int32/ZZRingElem/Bool fell
-  # through to the generic allocating fallback (AbstractAlgebra's
-  # `mul!(z, x, y) = x*y`); only the returned value is required to be correct.
+  # type; only the returned value is required to be correct.
   for s in (3, -3, big(3), ZZ(3), UInt(3), R(3))
     c = zero(a)
     c = mul!(c, a, s)
