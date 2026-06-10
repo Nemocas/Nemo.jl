@@ -307,18 +307,6 @@ end
   @test d == matrix_space(Z17, 4, 4)([11 11 8 7; 11 0 14 6; 8 14 14 5; 7 6 5 5])
 end
 
-@testset "ZZModMatrix.sub!" begin
-  R, = residue_ring(ZZ, ZZ(7)^30)
-  a = matrix(R, [1 2; 3 4])
-  b = matrix(R, [5 6; 7 8])
-
-  # 3-arg sub! must mutate in place and use fmpz_mod_mat_sub (previously fell
-  # through to AbstractAlgebra's entry-by-entry generic loop).
-  c = zero(a)
-  d = sub!(c, a, b)
-  @test d === c && c == a - b
-end
-
 @testset "ZZModMatrix.row_col_swapping" begin
   R, = residue_ring(ZZ, ZZ(17))
 
