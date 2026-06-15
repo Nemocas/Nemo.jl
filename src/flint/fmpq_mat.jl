@@ -560,14 +560,16 @@ end
 
 function rref(x::QQMatrix)
   z = similar(x)
-  r = @ccall libflint.fmpq_mat_rref(z::Ref{QQMatrix}, x::Ref{QQMatrix})::Int
+  r = rref!(z, x)
   return r, z
 end
 
-function rref!(x::QQMatrix)
-  r = @ccall libflint.fmpq_mat_rref(x::Ref{QQMatrix}, x::Ref{QQMatrix})::Int
+function rref!(z::QQMatrix, x::QQMatrix)
+  r = @ccall libflint.fmpq_mat_rref(z::Ref{QQMatrix}, x::Ref{QQMatrix})::Int
   return r
 end
+
+rref!(x::QQMatrix) = rref!(x, x)
 
 ###############################################################################
 #
