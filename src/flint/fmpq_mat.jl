@@ -85,7 +85,7 @@ function setindex!(a::QQMatrix, b::QQMatrix, r::UnitRange{Int64}, c::UnitRange{I
   _checkbounds(a, r, c)
   size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
   A = view(a, r, c)
-  @ccall libflint.fmpq_mat_set(A::Ref{QQMatrix}, b::Ref{QQMatrix})::Nothing
+  set!(A, b)
 end
 
 number_of_rows(a::QQMatrix) = a.r
@@ -668,6 +668,20 @@ function neg!(z::QQMatrixOrPtr, a::QQMatrixOrPtr)
   return z
 end
 
+#
+
+function set!(z::QQMatrixOrPtr, a::QQMatrixOrPtr)
+  @ccall libflint.fmpq_mat_set(z::Ref{QQMatrix}, a::Ref{QQMatrix})::Nothing
+  return z
+end
+
+function set!(z::QQMatrixOrPtr, x::ZZMatrixOrPtr)
+  @ccall libflint.fmpq_mat_set_fmpz_mat(z::Ref{QQMatrixOrPtr}, x::Ref{ZZMatrixOrPtr})::Nothing
+  return z
+end
+
+#
+
 function add!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::QQMatrixOrPtr)
   @ccall libflint.fmpq_mat_add(z::Ref{QQMatrix}, x::Ref{QQMatrix}, y::Ref{QQMatrix})::Nothing
   return z
@@ -789,7 +803,7 @@ end
 function (a::QQMatrixSpace)(M::ZZMatrix)
   (ncols(a) == ncols(M) && nrows(a) == nrows(M)) || error("wrong matrix dimension")
   z = a()
-  @ccall libflint.fmpq_mat_set_fmpz_mat(z::Ref{QQMatrix}, M::Ref{ZZMatrix})::Nothing
+  set!(z, M)
   return z
 end
 
@@ -857,7 +871,7 @@ end
 
 function QQMatrix(x::ZZMatrix)
   z = QQMatrix(nrows(x), ncols(x))
-  @ccall libflint.fmpq_mat_set_fmpz_mat(z::Ref{QQMatrix}, x::Ref{ZZMatrix})::Nothing
+  set!(z, x)
   return z
 end
 
@@ -881,7 +895,7 @@ function nullspace(A::QQMatrix)
   N = similar(AZZ, ncols(A), ncols(A))
   nullity = @ccall libflint.fmpz_mat_nullspace(N::Ref{ZZMatrix}, AZZ::Ref{ZZMatrix})::Int
   NQQ = similar(A, ncols(A), ncols(A))
-  @ccall libflint.fmpq_mat_set_fmpz_mat(NQQ::Ref{QQMatrix}, N::Ref{ZZMatrix})::Nothing
+  set!(NQQ, N)
 
   # Now massage the result until it looks like what the generic AbstractAlgebra
   # nullspace would return: remove zero columns and rescale the columns so that
