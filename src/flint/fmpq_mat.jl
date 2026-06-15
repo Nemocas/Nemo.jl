@@ -390,7 +390,7 @@ end
 ###############################################################################
 
 function charpoly(R::QQPolyRing, x::QQMatrix)
-  nrows(x) != ncols(x) && error("Non-square")
+  @req is_square(x) "Matrix must be a square matrix"
   z = R()
   @ccall libflint.fmpq_mat_charpoly(z::Ref{QQPolyRingElem}, x::Ref{QQMatrix})::Nothing
   return z
@@ -403,7 +403,7 @@ end
 ###############################################################################
 
 function minpoly(R::QQPolyRing, x::QQMatrix)
-  nrows(x) != ncols(x) && error("Non-square")
+  @req is_square(x) "Matrix must be a square matrix"
   z = R()
   @ccall libflint.fmpq_mat_minpoly(z::Ref{QQPolyRingElem}, x::Ref{QQMatrix})::Nothing
   return z
@@ -418,7 +418,7 @@ minpoly(x::QQMatrix) = minpoly(polynomial_ring(QQ; cached = false)[1], x)
 ###############################################################################
 
 function det(x::QQMatrix)
-  nrows(x) != ncols(x) && error("Non-square matrix")
+  @req is_square(x) "Matrix must be a square matrix"
   z = QQFieldElem()
   @ccall libflint.fmpq_mat_det(z::Ref{QQFieldElem}, x::Ref{QQMatrix})::Nothing
   return z
@@ -611,7 +611,7 @@ end
 ###############################################################################
 
 function tr(x::QQMatrix)
-  nrows(x) != ncols(x) && error("Not a square matrix in trace")
+  @req is_square(x) "Matrix must be a square matrix"
   d = QQFieldElem()
   @ccall libflint.fmpq_mat_trace(d::Ref{QQFieldElem}, x::Ref{QQMatrix})::Nothing
   return d

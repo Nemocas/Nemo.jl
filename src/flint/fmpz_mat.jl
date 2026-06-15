@@ -627,7 +627,7 @@ end
 ###############################################################################
 
 function charpoly(R::ZZPolyRing, x::ZZMatrix)
-  nrows(x) != ncols(x) && error("Non-square")
+  @req is_square(x) "Matrix must be a square matrix"
   z = R()
   @ccall libflint.fmpz_mat_charpoly(z::Ref{ZZPolyRingElem}, x::Ref{ZZMatrix})::Nothing
   return z
@@ -640,7 +640,7 @@ end
 ###############################################################################
 
 function minpoly(R::ZZPolyRing, x::ZZMatrix)
-  nrows(x) != ncols(x) && error("Non-square")
+  @req is_square(x) "Matrix must be a square matrix"
   z = R()
   @ccall libflint.fmpz_mat_minpoly(z::Ref{ZZPolyRingElem}, x::Ref{ZZMatrix})::Nothing
   return z
@@ -655,7 +655,7 @@ minpoly(x::ZZMatrix) = minpoly(polynomial_ring(ZZ; cached = false)[1], x)
 ###############################################################################
 
 function det(x::ZZMatrix)
-  nrows(x) != ncols(x) && error("Non-square matrix")
+  @req is_square(x) "Matrix must be a square matrix"
   z = ZZRingElem()
   @ccall libflint.fmpz_mat_det(z::Ref{ZZRingElem}, x::Ref{ZZMatrix})::Nothing
   return z
@@ -668,7 +668,7 @@ Return some positive divisor of the determinant of $x$, if the determinant
 is nonzero, otherwise return zero.
 """
 function det_divisor(x::ZZMatrix)
-  nrows(x) != ncols(x) && error("Non-square matrix")
+  @req is_square(x) "Matrix must be a square matrix"
   z = ZZRingElem()
   @ccall libflint.fmpz_mat_det_divisor(z::Ref{ZZRingElem}, x::Ref{ZZMatrix})::Nothing
   return z
@@ -682,7 +682,7 @@ Return the determinant of $x$ given a positive divisor of its determinant. If
 otherwise a heuristic algorithm is used.
 """
 function det_given_divisor(x::ZZMatrix, d::ZZRingElem, proved=true)
-  nrows(x) != ncols(x) && error("Non-square")
+  @req is_square(x) "Matrix must be a square matrix"
   z = ZZRingElem()
   @ccall libflint.fmpz_mat_det_modular_given_divisor(z::Ref{ZZRingElem}, x::Ref{ZZMatrix}, d::Ref{ZZRingElem}, proved::Cint)::Nothing
   return z
