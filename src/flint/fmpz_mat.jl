@@ -2030,8 +2030,8 @@ function one!(z::ZZMatrixOrPtr)
   return z
 end
 
-function neg!(z::ZZMatrixOrPtr, w::ZZMatrixOrPtr)
-  @ccall libflint.fmpz_mat_neg(z::Ref{ZZMatrix}, w::Ref{ZZMatrix})::Nothing
+function neg!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr)
+  @ccall libflint.fmpz_mat_neg(z::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
   return z
 end
 
