@@ -244,6 +244,18 @@ function *(x::QQMatrix, y::QQMatrix)
   return mul!(z, x, y)
 end
 
+function *(x::QQMatrix, y::ZZMatrix)
+  ncols(x) != nrows(y) && error("Incompatible matrix dimensions")
+  z = similar(x, nrows(x), ncols(y))
+  return mul!(z, x, y)
+end
+
+function *(x::ZZMatrix, y::QQMatrix)
+  ncols(x) != nrows(y) && error("Incompatible matrix dimensions")
+  z = similar(y, nrows(x), ncols(y))
+  return mul!(z, x, y)
+end
+
 ###############################################################################
 #
 #   Ad hoc binary operators
@@ -697,6 +709,16 @@ end
 #
 function mul!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::QQMatrixOrPtr)
   @ccall libflint.fmpq_mat_mul(z::Ref{QQMatrix}, x::Ref{QQMatrix}, y::Ref{QQMatrix})::Nothing
+  return z
+end
+
+function mul!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::ZZMatrixOrPtr)
+  @ccall libflint.fmpq_mat_mul_fmpz_mat(z::Ref{QQMatrix}, x::Ref{QQMatrix}, y::Ref{ZZMatrix})::Nothing
+  return z
+end
+
+function mul!(z::QQMatrixOrPtr, x::ZZMatrixOrPtr, y::QQMatrixOrPtr)
+  @ccall libflint.fmpq_mat_mul_r_fmpz_mat(z::Ref{QQMatrix}, x::Ref{ZZMatrix}, y::Ref{QQMatrix})::Nothing
   return z
 end
 
