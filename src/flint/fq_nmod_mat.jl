@@ -121,7 +121,7 @@ function transpose(a::fqPolyRepMatrix)
 end
 
 function transpose!(a::fqPolyRepMatrix)
-  @req is_square(a) "Matrix must be a square matrix"
+  check_square(a)
   return transpose!(a, a)
 end
 
@@ -314,7 +314,7 @@ end
 ################################################################################
 
 function det(a::fqPolyRepMatrix)
-  !is_square(a) && error("Non-square matrix")
+  check_square(a)
   n = nrows(a)
   R = base_ring(a)
   if n == 0
@@ -354,7 +354,7 @@ end
 ################################################################################
 
 function inv(a::fqPolyRepMatrix)
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   z = similar(a)
   r = @ccall libflint.fq_nmod_mat_inv(z::Ref{fqPolyRepMatrix}, a::Ref{fqPolyRepMatrix}, base_ring(a)::Ref{fqPolyRepField})::Int
   !Bool(r) && error("Matrix not invertible")
@@ -503,7 +503,7 @@ end
 ################################################################################
 
 function charpoly(R::fqPolyRepPolyRing, a::fqPolyRepMatrix)
-  !is_square(a) && error("Matrix must be square")
+  check_square(a)
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   p = R()
   @ccall libflint.fq_nmod_mat_charpoly(p::Ref{fqPolyRepPolyRingElem}, a::Ref{fqPolyRepMatrix}, base_ring(a)::Ref{fqPolyRepField})::Nothing
@@ -511,7 +511,7 @@ function charpoly(R::fqPolyRepPolyRing, a::fqPolyRepMatrix)
 end
 
 function charpoly_danivlesky!(R::fqPolyRepPolyRing, a::fqPolyRepMatrix)
-  !is_square(a) && error("Matrix must be square")
+  check_square(a)
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   p = R()
   @ccall libflint.fq_nmod_mat_charpoly_danilevsky(p::Ref{fqPolyRepPolyRingElem}, a::Ref{fqPolyRepMatrix}, base_ring(a)::Ref{fqPolyRepField})::Nothing
@@ -526,7 +526,7 @@ end
 ################################################################################
 
 function minpoly(R::fqPolyRepPolyRing, a::fqPolyRepMatrix)
-  !is_square(a) && error("Matrix must be square")
+  check_square(a)
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   m = deepcopy(a)
   p = R()

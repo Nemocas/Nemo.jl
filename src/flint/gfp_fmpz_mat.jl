@@ -179,7 +179,7 @@ promote_rule(::Type{FpMatrix}, ::Type{ZZRingElem}) = FpMatrix
 ################################################################################
 
 function inv(a::FpMatrix)
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   z = similar(a)
   r = @ccall libflint.fmpz_mod_mat_inv(z::Ref{FpMatrix}, a::Ref{FpMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Int
   !Bool(r) && error("Matrix not invertible")

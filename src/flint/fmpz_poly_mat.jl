@@ -197,7 +197,7 @@ end
 ###############################################################################
 
 function det(a::ZZPolyRingMatrix)
-  @req is_square(a) "Matrix must be a square matrix"
+  check_square(a)
   z = base_ring(a)()
   @ccall libflint.fmpz_poly_mat_det(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingMatrix})::Nothing
   return z
@@ -220,7 +220,7 @@ end
 ###############################################################################
 
 function tr(a::ZZPolyRingMatrix)
-  @req is_square(a) "Matrix must be a square matrix"
+  check_square(a)
   z = base_ring(a)()
   @ccall libflint.fmpz_poly_mat_trace(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingMatrix})::Nothing
   return z

@@ -109,7 +109,7 @@ function transpose(a::T) where T <: Zmod_fmpz_mat
 end
 
 function transpose!(a::T) where T <: Zmod_fmpz_mat
-  @req is_square(a) "Matrix must be a square matrix"
+  check_square(a)
   return transpose!(a, a)
 end
 
@@ -378,7 +378,7 @@ end
 ################################################################################
 
 function ^(x::T, y::Int) where {T<:Zmod_fmpz_mat}
-  nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
+  check_square(x)
   if y < 0
     x = inv(x)
     y = -y
@@ -447,7 +447,7 @@ end
 ################################################################################
 
 function tr(a::T) where T <: Zmod_fmpz_mat
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   R = base_ring(a)
   r = ZZRingElem()
   @ccall libflint.fmpz_mod_mat_trace(r::Ref{ZZRingElem}, a::Ref{T}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
@@ -461,7 +461,7 @@ end
 ################################################################################
 
 function det(a::ZZModMatrix)
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   z = ZZRingElem()
   r = @ccall libflint.fmpz_mod_mat_det(z::Ref{ZZRingElem}, a::Ref{ZZModMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return base_ring(a)(z)
@@ -492,7 +492,7 @@ end
 ################################################################################
 
 function inv(a::ZZModMatrix)
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   if is_probable_prime(modulus(base_ring(a)))
     X, d = pseudo_inv(a)
     if !is_unit(d)
@@ -511,7 +511,7 @@ function inv(a::ZZModMatrix)
 end
 
 function inv(a::T) where T <: Zmod_fmpz_mat
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   z = similar(a)
   r = @ccall libflint.fmpz_mod_mat_inv(z::Ref{T}, a::Ref{T}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Int
   !Bool(r) && error("Matrix not invertible")
