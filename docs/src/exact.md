@@ -6,7 +6,8 @@ DocTestSetup = Nemo.doctestsetup()
 
 # [Exact real and complex numbers](@id exact_real_complex)
 
-Exact real and complex numbers are provided by Calcium.
+Exact real and complex numbers are provided by FLINT.
+Since the respective library used to be called Calcium, we will refer to it as the Calcium field.
 Internally, a number $z$ is represented as an element
 of an extension field of the rational numbers. That is,
 
@@ -113,8 +114,8 @@ try to find an answer before it gives up. For example:
   calculations where Gröbner bases are unnecessary.
 
 For a detailed explanation, refer to the following section
-in the Calcium documentation:
-<https://fredrikj.net/calcium/ca.html#context-options>
+in the FLINT documentation:
+<https://flintlib.org/doc/ca.html#context-optionss>
 
 ## Basic examples
 

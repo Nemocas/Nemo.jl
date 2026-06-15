@@ -36,25 +36,25 @@ Nowadays we see AbstractAlgebra to provide three things to Nemo:
   required interfaces. These interfaces are documented in the AbstractAlgebra
   documentation.
 
-Nemo itself is now more or less just a wrapper of four C libraries:
+Nemo itself is more or less just a wrapper of the C library FLINT, which provides highly optimised implementations of commonly used rings.
+
+Each ring implemented in FLINT is wrapped in such a way as to
+implement the interfaces described by AbstractAlgebra.
+
+Most of the time an AbstractAlgebra implementation will work just as well
+as using Nemo, but the latter will usually be faster, due to the extremely
+performant C code (around half a million lines of it).
+
+## Layout of files
+
+Before FLINT v3, the content of FLINT was split into a number of separate libraries:
 
 * FLINT : polynomials and matrices over Z, Q, Z/nZ, Qp, Fq
 * Arb : polynomials, matrices and special functions over balls over R and C
 * Antic : algebraic number field element arithmetic
 * Calcium : exact real and complex numbers, including algebraic numbers
 
-Each ring implemented in those C libraries is wrapped in such a way as to
-implement the interfaces described by AbstractAlgebra.
-
-Most of the time an AbstractAlgebra implementation will work just as well
-using Nemo, but the latter will usually be faster, due to the extremely
-performant C code (around half a million lines of it).
-
-## Layout of files
-
-In the `src` directory of Nemo are four directories `flint`, `arb`, `antic` and
-`calcium`, each containing the wrappers for the relevant C libraries. The
-`test` directory is similarly organised.
+Due to historical reasons, Nemo has a similar layout, with the `src` directory containing subdirectories `flint`, `arb`, `antic` and `calcium`. Each of these directories contains the wrappers for the relevant C libraries. The `test` directory is similarly organised.
 
 Within each of these directories is a set of files, one per module within
 the C libraries, e.g. the `fmpz.jl` file wraps the FLINT `fmpz` module for
