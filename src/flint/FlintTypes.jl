@@ -5432,8 +5432,6 @@ end
 #
 ################################################################################
 
-const TypeOrPtr{T} = Union{T, Ref{T}, Ptr{T}} where T
-
 const ZmodNFmpzPolyRing = Union{ZZModPolyRing, FpPolyRing}
 
 const Zmodn_poly = Union{zzModPolyRingElem, fpPolyRingElem}
