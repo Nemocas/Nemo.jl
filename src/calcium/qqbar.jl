@@ -1293,44 +1293,44 @@ convert(::Type{T}, a::QQBarFieldElem) where {T <: RationalUnion} = T(a)
 ###############################################################################
 
 function zero!(z::QQBarFieldElemOrPtr)
-  @ccall libflint.qqbar_zero(z::Ref{QQBarFieldElemOrPtr})::Nothing
+  @ccall libflint.qqbar_zero(z::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function one!(z::QQBarFieldElemOrPtr)
-  @ccall libflint.qqbar_one(z::Ref{QQBarFieldElemOrPtr})::Nothing
+  @ccall libflint.qqbar_one(z::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function neg!(z::QQBarFieldElemOrPtr, a::QQBarFieldElemOrPtr)
-  @ccall libflint.qqbar_neg(z::Ref{QQBarFieldElemOrPtr}, a::Ref{QQBarFieldElemOrPtr})::Nothing
+  @ccall libflint.qqbar_neg(z::Ref{QQBarFieldElem}, a::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 #
 
 function add!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::QQBarFieldElemOrPtr)
-  @ccall libflint.qqbar_add(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Ref{QQBarFieldElemOrPtr})::Nothing
+  @ccall libflint.qqbar_add(z::Ref{QQBarFieldElem}, x::Ref{QQBarFieldElem}, y::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function add!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::QQFieldElemOrPtr)
-  @ccall libflint.qqbar_add_fmpq(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Ref{QQFieldElem})::Nothing
+  @ccall libflint.qqbar_add_fmpq(z::Ref{QQBarFieldElem}, x::Ref{QQBarFieldElem}, y::Ref{QQFieldElem})::Nothing
   return z
 end
 
 function add!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.qqbar_add_fmpz(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.qqbar_add_fmpz(z::Ref{QQBarFieldElem}, x::Ref{QQBarFieldElem}, y::Ref{ZZRingElem})::Nothing
   return z
 end
 
 function add!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::Int)
-  @ccall libflint.qqbar_add_si(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Int)::Nothing
+  @ccall libflint.qqbar_add_si(z::Ref{QQBarFieldElem}, x::Ref{QQBarFieldElem}, y::Int)::Nothing
   return z
 end
 
 function add!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::UInt)
-  @ccall libflint.qqbar_add_ui(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::UInt)::Nothing
+  @ccall libflint.qqbar_add_ui(z::Ref{QQBarFieldElem}, x::Ref{QQBarFieldElem}, y::UInt)::Nothing
   return z
 end
 
@@ -1340,47 +1340,47 @@ add!(c::QQBarFieldElemOrPtr, a::Union{QQFieldElemOrPtr, ZZRingElemOrPtr, Integer
 #
 
 function sub!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::QQBarFieldElemOrPtr)
-  @ccall libflint.qqbar_sub(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Ref{QQBarFieldElemOrPtr})::Nothing
+  @ccall libflint.qqbar_sub(z::Ref{QQBarFieldElem}, x::Ref{QQBarFieldElem}, y::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function sub!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::QQFieldElemOrPtr)
-  @ccall libflint.qqbar_sub_fmpq(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Ref{QQFieldElem})::Nothing
+  @ccall libflint.qqbar_sub_fmpq(z::Ref{QQBarFieldElem}, x::Ref{QQBarFieldElem}, y::Ref{QQFieldElem})::Nothing
   return z
 end
 
 function sub!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.qqbar_sub_fmpz(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.qqbar_sub_fmpz(z::Ref{QQBarFieldElem}, x::Ref{QQBarFieldElem}, y::Ref{ZZRingElem})::Nothing
   return z
 end
 
 function sub!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::Int)
-  @ccall libflint.qqbar_sub_si(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Int)::Nothing
+  @ccall libflint.qqbar_sub_si(z::Ref{QQBarFieldElem}, x::Ref{QQBarFieldElem}, y::Int)::Nothing
   return z
 end
 
 function sub!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::UInt)
-  @ccall libflint.qqbar_sub_ui(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::UInt)::Nothing
+  @ccall libflint.qqbar_sub_ui(z::Ref{QQBarFieldElem}, x::Ref{QQBarFieldElem}, y::UInt)::Nothing
   return z
 end
 
 function sub!(z::QQBarFieldElemOrPtr, x::QQFieldElemOrPtr, y::QQBarFieldElemOrPtr)
-  @ccall libflint.qqbar_fmpq_sub(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQFieldElem}, y::Ref{QQBarFieldElemOrPtr})::Nothing
+  @ccall libflint.qqbar_fmpq_sub(z::Ref{QQBarFieldElem}, x::Ref{QQFieldElem}, y::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function sub!(z::QQBarFieldElemOrPtr, x::ZZRingElemOrPtr, y::QQBarFieldElemOrPtr)
-  @ccall libflint.qqbar_fmpz_sub(z::Ref{QQBarFieldElemOrPtr}, x::Ref{ZZRingElem}, y::Ref{QQBarFieldElemOrPtr})::Nothing
+  @ccall libflint.qqbar_fmpz_sub(z::Ref{QQBarFieldElem}, x::Ref{ZZRingElem}, y::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function sub!(z::QQBarFieldElemOrPtr, x::Int, y::QQBarFieldElemOrPtr)
-  @ccall libflint.qqbar_si_sub(z::Ref{QQBarFieldElemOrPtr}, x::Int, y::Ref{QQBarFieldElemOrPtr})::Nothing
+  @ccall libflint.qqbar_si_sub(z::Ref{QQBarFieldElem}, x::Int, y::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function sub!(z::QQBarFieldElemOrPtr, x::UInt, y::QQBarFieldElemOrPtr)
-  @ccall libflint.qqbar_ui_sub(z::Ref{QQBarFieldElemOrPtr}, x::UInt, y::Ref{QQBarFieldElemOrPtr})::Nothing
+  @ccall libflint.qqbar_ui_sub(z::Ref{QQBarFieldElem}, x::UInt, y::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
@@ -1390,27 +1390,27 @@ sub!(c::QQBarFieldElemOrPtr, a::Union{Integer, Rational}, b::QQBarFieldElemOrPtr
 #
 
 function mul!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::QQBarFieldElemOrPtr)
-  @ccall libflint.qqbar_mul(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Ref{QQBarFieldElemOrPtr})::Nothing
+  @ccall libflint.qqbar_mul(z::Ref{QQBarFieldElem}, x::Ref{QQBarFieldElem}, y::Ref{QQBarFieldElem})::Nothing
   return z
 end
 
 function mul!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::QQFieldElemOrPtr)
-  @ccall libflint.qqbar_mul_fmpq(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Ref{QQFieldElem})::Nothing
+  @ccall libflint.qqbar_mul_fmpq(z::Ref{QQBarFieldElem}, x::Ref{QQBarFieldElem}, y::Ref{QQFieldElem})::Nothing
   return z
 end
 
 function mul!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::ZZRingElemOrPtr)
-  @ccall libflint.qqbar_mul_fmpz(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.qqbar_mul_fmpz(z::Ref{QQBarFieldElem}, x::Ref{QQBarFieldElem}, y::Ref{ZZRingElem})::Nothing
   return z
 end
 
 function mul!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::Int)
-  @ccall libflint.qqbar_mul_si(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::Int)::Nothing
+  @ccall libflint.qqbar_mul_si(z::Ref{QQBarFieldElem}, x::Ref{QQBarFieldElem}, y::Int)::Nothing
   return z
 end
 
 function mul!(z::QQBarFieldElemOrPtr, x::QQBarFieldElemOrPtr, y::UInt)
-  @ccall libflint.qqbar_mul_ui(z::Ref{QQBarFieldElemOrPtr}, x::Ref{QQBarFieldElemOrPtr}, y::UInt)::Nothing
+  @ccall libflint.qqbar_mul_ui(z::Ref{QQBarFieldElem}, x::Ref{QQBarFieldElem}, y::UInt)::Nothing
   return z
 end
 
