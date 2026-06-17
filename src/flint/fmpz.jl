@@ -178,18 +178,18 @@ end
   return (unsigned(a) >> (Sys.WORD_SIZE - 2) != 1)
 end
 
-@inline function _fmpz_is_small(a::ZZRingElemOrPtr)
+@inline function _fmpz_is_small(a::TypeOrPtr{ZZRingElem})
   return __fmpz_is_small(data(a))
 end
 
 # "views" a non-small ZZRingElem as a readonly BigInt
 # the caller must ensure z is actually non-small, and
 # call GC.@preserve appropriately
-function _as_bigint(a::ZZRingElemOrPtr)
+function _as_bigint(a::TypeOrPtr{ZZRingElem})
   unsafe_load(Ptr{BigInt}(data(a) << 2))
 end
 
-@inline function _fmpz_size(a::ZZRingElemOrPtr)
+@inline function _fmpz_size(a::TypeOrPtr{ZZRingElem})
   return _fmpz_is_small(a) ? 1 : GC.@preserve a _as_bigint(a).size
 end
 
@@ -255,14 +255,14 @@ is_noetherian(::ZZRing) = true
 
 Return the sign of $a$, i.e. $+1$, $0$ or $-1$.
 """
-sign(a::ZZRingElemOrPtr) = ZZRingElem(sign(Int, a))
+sign(a::TypeOrPtr{ZZRingElem}) = ZZRingElem(sign(Int, a))
 
-sign(::Type{Int}, a::ZZRingElemOrPtr) = is_zero(a) ? 0 : (signbit(a) ? -1 : 1)
+sign(::Type{Int}, a::TypeOrPtr{ZZRingElem}) = is_zero(a) ? 0 : (signbit(a) ? -1 : 1)
 
-Base.signbit(a::ZZRingElemOrPtr) = _fmpz_is_small(a) ? signbit(data(a)) : signbit(_fmpz_size(a))
+Base.signbit(a::TypeOrPtr{ZZRingElem}) = _fmpz_is_small(a) ? signbit(data(a)) : signbit(_fmpz_size(a))
 
-is_negative(n::ZZRingElemOrPtr) = sign(Int, n) < 0
-is_positive(n::ZZRingElemOrPtr) = sign(Int, n) > 0
+is_negative(n::TypeOrPtr{ZZRingElem}) = sign(Int, n) < 0
+is_positive(n::TypeOrPtr{ZZRingElem}) = sign(Int, n) > 0
 
 @doc raw"""
     fits(::Type{Int}, a::ZZRingElem)
@@ -301,11 +301,11 @@ Return the number of limbs required to store the absolute value of $a$.
 """
 size(a::ZZRingElem) = _fmpz_is_small(a) ? 1 : abs(_fmpz_size(a))
 
-is_unit(a::ZZRingElemOrPtr) = data(a) == 1 || data(a) == -1
+is_unit(a::TypeOrPtr{ZZRingElem}) = data(a) == 1 || data(a) == -1
 
-is_zero(a::ZZRingElemOrPtr) = data(a) == 0
+is_zero(a::TypeOrPtr{ZZRingElem}) = data(a) == 0
 
-is_one(a::ZZRingElemOrPtr) = data(a) == 1
+is_one(a::TypeOrPtr{ZZRingElem}) = data(a) == 1
 
 isinteger(::ZZRingElem) = true
 
@@ -331,8 +331,8 @@ function numerator(a::ZZRingElem)
   return a
 end
 
-isodd(a::ZZRingElemOrPtr) = isodd(a % UInt)
-iseven(a::ZZRingElemOrPtr) = !isodd(a)
+isodd(a::TypeOrPtr{ZZRingElem}) = isodd(a % UInt)
+iseven(a::TypeOrPtr{ZZRingElem}) = !isodd(a)
 
 ###############################################################################
 #
@@ -494,24 +494,24 @@ end
 divides(x::ZZRingElem, y::Integer) = divides(x, ZZRingElem(y))
 
 @doc raw"""
-    is_divisible_by(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+    is_divisible_by(x::TypeOrPtr{ZZRingElem}, y::TypeOrPtr{ZZRingElem})
 
 Return `true` if $x$ is divisible by $y$, otherwise return `false`.
 """
-function is_divisible_by(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+function is_divisible_by(x::TypeOrPtr{ZZRingElem}, y::TypeOrPtr{ZZRingElem})
   return Bool(@ccall libflint.fmpz_divisible(x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Cint)
 end
 
 @doc raw"""
-    is_divisible_by(x::ZZRingElemOrPtr, y::Int)
+    is_divisible_by(x::TypeOrPtr{ZZRingElem}, y::Int)
 
 Return `true` if $x$ is divisible by $y$, otherwise return `false`.
 """
-function is_divisible_by(x::ZZRingElemOrPtr, y::Int)
+function is_divisible_by(x::TypeOrPtr{ZZRingElem}, y::Int)
   return Bool(@ccall libflint.fmpz_divisible_si(x::Ref{ZZRingElem}, y::Int)::Cint)
 end
 
-function is_divisible_by(x::ZZRingElemOrPtr, y::Integer)
+function is_divisible_by(x::TypeOrPtr{ZZRingElem}, y::Integer)
   return is_divisible_by(x, flintify(y))
 end
 
@@ -519,7 +519,7 @@ function is_divisible_by(x::Integer, y::ZZRingElem)
   return is_divisible_by(ZZRingElem(x), y)
 end
 
-function rem(x::ZZRingElemOrPtr, ::Type{UInt})
+function rem(x::TypeOrPtr{ZZRingElem}, ::Type{UInt})
   return _fmpz_is_small(x) ? (data(x) % UInt) : GC.@preserve x (_as_bigint(x) % UInt)
 end
 
@@ -613,9 +613,9 @@ function div(f::ZZRingElem, g::Int)
   div!(z, f, g)
 end
 
-div!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr) = fdiv!(z, f, g)
+div!(z::TypeOrPtr{ZZRingElem}, f::TypeOrPtr{ZZRingElem}, g::TypeOrPtr{ZZRingElem}) = fdiv!(z, f, g)
 
-div!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int) = fdiv!(z, f, g)
+div!(z::TypeOrPtr{ZZRingElem}, f::TypeOrPtr{ZZRingElem}, g::Int) = fdiv!(z, f, g)
 
 function tdivpow2(x::ZZRingElem, c::Int)
   c < 0 && throw(DomainError(c, "Exponent must be non-negative"))
@@ -663,17 +663,17 @@ function tdiv(f::ZZRingElem, g::Int)
   return tdiv!(z, f, g)
 end
 
-function tdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+function tdiv!(z::TypeOrPtr{ZZRingElem}, f::TypeOrPtr{ZZRingElem}, g::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_tdiv_q(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function tdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+function tdiv!(z::TypeOrPtr{ZZRingElem}, f::TypeOrPtr{ZZRingElem}, g::Int)
   @ccall libflint.fmpz_tdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
   return z
 end
 
-tdiv!(f::ZZRingElemOrPtr, g::ZZRingElemOrPtr) = tdiv!(f, f, g)
+tdiv!(f::TypeOrPtr{ZZRingElem}, g::TypeOrPtr{ZZRingElem}) = tdiv!(f, f, g)
 
 @doc raw"""
     tdiv!(z, f, g)
@@ -692,7 +692,7 @@ julia> f = tdiv!(f, 7)
 14
 ```
 """
-tdiv!(f::ZZRingElemOrPtr, g::Int) = tdiv!(f, f, g)
+tdiv!(f::TypeOrPtr{ZZRingElem}, g::Int) = tdiv!(f, f, g)
 
 @doc raw"""
     fdiv(f::ZZRingElem, g::Int)
@@ -713,17 +713,17 @@ function fdiv(f::ZZRingElem, g::Int)
   return z
 end
 
-function fdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+function fdiv!(z::TypeOrPtr{ZZRingElem}, f::TypeOrPtr{ZZRingElem}, g::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_fdiv_q(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function fdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+function fdiv!(z::TypeOrPtr{ZZRingElem}, f::TypeOrPtr{ZZRingElem}, g::Int)
   @ccall libflint.fmpz_fdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
   return z
 end
 
-fdiv!(f::ZZRingElemOrPtr, g::ZZRingElemOrPtr) = fdiv!(f, f, g)
+fdiv!(f::TypeOrPtr{ZZRingElem}, g::TypeOrPtr{ZZRingElem}) = fdiv!(f, f, g)
 
 @doc raw"""
     fdiv!(z, f, g)
@@ -742,7 +742,7 @@ julia> f = fdiv!(f, 7)
 14
 ```
 """
-fdiv!(f::ZZRingElemOrPtr, g::Int) = fdiv!(f, f, g)
+fdiv!(f::TypeOrPtr{ZZRingElem}, g::Int) = fdiv!(f, f, g)
 
 @doc raw"""
     cdiv(f::ZZRingElem, g::Int)
@@ -762,17 +762,17 @@ function cdiv(f::ZZRingElem, g::Int)
   return cdiv!(z, f, g)
 end
 
-function cdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::ZZRingElemOrPtr)
+function cdiv!(z::TypeOrPtr{ZZRingElem}, f::TypeOrPtr{ZZRingElem}, g::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_cdiv_q(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function cdiv!(z::ZZRingElemOrPtr, f::ZZRingElemOrPtr, g::Int)
+function cdiv!(z::TypeOrPtr{ZZRingElem}, f::TypeOrPtr{ZZRingElem}, g::Int)
   @ccall libflint.fmpz_cdiv_q_si(z::Ref{ZZRingElem}, f::Ref{ZZRingElem}, g::Int)::Nothing
   return z
 end
 
-cdiv!(f::ZZRingElemOrPtr, g::ZZRingElemOrPtr) = cdiv!(f, f, g)
+cdiv!(f::TypeOrPtr{ZZRingElem}, g::TypeOrPtr{ZZRingElem}) = cdiv!(f, f, g)
 
 @doc raw"""
     cdiv!(z, f, g)
@@ -791,7 +791,7 @@ julia> f = cdiv!(f, 7)
 15
 ```
 """
-cdiv!(f::ZZRingElemOrPtr, g::Int) = cdiv!(f, f, g)
+cdiv!(f::TypeOrPtr{ZZRingElem}, g::Int) = cdiv!(f, f, g)
 
 rem(x::Integer, y::ZZRingElem) = rem(ZZRingElem(x), y)
 
@@ -805,7 +805,7 @@ mod(x::Integer, y::ZZRingElem) = mod(ZZRingElem(x), y)
 Return the remainder after division of $x$ by $y$. The remainder will be
 closer to zero than $y$ and have the same sign, or it will be zero.
 """
-mod(x::ZZRingElemOrPtr, y::Integer) = mod(x, ZZRingElem(y))
+mod(x::TypeOrPtr{ZZRingElem}, y::Integer) = mod(x, ZZRingElem(y))
 
 div(x::Integer, y::ZZRingElem) = div(ZZRingElem(x), y)
 
@@ -986,7 +986,7 @@ end
 #
 ###############################################################################
 
-function cmp(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+function cmp(x::TypeOrPtr{ZZRingElem}, y::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_cmp(x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Cint
 end
 
@@ -996,7 +996,7 @@ end
 
 <(x::ZZRingElem, y::ZZRingElem) = cmp(x,y) < 0
 
-function cmpabs(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+function cmpabs(x::TypeOrPtr{ZZRingElem}, y::TypeOrPtr{ZZRingElem})
   Int(@ccall libflint.fmpz_cmpabs(x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Cint)
 end
 
@@ -1022,17 +1022,17 @@ end
 #
 ###############################################################################
 
-function cmp(x::ZZRingElemOrPtr, y::Int)
+function cmp(x::TypeOrPtr{ZZRingElem}, y::Int)
   _fmpz_is_small(x) && return cmp(data(x), y)
   Int(@ccall libflint.fmpz_cmp_si(x::Ref{ZZRingElem}, y::Int)::Cint)
 end
 
-function cmp(x::ZZRingElemOrPtr, y::UInt)
+function cmp(x::TypeOrPtr{ZZRingElem}, y::UInt)
   _fmpz_is_small(x) && return cmp(data(x), y)
   Int(@ccall libflint.fmpz_cmp_ui(x::Ref{ZZRingElem}, y::UInt)::Cint)
 end
 
-cmp(x::ZZRingElemOrPtr, y::Integer) = cmp(x, flintify(y))
+cmp(x::TypeOrPtr{ZZRingElem}, y::Integer) = cmp(x, flintify(y))
 
 for T in (Int, UInt, Integer)
   @eval begin
@@ -1114,24 +1114,24 @@ end
 #
 ###############################################################################
 
-function mod!(r::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+function mod!(r::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_fdiv_r(r::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
   return r
 end
 
-function mod(x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+function mod(x::TypeOrPtr{ZZRingElem}, y::TypeOrPtr{ZZRingElem})
   iszero(y) && throw(DivideError())
   r = ZZRingElem()
   return mod!(r, x, y)
 end
 
-function mod(x::ZZRingElemOrPtr, c::UInt)
+function mod(x::TypeOrPtr{ZZRingElem}, c::UInt)
   c == 0 && throw(DivideError())
   @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, c::UInt)::UInt
 end
 
 @doc raw"""
-    mod_sym!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
+    mod_sym!(z::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem}, b::TypeOrPtr{ZZRingElem})
 
 Return the signed remainder of $a$ mod $b$, that is, the unique integer $x$ satisfying
 $-b < 2x \le b$, possibly modifying the object $z$ in the process.
@@ -1150,13 +1150,13 @@ julia> z
 
 ```
 """
-function mod_sym!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
+function mod_sym!(z::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem}, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_smod(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
   return z
 end
 
 @doc raw"""
-    mod_sym!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
+    mod_sym!(a::TypeOrPtr{ZZRingElem}, b::TypeOrPtr{ZZRingElem})
 
 Return the signed remainder of $a$ mod $b$, that is, the unique integer $x$ satisfying
 $-b < 2x \le b$, possibly modifying the object $a$ in the process.
@@ -1176,7 +1176,7 @@ julia> a
 
 ```
 """
-function mod_sym!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
+function mod_sym!(a::TypeOrPtr{ZZRingElem}, b::TypeOrPtr{ZZRingElem})
   return mod_sym!(a, a, b)
 end
 
@@ -1621,7 +1621,7 @@ lcm(a::Integer, b::ZZRingElem) = lcm(ZZRingElem(a), b)
 #
 ###############################################################################
 
-function gcdx!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::ZZRingElemOrPtr, d::ZZRingElemOrPtr, e::ZZRingElemOrPtr)
+function gcdx!(a::TypeOrPtr{ZZRingElem}, b::TypeOrPtr{ZZRingElem}, c::TypeOrPtr{ZZRingElem}, d::TypeOrPtr{ZZRingElem}, e::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_xgcd_canonical_bezout(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ref{ZZRingElem}, d::Ref{ZZRingElem}, e::Ref{ZZRingElem})::Nothing
   return a, b, c
 end
@@ -1691,7 +1691,7 @@ function isqrt(x::ZZRingElem)
 end
 
 @doc raw"""
-    isqrt!(x::ZZRingElemOrPtr)
+    isqrt!(x::TypeOrPtr{ZZRingElem})
 
 Return the floor of the square root of $x$, possibly modifying the object $x$ in the process.
 This is a shorthand for isqrt!(x, x).
@@ -1710,12 +1710,12 @@ julia> a
 
 ```
 """
-function isqrt!(x::ZZRingElemOrPtr)
+function isqrt!(x::TypeOrPtr{ZZRingElem})
   return isqrt!(x,x)
 end
 
 @doc raw"""
-    isqrt!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr)
+    isqrt!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem})
 
 Return the floor of the square root of $x$, possibly modifying the object $z$ in the process.
 
@@ -1733,7 +1733,7 @@ julia> z
 
 ```
 """
-function isqrt!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr)
+function isqrt!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_sqrt(z::Ref{ZZRingElem}, x::Ref{ZZRingElem})::Nothing
   return z
 end
@@ -1989,12 +1989,12 @@ function next_prime(x::Int, proved::Bool = true)
   return x < 2 ? 2 : Int(next_prime(x % UInt, proved))
 end
 
-function remove!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
+function remove!(z::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem}, b::TypeOrPtr{ZZRingElem})
   v = @ccall libflint.fmpz_remove(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Clong
   return Int(v), z
 end
 
-remove!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr) = remove!(a, a, b)
+remove!(a::TypeOrPtr{ZZRingElem}, b::TypeOrPtr{ZZRingElem}) = remove!(a, a, b)
 
 function remove(x::ZZRingElem, y::ZZRingElem)
   iszero(y) && throw(DivideError())
@@ -2565,7 +2565,7 @@ julia> nbits(ZZ(12))
 4
 ```
 """
-nbits(x::ZZRingElemOrPtr) = Int(@ccall libflint.fmpz_bits(x::Ref{ZZRingElem})::Culong)
+nbits(x::TypeOrPtr{ZZRingElem}) = Int(@ccall libflint.fmpz_bits(x::Ref{ZZRingElem})::Culong)
 
 @doc raw"""
     nbits(a::Integer) -> Int
@@ -2729,23 +2729,23 @@ end
 #
 ###############################################################################
 
-function zero!(z::ZZRingElemOrPtr)
+function zero!(z::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_zero(z::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function one!(z::ZZRingElemOrPtr)
+function one!(z::TypeOrPtr{ZZRingElem})
   set!(z, UInt(1))
 end
 
-function neg!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
+function neg!(z::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_neg(z::Ref{ZZRingElem}, a::Ref{ZZRingElem})::Nothing
   return z
 end
 
 @doc raw"""
-    set!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
-    set!(z::ZZRingElemOrPtr, a::Integer)
+    set!(z::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem})
+    set!(z::TypeOrPtr{ZZRingElem}, a::Integer)
 
 Change `z` to be equal to `a` and return `z`.
 
@@ -2797,148 +2797,148 @@ julia> A
  3  3
 ```
 """
-function set!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr)
+function set!(z::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_set(z::Ref{ZZRingElem}, a::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function set!(z::ZZRingElemOrPtr, a::Int)
+function set!(z::TypeOrPtr{ZZRingElem}, a::Int)
   @ccall libflint.fmpz_set_si(z::Ref{ZZRingElem}, a::Int)::Nothing
   return z
 end
 
-function set!(z::ZZRingElemOrPtr, a::UInt)
+function set!(z::TypeOrPtr{ZZRingElem}, a::UInt)
   @ccall libflint.fmpz_set_ui(z::Ref{ZZRingElem}, a::UInt)::Nothing
   return z
 end
 
-set!(z::ZZRingElemOrPtr, a::Integer) = set!(z, flintify(a))
+set!(z::TypeOrPtr{ZZRingElem}, a::Integer) = set!(z, flintify(a))
 
-function swap!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
+function swap!(a::TypeOrPtr{ZZRingElem}, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_swap(a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
 end
 
 #
 
-function add!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+function add!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_add(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function add!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Int)
+function add!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::Int)
   @ccall libflint.fmpz_add_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Int)::Nothing
   return z
 end
 
-function add!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
+function add!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::UInt)
   @ccall libflint.fmpz_add_ui(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::UInt)::Nothing
   return z
 end
 
-function add!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::Ptr{Int})
+function add!(a::TypeOrPtr{ZZRingElem}, b::TypeOrPtr{ZZRingElem}, c::Ptr{Int})
   @ccall libflint.fmpz_add(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ptr{Int})::Nothing
   return a
 end
 
-add!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer) = add!(z, a, flintify(b))
-add!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr) = add!(z, y, x)
+add!(z::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem}, b::Integer) = add!(z, a, flintify(b))
+add!(z::TypeOrPtr{ZZRingElem}, x::Integer, y::TypeOrPtr{ZZRingElem}) = add!(z, y, x)
 
 #
 
-function sub!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
+function sub!(z::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem}, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_sub(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function sub!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Int)
+function sub!(z::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem}, b::Int)
   @ccall libflint.fmpz_sub_si(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Int)::Nothing
   return z
 end
 
-function sub!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::UInt)
+function sub!(z::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem}, b::UInt)
   @ccall libflint.fmpz_sub_ui(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::UInt)::Nothing
   return z
 end
 
-sub!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer) = sub!(z, a, flintify(b))
-sub!(z::ZZRingElemOrPtr, a::Integer, b::ZZRingElemOrPtr) = neg!(sub!(z, b, a))
+sub!(z::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem}, b::Integer) = sub!(z, a, flintify(b))
+sub!(z::TypeOrPtr{ZZRingElem}, a::Integer, b::TypeOrPtr{ZZRingElem}) = neg!(sub!(z, b, a))
 
 #
 
-function mul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+function mul!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_mul(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function mul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Int)
+function mul!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::Int)
   @ccall libflint.fmpz_mul_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Int)::Nothing
   return z
 end
 
-function mul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
+function mul!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::UInt)
   @ccall libflint.fmpz_mul_ui(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::UInt)::Nothing
   return z
 end
 
-mul!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer) = mul!(z, a, flintify(b))
-mul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr) = mul!(z, y, x)
+mul!(z::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem}, b::Integer) = mul!(z, a, flintify(b))
+mul!(z::TypeOrPtr{ZZRingElem}, x::Integer, y::TypeOrPtr{ZZRingElem}) = mul!(z, y, x)
 
-function mul!(a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::Ptr{Int})
+function mul!(a::TypeOrPtr{ZZRingElem}, b::TypeOrPtr{ZZRingElem}, c::Ptr{Int})
   @ccall libflint.fmpz_mul(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ptr{Int})::Nothing
   return a
 end
 
 #
 
-function addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+function addmul!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_addmul(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Int)
+function addmul!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::Int)
   @ccall libflint.fmpz_addmul_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Int)::Nothing
   return z
 end
 
-function addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
+function addmul!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::UInt)
   @ccall libflint.fmpz_addmul_ui(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::UInt)::Nothing
   return z
 end
 
-addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Integer) = addmul!(z, x, flintify(y))
-addmul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr) = addmul!(z, y, x)
+addmul!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::Integer) = addmul!(z, x, flintify(y))
+addmul!(z::TypeOrPtr{ZZRingElem}, x::Integer, y::TypeOrPtr{ZZRingElem}) = addmul!(z, y, x)
 
 # ignore fourth argument
-addmul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Union{ZZRingElemOrPtr,Integer}, ::ZZRingElemOrPtr) = addmul!(z, x, y)
-addmul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr, ::ZZRingElemOrPtr) = addmul!(z, x, y)
+addmul!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::Union{TypeOrPtr{ZZRingElem},Integer}, ::TypeOrPtr{ZZRingElem}) = addmul!(z, x, y)
+addmul!(z::TypeOrPtr{ZZRingElem}, x::Integer, y::TypeOrPtr{ZZRingElem}, ::TypeOrPtr{ZZRingElem}) = addmul!(z, x, y)
 
-function submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+function submul!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_submul(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Int)
+function submul!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::Int)
   @ccall libflint.fmpz_submul_si(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Int)::Nothing
   return z
 end
 
-function submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::UInt)
+function submul!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::UInt)
   @ccall libflint.fmpz_submul_ui(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::UInt)::Nothing
   return z
 end
 
-submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Integer) = submul!(z, x, flintify(y))
+submul!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::Integer) = submul!(z, x, flintify(y))
 
 # ignore fourth argument
-submul!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::Union{ZZRingElemOrPtr,Integer}, ::ZZRingElemOrPtr) = submul!(z, x, y)
-submul!(z::ZZRingElemOrPtr, x::Integer, y::ZZRingElemOrPtr, ::ZZRingElemOrPtr) = submul!(z, x, y)
+submul!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::Union{TypeOrPtr{ZZRingElem},Integer}, ::TypeOrPtr{ZZRingElem}) = submul!(z, x, y)
+submul!(z::TypeOrPtr{ZZRingElem}, x::Integer, y::TypeOrPtr{ZZRingElem}, ::TypeOrPtr{ZZRingElem}) = submul!(z, x, y)
 
 @doc raw"""
     fmma!(r::ZZRingElem, a::ZZRingElem, b::ZZRingElem, c::ZZRingElem, d::ZZRingElem)
 
 Return $r = a b + c d$, changing $r$ in-place.
 """
-function fmma!(r::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::ZZRingElemOrPtr, d::ZZRingElemOrPtr)
+function fmma!(r::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem}, b::TypeOrPtr{ZZRingElem}, c::TypeOrPtr{ZZRingElem}, d::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_fmma(r::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ref{ZZRingElem}, d::Ref{ZZRingElem})::Nothing
   return r
 end
@@ -2948,29 +2948,29 @@ end
 
 Return $r = a b - c d$, changing $r$ in-place.
 """
-function fmms!(r::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr, c::ZZRingElemOrPtr, d::ZZRingElemOrPtr)
+function fmms!(r::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem}, b::TypeOrPtr{ZZRingElem}, c::TypeOrPtr{ZZRingElem}, d::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_fmms(r::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, c::Ref{ZZRingElem}, d::Ref{ZZRingElem})::Nothing
   return r
 end
 
 #
 
-function divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
+function divexact!(z::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem}, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_divexact(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Int)
+function divexact!(z::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem}, b::Int)
   @ccall libflint.fmpz_divexact_si(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::Int)::Nothing
   return z
 end
 
-function divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::UInt)
+function divexact!(z::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem}, b::UInt)
   @ccall libflint.fmpz_divexact_ui(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, b::UInt)::Nothing
   return z
 end
 
-divexact!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer) = divexact!(z, a, flintify(b))
+divexact!(z::TypeOrPtr{ZZRingElem}, a::TypeOrPtr{ZZRingElem}, b::Integer) = divexact!(z, a, flintify(b))
 
 #
 
@@ -2992,12 +2992,12 @@ end
 
 #
 
-function pow!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, n::Integer)
+function pow!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, n::Integer)
   @ccall libflint.fmpz_pow_ui(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, UInt(n)::UInt)::Nothing
   return z
 end
 
-function pow!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, n::ZZRingElemOrPtr)
+function pow!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, n::TypeOrPtr{ZZRingElem})
   ok = Bool(@ccall libflint.fmpz_pow_fmpz(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, n::Ref{ZZRingElem})::Cint)
   if !ok
     error("unable to compute power")
@@ -3007,12 +3007,12 @@ end
 
 #
 
-function lcm!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+function lcm!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_lcm(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function gcd!(z::ZZRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZRingElemOrPtr)
+function gcd!(z::TypeOrPtr{ZZRingElem}, x::TypeOrPtr{ZZRingElem}, y::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_gcd(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
   return z
 end

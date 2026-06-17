@@ -613,7 +613,7 @@ end
 
 #
 
-function set!(z::FqFieldElem, a::FqFieldElemOrPtr)
+function set!(z::FqFieldElem, a::TypeOrPtr{FqFieldElem})
   @ccall libflint.fq_default_set(z::Ref{FqFieldElem}, a::Ref{FqFieldElem}, parent(z)::Ref{FqField})::Nothing
   z.poly = nothing
   return z
@@ -631,7 +631,7 @@ function set!(z::FqFieldElem, a::UInt)
   return z
 end
 
-function set!(z::FqFieldElem, a::ZZRingElemOrPtr)
+function set!(z::FqFieldElem, a::TypeOrPtr{ZZRingElem})
   @ccall libflint.fq_default_set_fmpz(z::Ref{FqFieldElem}, a::Ref{ZZRingElem}, parent(z)::Ref{FqField})::Nothing
   z.poly = nothing
   return z
@@ -639,31 +639,31 @@ end
 
 set!(z::FqFieldElem, a::Integer) = set!(z, flintify(a))
 
-function set!(z::FqFieldElem, a::ZZPolyRingElemOrPtr)
+function set!(z::FqFieldElem, a::TypeOrPtr{ZZPolyRingElem})
   @ccall libflint.fq_default_set_fmpz_poly(z::Ref{FqFieldElem}, a::Ref{ZZPolyRingElem}, parent(z)::Ref{FqField})::Nothing
   z.poly = nothing
   return z
 end
 
-function set!(z::FqFieldElem, a::zzModPolyRingElemOrPtr)
+function set!(z::FqFieldElem, a::TypeOrPtr{zzModPolyRingElem})
   @ccall libflint.fq_default_set_nmod_poly(z::Ref{FqFieldElem}, a::Ref{zzModPolyRingElem}, parent(z)::Ref{FqField})::Nothing
   z.poly = nothing
   return z
 end
 
-function set!(z::FqFieldElem, a::fpPolyRingElemOrPtr)
+function set!(z::FqFieldElem, a::TypeOrPtr{fpPolyRingElem})
   @ccall libflint.fq_default_set_nmod_poly(z::Ref{FqFieldElem}, a::Ref{fpPolyRingElem}, parent(z)::Ref{FqField})::Nothing
   z.poly = nothing
   return z
 end
 
-function set!(z::FqFieldElem, a::ZZModPolyRingElemOrPtr)
+function set!(z::FqFieldElem, a::TypeOrPtr{ZZModPolyRingElem})
   @ccall libflint.fq_default_set_fmpz_mod_poly(z::Ref{FqFieldElem}, a::Ref{ZZModPolyRingElem}, parent(z)::Ref{FqField})::Nothing
   z.poly = nothing
   return z
 end
 
-function set!(z::FqFieldElem, a::FpPolyRingElemOrPtr)
+function set!(z::FqFieldElem, a::TypeOrPtr{FpPolyRingElem})
   @ccall libflint.fq_default_set_fmpz_mod_poly(z::Ref{FqFieldElem}, a::Ref{FpPolyRingElem}, parent(z)::Ref{FqField})::Nothing
   z.poly = nothing
   return z
@@ -693,7 +693,7 @@ function mul!(z::FqFieldElem, x::FqFieldElem, y::FqFieldElem)
   return z
 end
 
-function mul!(z::FqFieldElem, x::FqFieldElem, y::ZZRingElemOrPtr)
+function mul!(z::FqFieldElem, x::FqFieldElem, y::TypeOrPtr{ZZRingElem})
   @ccall libflint.fq_default_mul_fmpz(z::Ref{FqFieldElem}, x::Ref{FqFieldElem}, y::Ref{ZZRingElem}, x.parent::Ref{FqField})::Nothing
   z.poly = nothing
   return z
@@ -713,7 +713,7 @@ end
 
 mul!(z::FqFieldElem, x::FqFieldElem, y::Integer) = mul!(z, x, flintify(y))
 
-mul!(z::FqFieldElem, x::ZZRingElemOrPtr, y::FqFieldElem) = mul!(z, y, x)
+mul!(z::FqFieldElem, x::TypeOrPtr{ZZRingElem}, y::FqFieldElem) = mul!(z, y, x)
 mul!(z::FqFieldElem, x::Integer, y::FqFieldElem) = mul!(z, y, x)
 
 ###############################################################################

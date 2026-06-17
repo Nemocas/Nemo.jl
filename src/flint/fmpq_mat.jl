@@ -750,12 +750,12 @@ end
 #
 # matrix x scalar, scalar x matrix
 #
-function mul!(z::QQMatrixOrPtr, a::QQMatrixOrPtr, b::QQFieldElemOrPtr)
+function mul!(z::QQMatrixOrPtr, a::QQMatrixOrPtr, b::TypeOrPtr{QQFieldElem})
    @ccall libflint.fmpq_mat_scalar_mul_fmpq(z::Ref{QQMatrix}, a::Ref{QQMatrix}, b::Ref{QQFieldElem})::Nothing
    return z
 end
 
-function mul!(z::QQMatrixOrPtr, a::QQMatrixOrPtr, b::ZZRingElemOrPtr)
+function mul!(z::QQMatrixOrPtr, a::QQMatrixOrPtr, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpq_mat_scalar_mul_fmpz(z::Ref{QQMatrix}, a::Ref{QQMatrix}, b::Ref{ZZRingElem})::Nothing
   return z
 end
@@ -766,7 +766,7 @@ mul!(z::QQMatrixOrPtr, a::QQMatrixOrPtr, b::Rational) = mul!(z, a, QQ(b))
 mul!(z::QQMatrixOrPtr, a::RationalUnionOrPtr, b::QQMatrixOrPtr) = mul!(z, b, a)
 
 
-function divexact!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::QQFieldElemOrPtr)
+function divexact!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::TypeOrPtr{QQFieldElem})
   GC.@preserve y begin
     divexact!(z, x, _num_ptr(y))
     mul!(z, z, _den_ptr(y))
@@ -774,7 +774,7 @@ function divexact!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::QQFieldElemOrPtr)
   return z
 end
 
-function divexact!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::ZZRingElemOrPtr)
+function divexact!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpq_mat_scalar_div_fmpz(z::Ref{QQMatrix}, x::Ref{QQMatrix}, y::Ref{ZZRingElem})::Nothing
   return z
 end

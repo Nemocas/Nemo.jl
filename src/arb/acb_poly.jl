@@ -636,17 +636,17 @@ end
 #
 ###############################################################################
 
-function zero!(z::AcbPolyRingElemOrPtr)
+function zero!(z::TypeOrPtr{AcbPolyRingElem})
   @ccall libflint.acb_poly_zero(z::Ref{AcbPolyRingElem})::Nothing
   return z
 end
 
-function one!(z::AcbPolyRingElemOrPtr)
+function one!(z::TypeOrPtr{AcbPolyRingElem})
   @ccall libflint.acb_poly_one(z::Ref{AcbPolyRingElem})::Nothing
   return z
 end
 
-function neg!(z::AcbPolyRingElemOrPtr, a::AcbPolyRingElemOrPtr)
+function neg!(z::TypeOrPtr{AcbPolyRingElem}, a::TypeOrPtr{AcbPolyRingElem})
   @ccall libflint.acb_poly_neg(z::Ref{AcbPolyRingElem}, a::Ref{AcbPolyRingElem})::Nothing
   return z
 end

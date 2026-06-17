@@ -62,8 +62,8 @@ end
 
 characteristic(::RealField) = 0
 
-_mid_ptr(x::RealFieldElemOrPtr) = @ccall libflint.arb_mid_ptr(x::Ref{RealFieldElem})::Ptr{arf_struct}
-_rad_ptr(x::RealFieldElemOrPtr) = @ccall libflint.arb_rad_ptr(x::Ref{RealFieldElem})::Ptr{mag_struct}
+_mid_ptr(x::TypeOrPtr{RealFieldElem}) = @ccall libflint.arb_mid_ptr(x::Ref{RealFieldElem})::Ptr{arf_struct}
+_rad_ptr(x::TypeOrPtr{RealFieldElem}) = @ccall libflint.arb_rad_ptr(x::Ref{RealFieldElem})::Ptr{mag_struct}
 
 ################################################################################
 #
@@ -1873,17 +1873,17 @@ end
 #
 ################################################################################
 
-function zero!(z::RealFieldElemOrPtr)
+function zero!(z::TypeOrPtr{RealFieldElem})
   @ccall libflint.arb_zero(z::Ref{RealFieldElem})::Nothing
   return z
 end
 
-function one!(z::RealFieldElemOrPtr)
+function one!(z::TypeOrPtr{RealFieldElem})
   @ccall libflint.arb_one(z::Ref{RealFieldElem})::Nothing
   return z
 end
 
-function neg!(z::RealFieldElemOrPtr, a::RealFieldElemOrPtr)
+function neg!(z::TypeOrPtr{RealFieldElem}, a::TypeOrPtr{RealFieldElem})
   @ccall libflint.arb_neg(z::Ref{RealFieldElem}, a::Ref{RealFieldElem})::Nothing
   return z
 end
@@ -1891,7 +1891,7 @@ end
 for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
               ("sub!","arb_sub"))
   @eval begin
-    function ($(Symbol(s)))(z::RealFieldElemOrPtr, x::RealFieldElemOrPtr, y::RealFieldElemOrPtr, prec::Int = precision(Balls))
+    function ($(Symbol(s)))(z::TypeOrPtr{RealFieldElem}, x::TypeOrPtr{RealFieldElem}, y::TypeOrPtr{RealFieldElem}, prec::Int = precision(Balls))
       @ccall libflint.$f(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{RealFieldElem}, prec::Int)::Nothing
       return z
     end
@@ -1904,90 +1904,90 @@ end
 #
 ################################################################################
 
-function _arb_set(x::RealFieldElemOrPtr, y::Int)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::Int)
   @ccall libflint.arb_set_si(x::Ref{RealFieldElem}, y::Int)::Nothing
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::UInt)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::UInt)
   @ccall libflint.arb_set_ui(x::Ref{RealFieldElem}, y::UInt)::Nothing
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::Float64)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::Float64)
   @ccall libflint.arb_set_d(x::Ref{RealFieldElem}, y::Float64)::Nothing
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::Union{Int,UInt,Float64}, p::Int)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::Union{Int,UInt,Float64}, p::Int)
   _arb_set(x, y)
   @ccall libflint.arb_set_round(x::Ref{RealFieldElem}, x::Ref{RealFieldElem}, p::Int)::Nothing
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::ZZRingElem)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::ZZRingElem)
   @ccall libflint.arb_set_fmpz(x::Ref{RealFieldElem}, y::Ref{ZZRingElem})::Nothing
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::ZZRingElem, p::Int)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::ZZRingElem, p::Int)
   @ccall libflint.arb_set_round_fmpz(x::Ref{RealFieldElem}, y::Ref{ZZRingElem}, p::Int)::Nothing
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::QQFieldElem, p::Int)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::QQFieldElem, p::Int)
   @ccall libflint.arb_set_fmpq(x::Ref{RealFieldElem}, y::Ref{QQFieldElem}, p::Int)::Nothing
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::RealFieldElemOrPtr)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::TypeOrPtr{RealFieldElem})
   @ccall libflint.arb_set(x::Ref{RealFieldElem}, y::Ref{RealFieldElem})::Nothing
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::Ptr{arb_struct})
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::Ptr{arb_struct})
   @ccall libflint.arb_set(x::Ref{RealFieldElem}, y::Ptr{arb_struct})::Nothing
 end
 
-function _arb_set(x::Ptr{arb_struct}, y::RealFieldElemOrPtr)
+function _arb_set(x::Ptr{arb_struct}, y::TypeOrPtr{RealFieldElem})
   @ccall libflint.arb_set(x::Ptr{arb_struct}, y::Ref{RealFieldElem})::Nothing
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::RealFieldElemOrPtr, p::Int)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::TypeOrPtr{RealFieldElem}, p::Int)
   @ccall libflint.arb_set_round(x::Ref{RealFieldElem}, y::Ref{RealFieldElem}, p::Int)::Nothing
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::AbstractString, p::Int)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::AbstractString, p::Int)
   s = string(y)
   err = @ccall libflint.arb_set_str(x::Ref{RealFieldElem}, s::Ptr{UInt8}, p::Int)::Int32
   err == 0 || error("Invalid real string: $(repr(s))")
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::BigFloat)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::BigFloat)
   m = _mid_ptr(x)
   r = _rad_ptr(x)
   @ccall libflint.arf_set_mpfr(m::Ptr{arf_struct}, y::Ref{BigFloat})::Nothing
   @ccall libflint.mag_zero(r::Ptr{mag_struct})::Nothing
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::BigFloat, p::Int)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::BigFloat, p::Int)
   _arb_set(x, y)
   @ccall libflint.arb_set_round(x::Ref{RealFieldElem}, x::Ref{RealFieldElem}, p::Int)::Nothing
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::Integer)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::Integer)
   _arb_set(x, ZZRingElem(y))
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::Integer, p::Int)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::Integer, p::Int)
   _arb_set(x, ZZRingElem(y), p)
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::Real)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::Real)
   _arb_set(x, BigFloat(y))
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::Real, p::Int)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::Real, p::Int)
   _arb_set(x, BigFloat(y), p)
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::Irrational)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::Irrational)
   _arb_set(x, y, precision(Balls))
 end
 
-function _arb_set(x::RealFieldElemOrPtr, y::Irrational, p::Int)
+function _arb_set(x::TypeOrPtr{RealFieldElem}, y::Irrational, p::Int)
   if y == pi
     @ccall libflint.arb_const_pi(x::Ref{RealFieldElem}, p::Int)::Nothing
   elseif y == MathConstants.e
