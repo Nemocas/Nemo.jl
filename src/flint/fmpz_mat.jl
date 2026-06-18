@@ -102,7 +102,7 @@ function setindex!(a::ZZMatrix, b::ZZMatrix, r::UnitRange{Int64}, c::UnitRange{I
   _checkbounds(a, r, c)
   size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
   A = view(a, r, c)
-  @ccall libflint.fmpz_mat_set(A::Ref{ZZMatrix}, b::Ref{ZZMatrix})::Nothing
+  set!(A, b)
 end
 
 @inline number_of_rows(a::ZZMatrix) = a.r
@@ -916,8 +916,7 @@ end
 function hnf!(x::ZZMatrix)
   if !(nrows(x) <= 50 && ncols(x) <= 50) && nrows(x) * ncols(x) > 100
     z = hnf(x)
-    @ccall libflint.fmpz_mat_set(x::Ref{ZZMatrix}, z::Ref{ZZMatrix})::Nothing
-
+    set!(x, z)
     return x
   end
   @ccall libflint.fmpz_mat_hnf(x::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
@@ -2007,7 +2006,7 @@ end
 ###############################################################################
 
 function Base.copy!(A::ZZMatrix, B::ZZMatrix)
-  @ccall libflint.fmpz_mat_set(A::Ref{ZZMatrix}, B::Ref{ZZMatrix})::Cvoid
+  set!(A, B)
 end
 
 function zero!(z::ZZMatrixOrPtr)
@@ -2031,10 +2030,19 @@ function one!(z::ZZMatrixOrPtr)
   return z
 end
 
-function neg!(z::ZZMatrixOrPtr, w::ZZMatrixOrPtr)
-  @ccall libflint.fmpz_mat_neg(z::Ref{ZZMatrix}, w::Ref{ZZMatrix})::Nothing
+function neg!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr)
+  @ccall libflint.fmpz_mat_neg(z::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
   return z
 end
+
+#
+
+function set!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr)
+  @ccall libflint.fmpz_mat_set(z::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
+  return z
+end
+
+#
 
 function add!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::ZZMatrixOrPtr)
   @ccall libflint.fmpz_mat_add(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Ref{ZZMatrix})::Nothing
