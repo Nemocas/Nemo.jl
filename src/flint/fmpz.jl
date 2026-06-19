@@ -2629,7 +2629,7 @@ end
 Returns the integer sum (base^j*d_{j+1}) where d_k is the k-th entry of digits.
 May overwrite digits.
 """
-function digits_to_integer!(digits::Vector{ZZRingElem}; base::Union{ZZRingElem,T2} = 10) where { T2 <: Integer }
+function digits_to_integer(digits::Vector{ZZRingElem}; base::IntegerUnion = 10)
   return _digits_to_integer_john!(digits, ZZ(base))
 end
 
