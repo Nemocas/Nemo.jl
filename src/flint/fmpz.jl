@@ -2624,17 +2624,17 @@ end
 
 
 @doc raw"""
-    digits_to_integer!(digits::Vector{ZZRingElem}; base::Union{ZZRingElem,T} = 10) where { T <: Integer }
-    digits_to_integer!(digits::Vector{T1}; base::T2 = Int(10)) where { T1 <: Integer, T2 <: Integer }
+    digits_to_integer!(digits::Vector{ZZRingElem}; base::IntegerUnion = 10)
+    digits_to_integer!(digits::Vector{T}; base::IntegerUnion = Int(10)) where { T <: Integer }
 
 Returns the integer sum (base^j*d_{j+1}) where d_k is the k-th entry of digits.
 May overwrite digits.
 """
-function digits_to_integer(digits::Vector{ZZRingElem}; base::IntegerUnion = 10)
+function digits_to_integer!(digits::Vector{ZZRingElem}; base::IntegerUnion = 10)
   return _digits_to_integer_john!(digits, ZZ(base))
 end
 
-function digits_to_integer!(digits::Vector{T1}; base::IntegerUnion = 10) where { T1 <: Integer}
+function digits_to_integer!(digits::Vector{T}; base::IntegerUnion = 10) where { T <: Integer}
   return digits_to_integer!(ZZ.(digits); base=ZZ(base))
 end
 
