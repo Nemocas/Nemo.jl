@@ -1539,22 +1539,22 @@ end
 #
 ################################################################################
 
-function zero!(z::AcbFieldElemOrPtr)
+function zero!(z::TypeOrPtr{AcbFieldElem})
   @ccall libflint.acb_zero(z::Ref{AcbFieldElem})::Nothing
   return z
 end
 
-function one!(z::AcbFieldElemOrPtr)
+function one!(z::TypeOrPtr{AcbFieldElem})
   @ccall libflint.acb_one(z::Ref{AcbFieldElem})::Nothing
   return z
 end
 
-function onei!(z::AcbFieldElemOrPtr)
+function onei!(z::TypeOrPtr{AcbFieldElem})
   @ccall libflint.acb_onei(z::Ref{AcbFieldElem})::Nothing
   return z
 end
 
-function neg!(z::AcbFieldElemOrPtr, a::AcbFieldElemOrPtr)
+function neg!(z::TypeOrPtr{AcbFieldElem}, a::TypeOrPtr{AcbFieldElem})
   @ccall libflint.acb_neg(z::Ref{AcbFieldElem}, a::Ref{AcbFieldElem})::Nothing
   return z
 end
@@ -1585,127 +1585,127 @@ end
 #
 ################################################################################
 
-_real_ptr(x::AcbFieldElemOrPtr) = @ccall libflint.acb_real_ptr(x::Ref{AcbFieldElem})::Ptr{ArbFieldElem}
-_imag_ptr(x::AcbFieldElemOrPtr) = @ccall libflint.acb_imag_ptr(x::Ref{AcbFieldElem})::Ptr{ArbFieldElem}
+_real_ptr(x::TypeOrPtr{AcbFieldElem}) = @ccall libflint.acb_real_ptr(x::Ref{AcbFieldElem})::Ptr{ArbFieldElem}
+_imag_ptr(x::TypeOrPtr{AcbFieldElem}) = @ccall libflint.acb_imag_ptr(x::Ref{AcbFieldElem})::Ptr{ArbFieldElem}
 
-function _acb_set(x::AcbFieldElemOrPtr, y::Int)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::Int)
   @ccall libflint.acb_set_si(x::Ref{AcbFieldElem}, y::Int)::Nothing
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::UInt)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::UInt)
   @ccall libflint.acb_set_ui(x::Ref{AcbFieldElem}, y::UInt)::Nothing
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::Float64)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::Float64)
   @ccall libflint.acb_set_d(x::Ref{AcbFieldElem}, y::Float64)::Nothing
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::Union{Int,UInt,Float64}, p::Int)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::Union{Int,UInt,Float64}, p::Int)
   _acb_set(x, y)
   @ccall libflint.acb_set_round(x::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, p::Int)::Nothing
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::ZZRingElem)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::ZZRingElem)
   @ccall libflint.acb_set_fmpz(x::Ref{AcbFieldElem}, y::Ref{ZZRingElem})::Nothing
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::ZZRingElem, p::Int)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::ZZRingElem, p::Int)
   @ccall libflint.acb_set_round_fmpz(x::Ref{AcbFieldElem}, y::Ref{ZZRingElem}, p::Int)::Nothing
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::QQFieldElem, p::Int)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::QQFieldElem, p::Int)
   @ccall libflint.acb_set_fmpq(x::Ref{AcbFieldElem}, y::Ref{QQFieldElem}, p::Int)::Nothing
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::ArbFieldElem)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::ArbFieldElem)
   @ccall libflint.acb_set_arb(x::Ref{AcbFieldElem}, y::Ref{ArbFieldElem})::Nothing
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::ArbFieldElem, p::Int)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::ArbFieldElem, p::Int)
   _acb_set(x, y)
   @ccall libflint.acb_set_round(x::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, p::Int)::Nothing
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::AcbFieldElemOrPtr)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::TypeOrPtr{AcbFieldElem})
   @ccall libflint.acb_set(x::Ref{AcbFieldElem}, y::Ref{AcbFieldElem})::Nothing
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::Ptr{acb_struct})
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::Ptr{acb_struct})
   @ccall libflint.acb_set(x::Ref{AcbFieldElem}, y::Ptr{acb_struct})::Nothing
 end
 
-function _acb_set(x::Ptr{acb_struct}, y::AcbFieldElemOrPtr)
+function _acb_set(x::Ptr{acb_struct}, y::TypeOrPtr{AcbFieldElem})
   @ccall libflint.acb_set(x::Ptr{acb_struct}, y::Ref{AcbFieldElem})::Nothing
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::AcbFieldElemOrPtr, p::Int)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::TypeOrPtr{AcbFieldElem}, p::Int)
   @ccall libflint.acb_set_round(x::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, p::Int)::Nothing
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::AbstractString, p::Int)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::AbstractString, p::Int)
   r = _real_ptr(x)
   _arb_set(r, y, p)
   i = _imag_ptr(x)
   zero!(i)
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::BigFloat)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::BigFloat)
   r = _real_ptr(x)
   _arb_set(r, y)
   i = _imag_ptr(x)
   zero!(i)
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::BigFloat, p::Int)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::BigFloat, p::Int)
   r = _real_ptr(x)
   _arb_set(r, y, p)
   i = _imag_ptr(x)
   zero!(i)
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, yz::Tuple{Int,Int}, p::Int)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, yz::Tuple{Int,Int}, p::Int)
   @ccall libflint.acb_set_si_si(x::Ref{AcbFieldElem}, yz[1]::Int, yz[2]::Int)::Nothing
   @ccall libflint.acb_set_round(x::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, p::Int)::Nothing
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, yz::Tuple{ArbFieldElem,ArbFieldElem})
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, yz::Tuple{ArbFieldElem,ArbFieldElem})
   @ccall libflint.acb_set_arb_arb(x::Ref{AcbFieldElem}, yz[1]::Ref{ArbFieldElem}, yz[2]::Ref{ArbFieldElem})::Nothing
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, yz::Tuple{ArbFieldElem,ArbFieldElem}, p::Int)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, yz::Tuple{ArbFieldElem,ArbFieldElem}, p::Int)
   _acb_set(x, yz)
   @ccall libflint.acb_set_round(x::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, p::Int)::Nothing
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, yz::Tuple{QQFieldElem,QQFieldElem}, p::Int)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, yz::Tuple{QQFieldElem,QQFieldElem}, p::Int)
   r = _real_ptr(x)
   _arb_set(r, yz[1], p)
   i = _imag_ptr(x)
   _arb_set(i, yz[2], p)
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, yz::Tuple{AbstractString,AbstractString}, p::Int)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, yz::Tuple{AbstractString,AbstractString}, p::Int)
   r = _real_ptr(x)
   _arb_set(r, yz[1], p)
   i = _imag_ptr(x)
   _arb_set(i, yz[2], p)
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::Real, p::Int)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::Real, p::Int)
   r = _real_ptr(x)
   _arb_set(r, y, p)
   i = _imag_ptr(x)
   zero!(i)
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, y::Complex, p::Int)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::Complex, p::Int)
   r = _real_ptr(x)
   _arb_set(r, real(y), p)
   i = _imag_ptr(x)
   _arb_set(i, imag(y), p)
 end
 
-function _acb_set(x::AcbFieldElemOrPtr, yz::Tuple{IntegerUnion,IntegerUnion}, p::Int)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, yz::Tuple{IntegerUnion,IntegerUnion}, p::Int)
   r = _real_ptr(x)
   _arb_set(r, yz[1], p)
   i = _imag_ptr(x)

@@ -165,7 +165,7 @@ function AbstractAlgebra.multiply_row!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::In
   return A
 end
 
-function AbstractAlgebra.multiply_column!(A::Zmod_fmpz_mat, s::ZZModRingElemOrPtr, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
+function AbstractAlgebra.multiply_column!(A::Zmod_fmpz_mat, s::TypeOrPtr{ZZModRingElem}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
   @assert 1 <= j <= ncols(A)
   @assert 1 <= first(rows)
   @assert last(rows) <= nrows(A)
@@ -202,7 +202,7 @@ function AbstractAlgebra.add_row!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::Int, j:
   return A
 end
 
-function AbstractAlgebra.add_column!(A::Zmod_fmpz_mat, s::ZZModRingElemOrPtr, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
+function AbstractAlgebra.add_column!(A::Zmod_fmpz_mat, s::TypeOrPtr{ZZModRingElem}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
   @assert 1 <= i <= ncols(A)
   @assert 1 <= j <= ncols(A)
   @assert 1 <= first(rows)

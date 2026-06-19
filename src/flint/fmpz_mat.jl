@@ -1556,7 +1556,7 @@ end
 #
 ###############################################################################
 
-function AbstractAlgebra.multiply_row!(A::ZZMatrix, s::Union{Int, ZZRingElemOrPtr}, i::Int, cols::UnitRange{Int}=1:ncols(A))
+function AbstractAlgebra.multiply_row!(A::ZZMatrix, s::Union{Int, TypeOrPtr{ZZRingElem}}, i::Int, cols::UnitRange{Int}=1:ncols(A))
   @assert 1 <= i <= nrows(A)
   @assert 1 <= first(cols) && last(cols) <= ncols(A)
   c = first(cols)
@@ -1571,7 +1571,7 @@ function AbstractAlgebra.multiply_row!(A::ZZMatrix, s::Union{Int, ZZRingElemOrPt
   return A
 end
 
-function AbstractAlgebra.multiply_column!(A::ZZMatrix, s::Union{Int, ZZRingElemOrPtr}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
+function AbstractAlgebra.multiply_column!(A::ZZMatrix, s::Union{Int, TypeOrPtr{ZZRingElem}}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
   @assert 1 <= j <= ncols(A)
   @assert 1 <= first(rows)
   @assert last(rows) <= nrows(A)
@@ -1585,7 +1585,7 @@ function AbstractAlgebra.multiply_column!(A::ZZMatrix, s::Union{Int, ZZRingElemO
 end
 
 
-function AbstractAlgebra.add_row!(A::ZZMatrix, s::Union{ZZRingElemOrPtr, Int}, i::Int, j::Int, cols::UnitRange{Int}=1:ncols(A))
+function AbstractAlgebra.add_row!(A::ZZMatrix, s::Union{TypeOrPtr{ZZRingElem}, Int}, i::Int, j::Int, cols::UnitRange{Int}=1:ncols(A))
   @assert 1 <= i <= nrows(A)
   @assert 1 <= j <= nrows(A)
   @assert 1 <= first(cols) && last(cols) <= ncols(A)
@@ -1602,7 +1602,7 @@ function AbstractAlgebra.add_row!(A::ZZMatrix, s::Union{ZZRingElemOrPtr, Int}, i
   return A
 end
 
-function AbstractAlgebra.add_column!(A::ZZMatrix, s::Union{ZZRingElemOrPtr, Int}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
+function AbstractAlgebra.add_column!(A::ZZMatrix, s::Union{TypeOrPtr{ZZRingElem}, Int}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
   @assert 1 <= i <= ncols(A)
   @assert 1 <= j <= ncols(A)
   @assert 1 <= first(rows)
@@ -2085,7 +2085,7 @@ function mul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::UInt)
   return z
 end
 
-function mul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::ZZRingElemOrPtr)
+function mul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_mat_scalar_mul_fmpz(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::Ref{ZZRingElem})::Nothing
   return z
 end
@@ -2093,7 +2093,7 @@ end
 mul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::Integer) = mul!(z, a, flintify(b))
 mul!(z::ZZMatrixOrPtr, a::IntegerUnionOrPtr, b::ZZMatrixOrPtr) = mul!(z, b, a)
 
-function addmul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::ZZRingElemOrPtr)
+function addmul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_mat_scalar_addmul_fmpz(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::Ref{ZZRingElem})::Nothing
   return z
 end
@@ -2115,7 +2115,7 @@ addmul!(z::ZZMatrixOrPtr, a::IntegerUnionOrPtr, b::ZZMatrixOrPtr) = addmul!(z, b
 addmul!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::IntegerUnionOrPtr, ::ZZMatrixOrPtr) = addmul!(z, x, y)
 addmul!(z::ZZMatrixOrPtr, x::IntegerUnionOrPtr, y::ZZMatrixOrPtr, ::ZZMatrixOrPtr) = addmul!(z, x, y)
 
-function submul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::ZZRingElemOrPtr)
+function submul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_mat_scalar_submul_fmpz(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::Ref{ZZRingElem})::Nothing
   return z
 end

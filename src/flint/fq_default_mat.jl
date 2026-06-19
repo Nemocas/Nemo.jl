@@ -33,7 +33,7 @@ end
   return z
 end
 
-@inline function setindex!(a::FqMatrix, u::FqFieldElemOrPtr, i::Int, j::Int)
+@inline function setindex!(a::FqMatrix, u::TypeOrPtr{FqFieldElem}, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   uu = base_ring(a)(u)
   @ccall libflint.fq_default_mat_entry_set(
