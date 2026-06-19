@@ -2633,7 +2633,7 @@ function digits_to_integer(digits::Vector{ZZRingElem}; base::IntegerUnion = 10)
   return _digits_to_integer_john!(digits, ZZ(base))
 end
 
-function digits_to_integer!(digits::Vector{T1}; base::T2 = Int(10)) where { T1 <: Integer, T2 <: Integer }
+function digits_to_integer!(digits::Vector{T1}; base::IntegerUnion = 10) where { T1 <: Integer}
   return digits_to_integer!(ZZ.(digits); base=ZZ(base))
 end
 
