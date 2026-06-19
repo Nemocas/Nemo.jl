@@ -935,7 +935,7 @@ end
   p = -primorial(ZZ(307))
   @test maximum(digits(p; base=ZZ(10))) <= 0
 
-  function column_matrix(c::Vector{T}) where { T <: IntegerUnion }
+  function column_matrix(c::Vector{T}) where { T <: Integer }
     return matrix(ZZ, length(c), 1, c)
   end
   for sz in 0:5
