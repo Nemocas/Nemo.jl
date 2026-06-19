@@ -942,7 +942,7 @@ end
 
     for base in [2, 3, 10, 32768, 2323823089*3969050863]
       @test digits_to_integer!(digits(n; base=base); base=base) == n
-      @test digits_to_integer!(digits(-n; base-base); base=base) == -n
+      @test digits_to_integer!(digits(-n; base=base); base=base) == -n
     end
   end
 end
