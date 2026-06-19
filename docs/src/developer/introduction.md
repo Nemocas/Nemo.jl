@@ -54,7 +54,7 @@ Before FLINT v3, the content of FLINT was split into a number of separate librar
 * Antic : algebraic number field element arithmetic
 * Calcium : exact real and complex numbers, including algebraic numbers
 
-Due to historical reasons, Nemo has a similar layout, with the `src` directory containing subdirectories `flint`, `arb`, `antic` and `calcium`. Each of these directories contains the wrappers for the relevant C libraries. The `test` directory is similarly organised.
+This historical fact is the reason why Nemo's `src` directory contains subdirectories `flint`, `arb`, `antic` and `calcium`. Each of these directories contains the wrappers for functionality that used to be in the C library its name indicates. The `test` directory is similarly organised.
 
 Within each of these directories is a set of files, one per module within
 the C libraries, e.g. the `fmpz.jl` file wraps the FLINT `fmpz` module for
