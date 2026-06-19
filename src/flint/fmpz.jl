@@ -2556,25 +2556,25 @@ end
 # Given a vector of digits [d_1,d_2,...]  compute  sum(b^j * d_{j+1})
 # OVERWRITES digits.  We don't care if the digits are "out of range".
 function _digits_to_integer_john!(digits::Vector{ZZRingElem}, b::ZZRingElem)
-  n = length(digits);
-  (n == 0)  &&  return ZZ(0);
-  (n == 1)  &&  return digits[1];
-  stride = 1;
+  n = length(digits)
+  (n == 0)  &&  return ZZ(0)
+  (n == 1)  &&  return digits[1]
+  stride = 1
   while n > stride
     # stride always divides n
     if is_odd(div(n,stride))
-      addmul!(digits[n-stride], b, digits[n]);  # equiv: digits[n-stride] += b*digits[n];
-      n -= stride;
+      addmul!(digits[n-stride], b, digits[n])  # equiv: digits[n-stride] += b*digits[n]
+      n -= stride
     end
     for i in 2*stride:2*stride:n
-      mul!(digits[i], b);                 # equiv: digits[i] *= b;
-      add!(digits[i], digits[i-stride]);  # equiv: digits[i] += digits[i-stride];
+      mul!(digits[i], b)                 # equiv: digits[i] *= b
+      add!(digits[i], digits[i-stride])  # equiv: digits[i] += digits[i-stride]
     end
-    stride *= 2;
+    stride *= 2
     if stride == n
-      return digits[stride];
+      return digits[stride]
     end
-    b ^= 2;
+    b ^= 2
   end
   # NEVER GET HERE
 end
