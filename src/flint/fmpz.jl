@@ -2611,8 +2611,7 @@ function digits_to_integer!(D::ZZMatrix; base::ZZRingElem = 10)
   Nemo._fmpz_clear_fn(b)
   # All rows, but the 1st have been set to zero! - or have never been used.
   # So no memory is lost...
-  D.r = 1
-  return D
+  return D[1:1,1]
 end
 
 
