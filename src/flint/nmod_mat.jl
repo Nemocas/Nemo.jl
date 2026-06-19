@@ -31,7 +31,14 @@ function getindex_raw(a::T, i::Int, j::Int) where T <: Zmodn_mat
   return GC.@preserve a unsafe_load(mat_entry_ptr(a, i, j))
 end
 
+
 @inline function setindex!(a::T, u::UInt, i::Int, j::Int) where T <: Zmodn_mat
+  @boundscheck _checkbounds(a, i, j)
+  R = base_ring(a)
+  setindex_raw!(a, mod(u, R.n), i, j)
+end
+
+@inline function setindex!(a::T, u::Int, i::Int, j::Int) where T <: Zmodn_mat
   @boundscheck _checkbounds(a, i, j)
   R = base_ring(a)
   setindex_raw!(a, mod(u, R.n), i, j)
@@ -237,6 +244,7 @@ function mul!(z::Vector{UInt}, a::Vector{UInt}, b::T) where T <: Zmodn_mat
   return z
 end
 
+# c required to be in [0,n)
 function mul!(a::T, b::T, c::UInt) where T <: Zmodn_mat
   @ccall libflint.nmod_mat_scalar_mul(a::Ref{T}, b::Ref{T}, c::UInt)::Nothing
   return a
@@ -285,6 +293,7 @@ end
 ################################################################################
 
 function *(x::T, y::UInt) where T <: Zmodn_mat
+  y = @ccall libflint.n_mod2_preinv(y::UInt, x.n::UInt, x.ninv::UInt)::UInt
   return mul!(similar(x), x, y)
 end
 

@@ -369,6 +369,9 @@ function show(io::IO, a::ZZRing)
   end
 end
 
+function Base.alignment(io::IO, x::ZZRingElem)
+  return (Base.alignment_from_show(io, x), 0)
+end
 
 
 ###############################################################################
@@ -2536,8 +2539,7 @@ function Base.digits!(a::AbstractVector{T}, n::ZZRingElem; base::T = 10) where T
   if nbits(n)/ndigits(base, base = 2) > 100
     c = div(div(nbits(n), ndigits(base, base = 2)), 2)
     nn = ZZRingElem(base)^c
-    q, r = divrem(n, nn)
-
+    q, r = Base.divrem(n, nn, RoundToZero)
     digits!(view(a, 1:c), r, base = base)
     digits!(view(a, c+1:length(a)), q, base = base)
     return a

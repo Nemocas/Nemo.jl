@@ -257,6 +257,14 @@ end
   @test a[1,2] == Z10(5)
   @test_throws BoundsError a[-2,2] = 5
 
+  a[1,2] = -17
+
+  @test a[1,2] == Z10(-17)
+
+  a[1,2] = typemax(Int)
+
+  @test a[1,2] == Z10(typemax(Int))
+
   @test a != b
 
   d = one(R)
@@ -1107,4 +1115,12 @@ end
   C = similar(A)
   mul!(C, b, A)
   @test C == b * A
+end
+
+@testset "#2309" begin
+  F = Native.GF(13)
+  x = matrix(F, 1, 1, [1])
+  s = 0x0678e92a8604bc8e
+  r = F(s)
+  @test x * s == x * r
 end

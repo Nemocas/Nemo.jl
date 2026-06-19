@@ -273,6 +273,14 @@ function show(io::IO, a::QQField)
   end
 end
 
+function Base.alignment(io::IO, a::QQFieldElem)
+  if denominator(a) != 1
+    return (Base.alignment_from_show(io, numerator(a)), 2 + Base.alignment_from_show(io, denominator(a)))
+  else
+    return (Base.alignment_from_show(io, numerator(a)), 0)
+  end
+end
+
 pretty_lt(x::QQFieldElem, y::QQFieldElem) = isless(x, y)
 pretty_eq(x::QQFieldElem, y::QQFieldElem) = (x == y)
 

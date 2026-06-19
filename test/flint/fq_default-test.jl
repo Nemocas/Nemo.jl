@@ -352,6 +352,8 @@ end
   x = preimage(f, R(1))
   @test x isa ZZRingElem && x == 1
   
+  # issue #2303
+  @test_throws ArgumentError residue_field(ZZ, 4)
 end
 
 @testset "FqFieldElem.krull_dim" begin

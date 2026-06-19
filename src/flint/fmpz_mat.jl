@@ -102,7 +102,7 @@ function setindex!(a::ZZMatrix, b::ZZMatrix, r::UnitRange{Int64}, c::UnitRange{I
   _checkbounds(a, r, c)
   size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
   A = view(a, r, c)
-  @ccall libflint.fmpz_mat_set(A::Ref{ZZMatrix}, b::Ref{ZZMatrix})::Nothing
+  set!(A, b)
 end
 
 @inline number_of_rows(a::ZZMatrix) = a.r
@@ -700,6 +700,52 @@ function det_given_divisor(x::ZZMatrix, d::Integer, proved=true)
 end
 
 
+# Test whether the determinant of an integer matrix is zero:
+# -- false means definitely not zero
+# -- true means "probably" zero (but hard to quantify how probable)
+# We use random starting points for the primes so that it is
+# harder to supply an input which will fool the implementation.
+# For initial speed we use small 22-bit primes, but after 3 iters
+# we switch to larger 61-bit primes (which are faster amortized).
+
+@doc raw"""
+    is_probably_zero_det(M::ZZMatrix; modulus_bitsize::Int = 100)
+
+Same as `is_zero(det(M))` but faster, though may _very rarely_ erroneously
+return `true`.  The kwarg `modulus_bitsize` must be between 20 and 1000;
+larger values decrease the probability of a false positive (but require
+more computation time).  Under a "uniformity assumption" the probability
+of a false positive is about `2^(-modulus_bitsize)`.
+"""
+function is_probably_zero_det(M::ZZMatrix; modulus_bitsize::Int = 100)
+  @req  is_square(M)  "matrix must be square"
+  @req ((modulus_bitsize >= 20) && (modulus_bitsize <= 1000))  "modulus_bitsize must be between 20 and 1000 (but bigger than about 250 is usually senseless)"
+  # Dispose of two trivial cases:
+  (nrows(M) == 0) && return false
+  (nrows(M) == 1) && return is_zero(M)
+  # General method starts here:
+  small_prime_size = 21
+  large_prime_size = 60
+  p = 2^small_prime_size + rand(1:2^(small_prime_size-1))  # works well on my computer
+  log2_modulus = 0.0
+  Mp = zero_matrix(Native.GF(2), nrows(M), ncols(M)) # workspace, to avoid reallocating
+  while log2_modulus < modulus_bitsize
+    # After 3 iters, we switch to larger primes (to make progress faster)
+    if log2_modulus > 3*small_prime_size && log2_modulus < 3*small_prime_size + 4
+      p = 2^large_prime_size + rand(1:2^30)
+    end
+    p = next_prime(p)  # ?? better to do  next_prime(p+rand(1:2^16)) ??
+    log2_modulus += log2(p)  # only approximate, but that's fine
+    Fp = Native.GF(p; cached=false, check=false)
+    Mp = map_entries!(Fp, Mp, M)  # non-allocating change_base_ring
+    if !is_zero(_det(Mp))
+      return false
+    end
+  end
+  return true
+end
+
+
 @doc raw"""
     hadamard_bound2(M::ZZMatrix)
 
@@ -870,8 +916,7 @@ end
 function hnf!(x::ZZMatrix)
   if !(nrows(x) <= 50 && ncols(x) <= 50) && nrows(x) * ncols(x) > 100
     z = hnf(x)
-    @ccall libflint.fmpz_mat_set(x::Ref{ZZMatrix}, z::Ref{ZZMatrix})::Nothing
-
+    set!(x, z)
     return x
   end
   @ccall libflint.fmpz_mat_hnf(x::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
@@ -1961,7 +2006,7 @@ end
 ###############################################################################
 
 function Base.copy!(A::ZZMatrix, B::ZZMatrix)
-  @ccall libflint.fmpz_mat_set(A::Ref{ZZMatrix}, B::Ref{ZZMatrix})::Cvoid
+  set!(A, B)
 end
 
 function zero!(z::ZZMatrixOrPtr)
@@ -1985,10 +2030,19 @@ function one!(z::ZZMatrixOrPtr)
   return z
 end
 
-function neg!(z::ZZMatrixOrPtr, w::ZZMatrixOrPtr)
-  @ccall libflint.fmpz_mat_neg(z::Ref{ZZMatrix}, w::Ref{ZZMatrix})::Nothing
+function neg!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr)
+  @ccall libflint.fmpz_mat_neg(z::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
   return z
 end
+
+#
+
+function set!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr)
+  @ccall libflint.fmpz_mat_set(z::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
+  return z
+end
+
+#
 
 function add!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::ZZMatrixOrPtr)
   @ccall libflint.fmpz_mat_add(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Ref{ZZMatrix})::Nothing
@@ -2293,10 +2347,15 @@ function map_entries(R::ZZModRing, A::ZZMatrix)
   return N
 end
 
+function map_entries(P::QQField, x::ZZMatrix)
+  z = zero_matrix(QQ, nrows(x), ncols(x))
+  return set!(z, x)
+end
+
 change_base_ring(R::zzModRing, A::ZZMatrix) = map_entries(R, A)
 change_base_ring(R::fpMatrix, A::ZZMatrix) = map_entries(R, A)
 change_base_ring(R::ZZModRing, A::ZZMatrix) = map_entries(R, A)
-
+change_base_ring(R::QQField, A::ZZMatrix) = map_entries(R, A)
 
 ###############################################################################
 #

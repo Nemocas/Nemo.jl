@@ -113,6 +113,7 @@ export continued_fraction
 export continued_fraction_with_matrix
 export convergents
 export convert
+export convolution
 export cos
 export cos_integral
 export cos_minpoly
@@ -381,6 +382,7 @@ export is_unit
 export is_unknown
 export is_unimodular
 export is_upper_triangular
+export is_probably_zero_det
 export is_zero_entry
 export is_zero_row
 export isequal

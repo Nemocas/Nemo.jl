@@ -74,10 +74,10 @@ mutable struct acb_struct
   imag_rad_man::UInt
 end
 
-const arf_structOrPtr = Union{arf_struct, Ref{arf_struct}, Ptr{arf_struct}}
-const mag_structOrPtr = Union{mag_struct, Ref{mag_struct}, Ptr{mag_struct}}
-const arb_structOrPtr = Union{arb_struct, Ref{arb_struct}, Ptr{arb_struct}}
-const acb_structOrPtr = Union{acb_struct, Ref{acb_struct}, Ptr{acb_struct}}
+const arf_structOrPtr = TypeOrPtr{arf_struct}
+const mag_structOrPtr = TypeOrPtr{mag_struct}
+const arb_structOrPtr = TypeOrPtr{arb_struct}
+const acb_structOrPtr = TypeOrPtr{acb_struct}
 
 _mid_ptr(x::arb_structOrPtr) = @ccall libflint.arb_mid_ptr(x::Ref{arb_struct})::Ptr{arf_struct}
 _rad_ptr(x::arb_structOrPtr) = @ccall libflint.arb_rad_ptr(x::Ref{arb_struct})::Ptr{mag_struct}
@@ -1342,17 +1342,17 @@ end
 #
 ################################################################################
 
-const RealFieldElemOrPtr = Union{RealFieldElem, Ref{RealFieldElem}, Ptr{RealFieldElem}}
-const ArbFieldElemOrPtr = Union{ArbFieldElem, Ref{ArbFieldElem}, Ptr{ArbFieldElem}}
-const ComplexFieldElemOrPtr = Union{ComplexFieldElem, Ref{ComplexFieldElem}, Ptr{ComplexFieldElem}}
-const AcbFieldElemOrPtr = Union{AcbFieldElem, Ref{AcbFieldElem}, Ptr{AcbFieldElem}}
+const RealFieldElemOrPtr = TypeOrPtr{RealFieldElem}
+const ArbFieldElemOrPtr = TypeOrPtr{ArbFieldElem}
+const ComplexFieldElemOrPtr = TypeOrPtr{ComplexFieldElem}
+const AcbFieldElemOrPtr = TypeOrPtr{AcbFieldElem}
 
-const RealPolyRingElemOrPtr = Union{RealPolyRingElem, Ref{RealPolyRingElem}, Ptr{RealPolyRingElem}}
-const ArbPolyRingElemOrPtr = Union{ArbPolyRingElem, Ref{ArbPolyRingElem}, Ptr{ArbPolyRingElem}}
-const ComplexPolyRingElemOrPtr = Union{ComplexPolyRingElem, Ref{ComplexPolyRingElem}, Ptr{ComplexPolyRingElem}}
-const AcbPolyRingElemOrPtr = Union{AcbPolyRingElem, Ref{AcbPolyRingElem}, Ptr{AcbPolyRingElem}}
+const RealPolyRingElemOrPtr = TypeOrPtr{RealPolyRingElem}
+const ArbPolyRingElemOrPtr = TypeOrPtr{ArbPolyRingElem}
+const ComplexPolyRingElemOrPtr = TypeOrPtr{ComplexPolyRingElem}
+const AcbPolyRingElemOrPtr = TypeOrPtr{AcbPolyRingElem}
 
-const RealMatrixOrPtr = Union{RealMatrix, Ref{RealMatrix}, Ptr{RealMatrix}}
-const ArbMatrixOrPtr = Union{ArbMatrix, Ref{ArbMatrix}, Ptr{ArbMatrix}}
-const ComplexMatrixOrPtr = Union{ComplexMatrix, Ref{ComplexMatrix}, Ptr{ComplexMatrix}}
-const AcbMatrixOrPtr = Union{AcbMatrix, Ref{AcbMatrix}, Ptr{AcbMatrix}}
+const RealMatrixOrPtr = TypeOrPtr{RealMatrix}
+const ArbMatrixOrPtr = TypeOrPtr{ArbMatrix}
+const ComplexMatrixOrPtr = TypeOrPtr{ComplexMatrix}
+const AcbMatrixOrPtr = TypeOrPtr{AcbMatrix}
