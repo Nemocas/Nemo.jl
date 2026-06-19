@@ -934,6 +934,17 @@ end
   # Nemo PR #2325
   p = -primorial(ZZ(307))
   @test maximum(digits(p; base=ZZ(10))) <= 0
+
+  for sz in 0:5
+    n = factorial(ZZ(10^sz))
+    @test digits_to_integer!(digits(n)) == n
+    @test digits_to_integer!(digits(-n)) == -n
+
+    for base in [2, 3, 10, 32768, 2323823089*3969050863]
+      @test digits_to_integer!(digits(n; base=base); base=base) == n
+      @test digits_to_integer!(digits(-n; base-base); base=base) == -n
+    end
+  end
 end
 
 @testset "ZZRingElem.string_io" begin
