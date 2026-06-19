@@ -2587,7 +2587,7 @@ Returns a 1-by-c matrix of integers whose k-th entry is sum (base^j*D[j+1, k]).
 The k-th column of D contains the digits (in the given base) of the k-th
 integer in the result returned.  Note: the matrix D is modified by this function.
 """
-function digits_to_integer!(D::ZZMatrix; base::ZZRingElem = 10)
+function digits_to_integer!(D::ZZMatrix; base::IntegerUnion = 10)
   # Code originally by Claus Fieker -- impressively quick!
   nr = nrows(D)
   bb = ZZRingElem(Val(:raw))

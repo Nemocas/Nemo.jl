@@ -935,14 +935,21 @@ end
   p = -primorial(ZZ(307))
   @test maximum(digits(p; base=ZZ(10))) <= 0
 
+  function column_matrix(c::Vector{T}) where { T <: IntegerUnion }
+    return matrix(ZZ, length(c), 1, c)
+  end
   for sz in 0:5
     n = factorial(ZZ(10^sz))
     @test digits_to_integer!(digits(n)) == n
     @test digits_to_integer!(digits(-n)) == -n
+    @test digits_to_integer!(column_matrix(digits(n))) == n
+    @test digits_to_integer!(column_matrix(digits(-n))) == -n
 
-    for base in [2, 3, 10, 32768, 2323823089*3969050863]
+    for base in [2, 3, 10, 32768, 2323823089*3969050863]  # last value is 2^63-1; maybe 2^62+(2^62-1) is clearer?
       @test digits_to_integer!(digits(n; base=base); base=base) == n
       @test digits_to_integer!(digits(-n; base=base); base=base) == -n
+      @test digits_to_integer!(column_matrix(digits(n; base=base)); base=base) == n
+      @test digits_to_integer!(column_matrix(digits(-n; base=base)); base=base) == -n
     end
   end
 end
