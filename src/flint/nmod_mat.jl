@@ -254,6 +254,16 @@ function mul!(a::T, b::UInt, c::T) where T <: Zmodn_mat
   return mul!(a, c, b)
 end
 
+function mul!(a::T, b::T, c::ZZRingElem) where T <: Zmodn_mat
+  t = ZZRingElem()
+  cc = @ccall libflint.fmpz_mod_ui(t::Ref{ZZRingElem}, c::Ref{ZZRingElem}, b.n::UInt)::UInt
+  return mul!(a, b, cc)
+end
+
+mul!(a::T, b::T, c::Integer) where T <: Zmodn_mat = mul!(a, b, ZZRingElem(c))
+
+mul!(a::T, b::Union{ZZRingElem, Integer}, c::T) where T <: Zmodn_mat = mul!(a, c, b)
+
 function mul!(a::zzModMatrix, b::zzModMatrix, c::zzModRingElem)
   return mul!(a, b, c.data)
 end
