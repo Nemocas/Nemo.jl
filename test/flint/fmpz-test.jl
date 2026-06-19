@@ -945,7 +945,7 @@ end
     @test digits_to_integer!(column_matrix(digits(n))) == n
     @test digits_to_integer!(column_matrix(digits(-n))) == -n
 
-    for base in [2, 3, 10, 32768, 2323823089*3969050863]  # last value is 2^63-1; maybe 2^62+(2^62-1) is clearer?
+    for base in [2, 3, 10, 32768, typemax(Int)]
       @test digits_to_integer!(digits(n; base=base); base=base) == n
       @test digits_to_integer!(digits(-n; base=base); base=base) == -n
       @test digits_to_integer!(column_matrix(digits(n; base=base)); base=base) == n
