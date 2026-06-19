@@ -2550,6 +2550,94 @@ function Base.digits!(a::AbstractVector{T}, n::ZZRingElem; base::T = 10) where T
   return a
 end
 
+
+# Given a vector of digits [d_1,d_2,...]  compute  sum(b^j * d_{j+1})
+# OVERWRITES digits.  We don't care if the digits are "out of range".
+function _digits_to_integer_john!(digits::Vector{ZZRingElem}, b::ZZRingElem)
+  n = length(digits);
+  (n == 0)  &&  return ZZ(0);
+  (n == 1)  &&  return digits[1];
+  stride = 1;
+  while n > stride
+    # stride always divides n
+    if is_odd(div(n,stride))
+      addmul!(digits[n-stride], b, digits[n]);  # equiv: digits[n-stride] += b*digits[n];
+      n -= stride;
+    end
+    for i in 2*stride:2*stride:n
+      mul!(digits[i], b);                 # equiv: digits[i] *= b;
+      add!(digits[i], digits[i-stride]);  # equiv: digits[i] += digits[i-stride];
+    end
+    stride *= 2;
+    if stride == n
+      return digits[stride];
+    end
+    b ^= 2;
+  end
+  # NEVER GET HERE
+end
+
+
+@doc raw"""
+    digits_to_integer!(D::ZZMatrix; base::ZZRingElem = 10)
+
+Returns a 1-by-c matrix of integers whose k-th entry is sum (base^j*D[j+1, k]).
+The k-th column of D contains the digits (in the given base) of the k-th
+integer in the result returned.  Note: the matrix D is modified by this function.
+"""
+function digits_to_integer!(D::ZZMatrix; base::ZZRingElem = 10)
+  # Code originally by Claus Fieker -- impressively quick!
+  nr = nrows(D)
+  bb = ZZRingElem(Val(:raw))
+  b = ZZRingElem(Val(:raw))
+  set!(b, base)
+  while nr > 1
+    mul!(bb, b, b)
+    for i in 1:div(nr, 2)
+      add_row!(D, b, 2*i, 2*i-1)
+      swap_rows!(D, i, 2*i-1)
+      zero_row!(D, 2*i)  # to release memory early
+    end
+    if is_odd(nr)
+      add_row!(D, bb, nr, div(nr, 2))
+      zero_row!(D, nr)
+    end
+    nr = div(nr, 2)
+    b.d, bb.d = bb.d, b.d  # faster than b = bb;
+  end
+  Nemo._fmpz_clear_fn(bb)
+  Nemo._fmpz_clear_fn(b)
+  # All rows, but the 1st have been set to zero! - or have never been used.
+  # So no memory is lost...
+  D.r = 1
+  return D
+end
+
+
+function _digits_to_integer_claus(digits::Vector{ZZRingElem}, b::ZZRingElem)
+  # Sometimes faster than _digits_to_integer_john.
+  # Delegate to the matrix version (immediately above)
+  n = length(digits)
+  return digits_to_integer!(ZZMatrix(n,1, digits), b)[1,1]
+end
+
+
+@doc raw"""
+    digits_to_integer!(digits::Vector{ZZRingElem}; base::Union{ZZRingElem,T} = 10) where { T <: Integer }
+    digits_to_integer!(digits::Vector{T1}; base::T2 = Int(10)) where { T1 <: Integer, T2 <: Integer }
+
+Returns the integer sum (base^j*d_{j+1}) where d_k is the k-th entry of digits.
+May overwrite digits.
+"""
+function digits_to_integer!(digits::Vector{ZZRingElem}; base::Union{ZZRingElem,T2} = 10) where { T2 <: Integer }
+  return _digits_to_integer_john!(digits, ZZ(base))
+end
+
+function digits_to_integer!(digits::Vector{T1}; base::T2 = Int(10)) where { T1 <: Integer, T2 <: Integer }
+  return digits_to_integer!(ZZ.(digits); base=ZZ(base))
+end
+
+
 @doc raw"""
     nbits(x::ZZRingElem)
 
