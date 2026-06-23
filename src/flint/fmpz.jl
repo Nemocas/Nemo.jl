@@ -2616,7 +2616,7 @@ end
 
 
 function _digits_to_integer_claus(digits::Vector{ZZRingElem}, b::ZZRingElem)
-  # Sometimes faster than _digits_to_integer_john.
+  # Sometimes faster than _digits_to_integer_john! and sometimes slower.
   # Delegate to the matrix version (immediately above)
   n = length(digits)
   return digits_to_integer!(ZZMatrix(n,1, digits), b)[1,1]
