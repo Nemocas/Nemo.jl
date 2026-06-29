@@ -239,7 +239,7 @@ function reverse(x::QQPolyRingElem, len::Int)
   return reverse!(parent(x)(), x, len)
 end
 
-function reverse!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, len::Int)
+function reverse!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, len::Int)
   @ccall libflint.fmpq_poly_reverse(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, len::Int)::Nothing
   return z
 end
@@ -255,7 +255,7 @@ function shift_left(x::QQPolyRingElem, len::Int)
   return shift_left!(parent(x)(), x, len)
 end
 
-function shift_left!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, len::Int)
+function shift_left!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, len::Int)
   @ccall libflint.fmpq_poly_shift_left(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, len::Int)::Nothing
   return z
 end
@@ -265,7 +265,7 @@ function shift_right(x::QQPolyRingElem, len::Int)
   return shift_right!(parent(x)(), x, len)
 end
 
-function shift_right!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, len::Int)
+function shift_right!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, len::Int)
   @ccall libflint.fmpq_poly_shift_right(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, len::Int)::Nothing
   return z
 end
@@ -656,181 +656,181 @@ end
 #
 ###############################################################################
 
-function zero!(z::QQPolyRingElemOrPtr)
+function zero!(z::TypeOrPtr{QQPolyRingElem})
   @ccall libflint.fmpq_poly_zero(z::Ref{QQPolyRingElem})::Nothing
   return z
 end
 
-function one!(z::QQPolyRingElemOrPtr)
+function one!(z::TypeOrPtr{QQPolyRingElem})
   @ccall libflint.fmpq_poly_one(z::Ref{QQPolyRingElem})::Nothing
   return z
 end
 
-function neg!(z::QQPolyRingElemOrPtr, a::QQPolyRingElemOrPtr)
+function neg!(z::TypeOrPtr{QQPolyRingElem}, a::TypeOrPtr{QQPolyRingElem})
   @ccall libflint.fmpq_poly_neg(z::Ref{QQPolyRingElem}, a::Ref{QQPolyRingElem})::Nothing
   return z
 end
 
-function fit!(z::QQPolyRingElemOrPtr, n::Int)
+function fit!(z::TypeOrPtr{QQPolyRingElem}, n::Int)
   @ccall libflint.fmpq_poly_fit_length(z::Ref{QQPolyRingElem}, n::Int)::Nothing
   return nothing
 end
 
 #
 
-function set!(z::QQPolyRingElemOrPtr, a::QQPolyRingElemOrPtr)
+function set!(z::TypeOrPtr{QQPolyRingElem}, a::TypeOrPtr{QQPolyRingElem})
   @ccall libflint.fmpq_poly_set(z::Ref{QQPolyRingElem}, a::Ref{QQPolyRingElem})::Nothing
   return z
 end
 
-function set!(z::QQPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr)
+function set!(z::TypeOrPtr{QQPolyRingElem}, a::TypeOrPtr{ZZPolyRingElem})
   @ccall libflint.fmpq_poly_set_fmpz_poly(z::Ref{QQPolyRingElem}, a::Ref{ZZPolyRingElem})::Nothing
   return z
 end
 
-function set!(z::QQPolyRingElemOrPtr, a::QQFieldElemOrPtr)
+function set!(z::TypeOrPtr{QQPolyRingElem}, a::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_poly_set_fmpq(z::Ref{QQPolyRingElem}, a::Ref{QQFieldElem})::Nothing
   return z
 end
 
-function set!(z::QQPolyRingElemOrPtr, a::ZZRingElemOrPtr)
+function set!(z::TypeOrPtr{QQPolyRingElem}, a::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpq_poly_set_fmpz(z::Ref{QQPolyRingElem}, a::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function set!(z::QQPolyRingElemOrPtr, a::Int)
+function set!(z::TypeOrPtr{QQPolyRingElem}, a::Int)
   @ccall libflint.fmpq_poly_set_si(z::Ref{QQPolyRingElem}, a::Int)::Nothing
   return z
 end
 
-function set!(z::QQPolyRingElemOrPtr, a::UInt)
+function set!(z::TypeOrPtr{QQPolyRingElem}, a::UInt)
   @ccall libflint.fmpq_poly_set_ui(z::Ref{QQPolyRingElem}, a::UInt)::Nothing
   return z
 end
 
-set!(z::QQPolyRingElemOrPtr, a::Union{Integer, Rational}) = set!(z, flintify(a))
+set!(z::TypeOrPtr{QQPolyRingElem}, a::Union{Integer, Rational}) = set!(z, flintify(a))
 
 #
 
-function setcoeff!(z::QQPolyRingElemOrPtr, n::Int, x::ZZRingElemOrPtr)
+function setcoeff!(z::TypeOrPtr{QQPolyRingElem}, n::Int, x::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpq_poly_set_coeff_fmpz(z::Ref{QQPolyRingElem}, n::Int, x::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function setcoeff!(z::QQPolyRingElemOrPtr, n::Int, x::QQFieldElemOrPtr)
+function setcoeff!(z::TypeOrPtr{QQPolyRingElem}, n::Int, x::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_poly_set_coeff_fmpq(z::Ref{QQPolyRingElem}, n::Int, x::Ref{QQFieldElem})::Nothing
   return z
 end
 
-function setcoeff!(z::QQPolyRingElemOrPtr, n::Int, x::UInt)
+function setcoeff!(z::TypeOrPtr{QQPolyRingElem}, n::Int, x::UInt)
   @ccall libflint.fmpq_poly_set_coeff_ui(z::Ref{QQPolyRingElem}, n::Int, x::UInt)::Nothing
   return z
 end
 
-function setcoeff!(z::QQPolyRingElemOrPtr, n::Int, x::Int)
+function setcoeff!(z::TypeOrPtr{QQPolyRingElem}, n::Int, x::Int)
   @ccall libflint.fmpq_poly_set_coeff_si(z::Ref{QQPolyRingElem}, n::Int, x::Int)::Nothing
   return z
 end
 
-setcoeff!(z::QQPolyRingElemOrPtr, n::Int, x::Union{Integer, Rational}) = setcoeff!(z, n, flintify(x))
+setcoeff!(z::TypeOrPtr{QQPolyRingElem}, n::Int, x::Union{Integer, Rational}) = setcoeff!(z, n, flintify(x))
 
 #
 
-function add!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::QQPolyRingElemOrPtr)
+function add!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, y::TypeOrPtr{QQPolyRingElem})
   @ccall libflint.fmpq_poly_add(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Ref{QQPolyRingElem})::Nothing
   return z
 end
 
-function add!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::QQFieldElemOrPtr)
+function add!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, y::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_poly_add_fmpq(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Ref{QQFieldElem})::Nothing
   return z
 end
 
-function add!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::ZZRingElemOrPtr)
+function add!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, y::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpq_poly_add_fmpz(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function add!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::Int)
+function add!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, y::Int)
   @ccall libflint.fmpq_poly_add_si(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Int)::Nothing
   return z
 end
 
-add!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::Union{Integer, Rational}) = add!(z, x, flintify(y))
+add!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, y::Union{Integer, Rational}) = add!(z, x, flintify(y))
 
-add!(z::QQPolyRingElemOrPtr, x::RationalUnionOrPtr, y::QQPolyRingElemOrPtr) = add!(z, y, x)
+add!(z::TypeOrPtr{QQPolyRingElem}, x::RationalUnionOrPtr, y::TypeOrPtr{QQPolyRingElem}) = add!(z, y, x)
 
 #
 
-function sub!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::QQPolyRingElemOrPtr)
+function sub!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, y::TypeOrPtr{QQPolyRingElem})
   @ccall libflint.fmpq_poly_sub(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Ref{QQPolyRingElem})::Nothing
   return z
 end
 
 
-function sub!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::QQFieldElemOrPtr)
+function sub!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, y::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_poly_sub_fmpq(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Ref{QQFieldElem})::Nothing
   return z
 end
 
-function sub!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::ZZRingElemOrPtr)
+function sub!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, y::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpq_poly_sub_fmpz(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function sub!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::Int)
+function sub!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, y::Int)
   @ccall libflint.fmpq_poly_sub_si(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Int)::Nothing
   return z
 end
 
-function sub!(z::QQPolyRingElemOrPtr, x::QQFieldElemOrPtr, y::QQPolyRingElemOrPtr)
+function sub!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQFieldElem}, y::TypeOrPtr{QQPolyRingElem})
   @ccall libflint.fmpq_poly_fmpq_sub(z::Ref{QQPolyRingElem}, x::Ref{QQFieldElem}, y::Ref{QQPolyRingElem})::Nothing
   return z
 end
 
-function sub!(z::QQPolyRingElemOrPtr, x::ZZRingElemOrPtr, y::QQPolyRingElemOrPtr)
+function sub!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{ZZRingElem}, y::TypeOrPtr{QQPolyRingElem})
   @ccall libflint.fmpq_poly_fmpz_sub(z::Ref{QQPolyRingElem}, x::Ref{ZZRingElem}, y::Ref{QQPolyRingElem})::Nothing
   return z
 end
 
-function sub!(z::QQPolyRingElemOrPtr, x::Int, y::QQPolyRingElemOrPtr)
+function sub!(z::TypeOrPtr{QQPolyRingElem}, x::Int, y::TypeOrPtr{QQPolyRingElem})
   @ccall libflint.fmpq_poly_si_sub(z::Ref{QQPolyRingElem}, x::Int, y::Ref{QQPolyRingElem})::Nothing
   return z
 end
 
-sub!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::Union{Integer, Rational}) = sub!(z, x, flintify(y))
+sub!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, y::Union{Integer, Rational}) = sub!(z, x, flintify(y))
 
-sub!(z::QQPolyRingElemOrPtr, x::Union{Integer, Rational}, y::QQPolyRingElemOrPtr) = sub!(z, flintify(x), y)
+sub!(z::TypeOrPtr{QQPolyRingElem}, x::Union{Integer, Rational}, y::TypeOrPtr{QQPolyRingElem}) = sub!(z, flintify(x), y)
 
 #
 
-function mul!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::QQPolyRingElemOrPtr)
+function mul!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, y::TypeOrPtr{QQPolyRingElem})
   @ccall libflint.fmpq_poly_mul(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Ref{QQPolyRingElem})::Nothing
   return z
 end
 
-function mul!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::QQFieldElemOrPtr)
+function mul!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, y::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_poly_scalar_mul_fmpq(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Ref{QQFieldElem})::Nothing
   return z
 end
 
-function mul!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::ZZRingElemOrPtr)
+function mul!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, y::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpq_poly_scalar_mul_fmpz(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function mul!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::Int)
+function mul!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, y::Int)
   @ccall libflint.fmpq_poly_scalar_mul_si(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, y::Int)::Nothing
   return z
 end
 
-mul!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, y::Union{Integer, Rational}) = mul!(z, x, flintify(y))
+mul!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, y::Union{Integer, Rational}) = mul!(z, x, flintify(y))
 
-mul!(z::QQPolyRingElemOrPtr, x::RationalUnionOrPtr, y::QQPolyRingElemOrPtr) = mul!(z, y, x)
+mul!(z::TypeOrPtr{QQPolyRingElem}, x::RationalUnionOrPtr, y::TypeOrPtr{QQPolyRingElem}) = mul!(z, y, x)
 
 #
 
-function pow!(z::QQPolyRingElemOrPtr, x::QQPolyRingElemOrPtr, n::IntegerUnion)
+function pow!(z::TypeOrPtr{QQPolyRingElem}, x::TypeOrPtr{QQPolyRingElem}, n::IntegerUnion)
   @ccall libflint.fmpq_poly_pow(z::Ref{QQPolyRingElem}, x::Ref{QQPolyRingElem}, UInt(n)::UInt)::Nothing
   return z
 end

@@ -85,7 +85,7 @@ function setindex!(a::QQMatrix, b::QQMatrix, r::UnitRange{Int64}, c::UnitRange{I
   _checkbounds(a, r, c)
   size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
   A = view(a, r, c)
-  @ccall libflint.fmpq_mat_set(A::Ref{QQMatrix}, b::Ref{QQMatrix})::Nothing
+  set!(A, b)
 end
 
 number_of_rows(a::QQMatrix) = a.r
@@ -241,6 +241,18 @@ end
 function *(x::QQMatrix, y::QQMatrix)
   ncols(x) != nrows(y) && error("Incompatible matrix dimensions")
   z = similar(x, nrows(x), ncols(y))
+  return mul!(z, x, y)
+end
+
+function *(x::QQMatrix, y::ZZMatrix)
+  ncols(x) != nrows(y) && error("Incompatible matrix dimensions")
+  z = similar(x, nrows(x), ncols(y))
+  return mul!(z, x, y)
+end
+
+function *(x::ZZMatrix, y::QQMatrix)
+  ncols(x) != nrows(y) && error("Incompatible matrix dimensions")
+  z = similar(y, nrows(x), ncols(y))
   return mul!(z, x, y)
 end
 
@@ -548,14 +560,16 @@ end
 
 function rref(x::QQMatrix)
   z = similar(x)
-  r = @ccall libflint.fmpq_mat_rref(z::Ref{QQMatrix}, x::Ref{QQMatrix})::Int
+  r = rref!(z, x)
   return r, z
 end
 
-function rref!(x::QQMatrix)
-  r = @ccall libflint.fmpq_mat_rref(x::Ref{QQMatrix}, x::Ref{QQMatrix})::Int
+function rref!(z::QQMatrix, x::QQMatrix)
+  r = @ccall libflint.fmpq_mat_rref(z::Ref{QQMatrix}, x::Ref{QQMatrix})::Int
   return r
 end
+
+rref!(x::QQMatrix) = rref!(x, x)
 
 ###############################################################################
 #
@@ -668,6 +682,20 @@ function neg!(z::QQMatrixOrPtr, a::QQMatrixOrPtr)
   return z
 end
 
+#
+
+function set!(z::QQMatrixOrPtr, a::QQMatrixOrPtr)
+  @ccall libflint.fmpq_mat_set(z::Ref{QQMatrix}, a::Ref{QQMatrix})::Nothing
+  return z
+end
+
+function set!(z::QQMatrixOrPtr, x::ZZMatrixOrPtr)
+  @ccall libflint.fmpq_mat_set_fmpz_mat(z::Ref{QQMatrixOrPtr}, x::Ref{ZZMatrixOrPtr})::Nothing
+  return z
+end
+
+#
+
 function add!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::QQMatrixOrPtr)
   @ccall libflint.fmpq_mat_add(z::Ref{QQMatrix}, x::Ref{QQMatrix}, y::Ref{QQMatrix})::Nothing
   return z
@@ -683,6 +711,16 @@ end
 #
 function mul!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::QQMatrixOrPtr)
   @ccall libflint.fmpq_mat_mul(z::Ref{QQMatrix}, x::Ref{QQMatrix}, y::Ref{QQMatrix})::Nothing
+  return z
+end
+
+function mul!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::ZZMatrixOrPtr)
+  @ccall libflint.fmpq_mat_mul_fmpz_mat(z::Ref{QQMatrix}, x::Ref{QQMatrix}, y::Ref{ZZMatrix})::Nothing
+  return z
+end
+
+function mul!(z::QQMatrixOrPtr, x::ZZMatrixOrPtr, y::QQMatrixOrPtr)
+  @ccall libflint.fmpq_mat_mul_r_fmpz_mat(z::Ref{QQMatrix}, x::Ref{ZZMatrix}, y::Ref{QQMatrix})::Nothing
   return z
 end
 
@@ -712,12 +750,12 @@ end
 #
 # matrix x scalar, scalar x matrix
 #
-function mul!(z::QQMatrixOrPtr, a::QQMatrixOrPtr, b::QQFieldElemOrPtr)
+function mul!(z::QQMatrixOrPtr, a::QQMatrixOrPtr, b::TypeOrPtr{QQFieldElem})
    @ccall libflint.fmpq_mat_scalar_mul_fmpq(z::Ref{QQMatrix}, a::Ref{QQMatrix}, b::Ref{QQFieldElem})::Nothing
    return z
 end
 
-function mul!(z::QQMatrixOrPtr, a::QQMatrixOrPtr, b::ZZRingElemOrPtr)
+function mul!(z::QQMatrixOrPtr, a::QQMatrixOrPtr, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpq_mat_scalar_mul_fmpz(z::Ref{QQMatrix}, a::Ref{QQMatrix}, b::Ref{ZZRingElem})::Nothing
   return z
 end
@@ -728,7 +766,7 @@ mul!(z::QQMatrixOrPtr, a::QQMatrixOrPtr, b::Rational) = mul!(z, a, QQ(b))
 mul!(z::QQMatrixOrPtr, a::RationalUnionOrPtr, b::QQMatrixOrPtr) = mul!(z, b, a)
 
 
-function divexact!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::QQFieldElemOrPtr)
+function divexact!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::TypeOrPtr{QQFieldElem})
   GC.@preserve y begin
     divexact!(z, x, _num_ptr(y))
     mul!(z, z, _den_ptr(y))
@@ -736,7 +774,7 @@ function divexact!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::QQFieldElemOrPtr)
   return z
 end
 
-function divexact!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::ZZRingElemOrPtr)
+function divexact!(z::QQMatrixOrPtr, x::QQMatrixOrPtr, y::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpq_mat_scalar_div_fmpz(z::Ref{QQMatrix}, x::Ref{QQMatrix}, y::Ref{ZZRingElem})::Nothing
   return z
 end
@@ -789,7 +827,7 @@ end
 function (a::QQMatrixSpace)(M::ZZMatrix)
   (ncols(a) == ncols(M) && nrows(a) == nrows(M)) || error("wrong matrix dimension")
   z = a()
-  @ccall libflint.fmpq_mat_set_fmpz_mat(z::Ref{QQMatrix}, M::Ref{ZZMatrix})::Nothing
+  set!(z, M)
   return z
 end
 
@@ -857,7 +895,7 @@ end
 
 function QQMatrix(x::ZZMatrix)
   z = QQMatrix(nrows(x), ncols(x))
-  @ccall libflint.fmpq_mat_set_fmpz_mat(z::Ref{QQMatrix}, x::Ref{ZZMatrix})::Nothing
+  set!(z, x)
   return z
 end
 
@@ -881,7 +919,7 @@ function nullspace(A::QQMatrix)
   N = similar(AZZ, ncols(A), ncols(A))
   nullity = @ccall libflint.fmpz_mat_nullspace(N::Ref{ZZMatrix}, AZZ::Ref{ZZMatrix})::Int
   NQQ = similar(A, ncols(A), ncols(A))
-  @ccall libflint.fmpq_mat_set_fmpz_mat(NQQ::Ref{QQMatrix}, N::Ref{ZZMatrix})::Nothing
+  set!(NQQ, N)
 
   # Now massage the result until it looks like what the generic AbstractAlgebra
   # nullspace would return: remove zero columns and rescale the columns so that

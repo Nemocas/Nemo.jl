@@ -597,7 +597,7 @@ function set!(z::ZZMPolyRingElem, a::ZZMPolyRingElem)
   return z
 end
 
-function set!(z::ZZMPolyRingElem, a::ZZRingElemOrPtr)
+function set!(z::ZZMPolyRingElem, a::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_mpoly_set_fmpz(z::Ref{ZZMPolyRingElem}, a::Ref{ZZRingElem}, parent(z)::Ref{ZZMPolyRing})::Nothing
   return z
 end
@@ -715,7 +715,7 @@ function pow!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, n::Integer)
   return z
 end
 
-function pow!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, n::ZZRingElemOrPtr)
+function pow!(z::ZZMPolyRingElem, a::ZZMPolyRingElem, n::TypeOrPtr{ZZRingElem})
   ok = Bool(@ccall libflint.fmpz_mpoly_pow_fmpz(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, n::Ref{ZZRingElem}, parent(a)::Ref{ZZMPolyRing})::Cint)
   if !ok
     error("unable to compute power")

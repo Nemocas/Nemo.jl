@@ -420,7 +420,7 @@ function pow!(z::ZZModRingElem, x::ZZModRingElem, n::Integer)
   return z
 end
 
-function pow!(z::ZZModRingElem, x::ZZModRingElem, n::ZZRingElemOrPtr)
+function pow!(z::ZZModRingElem, x::ZZModRingElem, n::TypeOrPtr{ZZRingElem})
   R = parent(z)
   ok = Bool(@ccall libflint.fmpz_mod_pow_fmpz(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, n::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Cint)
   if !ok

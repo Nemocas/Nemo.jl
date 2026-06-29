@@ -165,7 +165,7 @@ function AbstractAlgebra.multiply_row!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::In
   return A
 end
 
-function AbstractAlgebra.multiply_column!(A::Zmod_fmpz_mat, s::ZZModRingElemOrPtr, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
+function AbstractAlgebra.multiply_column!(A::Zmod_fmpz_mat, s::TypeOrPtr{ZZModRingElem}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
   @assert 1 <= j <= ncols(A)
   @assert 1 <= first(rows)
   @assert last(rows) <= nrows(A)
@@ -202,7 +202,7 @@ function AbstractAlgebra.add_row!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::Int, j:
   return A
 end
 
-function AbstractAlgebra.add_column!(A::Zmod_fmpz_mat, s::ZZModRingElemOrPtr, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
+function AbstractAlgebra.add_column!(A::Zmod_fmpz_mat, s::TypeOrPtr{ZZModRingElem}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
   @assert 1 <= i <= ncols(A)
   @assert 1 <= j <= ncols(A)
   @assert 1 <= first(rows)
@@ -289,6 +289,45 @@ function add!(a::T, b::T, c::T) where T <: Zmod_fmpz_mat
   @ccall libflint.fmpz_mod_mat_add(a::Ref{T}, b::Ref{T}, c::Ref{T}, base_ring(b).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return a
 end
+
+function sub!(a::T, b::T, c::T) where T <: Zmod_fmpz_mat
+  @ccall libflint.fmpz_mod_mat_sub(a::Ref{T}, b::Ref{T}, c::Ref{T}, base_ring(b).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return a
+end
+
+# matrix x vector, vector x matrix
+
+function mul!(z::Vector{ZZRingElem}, a::T, b::Vector{ZZRingElem}) where T <: Zmod_fmpz_mat
+  @ccall libflint.fmpz_mod_mat_mul_fmpz_vec_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ref{T}, b::Ptr{Ref{ZZRingElem}}, length(b)::Int, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return z
+end
+
+function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::T) where T <: Zmod_fmpz_mat
+  @ccall libflint.fmpz_mod_mat_fmpz_vec_mul_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ptr{Ref{ZZRingElem}}, length(a)::Int, b::Ref{T}, base_ring(b).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return z
+end
+
+# matrix x scalar, scalar x matrix
+
+function mul!(a::T, b::T, c::ZZRingElem) where T <: Zmod_fmpz_mat
+  @ccall libflint.fmpz_mod_mat_scalar_mul_fmpz(a::Ref{T}, b::Ref{T}, c::Ref{ZZRingElem}, base_ring(b).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return a
+end
+
+function mul!(a::T, b::T, c::Int) where T <: Zmod_fmpz_mat
+  @ccall libflint.fmpz_mod_mat_scalar_mul_si(a::Ref{T}, b::Ref{T}, c::Int, base_ring(b).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return a
+end
+
+mul!(a::T, b::T, c::Integer) where T <: Zmod_fmpz_mat = mul!(a, b, flintify(c))
+
+mul!(a::T, b::IntegerUnion, c::T) where T <: Zmod_fmpz_mat = mul!(a, c, b)
+
+mul!(a::ZZModMatrix, b::ZZModMatrix, c::ZZModRingElem) = mul!(a, b, c.data)
+mul!(a::ZZModMatrix, b::ZZModRingElem, c::ZZModMatrix) = mul!(a, c, b)
+
+mul!(a::FpMatrix, b::FpMatrix, c::FpFieldElem) = mul!(a, b, c.data)
+mul!(a::FpMatrix, b::FpFieldElem, c::FpMatrix) = mul!(a, c, b)
 
 function Generic.add_one!(a::ZZModMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)

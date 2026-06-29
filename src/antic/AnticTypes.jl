@@ -107,4 +107,4 @@ end
 #
 ################################################################################
 
-const AbsSimpleNumFieldElemOrPtr = Union{AbsSimpleNumFieldElem, Ref{AbsSimpleNumFieldElem}, Ptr{AbsSimpleNumFieldElem}}
+const AbsSimpleNumFieldElemOrPtr = TypeOrPtr{AbsSimpleNumFieldElem}

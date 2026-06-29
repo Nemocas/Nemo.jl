@@ -597,7 +597,7 @@ end
 _content_ptr(c::QQMPolyRingElem) = Ptr{QQFieldElem}(pointer_from_objref(c))
 _content_ptr(c::Ptr{QQMPolyRingElem}) = Ptr{QQFieldElem}(c)
 _content_ptr(c::Ref{QQMPolyRingElem}) = _content_ptr(c[])
-_zpoly_ptr(c::QQMPolyRingElemOrPtr) = Ptr{ZZMPolyRingElem}(_content_ptr(c) + sizeof(QQFieldElem))
+_zpoly_ptr(c::TypeOrPtr{QQMPolyRingElem}) = Ptr{ZZMPolyRingElem}(_content_ptr(c) + sizeof(QQFieldElem))
 
 function zero!(a::QQMPolyRingElem)
   @ccall libflint.fmpq_mpoly_zero(a::Ref{QQMPolyRingElem}, a.parent::Ref{QQMPolyRing})::Nothing
@@ -621,12 +621,12 @@ function set!(z::QQMPolyRingElem, a::QQMPolyRingElem)
   return z
 end
 
-function set!(z::QQMPolyRingElem, a::QQFieldElemOrPtr)
+function set!(z::QQMPolyRingElem, a::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_mpoly_set_fmpq(z::Ref{QQMPolyRingElem}, a::Ref{QQFieldElem}, parent(z)::Ref{QQMPolyRing})::Nothing
   return z
 end
 
-function set!(z::QQMPolyRingElem, a::ZZRingElemOrPtr)
+function set!(z::QQMPolyRingElem, a::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpq_mpoly_set_fmpz(z::Ref{QQMPolyRingElem}, a::Ref{ZZRingElem}, parent(z)::Ref{QQMPolyRing})::Nothing
   return z
 end
@@ -750,7 +750,7 @@ function pow!(z::QQMPolyRingElem, a::QQMPolyRingElem, n::Integer)
   return z
 end
 
-function pow!(z::QQMPolyRingElem, a::QQMPolyRingElem, n::ZZRingElemOrPtr)
+function pow!(z::QQMPolyRingElem, a::QQMPolyRingElem, n::TypeOrPtr{ZZRingElem})
   ok = Bool(@ccall libflint.fmpq_mpoly_pow_fmpz(z::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, n::Ref{ZZRingElem}, parent(a)::Ref{QQMPolyRing})::Cint)
   if !ok
     error("unable to compute power")

@@ -87,12 +87,12 @@ Return the sign of $a$ ($-1$, $0$ or $1$) as a fraction.
 """
 sign(a::QQFieldElem) = QQFieldElem(sign(numerator(a)))
 
-sign(::Type{Int}, a::QQFieldElemOrPtr) = sign(Int, _num_ptr(a))
+sign(::Type{Int}, a::TypeOrPtr{QQFieldElem}) = sign(Int, _num_ptr(a))
 
 Base.signbit(a::QQFieldElem) = signbit(sign(Int, a))
 
-is_negative(n::QQFieldElemOrPtr) = sign(Int, n) < 0
-is_positive(n::QQFieldElemOrPtr) = sign(Int, n) > 0
+is_negative(n::TypeOrPtr{QQFieldElem}) = sign(Int, n) < 0
+is_positive(n::TypeOrPtr{QQFieldElem}) = sign(Int, n) > 0
 
 function abs(a::QQFieldElem)
   z = QQFieldElem()
@@ -113,11 +113,11 @@ zero(::Type{QQFieldElem}) = QQFieldElem(0)
 one(::Type{QQFieldElem}) = QQFieldElem(1)
 
 
-is_one(a::QQFieldElemOrPtr) = isinteger(a) && is_one(_num_ptr(a))
+is_one(a::TypeOrPtr{QQFieldElem}) = isinteger(a) && is_one(_num_ptr(a))
 
-is_zero(a::QQFieldElemOrPtr) = is_zero(_num_ptr(a))
+is_zero(a::TypeOrPtr{QQFieldElem}) = is_zero(_num_ptr(a))
 
-isinteger(a::QQFieldElemOrPtr) = is_one(_den_ptr(a))
+isinteger(a::TypeOrPtr{QQFieldElem}) = is_one(_den_ptr(a))
 
 isfinite(::QQFieldElem) = true
 
@@ -334,7 +334,7 @@ end
 #
 ###############################################################################
 
-function cmp(a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
+function cmp(a::TypeOrPtr{QQFieldElem}, b::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_cmp(a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Cint
 end
 
@@ -359,21 +359,21 @@ end
 #
 ###############################################################################
 
-function cmp(a::QQFieldElemOrPtr, b::ZZRingElemOrPtr)
+function cmp(a::TypeOrPtr{QQFieldElem}, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpq_cmp_fmpz(a::Ref{QQFieldElem}, b::Ref{ZZRingElem})::Cint
 end
 
-function cmp(a::QQFieldElemOrPtr, b::Int)
+function cmp(a::TypeOrPtr{QQFieldElem}, b::Int)
   @ccall libflint.fmpq_cmp_si(a::Ref{QQFieldElem}, b::Int)::Cint
 end
 
-function cmp(a::QQFieldElemOrPtr, b::UInt)
+function cmp(a::TypeOrPtr{QQFieldElem}, b::UInt)
   @ccall libflint.fmpq_cmp_ui(a::Ref{QQFieldElem}, b::UInt)::Cint
 end
 
-cmp(a::QQFieldElemOrPtr, b::Integer) = cmp(a, flintify(b))
+cmp(a::TypeOrPtr{QQFieldElem}, b::Integer) = cmp(a, flintify(b))
 
-cmp(a::Union{ZZRingElemOrPtr, Integer}, b::QQFieldElemOrPtr) = -cmp(b, a)
+cmp(a::Union{TypeOrPtr{ZZRingElem}, Integer}, b::TypeOrPtr{QQFieldElem}) = -cmp(b, a)
 
 
 for T in (Int, UInt, ZZRingElem, Integer)
@@ -1022,43 +1022,43 @@ end
 _num_ptr(c::QQFieldElem) = Ptr{ZZRingElem}(pointer_from_objref(c))
 _num_ptr(c::Ptr{QQFieldElem}) = Ptr{ZZRingElem}(c)
 _num_ptr(c::Ref{QQFieldElem}) = _num_ptr(c[])
-_den_ptr(c::QQFieldElemOrPtr) = _num_ptr(c) + sizeof(ZZRingElem)
+_den_ptr(c::TypeOrPtr{QQFieldElem}) = _num_ptr(c) + sizeof(ZZRingElem)
 
-function zero!(c::QQFieldElemOrPtr)
+function zero!(c::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_zero(c::Ref{QQFieldElem})::Nothing
   return c
 end
 
-function one!(c::QQFieldElemOrPtr)
+function one!(c::TypeOrPtr{QQFieldElem})
   set!(c, 1)
 end
 
-function neg!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr)
+function neg!(z::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_neg(z::Ref{QQFieldElem}, a::Ref{QQFieldElem})::Nothing
   return z
 end
 
-function set!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr)
+function set!(c::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_set(c::Ref{QQFieldElem}, a::Ref{QQFieldElem})::Nothing
   return c
 end
 
-function set!(c::QQFieldElemOrPtr, a::Int, b::UInt = UInt(1))
+function set!(c::TypeOrPtr{QQFieldElem}, a::Int, b::UInt = UInt(1))
   @ccall libflint.fmpq_set_si(c::Ref{QQFieldElem}, a::Int, b::UInt)::Nothing
   return c
 end
 
-function set!(c::QQFieldElemOrPtr, a::UInt, b::UInt = UInt(1))
+function set!(c::TypeOrPtr{QQFieldElem}, a::UInt, b::UInt = UInt(1))
   @ccall libflint.fmpq_set_ui(c::Ref{QQFieldElem}, a::UInt, b::UInt)::Nothing
   return c
 end
 
-function set!(c::QQFieldElemOrPtr, a::ZZRingElemOrPtr, b::ZZRingElemOrPtr)
+function set!(c::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{ZZRingElem}, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpq_set_fmpz_frac(c::Ref{QQFieldElem}, a::Ref{ZZRingElem}, b::Ref{ZZRingElem})::Nothing
   return c
 end
 
-function set!(c::QQFieldElemOrPtr, a::Union{Integer,ZZRingElemOrPtr})
+function set!(c::TypeOrPtr{QQFieldElem}, a::Union{Integer,TypeOrPtr{ZZRingElem}})
   GC.@preserve c begin
     set!(_num_ptr(c), a)
     one!(_den_ptr(c))
@@ -1066,14 +1066,14 @@ function set!(c::QQFieldElemOrPtr, a::Union{Integer,ZZRingElemOrPtr})
   return c
 end
 
-function numerator!(z::ZZRingElemOrPtr, y::QQFieldElemOrPtr)
+function numerator!(z::TypeOrPtr{ZZRingElem}, y::TypeOrPtr{QQFieldElem})
   GC.@preserve y begin
     set!(z, _num_ptr(y))
   end
   return z
 end
 
-function denominator!(z::ZZRingElemOrPtr, y::QQFieldElemOrPtr)
+function denominator!(z::TypeOrPtr{ZZRingElem}, y::TypeOrPtr{QQFieldElem})
   GC.@preserve y begin
     set!(z, _den_ptr(y))
   end
@@ -1082,117 +1082,117 @@ end
 
 #
 
-function add!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
+function add!(c::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_add(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Nothing
   return c
 end
 
-function add!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::ZZRingElemOrPtr)
+function add!(c::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpq_add_fmpz(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{ZZRingElem})::Nothing
   return c
 end
 
-function add!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::Int)
+function add!(c::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::Int)
   @ccall libflint.fmpq_add_si(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Int)::Nothing
   return c
 end
 
-function add!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::UInt)
+function add!(c::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::UInt)
   @ccall libflint.fmpq_add_ui(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Int)::Nothing
   return c
 end
 
-add!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::Union{Integer, Rational}) = add!(c, a, flintify(b))
-add!(c::QQFieldElemOrPtr, a::Union{ZZRingElemOrPtr, Integer, Rational}, b::QQFieldElemOrPtr) = add!(c, b, a)
+add!(c::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::Union{Integer, Rational}) = add!(c, a, flintify(b))
+add!(c::TypeOrPtr{QQFieldElem}, a::Union{TypeOrPtr{ZZRingElem}, Integer, Rational}, b::TypeOrPtr{QQFieldElem}) = add!(c, b, a)
 
 #
 
-function sub!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
+function sub!(z::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_sub(z::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Nothing
   return z
 end
 
-function sub!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::ZZRingElemOrPtr)
+function sub!(z::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpq_sub_fmpz(z::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function sub!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::Int)
+function sub!(z::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::Int)
   @ccall libflint.fmpq_sub_si(z::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Int)::Nothing
   return z
 end
 
-function sub!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::UInt)
+function sub!(z::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::UInt)
   @ccall libflint.fmpq_sub_ui(z::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::UInt)::Nothing
   return z
 end
 
-sub!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::Union{Integer, Rational}) = sub!(c, a, flintify(b))
-sub!(c::QQFieldElemOrPtr, a::Union{ZZRingElemOrPtr, Integer, Rational}, b::QQFieldElemOrPtr) = neg!(sub!(c, b, a))
+sub!(c::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::Union{Integer, Rational}) = sub!(c, a, flintify(b))
+sub!(c::TypeOrPtr{QQFieldElem}, a::Union{TypeOrPtr{ZZRingElem}, Integer, Rational}, b::TypeOrPtr{QQFieldElem}) = neg!(sub!(c, b, a))
 
 #
 
-function mul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
+function mul!(c::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_mul(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Nothing
   return c
 end
 
-function mul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::ZZRingElemOrPtr)
+function mul!(c::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpq_mul_fmpz(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{ZZRingElem})::Nothing
   return c
 end
 
-function mul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::Int)
+function mul!(c::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::Int)
   @ccall libflint.fmpq_mul_si(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Int)::Nothing
   return c
 end
 
-function mul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::UInt)
+function mul!(c::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::UInt)
   @ccall libflint.fmpq_mul_ui(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::UInt)::Nothing
   return c
 end
 
-mul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::Union{Integer, Rational}) = mul!(c, a, flintify(b))
-mul!(c::QQFieldElemOrPtr, a::Union{ZZRingElemOrPtr, Integer, Rational}, b::QQFieldElemOrPtr) = mul!(c, b, a)
+mul!(c::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::Union{Integer, Rational}) = mul!(c, a, flintify(b))
+mul!(c::TypeOrPtr{QQFieldElem}, a::Union{TypeOrPtr{ZZRingElem}, Integer, Rational}, b::TypeOrPtr{QQFieldElem}) = mul!(c, b, a)
 
 #
 
-function addmul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
+function addmul!(c::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_addmul(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Nothing
   return c
 end
 
 # ignore fourth argument
-addmul!(z::QQFieldElemOrPtr, x::QQFieldElemOrPtr, y::QQFieldElemOrPtr, ::QQFieldElemOrPtr) = addmul!(z, x, y)
+addmul!(z::TypeOrPtr{QQFieldElem}, x::TypeOrPtr{QQFieldElem}, y::TypeOrPtr{QQFieldElem}, ::TypeOrPtr{QQFieldElem}) = addmul!(z, x, y)
 
-function submul!(c::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
+function submul!(c::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_submul(c::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Nothing
   return c
 end
 
 # ignore fourth argument
-submul!(z::QQFieldElemOrPtr, x::QQFieldElemOrPtr, y::QQFieldElemOrPtr, ::QQFieldElemOrPtr) = submul!(z, x, y)
+submul!(z::TypeOrPtr{QQFieldElem}, x::TypeOrPtr{QQFieldElem}, y::TypeOrPtr{QQFieldElem}, ::TypeOrPtr{QQFieldElem}) = submul!(z, x, y)
 
 #
 
-function divexact!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::QQFieldElemOrPtr)
+function divexact!(z::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_div(z::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{QQFieldElem})::Nothing
   return z
 end
 
-function divexact!(z::QQFieldElemOrPtr, a::QQFieldElemOrPtr, b::ZZRingElemOrPtr)
+function divexact!(z::TypeOrPtr{QQFieldElem}, a::TypeOrPtr{QQFieldElem}, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpq_div_fmpz(z::Ref{QQFieldElem}, a::Ref{QQFieldElem}, b::Ref{ZZRingElem})::Nothing
   return z
 end
 
 #
 
-function pow!(z::QQFieldElemOrPtr, x::QQFieldElemOrPtr, n::Integer)
+function pow!(z::TypeOrPtr{QQFieldElem}, x::TypeOrPtr{QQFieldElem}, n::Integer)
   @ccall libflint.fmpq_pow_si(z::Ref{QQFieldElem}, x::Ref{QQFieldElem}, Int(n)::Int)::Nothing
   return  z
 end
 
-function pow!(z::QQFieldElemOrPtr, x::QQFieldElemOrPtr, n::ZZRingElemOrPtr)
+function pow!(z::TypeOrPtr{QQFieldElem}, x::TypeOrPtr{QQFieldElem}, n::TypeOrPtr{ZZRingElem})
   ok = Bool(@ccall libflint.fmpq_pow_fmpz(z::Ref{QQFieldElem}, x::Ref{QQFieldElem}, n::Ref{ZZRingElem})::Cint)
   if !ok
     error("unable to compute power")

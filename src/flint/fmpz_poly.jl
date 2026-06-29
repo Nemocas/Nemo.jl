@@ -238,7 +238,7 @@ function reverse(x::ZZPolyRingElem, len::Int)
   return reverse!(parent(x)(), x, len)
 end
 
-function reverse!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, len::Int)
+function reverse!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, len::Int)
   @ccall libflint.fmpz_poly_reverse(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, len::Int)::Nothing
   return z
 end
@@ -254,7 +254,7 @@ function shift_left(x::ZZPolyRingElem, len::Int)
   return shift_left!(parent(x)(), x, len)
 end
 
-function shift_left!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, len::Int)
+function shift_left!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, len::Int)
   @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, len::Int)::Nothing
   return z
 end
@@ -264,7 +264,7 @@ function shift_right(x::ZZPolyRingElem, len::Int)
   return shift_right!(parent(x)(), x, len)
 end
 
-function shift_right!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, len::Int)
+function shift_right!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, len::Int)
   @ccall libflint.fmpz_poly_shift_right(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, len::Int)::Nothing
   return z
 end
@@ -783,188 +783,188 @@ end
 #
 ###############################################################################
 
-function zero!(z::ZZPolyRingElemOrPtr)
+function zero!(z::TypeOrPtr{ZZPolyRingElem})
   @ccall libflint.fmpz_poly_zero(z::Ref{ZZPolyRingElem})::Nothing
   return z
 end
 
-function one!(z::ZZPolyRingElemOrPtr)
+function one!(z::TypeOrPtr{ZZPolyRingElem})
   @ccall libflint.fmpz_poly_one(z::Ref{ZZPolyRingElem})::Nothing
   return z
 end
 
-function neg!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr)
+function neg!(z::TypeOrPtr{ZZPolyRingElem}, a::TypeOrPtr{ZZPolyRingElem})
   @ccall libflint.fmpz_poly_neg(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem})::Nothing
   return z
 end
 
-function fit!(z::ZZPolyRingElemOrPtr, n::Int)
+function fit!(z::TypeOrPtr{ZZPolyRingElem}, n::Int)
   @ccall libflint.fmpz_poly_fit_length(z::Ref{ZZPolyRingElem}, n::Int)::Nothing
   return nothing
 end
 
 #
 
-function set!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr)
+function set!(z::TypeOrPtr{ZZPolyRingElem}, a::TypeOrPtr{ZZPolyRingElem})
   @ccall libflint.fmpz_poly_set(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem})::Nothing
   return z
 end
 
-function set!(z::ZZPolyRingElemOrPtr, a::ZZRingElemOrPtr)
+function set!(z::TypeOrPtr{ZZPolyRingElem}, a::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_poly_set_fmpz(z::Ref{ZZPolyRingElem}, a::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function set!(z::ZZPolyRingElemOrPtr, a::Int)
+function set!(z::TypeOrPtr{ZZPolyRingElem}, a::Int)
   @ccall libflint.fmpz_poly_set_si(z::Ref{ZZPolyRingElem}, a::Int)::Nothing
   return z
 end
 
-function set!(z::ZZPolyRingElemOrPtr, a::UInt)
+function set!(z::TypeOrPtr{ZZPolyRingElem}, a::UInt)
   @ccall libflint.fmpz_poly_set_ui(z::Ref{ZZPolyRingElem}, a::UInt)::Nothing
   return z
 end
 
-set!(z::ZZPolyRingElemOrPtr, a::Integer) = set!(z, flintify(a))
+set!(z::TypeOrPtr{ZZPolyRingElem}, a::Integer) = set!(z, flintify(a))
 
 #
 
-function setcoeff!(z::ZZPolyRingElemOrPtr, n::Int, x::ZZRingElemOrPtr)
+function setcoeff!(z::TypeOrPtr{ZZPolyRingElem}, n::Int, x::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_poly_set_coeff_fmpz(z::Ref{ZZPolyRingElem}, n::Int, x::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function setcoeff!(z::ZZPolyRingElemOrPtr, n::Int, x::Int)
+function setcoeff!(z::TypeOrPtr{ZZPolyRingElem}, n::Int, x::Int)
   @ccall libflint.fmpz_poly_set_coeff_si(z::Ref{ZZPolyRingElem}, n::Int, x::Int)::Nothing
   return z
 end
 
-function setcoeff!(z::ZZPolyRingElemOrPtr, n::Int, x::UInt)
+function setcoeff!(z::TypeOrPtr{ZZPolyRingElem}, n::Int, x::UInt)
   @ccall libflint.fmpz_poly_set_coeff_ui(z::Ref{ZZPolyRingElem}, n::Int, x::UInt)::Nothing
   return z
 end
 
-setcoeff!(z::ZZPolyRingElemOrPtr, n::Int, x::Integer) = setcoeff!(z, n, flintify(x))
+setcoeff!(z::TypeOrPtr{ZZPolyRingElem}, n::Int, x::Integer) = setcoeff!(z, n, flintify(x))
 
 #
 
-function add!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::ZZPolyRingElemOrPtr)
+function add!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, y::TypeOrPtr{ZZPolyRingElem})
   @ccall libflint.fmpz_poly_add(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZPolyRingElem})::Nothing
   return z
 end
 
-function add!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::ZZRingElemOrPtr)
+function add!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, y::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_poly_add_fmpz(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function add!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::Int)
+function add!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, y::Int)
   @ccall libflint.fmpz_poly_add_si(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Int)::Nothing
   return z
 end
 
-add!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::Integer) = add!(z, x, flintify(y))
+add!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, y::Integer) = add!(z, x, flintify(y))
 
-add!(z::ZZPolyRingElemOrPtr, x::IntegerUnionOrPtr, y::ZZPolyRingElemOrPtr) = add!(z, y, x)
+add!(z::TypeOrPtr{ZZPolyRingElem}, x::IntegerUnionOrPtr, y::TypeOrPtr{ZZPolyRingElem}) = add!(z, y, x)
 
 #
 
-function sub!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::ZZPolyRingElemOrPtr)
+function sub!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, y::TypeOrPtr{ZZPolyRingElem})
   @ccall libflint.fmpz_poly_sub(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZPolyRingElem})::Nothing
   return z
 end
 
-function sub!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::ZZRingElemOrPtr)
+function sub!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, y::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_poly_sub_fmpz(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function sub!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::Int)
+function sub!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, y::Int)
   @ccall libflint.fmpz_poly_sub_si(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Int)::Nothing
   return z
 end
 
-function sub!(z::ZZPolyRingElemOrPtr, x::ZZRingElemOrPtr, y::ZZPolyRingElemOrPtr)
+function sub!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZRingElem}, y::TypeOrPtr{ZZPolyRingElem})
   @ccall libflint.fmpz_poly_fmpz_sub(z::Ref{ZZPolyRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZPolyRingElem})::Nothing
   return z
 end
 
-function sub!(z::ZZPolyRingElemOrPtr, x::Int, y::ZZPolyRingElemOrPtr)
+function sub!(z::TypeOrPtr{ZZPolyRingElem}, x::Int, y::TypeOrPtr{ZZPolyRingElem})
   @ccall libflint.fmpz_poly_si_sub(z::Ref{ZZPolyRingElem}, x::Int, y::Ref{ZZPolyRingElem})::Nothing
   return z
 end
 
-sub!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::Integer) = sub!(z, x, flintify(y))
+sub!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, y::Integer) = sub!(z, x, flintify(y))
 
-sub!(z::ZZPolyRingElemOrPtr, x::Integer, y::ZZPolyRingElemOrPtr) = sub!(z, flintify(x), y)
+sub!(z::TypeOrPtr{ZZPolyRingElem}, x::Integer, y::TypeOrPtr{ZZPolyRingElem}) = sub!(z, flintify(x), y)
 
 #
 
-function mul!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::ZZPolyRingElemOrPtr)
+function mul!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, y::TypeOrPtr{ZZPolyRingElem})
   @ccall libflint.fmpz_poly_mul(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZPolyRingElem})::Nothing
   return z
 end
 
-function mul!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::ZZRingElemOrPtr)
+function mul!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, y::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_poly_scalar_mul_fmpz(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function mul!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::Int)
+function mul!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, y::Int)
   @ccall libflint.fmpz_poly_scalar_mul_si(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::Int)::Nothing
   return z
 end
 
-function mul!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::UInt)
+function mul!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, y::UInt)
   @ccall libflint.fmpz_poly_scalar_mul_ui(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, y::UInt)::Nothing
   return z
 end
 
-mul!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::Integer) = mul!(z, x, flintify(y))
+mul!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, y::Integer) = mul!(z, x, flintify(y))
 
-mul!(z::ZZPolyRingElemOrPtr, x::IntegerUnionOrPtr, y::ZZPolyRingElemOrPtr) = mul!(z, y, x)
+mul!(z::TypeOrPtr{ZZPolyRingElem}, x::IntegerUnionOrPtr, y::TypeOrPtr{ZZPolyRingElem}) = mul!(z, y, x)
 
 #
 
-function addmul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::ZZRingElemOrPtr)
+function addmul!(z::TypeOrPtr{ZZPolyRingElem}, a::TypeOrPtr{ZZPolyRingElem}, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_poly_scalar_addmul_fmpz(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem}, b::Ref{ZZRingElem})::Nothing
   return z
 end
 
-function addmul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::Int)
+function addmul!(z::TypeOrPtr{ZZPolyRingElem}, a::TypeOrPtr{ZZPolyRingElem}, b::Int)
   @ccall libflint.fmpz_poly_scalar_addmul_si(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem}, b::Int)::Nothing
   return z
 end
 
-function addmul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::UInt)
+function addmul!(z::TypeOrPtr{ZZPolyRingElem}, a::TypeOrPtr{ZZPolyRingElem}, b::UInt)
   @ccall libflint.fmpz_poly_scalar_addmul_ui(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem}, b::UInt)::Nothing
   return z
 end
 
-addmul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::Integer) = addmul!(z, a, flintify(b))
-addmul!(z::ZZPolyRingElemOrPtr, a::IntegerUnionOrPtr, b::ZZPolyRingElemOrPtr) = addmul!(z, b, a)
+addmul!(z::TypeOrPtr{ZZPolyRingElem}, a::TypeOrPtr{ZZPolyRingElem}, b::Integer) = addmul!(z, a, flintify(b))
+addmul!(z::TypeOrPtr{ZZPolyRingElem}, a::IntegerUnionOrPtr, b::TypeOrPtr{ZZPolyRingElem}) = addmul!(z, b, a)
 
 # ignore fourth argument
-addmul!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::IntegerUnionOrPtr, ::ZZPolyRingElemOrPtr) = addmul!(z, x, y)
-addmul!(z::ZZPolyRingElemOrPtr, x::IntegerUnionOrPtr, y::ZZPolyRingElemOrPtr, ::ZZPolyRingElemOrPtr) = addmul!(z, x, y)
+addmul!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, y::IntegerUnionOrPtr, ::TypeOrPtr{ZZPolyRingElem}) = addmul!(z, x, y)
+addmul!(z::TypeOrPtr{ZZPolyRingElem}, x::IntegerUnionOrPtr, y::TypeOrPtr{ZZPolyRingElem}, ::TypeOrPtr{ZZPolyRingElem}) = addmul!(z, x, y)
 
 #
 
-function submul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::ZZRingElemOrPtr)
+function submul!(z::TypeOrPtr{ZZPolyRingElem}, a::TypeOrPtr{ZZPolyRingElem}, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_poly_scalar_submul_fmpz(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingElem}, b::Ref{ZZRingElem})::Nothing
   return z
 end
 
-submul!(z::ZZPolyRingElemOrPtr, a::ZZPolyRingElemOrPtr, b::Integer) = addmul!(z, a, ZZRingElem(b))
-submul!(z::ZZPolyRingElemOrPtr, a::IntegerUnionOrPtr, b::ZZPolyRingElemOrPtr) = addmul!(z, b, a)
+submul!(z::TypeOrPtr{ZZPolyRingElem}, a::TypeOrPtr{ZZPolyRingElem}, b::Integer) = addmul!(z, a, ZZRingElem(b))
+submul!(z::TypeOrPtr{ZZPolyRingElem}, a::IntegerUnionOrPtr, b::TypeOrPtr{ZZPolyRingElem}) = addmul!(z, b, a)
 
 # ignore fourth argument
-submul!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, y::IntegerUnionOrPtr, ::ZZPolyRingElemOrPtr) = submul!(z, x, y)
-submul!(z::ZZPolyRingElemOrPtr, x::IntegerUnionOrPtr, y::ZZPolyRingElemOrPtr, ::ZZPolyRingElemOrPtr) = submul!(z, x, y)
+submul!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, y::IntegerUnionOrPtr, ::TypeOrPtr{ZZPolyRingElem}) = submul!(z, x, y)
+submul!(z::TypeOrPtr{ZZPolyRingElem}, x::IntegerUnionOrPtr, y::TypeOrPtr{ZZPolyRingElem}, ::TypeOrPtr{ZZPolyRingElem}) = submul!(z, x, y)
 
 #
 
-function pow!(z::ZZPolyRingElemOrPtr, x::ZZPolyRingElemOrPtr, e::IntegerUnion)
+function pow!(z::TypeOrPtr{ZZPolyRingElem}, x::TypeOrPtr{ZZPolyRingElem}, e::IntegerUnion)
   @ccall libflint.fmpz_poly_pow(z::Ref{ZZPolyRingElem}, x::Ref{ZZPolyRingElem}, UInt(e)::UInt)::Nothing
   return z
 end
