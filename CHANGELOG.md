@@ -9,6 +9,21 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.56.1](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.56.1) - 2026-06-30
+
+### New or extended functionality
+
+- [#2334](https://github.com/Nemocas/Nemo.jl/pull/2334) Update FLINT to v3.6.0
+
+### Performance improvements or improved testing
+
+- [#2315](https://github.com/Nemocas/Nemo.jl/pull/2315) Add in-place `mul!` specializations for modular matrices
+- [#2316](https://github.com/Nemocas/Nemo.jl/pull/2316) Add `sub!` for `ZZModMatrix` / `FpMatrix`
+
+### Fixed bugs that returned incorrect results
+
+- [#2325](https://github.com/Nemocas/Nemo.jl/pull/2325) Fix a subtle bug in `digits!` for negative inputs
+
 ## [0.56.0](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.56.0) - 2026-06-09
 
 ### New or extended functionality
