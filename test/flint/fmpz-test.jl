@@ -934,6 +934,24 @@ end
   # Nemo PR #2325
   p = -primorial(ZZ(307))
   @test maximum(digits(p; base=ZZ(10))) <= 0
+
+  function column_matrix(c::Vector{T}) where { T <: Integer }
+    return matrix(ZZ, length(c), 1, c)
+  end
+  for sz in 0:5
+    n = factorial(ZZ(10^sz))
+    @test digits_to_integer!(digits(n)) == n
+    @test digits_to_integer!(digits(-n)) == -n
+    @test digits_to_integer!(column_matrix(digits(n)))[1,1] == n
+    @test digits_to_integer!(column_matrix(digits(-n)))[1,1] == -n
+
+    for base in [2, 3, 10, 32768, typemax(Int)]
+      @test digits_to_integer!(digits(n; base=base); base=base) == n
+      @test digits_to_integer!(digits(-n; base=base); base=base) == -n
+      @test digits_to_integer!(column_matrix(digits(n; base=base)); base=base)[1,1] == n
+      @test digits_to_integer!(column_matrix(digits(-n; base=base)); base=base)[1,1] == -n
+    end
+  end
 end
 
 @testset "ZZRingElem.string_io" begin

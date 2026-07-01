@@ -146,6 +146,7 @@ export det_divisor
 export det_given_divisor
 export diagonal
 export digamma
+export digits_to_integer!
 export div!
 export divexact
 export divexact!
