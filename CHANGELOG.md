@@ -9,7 +9,7 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
-## [0.56.1](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.56.1) - 2026-06-30
+## [0.56.1](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.56.1) - 2026-06-31
 
 ### New or extended functionality
 
