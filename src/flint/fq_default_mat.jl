@@ -318,7 +318,7 @@ end
 ################################################################################
 
 function det(a::FqMatrix)
-  !is_square(a) && error("Non-square matrix")
+  @req is_square(a) "Matrix must be a square matrix"
   n = nrows(a)
   R = base_ring(a)
   if n == 0
