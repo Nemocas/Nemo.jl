@@ -7,7 +7,8 @@ DocTestSetup = Nemo.doctestsetup()
 # [Exact real and complex numbers](@id exact_real_complex)
 
 Exact real and complex numbers are provided by FLINT.
-Since the respective library used to be called Calcium, we will refer to it as the Calcium field.
+The corresponding Nemo types retain the historical name Calcium, from the
+separate library that is now part of FLINT.
 Internally, a number $z$ is represented as an element
 of an extension field of the rational numbers. That is,
 
@@ -19,7 +20,7 @@ real or complex numbers
 such as $\pi$, $\sqrt{2}$ or $e^{\sqrt{2} \pi i}$.
 The user does not normally need to worry about the details of
 the internal representation;
-Calcium constructs extension numbers and fields automatically
+FLINT constructs extension numbers and fields automatically
 as needed to perform operations.
 
 The user must create a `CalciumField` instance which represents the
@@ -30,19 +31,19 @@ stores various options for evaluation (documented further below).
 
  Library        | Element type        | Parent type
 ----------------|---------------------|--------------------
-Calcium         | `CalciumFieldElem`  | `CalciumField`
+FLINT           | `CalciumFieldElem`  | `CalciumField`
 
 
 Please note the following:
 
 * It is in the nature of exact complex arithmetic that some operations
   must be implemented using incomplete heuristics. For example, testing
-  whether an element is zero will not always succeed. When Calcium is
+  whether an element is zero will not always succeed. When FLINT is
   unable to perform a task, Nemo will throw an exception.
-  This ensures that Calcium fields behave exactly
+  This ensures that `CalciumFieldElem`s behave exactly
   and never silently return wrong results.
 
-* Calcium elements can optionally hold special non-numerical values:
+* `CalciumFieldElem` values can optionally hold special non-numerical values:
 
   * Unsigned infinity $\hat \infty$
 
@@ -56,7 +57,8 @@ Please note the following:
   disallowed so that a `CalciumField` represents the
   mathematical field $\mathbb{C}$, and any operation that would result
   in a special value (for example, $1 / 0 = \hat \infty$) will throw an exception.
-  To allow special values, pass `extended=true` to the `CalciumField` constructor.
+  To allow special values, pass `extended=true` to the `CalciumField` constructor
+  (see [Constructor options](@ref calciumfield_constructor_options)).
 
 * `CalciumField` instances only support single-threaded use.
   You must create a separate parent object for each thread
@@ -68,7 +70,7 @@ Please note the following:
 
 
 
-## Calcium field options
+## [Constructor options](@id calciumfield_constructor_options)
 
 The `CalciumField` parent stores various options that affect
 simplification power, performance, or appearance.
@@ -98,10 +100,10 @@ The following options are supported:
   `:gb_vieta_limit`       | Maximum degree to use Vieta's formulas
   `:trig_form`            | Default form of trigonometric functions
 
-An important function of these options is to control how hard Calcium will
+An important function of these options is to control how hard FLINT will
 try to find an answer before it gives up. For example:
 
-* Setting `:prec_limit => 65536` will allow Calcium to use up to 65536
+* Setting `:prec_limit => 65536` will allow FLINT to use up to 65536
   bits of precision (instead of the default 4096) to prove inequalities.
 
 * Setting `:qqbar_deg_limit => typemax(Int)` (instead of the default 120)
@@ -109,13 +111,13 @@ try to find an answer before it gives up. For example:
   completion, no matter how long this will take.
 
 * Setting `:use_gb => 0` (instead of the default 1) disables use of
-  Gröbner bases. In general, this will negatively impact Calcium's ability
+  Gröbner bases. In general, this will negatively impact FLINT's ability
   to simplify field elements and prove equalities, but it can speed up
   calculations where Gröbner bases are unnecessary.
 
 For a detailed explanation, refer to the following section
 in the FLINT documentation:
-<https://flintlib.org/doc/ca.html#context-optionss>
+<https://flintlib.org/doc/ca.html#context-options>
 
 ## Basic examples
 
@@ -150,15 +152,15 @@ x^4 + -10*x^2 + 1
 
 ## Conversions and numerical evaluation
 
-Calcium numbers can created from integers (`ZZ`), rationals (`QQ`)
+Exact complex numbers can be created from integers (`ZZ`), rationals (`QQ`)
 and algebraic numbers (`algebraic_closure(QQ)`), and through the application of
 arithmetic operations and transcendental functions.
 
-Calcium numbers can be converted to integers, rational and algebraic fields
+`CalciumFieldElem`s  can be converted to integer, rational and algebraic fields
 provided that the values are integer, rational or algebraic.
 An exception is thrown if the value does not belong to the target domain,
-if Calcium is unable to prove that the value belongs
-to the target domain, or if Calcium is unable to compute the explicit
+if FLINT is unable to prove that the value belongs
+to the target domain, or if FLINT is unable to compute the explicit
 value because of evaluation limits.
 
 ```jldoctest; setup = :(C = CalciumField())
@@ -232,7 +234,7 @@ This can be significantly faster.
 ## Comparisons and properties
 
 Except where otherwise noted, predicate functions such as `iszero`, `==`, `<` and `isreal`
-act on the mathematical values of Calcium field elements.
+act on the mathematical values of `CalciumFieldElem`s.
 For example, although evaluating $x = \sqrt{2} \sqrt{3}$ and $y = \sqrt{6}$
 results in different internal representations ($x \in \mathbb{Q}(\sqrt{3}, \sqrt{2})$
 and $y \in \mathbb{Q}(\sqrt{6})$),
@@ -256,9 +258,9 @@ true
 ```
 
 Predicate functions return *true* if the property is provably true
-and *false* if the property if provably false. If Calcium is unable
+and *false* if the property if provably false. If FLINT is unable
 to prove the truth value, an exception is thrown.
-For example, with default settings, Calcium is currently
+For example, with default settings, FLINT is currently
 able to prove that $e^{e^{-1000}} \ne 1$,
 but it fails to prove $e^{e^{-3000}} \ne 1$:
 
@@ -344,7 +346,7 @@ By default, `CalciumField` does not permit creating values that are not
 numbers, and any non-number value (unsigned infinity, signed infinity,
 Undefined) will result in an exception.
 This also applies to the special value Unknown, used in situations
-where Calcium is unable to prove that a value is a number.
+where FLINT is unable to prove that a value is a number.
 To enable special values, use `extended=true`.
 
 ```jldoctest
@@ -490,7 +492,7 @@ The default behavior of trigonometric functions can be changed
 using the `:trig_form` option of `CalciumField`.
 
 Proving equalities involving transcendental function values is a difficult
-problem in general. Calcium will sometimes fail even in elementary cases.
+problem in general. FLINT will sometimes fail even in elementary cases.
 Here is an example of two constant trigonometric identities where
 the first succeeds and the second fails:
 
