@@ -6,8 +6,8 @@ DocTestSetup = Nemo.doctestsetup()
 
 # Number field arithmetic
 
-Number fields are provided in Nemo by Antic. This allows construction of
-absolute number fields and basic arithmetic computations therein.
+Number fields are provided in Nemo by FLINT.
+This allows construction of absolute number fields and basic arithmetic computations therein.
 
 Number fields are constructed using the `number_field` function.
 
@@ -17,7 +17,7 @@ parent objects.
 
  Library | Field                          | Element type  | Parent type
 ---------|--------------------------------|---------------|---------------------
-Antic    | $\mathbb{Q}[x]/(f)$            | `AbsSimpleNumFieldElem`     | `AbsSimpleNumField`
+FLINT    | $\mathbb{Q}[x]/(f)$            | `AbsSimpleNumFieldElem`     | `AbsSimpleNumField`
 
 All the number field types belong to the `Field` abstract type and the number
 field element types belong to the `FieldElem` abstract type.
@@ -25,8 +25,8 @@ field element types belong to the `FieldElem` abstract type.
 The Hecke.jl library radically expands on number field functionality, providing
 ideals, orders, class groups, relative extensions, class field theory, etc.
 
-The basic number field element type used in Hecke is the Nemo/antic number field
-element type, making the two libraries tightly integrated.
+The basic number field element type used in Hecke is the Nemo `AbsSimpleNumField` type, 
+making the two libraries tightly integrated.
 
 <https://thofma.github.io/Hecke.jl/stable/>
 
