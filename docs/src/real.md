@@ -6,7 +6,7 @@ DocTestSetup = Nemo.doctestsetup()
 
 # [Arbitrary precision real balls](@id real_field_section)
 
-Arbitrary precision real ball arithmetic is supplied by Arb which provides a
+Arbitrary precision real ball arithmetic is supplied by FLINT which provides a
 ball representation which tracks error bounds rigorously. Real numbers are 
 represented in mid-rad interval form $[m \pm r] = [m-r, m+r]$.
 
@@ -15,7 +15,7 @@ the libraries that provide them and the associated types of the parent objects.
 
  Library | Field                | Element type       | Parent type
 ---------|----------------------|--------------------|--------------
-Arb      | $\mathbb{R}$ (balls) | `RealFieldElem`    | `RealField`
+FLINT      | $\mathbb{R}$ (balls) | `RealFieldElem`    | `RealField`
 
 The real field types belong to the `Field` abstract type and the types of
 elements in this field, i.e. balls in this case, belong to the `FieldElem`
@@ -41,12 +41,11 @@ set_precision!(f::Any, ::Type{Balls}, n::Int)
 ```
 
 !!! info
-    This functions are not thread-safe.
+    These functions are not thread-safe.
 
 ### Constructors
 
-In order to construct real balls in Nemo, one must first construct the Arb
-real field itself. This is accomplished with the following constructor.
+In order to construct real balls in Nemo, one must first construct the real field itself. This is accomplished with the following constructor.
 
 ```@docs
 real_field()
@@ -74,16 +73,16 @@ julia> d = RR(12)
 12.000000000000000000
 ```
 
-Note that whilst one can coerce double precision floating point values into an
-Arb real field, unless those values can be represented exactly in double
+Note that whilst one can coerce double precision floating point values into a
+real field, unless those values can be represented exactly in double
 precision the resulting ball can't be any more precise than the double
 precision supplied.
 
 If instead, values can be represented precisely using decimal arithmetic then
-one can supply them to Arb using a string. In this case, Arb will store them to
-the precision specified when creating the Arb field.
+one can supply them to the real field using a string. In this case, the real field will store them to
+the global ball precision.
 
-If the values can be stored precisely as a binary floating point number, Arb
+If the values can be stored precisely as a binary floating point number, the real field
 will store the values exactly. See the function `is_exact` below for more
 information.
 
@@ -316,7 +315,7 @@ true
 
 ### Comparison
 
-Nemo provides a full range of comparison operations for Arb balls. Note that a
+Nemo provides a full range of comparison operations for real balls. Note that a
 ball is considered less than another ball if every value in the first ball is
 less than every value in the second ball, etc.
 

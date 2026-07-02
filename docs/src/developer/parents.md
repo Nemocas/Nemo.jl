@@ -105,7 +105,7 @@ create one over the same ring with different dimensions `r x c` by calling
 `similar(M, r, c)`.
 
 The `similar` system is sophisticated enough to know that there is no native
-type provided by FLINT/Antic for matrices and polynomials over a number field.
+type provided by FLINT for matrices and polynomials over a number field.
 The system knows that in such cases it must create a generic matrix or
 polynomial over the given number field.
 
