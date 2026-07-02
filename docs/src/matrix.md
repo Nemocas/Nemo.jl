@@ -9,8 +9,7 @@ DocTestSetup = Nemo.doctestsetup()
 Nemo allow the creation of dense matrices over any computable ring $R$. There
 are two different kinds of implementation: a generic one for the case where no
 specific implementation exists (provided by AbstractAlgebra.jl), and efficient
-implementations of matrices over numerous specific rings, usually provided by C/C++
-libraries.
+implementations of matrices over numerous specific rings provided by FLINT.
 
 The following table shows each of the matrix types available in Nemo, the
 base ring $R$, and the Julia/Nemo types for that kind of matrix (the type
@@ -26,10 +25,10 @@ $\mathbb{Q}$                          | FLINT               | `QQMatrix`        
 $\mathbb{Z}/p\mathbb{Z}$ (small $p$)  | FLINT               | `fpMatrix`          | `fpMatrixSpace`
 $\mathbb{F}_{p^n}$ (small $p$)        | FLINT               | `fqPolyRepMatrix`   | `fqPolyRepMatrixSpace`
 $\mathbb{F}_{p^n}$ (large $p$)        | FLINT               | `FqPolyRepMatrix`   | `FqPolyRepMatrixSpace`
-$\mathbb{R}$ (arbitrary precision)    | Arb                 | `RealMatrix`        | `RealMatrixSpace`
-$\mathbb{C}$ (arbitrary precision)    | Arb                 | `ComplexMatrix`     | `ComplexMatrixSpace`
-$\mathbb{R}$ (fixed precision)        | Arb                 | `ArbMatrix`         | `ArbMatrixSpace`
-$\mathbb{C}$ (fixed precision)        | Arb                 | `AcbMatrix`         | `AcbMatrixSpace`
+$\mathbb{R}$ (arbitrary precision)    | FLINT               | `RealMatrix`        | `RealMatrixSpace`
+$\mathbb{C}$ (arbitrary precision)    | FLINT               | `ComplexMatrix`     | `ComplexMatrixSpace`
+$\mathbb{R}$ (fixed precision)        | FLINT               | `ArbMatrix`         | `ArbMatrixSpace`
+$\mathbb{C}$ (fixed precision)        | FLINT               | `AcbMatrix`         | `AcbMatrixSpace`
 
 The dimensions and base ring $R$ of a generic matrix are stored in its parent
 object.

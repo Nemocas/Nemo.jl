@@ -67,58 +67,20 @@ characteristic. The `padic` prefix is for the field of p-adic numbers for a
 given `p`. The `nmod` prefix is for `Z/nZ` for a given `n`. The `gfp` prefix is
 the same as `Z/nZ` but where `n` is prime, so that we are dealing with a field.
 
-The `FlintTypes.jl` file contains the implementation of all the FLINT types.
+The `FlintTypes.jl` file contains the implementation of all the original FLINT types.
 
 In the `antic` directory, `nf_elem` is for elements of a number field.
 
-The `AnticTypes.jl` file contains the Antic types.
+The `AnticTypes.jl` file contains the former Antic types.
 
 In the `arb` directory the `arb` prefix is for arbitrary precision ball
 arithmetic over the reals. The `acb` prefix is similar but for complex numbers.
 
-The `ArbTypes.jl` file contains the Arb types.
+The `ArbTypes.jl` file contains the former Arb types.
 
-In the `calcium` directory the `ca` prefix is for Calcium's type. There is also
-a `qqbar` file for the field of algebraic numbers.
+In the `calcium` directory the `ca` prefix is for exact real and complex numbers.
+There is also a `qqbar` file for the field of algebraic numbers.
 
-In the AbstractAlgebra.jl package the `src` directory contains a directory
-called `generic`. This is where the implementations of generic types, such as
-matrices, polynomials, series, etc. reside. Each file such as `Matrix.jl`
-corresponds to a generic group/ring/field or other algebraic construction
-(typically over a base ring). The files in this directory exist inside a
-submodule of AbstractAlgebra called `Generic`.
-
-The file `GenericTypes.jl` is where all the generic types are implemented.
-
-At the top level of the `src` directory is a file `Generic.jl` which is where
-the `Generic` submodule of AbstractAlgebra begins and where imports are made
-from AbstractAlgebra into `Generic`.
-
-In the `src` directory we have implementations that work for every type
-belonging to a given abstract type, e.g. `Matrix.jl` has implementations that
-will work for any matrix type, whether from AbstractAlgebra's `Generic` module
-or even matrix types from Nemo, and so on. So long as they are implemented to
-provide the `Matrix` interface all the functions there will work for them. The
-same applies for `Poly.jl` for polynomial types, `AbsSeries.jl` for absolute
-series types, `RelSeries.jl` for relative series types, etc.
-
-In the `src` directory is `AbstractTypes.jl` where all the AbstractAlgebra
-abstract types are defined.
-
-Also in the `src` directory is a subdirectory called `Julia`. This is where we
-give our own implementations of functionality for Julia `Integer`s and
-`Rational`s and various other basic rings implemented in terms of Julia types.
-These are provided so that the package will work as a pure Julia package,
-replacing many of the rings and fields that would be available in FLINT and
-the other C libraries with Julia equivalents.
-
-Note that some of the implementations we give there would conflict with `Base`
-and so are only available inside AbstractAlgebra and are not exported!
-
-We try to keep the `test` directory at the top level of the source tree
-organised in the same manner as the other directories just discussed, though
-there is currently no split between tests for `Generic` and for the
-implementations in `src`. All tests are currently combined in `test/generic`..
 
 ## Git, GitHub and project workflows
 
