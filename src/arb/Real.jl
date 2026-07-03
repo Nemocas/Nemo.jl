@@ -764,7 +764,7 @@ function ^(x::RealFieldElem, y::ZZRingElem; precision::Int = precision(Balls))
   return z
 end
 
-^(x::RealFieldElem, y::Integer; precision::Int = precision(Balls)) = ^(x, ZZRingElem(y), precision)
+^(x::RealFieldElem, y::Integer; precision::Int = precision(Balls)) = ^(x, ZZRingElem(y); precision)
 
 function ^(x::RealFieldElem, y::UInt; precision::Int = precision(Balls))
   z = RealFieldElem()
