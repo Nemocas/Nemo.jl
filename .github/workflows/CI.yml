@@ -105,8 +105,8 @@ jobs:
               fonts-dejavu-extra
       - name: Prepare building docs
         run: |
-          julia --color=yes --code-coverage --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()))'
-          julia --color=yes --code-coverage --project=docs/ -e 'using Pkg; Pkg.instantiate()'
+          julia --color=yes --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd()))'
+          julia --color=yes --project=docs/ -e 'using Pkg; Pkg.instantiate()'
       - name: Build docs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
