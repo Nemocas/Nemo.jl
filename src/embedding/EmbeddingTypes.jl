@@ -11,8 +11,8 @@ struct FinFieldMorphism{S, T} <: AbstractAlgebra.Map{S, T, AbstractAlgebra.SetMa
 
   function FinFieldMorphism(domain::S, codomain::T, image_fn::Function,
       inverse_fn::Function) where {S, T}
-    map = MapFromFunc(domain, codomain, image_fn)
-    preimage = MapFromFunc(codomain, domain, inverse_fn)
+    map = map_from_func(domain, codomain, image_fn)
+    preimage = map_from_func(codomain, domain, inverse_fn)
     return new{S, T}(map, preimage)
   end
 end
@@ -43,8 +43,8 @@ struct FinFieldPreimage{S, T} <: AbstractAlgebra.Map{S, T, AbstractAlgebra.SetMa
 
   function FinFieldPreimage(domain::S, codomain::T, image_fn::Function,
       inverse_fn::Function) where {S, T}
-    map = MapFromFunc(domain, codomain, image_fn)
-    preimage = MapFromFunc(codomain, domain, inverse_fn)
+    map = map_from_func(domain, codomain, image_fn)
+    preimage = map_from_func(codomain, domain, inverse_fn)
     return new{S, T}(map, preimage)
   end
 end
