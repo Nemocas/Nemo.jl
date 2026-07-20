@@ -1549,6 +1549,8 @@ function lindep(A::Matrix{ComplexFieldElem}, bits::Int)
   return [L[1, i] for i = 1:n]
 end
 
+lindep(A::ComplexMatrix, bits::Int) = lindep(Matrix(A), bits)
+
 ################################################################################
 #
 #  Unsafe arithmetic

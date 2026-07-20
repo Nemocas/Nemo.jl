@@ -1533,6 +1533,8 @@ function lindep(A::Matrix{AcbFieldElem}, bits::Int)
   return [L[1, i] for i = 1:n]
 end
 
+lindep(A::AcbMatrix, bits::Int) = lindep(Matrix(A), bits)
+
 ################################################################################
 #
 #  Unsafe arithmetic
