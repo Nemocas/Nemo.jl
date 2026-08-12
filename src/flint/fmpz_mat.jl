@@ -784,7 +784,7 @@ function maximum(::typeof(nbits), M::ZZMatrix)
       for j in 1:m
         #a zero fmpz is a binary zero, hence this works
         #fmpz_bits does not work on 0 I think (at least is it unneccessary)
-        #this is not going through the "correct" order of the rows, but 
+        #this is not going through the "correct" order of the rows, but
         #for this is does not matter
         if !iszero(unsafe_load(reinterpret(Ptr{Int}, M_ptr)))
           mx = max(mx, nbits(M_ptr))
@@ -1283,6 +1283,8 @@ function rank(x::ZZMatrix)
   return @ccall libflint.fmpz_mat_rank(x::Ref{ZZMatrix})::Int
 end
 
+rank(x::Matrix{ZZRingElem}) = rank(matrix(ZZ, x))
+
 ###############################################################################
 #
 #   Reduced row echelon form
@@ -1470,7 +1472,7 @@ function snf_with_transform(A::ZZMatrix, l::Bool=true, r::Bool=true; is_hnf::Boo
         continue
       end
       for j = i+1:min(nrows(S), ncols(S))
-        #if S[j, j] == 0 
+        #if S[j, j] == 0
         if is_zero_entry(S, j, j)
           continue
         end
@@ -1865,9 +1867,9 @@ function AbstractAlgebra._solve_triu_left(U::ZZMatrix, b::ZZMatrix; unipotent::B
 end
 
 # Solve UX = B for X given U & B: U has to be upper triangular.
-# I think due to the Strassen calling path, where Strasse.solve(side = :left) 
+# I think due to the Strassen calling path, where Strasse.solve(side = :left)
 # call directly AA.solve_left, this has to be in AA and cannot be independent.
-function AbstractAlgebra._solve_triu(U::ZZMatrix, b::ZZMatrix; side::Symbol=:left, unipotent::Bool = false) 
+function AbstractAlgebra._solve_triu(U::ZZMatrix, b::ZZMatrix; side::Symbol=:left, unipotent::Bool = false)
   if side == :left
     return AbstractAlgebra._solve_triu_left(U, b; unipotent)
   end
@@ -1925,7 +1927,7 @@ end
 # One cannot assert is_lower_triangular as this is used for the inplace
 # lu decomposition where the matrix is full, encoding an upper triangular
 # using the diagonal and a lower triangular with trivial diagonal
-function AbstractAlgebra._solve_tril!(X::ZZMatrix, L::ZZMatrix, B::ZZMatrix; unipotent::Bool = false) 
+function AbstractAlgebra._solve_tril!(X::ZZMatrix, L::ZZMatrix, B::ZZMatrix; unipotent::Bool = false)
 
   # a       x   u      ax = u
   # b c   * y = v      bx + cy = v
