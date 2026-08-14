@@ -3718,15 +3718,27 @@ end
 using .BitsMod
 
 #small helper to decide a reasonable crossover point between FLINT and Bernstein.
-function _perfect_power_auto_threshold_bits(; candidates::Vector{Int} = [50_000, 75_000, 100_000, 125_000, 150_000],
+#CF: Bernstein wins from 5_000 bits onwards - if the exponents are large
+#    eg. for a^5: flint is (always) faster, as flint just tries the exponents
+#    one-by-one
+#    for larger exponents, Berstein wins as the cost then is dominated (in 
+#    flint) by verifying that the computed root is correct.
+#    cost computing a n-root of a:
+#     Bernstein: O(size root) = O(log(a)/n)
+#     Flint: don't know
+#    cost verification: O(log(n)) mult ultimately of size log(a) 
+# so: if you suspect a to be a small power: flint
+#                              large power, or no-power: Bernstein
+#
+function _perfect_power_auto_threshold_bits(; candidates::Vector{Int} = [5_000, 10_000, 25_000, 50_000, 75_000, 100_000, 125_000, 150_000],
   trials::Int = 3)
 
-  _zz_bits(nbits::Int, seed::Int) = begin
-    a = ZZRingElem(1) << (nbits - 1)
+  function _zz_bits(nbits::Int, seed::Int)
+    a = ZZRingElem(1) << max(2, (nbits - 1))
     return a + ZZRingElem(0x9e3779b97f4a7c15 % UInt) * ZZRingElem(seed) + ZZRingElem(1234567)
   end
 
-  _time_pair(a::ZZRingElem) = begin
+  function _time_pair(a::ZZRingElem)
     tF = @elapsed _is_perfect_power_with_data_flint(a)
     tB = @elapsed is_perfect_power_with_data_bernstein(a)
     return tF, tB
@@ -3749,6 +3761,17 @@ function _perfect_power_auto_threshold_bits(; candidates::Vector{Int} = [50_000,
       tF2, tB2 = _time_pair(a5)
       wins += (tB2 < tF2) ? 1 : 0
       total += 1
+
+      for ex=1:nbits(b)
+        a = _zz_bits((b + 17*i)>>ex, i)
+        a5 = a^rand(2^(ex-1):2^ex)
+        if nbits(a5) > 2*b
+          continue
+        end
+        tF2, tB2 = _time_pair(a5)
+        wins += (tB2 < tF2) ? 1 : 0
+        total += 1
+      end
     end
 
     if wins > trials / 2
@@ -4070,16 +4093,16 @@ function is_perfect_power_with_data_bernstein(a::ZZRingElem)
 end
 
 @doc raw"""
-    is_perfect_power_with_data_auto(a::ZZRingElem; threshold_bits::Int=100_000)
+    is_perfect_power_with_data_auto(a::ZZRingElem; threshold_bits::Int=2_000)
 
 Return `(e, r)` as in `is_perfect_power_with_data`, choosing between the FLINT
 method and the Bernstein method depending on `nbits(a)`.
 
-The default crossover (`threshold_bits = 100_000`) was chosen empirically on local
-benchmarks comparing both methods on (1) random inputs and (2) true 5th powers.
+The default crossover (`threshold_bits = 2_000`) was chosen empirically on local
+benchmarks comparing both methods on (1) random inputs and (2) true large powers.
 This value is expected to change if the prime iteration / coprime-base backend changes.
 """
-function is_perfect_power_with_data_auto(a::ZZRingElem; threshold_bits::Int=100_000)
+function is_perfect_power_with_data_auto(a::ZZRingElem; threshold_bits::Int=2_000)
   return nbits(a) < threshold_bits ? _is_perfect_power_with_data_flint(a) :
                                      is_perfect_power_with_data_bernstein(a)
 end
