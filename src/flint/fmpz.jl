@@ -3986,7 +3986,7 @@ function _is_power_bernstein(a::ZZRingElem)::Int
     if !isone(d)
       if powermod(d, p, ZZRingElem(p_test)) == a_test && d^p == aa
         f *= p
-        cl = min(cl, flog(d, 7))
+        cl = min(cl, clog(d, 7))
         aa = d
         a_test = aa % p_test
       else
@@ -3994,14 +3994,13 @@ function _is_power_bernstein(a::ZZRingElem)::Int
       end
     end
 
-    while !isone(d) && pp <= cl
+    while !isone(d) && p <= cl
       push!(cands, d)
-      pp > div(cl, p) && break
       pp *= p
       d = root_exact(d, p)
       if !isone(d) && d^p == aa
         f *= p
-        cl = min(cl, flog(d, 7))
+        cl = min(cl, clog(d, 7))
         aa = d
         a_test = aa % p_test
       else
