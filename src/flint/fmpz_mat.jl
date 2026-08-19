@@ -102,7 +102,7 @@ function setindex!(a::ZZMatrix, b::ZZMatrix, r::UnitRange{Int64}, c::UnitRange{I
   _checkbounds(a, r, c)
   size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
   A = view(a, r, c)
-  @ccall libflint.fmpz_mat_set(A::Ref{ZZMatrix}, b::Ref{ZZMatrix})::Nothing
+  set!(A, b)
 end
 
 @inline number_of_rows(a::ZZMatrix) = a.r
@@ -111,7 +111,10 @@ end
 
 iszero(a::ZZMatrix) = @ccall libflint.fmpz_mat_is_zero(a::Ref{ZZMatrix})::Bool
 
-isone(a::ZZMatrix) = @ccall libflint.fmpz_mat_is_one(a::Ref{ZZMatrix})::Bool
+function isone(a::ZZMatrix)
+  is_square(a) || return false
+  return @ccall libflint.fmpz_mat_is_one(a::Ref{ZZMatrix})::Bool
+end
 
 @inline function is_zero_entry(A::ZZMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(A, i, j)
@@ -697,6 +700,52 @@ function det_given_divisor(x::ZZMatrix, d::Integer, proved=true)
 end
 
 
+# Test whether the determinant of an integer matrix is zero:
+# -- false means definitely not zero
+# -- true means "probably" zero (but hard to quantify how probable)
+# We use random starting points for the primes so that it is
+# harder to supply an input which will fool the implementation.
+# For initial speed we use small 22-bit primes, but after 3 iters
+# we switch to larger 61-bit primes (which are faster amortized).
+
+@doc raw"""
+    is_probably_zero_det(M::ZZMatrix; modulus_bitsize::Int = 100)
+
+Same as `is_zero(det(M))` but faster, though may _very rarely_ erroneously
+return `true`.  The kwarg `modulus_bitsize` must be between 20 and 1000;
+larger values decrease the probability of a false positive (but require
+more computation time).  Under a "uniformity assumption" the probability
+of a false positive is about `2^(-modulus_bitsize)`.
+"""
+function is_probably_zero_det(M::ZZMatrix; modulus_bitsize::Int = 100)
+  @req  is_square(M)  "matrix must be square"
+  @req ((modulus_bitsize >= 20) && (modulus_bitsize <= 1000))  "modulus_bitsize must be between 20 and 1000 (but bigger than about 250 is usually senseless)"
+  # Dispose of two trivial cases:
+  (nrows(M) == 0) && return false
+  (nrows(M) == 1) && return is_zero(M)
+  # General method starts here:
+  small_prime_size = 21
+  large_prime_size = 60
+  p = 2^small_prime_size + rand(1:2^(small_prime_size-1))  # works well on my computer
+  log2_modulus = 0.0
+  Mp = zero_matrix(Native.GF(2), nrows(M), ncols(M)) # workspace, to avoid reallocating
+  while log2_modulus < modulus_bitsize
+    # After 3 iters, we switch to larger primes (to make progress faster)
+    if log2_modulus > 3*small_prime_size && log2_modulus < 3*small_prime_size + 4
+      p = 2^large_prime_size + rand(1:2^30)
+    end
+    p = next_prime(p)  # ?? better to do  next_prime(p+rand(1:2^16)) ??
+    log2_modulus += log2(p)  # only approximate, but that's fine
+    Fp = Native.GF(p; cached=false, check=false)
+    Mp = map_entries!(Fp, Mp, M)  # non-allocating change_base_ring
+    if !is_zero(_det(Mp))
+      return false
+    end
+  end
+  return true
+end
+
+
 @doc raw"""
     hadamard_bound2(M::ZZMatrix)
 
@@ -865,10 +914,9 @@ function __hnf(x)
 end
 
 function hnf!(x::ZZMatrix)
-  if nrows(x) * ncols(x) > 100
+  if !(nrows(x) <= 50 && ncols(x) <= 50) && nrows(x) * ncols(x) > 100
     z = hnf(x)
-    @ccall libflint.fmpz_mat_set(x::Ref{ZZMatrix}, z::Ref{ZZMatrix})::Nothing
-
+    set!(x, z)
     return x
   end
   @ccall libflint.fmpz_mat_hnf(x::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
@@ -1289,11 +1337,55 @@ function is_snf(x::ZZMatrix)
   return @ccall libflint.fmpz_mat_is_in_snf(x::Ref{ZZMatrix})::Bool
 end
 
+@doc raw"""
+    elementary_divisors(x::ZZMatrix) -> Vector{ZZRingElem}
+
+Return the elementary divisors $d_1 \mid d_2 \mid \cdots \mid d_r$ of $x$,
+where $r$ is the rank of $x$.
+"""
+function elementary_divisors(x::ZZMatrix)
+  m = min(nrows(x), ncols(x))
+  buf = @ccall libflint._fmpz_vec_init(m::Int)::Ptr{ZZRingElem}
+  r = @ccall libflint.fmpz_mat_elementary_divisors(buf::Ptr{ZZRingElem}, x::Ref{ZZMatrix})::Int
+  z = Vector{ZZRingElem}(undef, r)
+  for i in 1:r
+    ei = ZZRingElem()
+    @ccall libflint.fmpz_set(ei::Ref{ZZRingElem}, (buf + (i - 1) * sizeof(ZZRingElem))::Ptr{ZZRingElem})::Nothing
+    z[i] = ei
+  end
+  @ccall libflint._fmpz_vec_clear(buf::Ptr{ZZRingElem}, m::Int)::Nothing
+  return z
+end
+
 ################################################################################
 #
 #  Smith normal form with trafo
 #
 ################################################################################
+
+function _snf_with_transform(A::ZZMatrix, l::Bool = true, r::Bool = true)
+  S = similar(A)
+  if l
+    U = zero_matrix(ZZ, nrows(A), nrows(A))
+    if r
+      V = zero_matrix(ZZ, ncols(A), ncols(A))
+      @ccall libflint.fmpz_mat_snf_transform(S::Ref{ZZMatrix}, U::Ref{ZZMatrix}, V::Ref{ZZMatrix}, A::Ref{ZZMatrix})::Nothing
+      return S, U, V
+    else
+      @ccall libflint.fmpz_mat_snf_transform(S::Ref{ZZMatrix}, U::Ref{ZZMatrix}, C_NULL::Ptr{Nothing}, A::Ref{ZZMatrix})::Nothing
+      return S, U, U
+    end
+  else
+    if r
+      V = zero_matrix(ZZ, ncols(A), ncols(A))
+      @ccall libflint.fmpz_mat_snf_transform(S::Ref{ZZMatrix}, C_NULL::Ptr{Nothing}, V::Ref{ZZMatrix}, A::Ref{ZZMatrix})::Nothing
+      return S, V, V
+    else
+      @ccall libflint.fmpz_mat_snf_transform(S::Ref{ZZMatrix}, C_NULL::Ptr{Nothing}, C_NULL::Ptr{Nothing}, A::Ref{ZZMatrix})::Nothing
+      return S, S, S
+    end
+  end
+end
 
 #=
 g, e,f = gcdx(a, b)
@@ -1309,96 +1401,149 @@ Given some integer matrix $A$, compute the Smith normal form (elementary
 divisor normal form) of $A$. If `l` and/ or `r` are true, then the corresponding
 left and/ or right transformation matrices are computed as well.
 """
-function snf_with_transform(A::ZZMatrix, l::Bool=true, r::Bool=true)
+function snf_with_transform(A::ZZMatrix, l::Bool=true, r::Bool=true; is_hnf::Bool = false)
+  # always need R and L defined for the GC.@preserve block below
   if r
     R = identity_matrix(ZZ, ncols(A))
+  else
+    R = A
   end
 
   if l
     L = identity_matrix(ZZ, nrows(A))
+  else
+    L = A
   end
-  # TODO: if only one trafo is required, start with the HNF that does not
-  #       compute the trafo
-  #       Rationale: most of the work is on the 1st HNF..
+
   S = deepcopy(A)
+  Stra = is_square(S) ? S : zero_matrix(ZZ, ncols(S), nrows(S))
+  first = true
   while !is_diagonal(S)
-    if l
-      S, T = hnf_with_transform(S)
-      L = T * L
-    else
-      S = hnf!(S)
+    # Most of the work seems to be done for the first HNF
+    # Since we can always choose the side we start with
+    # in case only one transformation is requested, we start with the side where no
+    # transformation is request.
+    # r && !l (this is the standard)
+    #   l -> r (with transform) -> l -> r (with transform) -> ...
+    # l && !r
+    #   r -> l (with transform) -> r -> l (with_transform)
+    if !(first && l && !r)
+      if l
+        S, T = hnf_with_transform(S)
+        L = T * L
+      else
+        S = hnf!(S)
+      end
     end
+    first = false
 
     if is_diagonal(S)
       break
     end
+
     if r
-      S, T = hnf_with_transform(transpose(S))
+      #S, T = hnf_with_transform(transpose(S))
+      Stra, T = hnf_with_transform(transpose!(Stra, S))
+      Stra, S = S, Stra
       R = T * R
     else
-      S = hnf!(transpose(S))
+      #S = hnf!(transpose(S))
+      Stra = hnf!(transpose!(Stra, S))
+      Stra, S = S, Stra
     end
-    S = transpose(S)
+    #S = transpose(S)
+    Stra = transpose!(Stra, S)
+    Stra, S = S, Stra
   end
   #this is probably not really optimal...
-  for i = 1:min(nrows(S), ncols(S))
-    if S[i, i] == 1
-      continue
+  a = ZZRingElem()
+  b = ZZRingElem()
+  g = ZZRingElem()
+  e = ZZRingElem()
+  f = ZZRingElem()
+  x = ZZRingElem()
+  y = ZZRingElem()
+  z = ZZRingElem()
+  GC.@preserve S L R begin
+    for i = 1:min(nrows(S), ncols(S))
+      if is_one(mat_entry_ptr(S, i, i))
+        continue
+      end
+      for j = i+1:min(nrows(S), ncols(S))
+        #if S[j, j] == 0 
+        if is_zero_entry(S, j, j)
+          continue
+        end
+        if !is_zero_entry(S, i, i) && is_divisible_by(mat_entry_ptr(S, j, j), mat_entry_ptr(S, i, i))
+        #if S[i, i] != 0 && S[j, j] % S[i, i] == 0 #is_divisible_by(mat_entry_ptr(S, j, j), mat_entry_ptr(S, i, i))
+          continue
+        end
+        g, e, f = gcdx!(g, e, f, mat_entry_ptr(S, i, i), mat_entry_ptr(S, j, j))
+        #a = divexact(S[i, i], g)
+        a = divexact!(a, mat_entry_ptr(S, i, i), g)
+        S[i, i] = g
+        #b = divexact(S[j, j], g)
+        b = divexact!(b, mat_entry_ptr(S, j, j), g)
+        #S[j, j] *= a
+        mul!(mat_entry_ptr(S, j, j), a)
+        b = neg!(b)
+        if l
+          # U = [1 0; -b*f 1] * [ 1 1; 0 1] = [1 1; -b*f -b*f+1]
+          # so row i and j of L will be transformed. We do it naively
+          # those 2x2 transformations of 2 rows should be a c-primitive
+          # or at least a Nemo/Hecke primitive
+          for k = 1:ncols(L)
+            #x = -b * f
+            x = mul!(x, b, f)
+            #L[i, k], L[j, k] = L[i, k] + L[j, k], x * (L[i, k] + L[j, k]) + L[j, k]
+            add!(mat_entry_ptr(L, i, k), mat_entry_ptr(L, j, k))
+            addmul!(mat_entry_ptr(L, j, k), x, mat_entry_ptr(L, i, k))
+          end
+          #b = neg!(b)
+        end
+        if r
+          # V = [e -b ; f a];
+          # so col i and j of R will be transformed. We do it naively
+          # careful: at this point, R is still transposed
+          for k = 1:nrows(R)
+            #R[i, k], R[j, k] = e * R[i, k] + f * R[j, k], -b * R[i, k] + a * R[j, k]
+            set!(x, mat_entry_ptr(R, j, k))
+            set!(z, mat_entry_ptr(R, i, k))
+
+            mul!(y, f, x)
+            mul!(mat_entry_ptr(R, i, k), e, mat_entry_ptr(R, i, k))
+            add!(mat_entry_ptr(R, i, k), y)
+
+            mul!(mat_entry_ptr(R, j, k), a, mat_entry_ptr(R, j, k))
+            mul!(z, z, b)
+            add!(mat_entry_ptr(R, j, k), z)
+          end
+        end
+      end
     end
-    for j = i+1:min(nrows(S), ncols(S))
-      if S[j, j] == 0
-        continue
-      end
-      if S[i, i] != 0 && S[j, j] % S[i, i] == 0
-        continue
-      end
-      g, e, f = gcdx(S[i, i], S[j, j])
-      a = divexact(S[i, i], g)
-      S[i, i] = g
-      b = divexact(S[j, j], g)
-      S[j, j] *= a
-      if l
-        # U = [1 0; -b*f 1] * [ 1 1; 0 1] = [1 1; -b*f -b*f+1]
-        # so row i and j of L will be transformed. We do it naively
-        # those 2x2 transformations of 2 rows should be a c-primitive
-        # or at least a Nemo/Hecke primitive
-        for k = 1:ncols(L)
-          x = -b * f
-          #          L[i,k], L[j,k] = L[i,k]+L[j,k], x*L[i,k]+(x+1)*L[j,k]
-          L[i, k], L[j, k] = L[i, k] + L[j, k], x * (L[i, k] + L[j, k]) + L[j, k]
+
+    # It might be the case that S was diagonal with negative diagonal entries.
+    mone = ZZ(-1)
+    for i in 1:min(nrows(S), ncols(S))
+      if is_negative_entry(S, i, i)
+        if l
+          multiply_row!(L, mone, i)
         end
-      end
-      if r
-        # V = [e -b ; f a];
-        # so col i and j of R will be transformed. We do it naively
-        # careful: at this point, R is still transposed
-        for k = 1:nrows(R)
-          R[i, k], R[j, k] = e * R[i, k] + f * R[j, k], -b * R[i, k] + a * R[j, k]
-        end
+        neg!(mat_entry_ptr(S, i, i))
+        #S[i, i] = -S[i, i]
       end
     end
   end
-
-  # It might be the case that S was diagonal with negative diagonal entries.
-  for i in 1:min(nrows(S), ncols(S))
-    if S[i, i] < 0
-      if l
-        multiply_row!(L, ZZRingElem(-1), i)
-      end
-      S[i, i] = -S[i, i]
-    end
-  end
-
   if l
     if r
-      return S, L, transpose(R)
+      return S, L, transpose!(R)
     else
       # last is dummy
       return S, L, L
     end
   elseif r
     # second is dummy
-    return S, R, transpose(R)
+    return S, R, transpose!(R)
   else
     # last two are dummy
     return S, S, S
@@ -1411,7 +1556,7 @@ end
 #
 ###############################################################################
 
-function AbstractAlgebra.multiply_row!(A::ZZMatrix, s::Union{Int, ZZRingElemOrPtr}, i::Int, cols::UnitRange{Int}=1:ncols(A))
+function AbstractAlgebra.multiply_row!(A::ZZMatrix, s::Union{Int, TypeOrPtr{ZZRingElem}}, i::Int, cols::UnitRange{Int}=1:ncols(A))
   @assert 1 <= i <= nrows(A)
   @assert 1 <= first(cols) && last(cols) <= ncols(A)
   c = first(cols)
@@ -1426,7 +1571,7 @@ function AbstractAlgebra.multiply_row!(A::ZZMatrix, s::Union{Int, ZZRingElemOrPt
   return A
 end
 
-function AbstractAlgebra.multiply_column!(A::ZZMatrix, s::Union{Int, ZZRingElemOrPtr}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
+function AbstractAlgebra.multiply_column!(A::ZZMatrix, s::Union{Int, TypeOrPtr{ZZRingElem}}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
   @assert 1 <= j <= ncols(A)
   @assert 1 <= first(rows)
   @assert last(rows) <= nrows(A)
@@ -1440,7 +1585,7 @@ function AbstractAlgebra.multiply_column!(A::ZZMatrix, s::Union{Int, ZZRingElemO
 end
 
 
-function AbstractAlgebra.add_row!(A::ZZMatrix, s::Union{ZZRingElemOrPtr, Int}, i::Int, j::Int, cols::UnitRange{Int}=1:ncols(A))
+function AbstractAlgebra.add_row!(A::ZZMatrix, s::Union{TypeOrPtr{ZZRingElem}, Int}, i::Int, j::Int, cols::UnitRange{Int}=1:ncols(A))
   @assert 1 <= i <= nrows(A)
   @assert 1 <= j <= nrows(A)
   @assert 1 <= first(cols) && last(cols) <= ncols(A)
@@ -1457,7 +1602,7 @@ function AbstractAlgebra.add_row!(A::ZZMatrix, s::Union{ZZRingElemOrPtr, Int}, i
   return A
 end
 
-function AbstractAlgebra.add_column!(A::ZZMatrix, s::Union{ZZRingElemOrPtr, Int}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
+function AbstractAlgebra.add_column!(A::ZZMatrix, s::Union{TypeOrPtr{ZZRingElem}, Int}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
   @assert 1 <= i <= ncols(A)
   @assert 1 <= j <= ncols(A)
   @assert 1 <= first(rows)
@@ -1861,7 +2006,7 @@ end
 ###############################################################################
 
 function Base.copy!(A::ZZMatrix, B::ZZMatrix)
-  @ccall libflint.fmpz_mat_set(A::Ref{ZZMatrix}, B::Ref{ZZMatrix})::Cvoid
+  set!(A, B)
 end
 
 function zero!(z::ZZMatrixOrPtr)
@@ -1885,10 +2030,19 @@ function one!(z::ZZMatrixOrPtr)
   return z
 end
 
-function neg!(z::ZZMatrixOrPtr, w::ZZMatrixOrPtr)
-  @ccall libflint.fmpz_mat_neg(z::Ref{ZZMatrix}, w::Ref{ZZMatrix})::Nothing
+function neg!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr)
+  @ccall libflint.fmpz_mat_neg(z::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
   return z
 end
+
+#
+
+function set!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr)
+  @ccall libflint.fmpz_mat_set(z::Ref{ZZMatrix}, x::Ref{ZZMatrix})::Nothing
+  return z
+end
+
+#
 
 function add!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::ZZMatrixOrPtr)
   @ccall libflint.fmpz_mat_add(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Ref{ZZMatrix})::Nothing
@@ -1931,7 +2085,7 @@ function mul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::UInt)
   return z
 end
 
-function mul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::ZZRingElemOrPtr)
+function mul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_mat_scalar_mul_fmpz(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::Ref{ZZRingElem})::Nothing
   return z
 end
@@ -1939,7 +2093,7 @@ end
 mul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::Integer) = mul!(z, a, flintify(b))
 mul!(z::ZZMatrixOrPtr, a::IntegerUnionOrPtr, b::ZZMatrixOrPtr) = mul!(z, b, a)
 
-function addmul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::ZZRingElemOrPtr)
+function addmul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_mat_scalar_addmul_fmpz(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::Ref{ZZRingElem})::Nothing
   return z
 end
@@ -1961,7 +2115,7 @@ addmul!(z::ZZMatrixOrPtr, a::IntegerUnionOrPtr, b::ZZMatrixOrPtr) = addmul!(z, b
 addmul!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::IntegerUnionOrPtr, ::ZZMatrixOrPtr) = addmul!(z, x, y)
 addmul!(z::ZZMatrixOrPtr, x::IntegerUnionOrPtr, y::ZZMatrixOrPtr, ::ZZMatrixOrPtr) = addmul!(z, x, y)
 
-function submul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::ZZRingElemOrPtr)
+function submul!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr, b::TypeOrPtr{ZZRingElem})
   @ccall libflint.fmpz_mat_scalar_submul_fmpz(z::Ref{ZZMatrix}, a::Ref{ZZMatrix}, b::Ref{ZZRingElem})::Nothing
   return z
 end
@@ -2193,10 +2347,15 @@ function map_entries(R::ZZModRing, A::ZZMatrix)
   return N
 end
 
+function map_entries(P::QQField, x::ZZMatrix)
+  z = zero_matrix(QQ, nrows(x), ncols(x))
+  return set!(z, x)
+end
+
 change_base_ring(R::zzModRing, A::ZZMatrix) = map_entries(R, A)
 change_base_ring(R::fpMatrix, A::ZZMatrix) = map_entries(R, A)
 change_base_ring(R::ZZModRing, A::ZZMatrix) = map_entries(R, A)
-
+change_base_ring(R::QQField, A::ZZMatrix) = map_entries(R, A)
 
 ###############################################################################
 #

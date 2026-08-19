@@ -497,121 +497,38 @@ end
 #
 ###############################################################################
 
-function evaluate(a::fqPolyRepMPolyRingElem, b::Vector{fqPolyRepFieldElem})
-  length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
-  z = base_ring(parent(a))()
-  @ccall libflint.fq_nmod_mpoly_evaluate_all_fq_nmod(z::Ref{fqPolyRepFieldElem}, a::Ref{fqPolyRepMPolyRingElem}, b::Ptr{Ref{fqPolyRepFieldElem}}, parent(a)::Ref{fqPolyRepMPolyRing})::Nothing
+function evaluate(a::fqPolyRepMPolyRingElem, vals::Vector{fqPolyRepFieldElem})
+  R = parent(a)
+  @req length(vals) == nvars(R) "Number of variables does not match number of values"
+  z = base_ring(R)()
+  @ccall libflint.fq_nmod_mpoly_evaluate_all_fq_nmod(z::Ref{fqPolyRepFieldElem}, a::Ref{fqPolyRepMPolyRingElem}, vals::Ptr{Ref{fqPolyRepFieldElem}}, R::Ref{fqPolyRepMPolyRing})::Nothing
   return z
 end
 
-function evaluate(a::fqPolyRepMPolyRingElem, b::Vector{Int})
-  length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
-  R = base_ring(parent(a))
-  b2 = [R(d) for d in b]
-  return evaluate(a, b2)
-end
+evaluate(a::fqPolyRepMPolyRingElem, vals::Vector{<:IntegerUnion}) = evaluate(a, coefficient_ring(a).(vals))
 
-function evaluate(a::fqPolyRepMPolyRingElem, b::Vector{T}) where T <: Integer
-  length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
-  R = base_ring(parent(a))
-  b2 = [R(d) for d in b]
-  return evaluate(a, b2)
-end
-
-function evaluate(a::fqPolyRepMPolyRingElem, b::Vector{ZZRingElem})
-  length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
-  R = base_ring(parent(a))
-  b2 = [R(d) for d in b]
-  return evaluate(a, b2)
-end
-
-function evaluate(a::fqPolyRepMPolyRingElem, b::Vector{UInt})
-  length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
-  R = base_ring(parent(a))
-  b2 = [R(d) for d in b]
-  return evaluate(a, b2)
-end
-
-function (a::fqPolyRepMPolyRingElem)()
-  error("need at least one value")
-end
-
-function (a::fqPolyRepMPolyRingElem)(vals::fqPolyRepFieldElem...)
-  length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
-  return evaluate(a, [vals...])
-end
-
-function (a::fqPolyRepMPolyRingElem)(vals::Integer...)
-  length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
-  return evaluate(a, [vals...])
-end
-
-function (a::fqPolyRepMPolyRingElem)(vals::NCRingElement...)
-  length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
-  R = base_ring(a)
-  # The best we can do here is to cache previously used powers of the values
-  # being substituted, as we cannot assume anything about the relative
-  # performance of powering vs multiplication. The function should not try
-  # to optimise computing new powers in any way.
-  # Note that this function accepts values in a non-commutative ring, so operations
-  # must be done in a certain order.
-  powers = [Dict{Int, Any}() for i in 1:length(vals)]
-  # First work out types of products
-  r = R()
-  c = zero(R)
-  U = Vector{Any}(undef, length(vals))
-  for j = 1:length(vals)
-    W = typeof(vals[j])
-    if ((W <: Integer && W != BigInt) ||
-        (W <: Rational && W != Rational{BigInt}))
-      c = c*zero(W)
-      U[j] = parent(c)
-    else
-      U[j] = parent(vals[j])
-      c = c*zero(parent(vals[j]))
-    end
-  end
-  for i = 1:length(a)
-    v = exponent_vector(a, i)
-    t = coeff(a, i)
-    for j = 1:length(vals)
-      exp = v[j]
-      if !haskey(powers[j], exp)
-        powers[j][exp] = (U[j](vals[j]))^exp
-      end
-      t = t*powers[j][exp]
-    end
-    r += t
-  end
-  return r
-end
-
-function evaluate(a::fqPolyRepMPolyRingElem, bs::Vector{fqPolyRepMPolyRingElem})
-  @req allequal(map(parent, bs)) "parents do not match"
+function evaluate(a::fqPolyRepMPolyRingElem, vals::Vector{fqPolyRepMPolyRingElem})
+  @req !isempty(vals) "No values supplied"
   R = parent(a)
-  S = parent(bs[1])
-  @assert base_ring(R) === base_ring(S)
-
-  length(bs) != nvars(R) &&
-  error("Number of variables does not match number of values")
+  @req length(vals) == nvars(R) "Number of variables does not match number of values"
+  @req allequal(map(parent, vals)) "Parents do not match"
+  S = parent(vals[1])
 
   c = S()
-  fl = @ccall libflint.fq_nmod_mpoly_compose_fq_nmod_mpoly(c::Ref{fqPolyRepMPolyRingElem}, a::Ref{fqPolyRepMPolyRingElem}, bs::Ptr{Ref{fqPolyRepMPolyRingElem}}, R::Ref{fqPolyRepMPolyRing}, S::Ref{fqPolyRepMPolyRing})::Cint
+  fl = @ccall libflint.fq_nmod_mpoly_compose_fq_nmod_mpoly(c::Ref{fqPolyRepMPolyRingElem}, a::Ref{fqPolyRepMPolyRingElem}, vals::Ptr{Ref{fqPolyRepMPolyRingElem}}, R::Ref{fqPolyRepMPolyRing}, S::Ref{fqPolyRepMPolyRing})::Cint
   fl == 0 && error("Something wrong in evaluation.")
   return c
 end
 
-function evaluate(a::fqPolyRepMPolyRingElem, bs::Vector{fqPolyRepPolyRingElem})
-  @req allequal(map(parent, bs)) "parents do not match"
+function evaluate(a::fqPolyRepMPolyRingElem, vals::Vector{fqPolyRepPolyRingElem})
+  @req !isempty(vals) "No values supplied"
   R = parent(a)
-  S = parent(bs[1])
-  @assert base_ring(R) === base_ring(S)
-
-  length(bs) != nvars(R) &&
-  error("Number of variables does not match number of values")
+  @req length(vals) == nvars(R) "Number of variables does not match number of values"
+  @req allequal(map(parent, vals)) "Parents do not match"
+  S = parent(vals[1])
 
   c = S()
-  fl = @ccall libflint.fq_nmod_mpoly_compose_fq_nmod_poly(c::Ref{fqPolyRepPolyRingElem}, a::Ref{fqPolyRepMPolyRingElem}, bs::Ptr{Ref{fqPolyRepPolyRingElem}}, R::Ref{fqPolyRepMPolyRing})::Cint
+  fl = @ccall libflint.fq_nmod_mpoly_compose_fq_nmod_poly(c::Ref{fqPolyRepPolyRingElem}, a::Ref{fqPolyRepMPolyRingElem}, vals::Ptr{Ref{fqPolyRepPolyRingElem}}, R::Ref{fqPolyRepMPolyRing})::Cint
   fl == 0 && error("Something wrong in evaluation.")
   return c
 end

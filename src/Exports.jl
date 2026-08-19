@@ -113,6 +113,7 @@ export continued_fraction
 export continued_fraction_with_matrix
 export convergents
 export convert
+export convolution
 export cos
 export cos_integral
 export cos_minpoly
@@ -159,6 +160,7 @@ export eigenvalues_with_multiplicities
 export eisenstein_g
 export elem_to_mat_row!
 export elem_type
+export elementary_divisors
 export elliptic_e
 export elliptic_k
 export embed
@@ -379,6 +381,7 @@ export is_unit
 export is_unknown
 export is_unimodular
 export is_upper_triangular
+export is_probably_zero_det
 export is_zero_entry
 export is_zero_row
 export isequal
@@ -493,6 +496,8 @@ export prevpow2
 export prime
 export prime_divisors
 export prime_field
+export primes_set
+export PrimesSet
 export primorial
 export prod_diagonal
 export pseudo_inv
@@ -558,6 +563,7 @@ export round!
 export rref
 export rref!
 export rsqrt
+export set!
 export set_exponent_vector!
 export set_printing_mode
 export setbit!

@@ -195,9 +195,9 @@ end
 
 for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (://, "acb_div"), (:-,"acb_sub"), (:^,"acb_pow"))
   @eval begin
-    function ($s)(x::ComplexFieldElem, y::ComplexFieldElem, prec::Int = precision(Balls))
+    function ($s)(x::ComplexFieldElem, y::ComplexFieldElem; precision::Int = precision(Balls))
       z = ComplexFieldElem()
-      @ccall libflint.$f(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{ComplexFieldElem}, prec::Int)::Nothing
+      @ccall libflint.$f(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{ComplexFieldElem}, precision::Int)::Nothing
       return z
     end
   end
@@ -206,27 +206,27 @@ end
 for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
   @eval begin
 
-    function ($f)(x::ComplexFieldElem, y::UInt, prec::Int = precision(Balls))
+    function ($f)(x::ComplexFieldElem, y::UInt; precision::Int = precision(Balls))
       z = ComplexFieldElem()
-      @ccall libflint.$("acb_"*s*"_ui")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::UInt, prec::Int)::Nothing
+      @ccall libflint.$("acb_"*s*"_ui")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::UInt, precision::Int)::Nothing
       return z
     end
 
-    function ($f)(x::ComplexFieldElem, y::Int, prec::Int = precision(Balls))
+    function ($f)(x::ComplexFieldElem, y::Int; precision::Int = precision(Balls))
       z = ComplexFieldElem()
-      @ccall libflint.$("acb_"*s*"_si")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Int, prec::Int)::Nothing
+      @ccall libflint.$("acb_"*s*"_si")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Int, precision::Int)::Nothing
       return z
     end
 
-    function ($f)(x::ComplexFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
+    function ($f)(x::ComplexFieldElem, y::ZZRingElem; precision::Int = precision(Balls))
       z = ComplexFieldElem()
-      @ccall libflint.$("acb_"*s*"_fmpz")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{ZZRingElem}, prec::Int)::Nothing
+      @ccall libflint.$("acb_"*s*"_fmpz")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{ZZRingElem}, precision::Int)::Nothing
       return z
     end
 
-    function ($f)(x::ComplexFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
+    function ($f)(x::ComplexFieldElem, y::RealFieldElem; precision::Int = precision(Balls))
       z = ComplexFieldElem()
-      @ccall libflint.$("acb_"*s*"_arb")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{RealFieldElem}, prec::Int)::Nothing
+      @ccall libflint.$("acb_"*s*"_arb")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{RealFieldElem}, precision::Int)::Nothing
       return z
     end
   end
@@ -1555,22 +1555,22 @@ end
 #
 ################################################################################
 
-function zero!(z::ComplexFieldElemOrPtr)
+function zero!(z::TypeOrPtr{ComplexFieldElem})
   @ccall libflint.acb_zero(z::Ref{ComplexFieldElem})::Nothing
   return z
 end
 
-function one!(z::ComplexFieldElemOrPtr)
+function one!(z::TypeOrPtr{ComplexFieldElem})
   @ccall libflint.acb_one(z::Ref{ComplexFieldElem})::Nothing
   return z
 end
 
-function onei!(z::ComplexFieldElemOrPtr)
+function onei!(z::TypeOrPtr{ComplexFieldElem})
   @ccall libflint.acb_onei(z::Ref{ComplexFieldElem})::Nothing
   return z
 end
 
-function neg!(z::ComplexFieldElemOrPtr, a::ComplexFieldElemOrPtr)
+function neg!(z::TypeOrPtr{ComplexFieldElem}, a::TypeOrPtr{ComplexFieldElem})
   @ccall libflint.acb_neg(z::Ref{ComplexFieldElem}, a::Ref{ComplexFieldElem})::Nothing
   return z
 end
@@ -1601,127 +1601,127 @@ end
 #
 ################################################################################
 
-_real_ptr(x::ComplexFieldElemOrPtr) = @ccall libflint.acb_real_ptr(x::Ref{ComplexFieldElem})::Ptr{RealFieldElem}
-_imag_ptr(x::ComplexFieldElemOrPtr) = @ccall libflint.acb_imag_ptr(x::Ref{ComplexFieldElem})::Ptr{RealFieldElem}
+_real_ptr(x::TypeOrPtr{ComplexFieldElem}) = @ccall libflint.acb_real_ptr(x::Ref{ComplexFieldElem})::Ptr{RealFieldElem}
+_imag_ptr(x::TypeOrPtr{ComplexFieldElem}) = @ccall libflint.acb_imag_ptr(x::Ref{ComplexFieldElem})::Ptr{RealFieldElem}
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::Int)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::Int)
   @ccall libflint.acb_set_si(x::Ref{ComplexFieldElem}, y::Int)::Nothing
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::UInt)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::UInt)
   @ccall libflint.acb_set_ui(x::Ref{ComplexFieldElem}, y::UInt)::Nothing
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::Float64)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::Float64)
   @ccall libflint.acb_set_d(x::Ref{ComplexFieldElem}, y::Float64)::Nothing
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::Union{Int,UInt,Float64}, p::Int)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::Union{Int,UInt,Float64}, p::Int)
   _acb_set(x, y)
   @ccall libflint.acb_set_round(x::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, p::Int)::Nothing
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::ZZRingElem)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::ZZRingElem)
   @ccall libflint.acb_set_fmpz(x::Ref{ComplexFieldElem}, y::Ref{ZZRingElem})::Nothing
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::ZZRingElem, p::Int)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::ZZRingElem, p::Int)
   @ccall libflint.acb_set_round_fmpz(x::Ref{ComplexFieldElem}, y::Ref{ZZRingElem}, p::Int)::Nothing
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::QQFieldElem, p::Int)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::QQFieldElem, p::Int)
   @ccall libflint.acb_set_fmpq(x::Ref{ComplexFieldElem}, y::Ref{QQFieldElem}, p::Int)::Nothing
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::RealFieldElem)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::RealFieldElem)
   @ccall libflint.acb_set_arb(x::Ref{ComplexFieldElem}, y::Ref{RealFieldElem})::Nothing
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::RealFieldElem, p::Int)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::RealFieldElem, p::Int)
   _acb_set(x, y)
   @ccall libflint.acb_set_round(x::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, p::Int)::Nothing
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::ComplexFieldElemOrPtr)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::TypeOrPtr{ComplexFieldElem})
   @ccall libflint.acb_set(x::Ref{ComplexFieldElem}, y::Ref{ComplexFieldElem})::Nothing
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::Ptr{acb_struct})
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::Ptr{acb_struct})
   @ccall libflint.acb_set(x::Ref{ComplexFieldElem}, y::Ptr{acb_struct})::Nothing
 end
 
-function _acb_set(x::Ptr{acb_struct}, y::ComplexFieldElemOrPtr)
+function _acb_set(x::Ptr{acb_struct}, y::TypeOrPtr{ComplexFieldElem})
   @ccall libflint.acb_set(x::Ptr{acb_struct}, y::Ref{ComplexFieldElem})::Nothing
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::ComplexFieldElemOrPtr, p::Int)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::TypeOrPtr{ComplexFieldElem}, p::Int)
   @ccall libflint.acb_set_round(x::Ref{ComplexFieldElem}, y::Ref{ComplexFieldElem}, p::Int)::Nothing
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::AbstractString, p::Int)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::AbstractString, p::Int)
   r = _real_ptr(x)
   _arb_set(r, y, p)
   i = _imag_ptr(x)
   zero!(i)
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::BigFloat)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::BigFloat)
   r = _real_ptr(x)
   _arb_set(r, y)
   i = _imag_ptr(x)
   zero!(i)
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::BigFloat, p::Int)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::BigFloat, p::Int)
   r = _real_ptr(x)
   _arb_set(r, y, p)
   i = _imag_ptr(x)
   zero!(i)
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, yz::Tuple{Int,Int}, p::Int)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, yz::Tuple{Int,Int}, p::Int)
   @ccall libflint.acb_set_si_si(x::Ref{ComplexFieldElem}, yz[1]::Int, yz[2]::Int)::Nothing
   @ccall libflint.acb_set_round(x::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, p::Int)::Nothing
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, yz::Tuple{RealFieldElem,RealFieldElem})
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, yz::Tuple{RealFieldElem,RealFieldElem})
   @ccall libflint.acb_set_arb_arb(x::Ref{ComplexFieldElem}, yz[1]::Ref{RealFieldElem}, yz[2]::Ref{RealFieldElem})::Nothing
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, yz::Tuple{RealFieldElem,RealFieldElem}, p::Int)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, yz::Tuple{RealFieldElem,RealFieldElem}, p::Int)
   _acb_set(x, yz)
   @ccall libflint.acb_set_round(x::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, p::Int)::Nothing
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, yz::Tuple{QQFieldElem,QQFieldElem}, p::Int)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, yz::Tuple{QQFieldElem,QQFieldElem}, p::Int)
   r = _real_ptr(x)
   _arb_set(r, yz[1], p)
   i = _imag_ptr(x)
   _arb_set(i, yz[2], p)
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, yz::Tuple{AbstractString,AbstractString}, p::Int)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, yz::Tuple{AbstractString,AbstractString}, p::Int)
   r = _real_ptr(x)
   _arb_set(r, yz[1], p)
   i = _imag_ptr(x)
   _arb_set(i, yz[2], p)
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::Real, p::Int)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::Real, p::Int)
   r = _real_ptr(x)
   _arb_set(r, y, p)
   i = _imag_ptr(x)
   zero!(i)
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, y::Complex, p::Int)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::Complex, p::Int)
   r = _real_ptr(x)
   _arb_set(r, real(y), p)
   i = _imag_ptr(x)
   _arb_set(i, imag(y), p)
 end
 
-function _acb_set(x::ComplexFieldElemOrPtr, yz::Tuple{IntegerUnion,IntegerUnion}, p::Int)
+function _acb_set(x::TypeOrPtr{ComplexFieldElem}, yz::Tuple{IntegerUnion,IntegerUnion}, p::Int)
   r = _real_ptr(x)
   _arb_set(r, yz[1], p)
   i = _imag_ptr(x)

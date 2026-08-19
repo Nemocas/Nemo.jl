@@ -773,3 +773,40 @@ function lift(R::ZZPolyRing, f::FqPolyRingElem)
     return z
   end
 end
+
+################################################################################
+#
+#  QadicField from FqPolyRingElem
+#
+################################################################################
+
+function QadicField(f::FqPolyRingElem, prec::Int = 64, var::String = "a"; cached::Bool = true, check::Bool = true, base_field::PadicField = PadicField(characteristic(base_ring(f)), prec, cached = cached))
+  K = base_ring(f)
+  absolute_degree(K) == 1 || throw(ArgumentError("base ring of polynomial must be a prime field"))
+
+  z = get_cached!(QadicBaseFqPol, (base_field, f), cached) do
+    ctx_type = _fq_default_ctx_type(K)
+    if ctx_type == _FQ_DEFAULT_NMOD
+      _K = _get_raw_type(fpField, K)
+    else
+      @assert ctx_type == _FQ_DEFAULT_FMPZ_NMOD
+      _K = _get_raw_type(FpField, K)
+    end
+    ff = map_coefficients(c -> _K(lift(ZZ, c)), f; cached = false)
+    return QadicField(ff, prec, var; cached = false, check = check, base_field = base_field)[1]
+  end
+  z.prec_max = prec
+  set_attribute!(z, :base_field, base_field)
+
+  return z, gen(z)
+end
+
+const QadicBaseFqPol = CacheDictType{Tuple{PadicField, FqPolyRingElem}, QadicField}()
+
+function qadic_field(f::FqPolyRingElem, var::String = "a"; precision::Int=64, cached::Bool=true, check::Bool=true)
+  return QadicField(f, precision, var; cached = cached, check = check)
+end
+
+function unramified_extension(K::PadicField, f::FqPolyRingElem, var::String = "a"; precision::Int=precision(K), cached::Bool = true, check::Bool = true)
+  return QadicField(f, precision, var; cached = cached, check = check, base_field = K)
+end

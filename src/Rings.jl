@@ -54,6 +54,8 @@ include("flint/fmpz_mod_abs_series.jl")
 
 include("flint/fmpz_mat.jl")
 
+include("flint/fmpz_poly_mat.jl")
+
 include("flint/fmpq_mat.jl")
 
 include("flint/nmod_mat.jl")

@@ -407,6 +407,20 @@ function det(x::RealMatrix, prec::Int = precision(Balls))
   return z
 end
 
+function _det_lu(x::RealMatrix, prec::Int = precision(Balls))
+  ncols(x) != nrows(x) && error("Matrix must be square")
+  z = base_ring(x)()
+  @ccall libflint.arb_mat_det_lu(z::Ref{RealFieldElem}, x::Ref{RealMatrix}, prec::Int)::Nothing
+  return z
+end
+
+function _det_precond(x::RealMatrix, prec::Int = precision(Balls))
+  ncols(x) != nrows(x) && error("Matrix must be square")
+  z = base_ring(x)()
+  @ccall libflint.arb_mat_det_precond(z::Ref{RealFieldElem}, x::Ref{RealMatrix}, prec::Int)::Nothing
+  return z
+end
+
 ################################################################################
 #
 #   Exponential function

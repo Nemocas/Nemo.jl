@@ -544,122 +544,38 @@ for (etype, rtype, ftype, ctype, utype) in (
     #
     ###############################################################################
 
-    function evaluate(a::($etype), b::Vector{$ctype})
-      length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
-      b2 = [d.data for d in b]
-      z = @ccall libflint.nmod_mpoly_evaluate_all_ui(a::Ref{($etype)}, b2::Ptr{UInt}, parent(a)::Ref{($rtype)})::UInt
-      return base_ring(parent(a))(z)
-    end
-
-    function evaluate(a::($etype), b::Vector{Int})
-      length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
-      R = base_ring(parent(a))
-      b2 = [R(d) for d in b]
-      return evaluate(a, b2)
-    end
-
-    function evaluate(a::($etype), b::Vector{T}) where T <: Integer
-      length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
-      R = base_ring(parent(a))
-      b2 = [R(d) for d in b]
-      return evaluate(a, b2)
-    end
-
-    function evaluate(a::($etype), b::Vector{ZZRingElem})
-      length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
-      R = base_ring(parent(a))
-      b2 = [R(d) for d in b]
-      return evaluate(a, b2)
-    end
-
-    function evaluate(a::($etype), b::Vector{UInt})
-      length(b) != nvars(parent(a)) && error("Vector size incorrect in evaluate")
-      R = base_ring(parent(a))
-      b2 = [R(d) for d in b]
-      return evaluate(a, b2)
-    end
-
-    function (a::($etype))()
-      error("need at least one value")
-    end
-
-    function (a::($etype))(vals::zzModRingElem...)
-      length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
-      return evaluate(a, [vals...])
-    end
-
-    function (a::($etype))(vals::Integer...)
-      length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
-      return evaluate(a, [vals...])
-    end
-
-    function (a::($etype))(vals::NCRingElement...)
-      length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
-      R = base_ring(a)
-      # The best we can do here is to cache previously used powers of the values
-      # being substituted, as we cannot assume anything about the relative
-      # performance of powering vs multiplication. The function should not try
-      # to optimise computing new powers in any way.
-      # Note that this function accepts values in a non-commutative ring, so operations
-      # must be done in a certain order.
-      powers = [Dict{Int, Any}() for i in 1:length(vals)]
-      # First work out types of products
-      r = R()
-      c = zero(R)
-      U = Vector{Any}(undef, length(vals))
-      for j = 1:length(vals)
-        W = typeof(vals[j])
-        if ((W <: Integer && W != BigInt) ||
-            (W <: Rational && W != Rational{BigInt}))
-          c = c*zero(W)
-          U[j] = parent(c)
-        else
-          U[j] = parent(vals[j])
-          c = c*zero(parent(vals[j]))
-        end
-      end
-      for i = 1:length(a)
-        v = exponent_vector(a, i)
-        t = coeff(a, i)
-        for j = 1:length(vals)
-          exp = v[j]
-          if !haskey(powers[j], exp)
-            powers[j][exp] = (U[j](vals[j]))^exp
-          end
-          t = t*powers[j][exp]
-        end
-        r += t
-      end
-      return r
-    end
-
-    function evaluate(a::$(etype), bs::Vector{$etype})
-      @req allequal(map(parent, bs)) "parents do not match"
+    function evaluate(a::($etype), vals::Vector{$ctype})
       R = parent(a)
-      S = parent(bs[1])
-      @assert base_ring(R) === base_ring(S)
+      @req length(vals) == nvars(R) "Number of variables does not match number of values"
+      vals2 = [val.data for val in vals]
+      z = @ccall libflint.nmod_mpoly_evaluate_all_ui(a::Ref{($etype)}, vals2::Ptr{UInt}, R::Ref{($rtype)})::UInt
+      return base_ring(R)(z)
+    end
 
-      length(bs) != nvars(R) &&
-      error("Number of variables does not match number of values")
+    evaluate(a::($etype), vals::Vector{<:IntegerUnion}) = evaluate(a, coefficient_ring(a).(vals))
+
+    function evaluate(a::$(etype), vals::Vector{$etype})
+      @req !isempty(vals) "No values supplied"
+      R = parent(a)
+      @req length(vals) == nvars(R) "Number of variables does not match number of values"
+      @req allequal(map(parent, vals)) "Parents do not match"
+      S = parent(vals[1])
 
       c = S()
-      fl = @ccall libflint.nmod_mpoly_compose_nmod_mpoly(c::Ref{$etype}, a::Ref{$etype}, bs::Ptr{Ref{$etype}}, R::Ref{$rtype}, S::Ref{$rtype})::Cint
+      fl = @ccall libflint.nmod_mpoly_compose_nmod_mpoly(c::Ref{$etype}, a::Ref{$etype}, vals::Ptr{Ref{$etype}}, R::Ref{$rtype}, S::Ref{$rtype})::Cint
       fl == 0 && error("Something wrong in evaluation.")
       return c
     end
 
-
-    function evaluate(a::($etype), bs::Vector{$utype})
-      @req allequal(map(parent, bs)) "parents do not match"
+    function evaluate(a::($etype), vals::Vector{$utype})
+      @req !isempty(vals) "No values supplied"
       R = parent(a)
-      S = parent(bs[1])
-      @assert base_ring(R) === base_ring(S)
-
-      length(bs) != nvars(R) &&
-      error("Number of variables does not match number of values")
+      @req length(vals) == nvars(R) "Number of variables does not match number of values"
+      @req allequal(map(parent, vals)) "Parents do not match"
+      S = parent(vals[1])
 
       c = S()
-      fl = @ccall libflint.nmod_mpoly_compose_nmod_poly(c::Ref{$utype}, a::Ref{$etype}, bs::Ptr{Ref{$utype}}, R::Ref{$rtype})::Cint
+      fl = @ccall libflint.nmod_mpoly_compose_nmod_poly(c::Ref{$utype}, a::Ref{$etype}, vals::Ptr{Ref{$utype}}, R::Ref{$rtype})::Cint
       fl == 0 && error("Something wrong in evaluation.")
       return c
     end

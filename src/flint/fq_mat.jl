@@ -39,7 +39,7 @@ end
   return z
 end
 
-@inline function setindex!(a::FqPolyRepMatrix, u::FqPolyRepFieldElemOrPtr, i::Int, j::Int)
+@inline function setindex!(a::FqPolyRepMatrix, u::TypeOrPtr{FqPolyRepFieldElem}, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   @ccall libflint.fq_mat_entry_set(
     a::Ref{FqPolyRepMatrix}, (i-1)::Int, (j-1)::Int, u::Ref{FqPolyRepFieldElem}, base_ring(a)::Ref{FqPolyRepField}

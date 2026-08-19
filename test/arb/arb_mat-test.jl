@@ -354,6 +354,14 @@ end
   d = det(A)
 
   @test contains(d, 24)
+
+  d_lu = Nemo._det_lu(A)
+
+  @test contains(d_lu, 24)
+
+  d_pre = Nemo._det_precond(A)
+
+  @test contains(d_pre, 24)
 end
 
 @testset "ArbMatrix.exp" begin
