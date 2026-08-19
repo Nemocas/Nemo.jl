@@ -445,6 +445,7 @@ function __init__()
   @ccall libflint.flint_set_throw(@cfunction(flint_throw, Nothing, (FlintExceptionType, Cstring, Ptr{Cvoid}))::Ptr{Nothing})::Nothing
 
   add_verbosity_scope(:UnimodVerif)
+  add_verbosity_scope(:det)
 
   if AbstractAlgebra.should_show_banner() && get(ENV, "NEMO_PRINT_BANNER", "true") != "false"
     show_banner()
@@ -493,6 +494,14 @@ const CacheDictType = AbstractAlgebra.WeakValueDict
 
 ###############################################################################
 #
+#   Union type for ccalls
+#
+###############################################################################
+
+const TypeOrPtr{T} = Union{T, Ref{T}, Ptr{T}} where T
+
+###############################################################################
+#
 #   Load Nemo Rings/Fields/etc
 #
 ###############################################################################
@@ -523,6 +532,8 @@ include("ZZMatrix-linalg.jl")
 
 include("HeckeMiscFiniteField.jl")
 include("HeckeMoreStuff.jl")
+
+include("Primes.jl")
 
 include("UnivPoly.jl")
 

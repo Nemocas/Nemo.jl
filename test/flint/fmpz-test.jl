@@ -930,6 +930,10 @@ end
   @test digits(a) == digits(BigInt(a))
   @test digits(a, base = 17) == digits(BigInt(a), base = 17)
   @test digits(a, base = 5, pad = 50) == digits(BigInt(a), base = 5, pad = 50)
+
+  # Nemo PR #2325
+  p = -primorial(ZZ(307))
+  @test maximum(digits(p; base=ZZ(10))) <= 0
 end
 
 @testset "ZZRingElem.string_io" begin

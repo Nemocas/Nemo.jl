@@ -45,10 +45,10 @@ Morphism of finite fields
   to finite field of degree 4 and characteristic 19
 
 julia> y = f(x2)
-6*x4^3 + 5*x4^2 + 9*x4 + 17
+13*x4^3 + 14*x4^2 + 10*x4 + 3
 
 julia> z = k4(x2)
-6*x4^3 + 5*x4^2 + 9*x4 + 17
+13*x4^3 + 14*x4^2 + 10*x4 + 3
 ```
 
 ### Computing the preimage of an embedding

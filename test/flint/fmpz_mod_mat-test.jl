@@ -307,6 +307,42 @@ end
   @test d == matrix_space(Z17, 4, 4)([11 11 8 7; 11 0 14 6; 8 14 14 5; 7 6 5 5])
 end
 
+@testset "ZZModMatrix.mul!" begin
+  # Large modulus to exercise the fmpz_mod path with values that wrap.
+  R, = residue_ring(ZZ, ZZ(7)^30)
+
+  a = matrix(R, [1 2; 3 4])
+
+  # scalar mul! reaches the FLINT-backed specialization for every integer scalar
+  # type; only the returned value is required to be correct.
+  for s in (3, -3, big(3), ZZ(3), UInt(3), R(3))
+    c = zero(a)
+    c = mul!(c, a, s)
+    @test c == a * s
+    c = zero(a)
+    c = mul!(c, s, a)
+    @test c == a * s
+  end
+
+  # matrix * vector and vector * matrix over Vector{ZZRingElem} use the
+  # FLINT-backed fmpz_mod_mat_mul_fmpz_vec_ptr specialization; only the returned
+  # value is required to be correct.
+  m = matrix(R, [1 2 3; 4 5 6])
+  z = [ZZ(0), ZZ(0)]
+  z = mul!(z, m, [ZZ(1), ZZ(2), ZZ(3)])
+  @test z == ZZRingElem[14, 32]
+  z = [ZZ(0), ZZ(0), ZZ(0)]
+  z = mul!(z, [ZZ(1), ZZ(2)], m)
+  @test z == ZZRingElem[9, 12, 15]
+
+  # reduction modulo n actually happens on the vector product
+  S, = residue_ring(ZZ, ZZ(7))
+  ms = matrix(S, [1 2 3; 4 5 6])
+  zs = [ZZ(0), ZZ(0)]
+  zs = mul!(zs, ms, [ZZ(1), ZZ(2), ZZ(3)])
+  @test zs == ZZRingElem[0, 4]   # [14, 32] mod 7
+end
+
 @testset "ZZModMatrix.row_col_swapping" begin
   R, = residue_ring(ZZ, ZZ(17))
 

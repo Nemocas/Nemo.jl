@@ -129,6 +129,10 @@ function show(io::IO, a::ZZModRingElem)
   print(io, a.data)
 end
 
+function Base.alignment(io::IO, a::ZZModRingElem)
+  return (Base.alignment_from_show(io, a), 0)
+end
+
 pretty_lt(x::ZZModRingElem, y::ZZModRingElem) = isless(x.data, y.data)
 pretty_eq(x::ZZModRingElem, y::ZZModRingElem) = (x == y)
 
@@ -416,7 +420,7 @@ function pow!(z::ZZModRingElem, x::ZZModRingElem, n::Integer)
   return z
 end
 
-function pow!(z::ZZModRingElem, x::ZZModRingElem, n::ZZRingElemOrPtr)
+function pow!(z::ZZModRingElem, x::ZZModRingElem, n::TypeOrPtr{ZZRingElem})
   R = parent(z)
   ok = Bool(@ccall libflint.fmpz_mod_pow_fmpz(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, n::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Cint)
   if !ok

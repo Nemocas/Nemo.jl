@@ -111,8 +111,8 @@ julia> r = roots(n);
 
 julia> sort(r; by=x->(real(x), imag(x))) # sort roots to make printing consistent
 2-element Vector{ComplexFieldElem}:
- [-1.000 +/- 1.01e-4] + [-1.414 +/- 3.14e-4]*im
- [-1.000 +/- 1.01e-4] + [1.414 +/- 3.14e-4]*im
+ [-1.000 +/- 2.01e-4] + [-1.414 +/- 4.14e-4]*im
+ [-1.000 +/- 2.01e-4] + [1.414 +/- 4.14e-4]*im
 
 julia> p = y^7 - 1
 y^7 - 1.0000000000000000000
@@ -121,8 +121,8 @@ julia> r = roots(n, isolate_real = true);
 
 julia> sort(r; by=x->(real(x), imag(x))) # sort roots to make printing consistent
 2-element Vector{ComplexFieldElem}:
- [-1.000 +/- 1.01e-4] + [-1.414 +/- 3.14e-4]*im
- [-1.000 +/- 1.01e-4] + [1.414 +/- 3.14e-4]*im
+ [-1.000 +/- 2.01e-4] + [-1.414 +/- 4.14e-4]*im
+ [-1.000 +/- 2.01e-4] + [1.414 +/- 4.14e-4]*im
 ```
 
 ### Construction from roots

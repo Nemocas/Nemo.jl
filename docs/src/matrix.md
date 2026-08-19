@@ -4,17 +4,17 @@ CollapsedDocStrings = true
 DocTestSetup = Nemo.doctestsetup()
 ```
 
-# Matrices
+# Nemo matrices
 
-Nemo allow the creation of dense matrices over any computable ring $R$. There
+Dense matrices can be created over any computable ring R. There
 are two different kinds of implementation: a generic one for the case where no
 specific implementation exists (provided by AbstractAlgebra.jl), and efficient
 implementations of matrices over numerous specific rings, usually provided by C/C++
 libraries.
 
-The following table shows each of the matrix types available in Nemo, the
-base ring $R$, and the Julia/Nemo types for that kind of matrix (the type
-information is mainly of concern to developers).
+The following table shows the available matrix types, together with their
+base ring R and the corresponding Julia types (the type information is
+mainly of concern to developers).
 
 Base ring                             | Library             | Element type        | Parent type
 --------------------------------------|---------------------|---------------------|----------------------
@@ -35,8 +35,9 @@ The dimensions and base ring $R$ of a generic matrix are stored in its parent
 object.
 
 All matrix element types belong to the abstract type `MatElem` and all of
-the matrix space types belong to the abstract type `MatSpace`. This enables
-one to write generic functions that can accept any Nemo matrix type.
+the matrix space types belong to the abstract type `MatSpace`. This enables one
+to write generic functions that can accept any matrix type
+described on this page.
 
 Note that the preferred way to create matrices is not to use the type
 constructors but to use the `matrix` function, see also the
@@ -45,15 +46,15 @@ section of the AbstractAlgebra manual.
 
 ## Matrix functionality
 
-All matrix spaces in Nemo provide the matrix functionality of AbstractAlgebra:
+All matrix spaces described on this page provide the generic matrix
+functionality of AbstractAlgebra:
 
 <https://nemocas.github.io/AbstractAlgebra.jl/stable/matrix>
 
-Some of this functionality is provided in Nemo by C libraries, such as FLINT,
-for various specific rings.
+Some of this functionality is implemented by underlying C libraries such as FLINT.
 
-In the following, we list the functionality which is provided in addition to the generic
-matrix functionality, for specific rings in Nemo.
+The following sections describe functionality provided in addition to the
+generic matrix functionality for specific rings.
 
 ### Comparison operators
 

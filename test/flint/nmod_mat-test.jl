@@ -257,6 +257,14 @@ end
   @test a[1,2] == Z10(5)
   @test_throws BoundsError a[-2,2] = 5
 
+  a[1,2] = -17
+
+  @test a[1,2] == Z10(-17)
+
+  a[1,2] = typemax(Int)
+
+  @test a[1,2] == Z10(typemax(Int))
+
   @test a != b
 
   d = one(R)
@@ -425,6 +433,23 @@ end
   @test dd == R([ 2 4 6 2; 6 4 2 4; 2 6 4 0])
 
   @test_throws ErrorException Z2(1)*a
+end
+
+@testset "zzModMatrix.scalar_mul!" begin
+  R, = residue_ring(ZZ, 101)
+
+  a = matrix(R, [1 2; 3 4])
+
+  # scalar mul! reaches the FLINT-backed specialization for every integer scalar
+  # type; only the returned value is required to be correct.
+  for s in (3, -3, big(3), ZZ(3), UInt(3), R(3))
+    c = zero(a)
+    c = mul!(c, a, s)
+    @test c == a * s
+    c = zero(a)
+    c = mul!(c, s, a)
+    @test c == a * s
+  end
 end
 
 @testset "zzModMatrix.comparison" begin
@@ -1107,4 +1132,12 @@ end
   C = similar(A)
   mul!(C, b, A)
   @test C == b * A
+end
+
+@testset "#2309" begin
+  F = Native.GF(13)
+  x = matrix(F, 1, 1, [1])
+  s = 0x0678e92a8604bc8e
+  r = F(s)
+  @test x * s == x * r
 end

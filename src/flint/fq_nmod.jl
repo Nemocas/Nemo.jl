@@ -438,11 +438,11 @@ function neg!(z::fqPolyRepFieldElem, a::fqPolyRepFieldElem)
   return z
 end
 
-function set!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElemOrPtr)
+function set!(z::fqPolyRepFieldElem, x::TypeOrPtr{fqPolyRepFieldElem})
   @ccall libflint.fq_nmod_set(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, parent(z)::Ref{fqPolyRepField})::Nothing
 end
 
-function set!(z::fqPolyRepFieldElem, x::ZZRingElemOrPtr)
+function set!(z::fqPolyRepFieldElem, x::TypeOrPtr{ZZRingElem})
   @ccall libflint.fq_nmod_set_fmpz(z::Ref{fqPolyRepFieldElem}, x::Ref{ZZRingElem}, parent(z)::Ref{fqPolyRepField})::Nothing
 end
 
@@ -454,7 +454,7 @@ function set!(z::fqPolyRepFieldElem, x::UInt)
   @ccall libflint.fq_nmod_set_ui(z::Ref{fqPolyRepFieldElem}, x::UInt, parent(z)::Ref{fqPolyRepField})::Nothing
 end
 
-function set!(z::fqPolyRepFieldElem, x::fpPolyRingElemOrPtr)
+function set!(z::fqPolyRepFieldElem, x::TypeOrPtr{fpPolyRingElem})
   @ccall libflint.fq_nmod_set_nmod_poly(z::Ref{fqPolyRepFieldElem}, x::Ref{fpPolyRingElem}, parent(z)::Ref{fqPolyRepField})::Nothing
 end
 

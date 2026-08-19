@@ -231,5 +231,5 @@ end
 #
 ################################################################################
 
-const QQBarFieldElemOrPtr = Union{QQBarFieldElem, Ref{QQBarFieldElem}, Ptr{QQBarFieldElem}}
-const CalciumFieldElemOrPtr = Union{CalciumFieldElem, Ref{CalciumFieldElem}, Ptr{CalciumFieldElem}}
+const QQBarFieldElemOrPtr = TypeOrPtr{QQBarFieldElem}
+const CalciumFieldElemOrPtr = TypeOrPtr{CalciumFieldElem}
