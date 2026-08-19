@@ -1946,7 +1946,7 @@ true
 """
 function is_prime(x::ZZRingElem)
   !is_probable_prime(x) && return false
-  if AbstractAlgebra.get_dodgy_mode()
+  if AbstractAlgebra.get_dodgy_mode(:is_prime)
     # FLINT doc says that the result is correct if nbits(x) < 81; can we trust this?  What if it changes in the future?  What is the portable solution?
     if x > typemax(Int64)
       AbstractAlgebra.@RegisterDodgyStep(:is_prime, (x,));
@@ -1980,7 +1980,7 @@ If a second argument of `false` is specified, the return is only probably prime.
 """
 function next_prime(x::ZZRingElem, proved::Union{Nothing,Bool} = nothing)
   z = ZZRingElem()
-  if ! AbstractAlgebra.get_dodgy_mode() || !isnothing(proved)
+  if !isnothing(proved) || !AbstractAlgebra.get_dodgy_mode(:is_prime)
     @ccall libflint.fmpz_nextprime(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, (proved!=false)::Cint)::Nothing
   else
     @ccall libflint.fmpz_nextprime(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, false::Cint)::Nothing
