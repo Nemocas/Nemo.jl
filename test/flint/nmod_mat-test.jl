@@ -435,6 +435,23 @@ end
   @test_throws ErrorException Z2(1)*a
 end
 
+@testset "zzModMatrix.scalar_mul!" begin
+  R, = residue_ring(ZZ, 101)
+
+  a = matrix(R, [1 2; 3 4])
+
+  # scalar mul! reaches the FLINT-backed specialization for every integer scalar
+  # type; only the returned value is required to be correct.
+  for s in (3, -3, big(3), ZZ(3), UInt(3), R(3))
+    c = zero(a)
+    c = mul!(c, a, s)
+    @test c == a * s
+    c = zero(a)
+    c = mul!(c, s, a)
+    @test c == a * s
+  end
+end
+
 @testset "zzModMatrix.comparison" begin
   Z17, = residue_ring(ZZ,17)
 

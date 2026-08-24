@@ -565,3 +565,12 @@ end
   @test overlaps(res, CC(const_e(parent(real(zero(CC))))) - 1)
   @test radius(real(res)) < 1.0e-6
 end
+
+@testset "#1925" begin
+  C = complex_field()
+
+  @test C(1)+C(1)+1 == (C(1)+C(1))+1
+  @test C(1)+1+1 == (C(1)+1)+1
+  @test C(2)*C(2)*2 == (C(2)*C(2))*2
+  @test C(2)*2*2 == (C(2)*2)*2
+end

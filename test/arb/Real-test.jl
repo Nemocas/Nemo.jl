@@ -639,3 +639,12 @@ end
     @test r_special isa RealFieldElem
   end
 end
+
+@testset "#1925" begin
+  R = real_field()
+
+  @test R(1)+R(1)+1 == (R(1)+R(1))+1
+  @test R(1)+1+1 == (R(1)+1)+1
+  @test R(2)*R(2)*2 == (R(2)*R(2))*2
+  @test R(2)*2*2 == (R(2)*2)*2
+end

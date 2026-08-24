@@ -52,8 +52,8 @@ end
 
 characteristic(::ArbField) = 0
 
-_mid_ptr(x::ArbFieldElemOrPtr) = @ccall libflint.arb_mid_ptr(x::Ref{ArbFieldElem})::Ptr{arf_struct}
-_rad_ptr(x::ArbFieldElemOrPtr) = @ccall libflint.arb_rad_ptr(x::Ref{ArbFieldElem})::Ptr{mag_struct}
+_mid_ptr(x::TypeOrPtr{ArbFieldElem}) = @ccall libflint.arb_mid_ptr(x::Ref{ArbFieldElem})::Ptr{arf_struct}
+_rad_ptr(x::TypeOrPtr{ArbFieldElem}) = @ccall libflint.arb_rad_ptr(x::Ref{ArbFieldElem})::Ptr{mag_struct}
 
 ################################################################################
 #
@@ -1857,17 +1857,17 @@ end
 #
 ################################################################################
 
-function zero!(z::Union{ArbFieldElemOrPtr})
+function zero!(z::Union{TypeOrPtr{ArbFieldElem}})
   @ccall libflint.arb_zero(z::Ref{ArbFieldElem})::Nothing
   return z
 end
 
-function one!(z::ArbFieldElemOrPtr)
+function one!(z::TypeOrPtr{ArbFieldElem})
   @ccall libflint.arb_one(z::Ref{ArbFieldElem})::Nothing
   return z
 end
 
-function neg!(z::ArbFieldElemOrPtr, a::ArbFieldElemOrPtr)
+function neg!(z::TypeOrPtr{ArbFieldElem}, a::TypeOrPtr{ArbFieldElem})
   @ccall libflint.arb_neg(z::Ref{ArbFieldElem}, a::Ref{ArbFieldElem})::Nothing
   return z
 end
@@ -1894,82 +1894,82 @@ end
 #
 ################################################################################
 
-function _arb_set(x::ArbFieldElemOrPtr, y::Int)
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::Int)
   @ccall libflint.arb_set_si(x::Ref{ArbFieldElem}, y::Int)::Nothing
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::UInt)
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::UInt)
   @ccall libflint.arb_set_ui(x::Ref{ArbFieldElem}, y::UInt)::Nothing
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::Float64)
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::Float64)
   @ccall libflint.arb_set_d(x::Ref{ArbFieldElem}, y::Float64)::Nothing
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::Union{Int,UInt,Float64}, p::Int)
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::Union{Int,UInt,Float64}, p::Int)
   _arb_set(x, y)
   @ccall libflint.arb_set_round(x::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, p::Int)::Nothing
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::ZZRingElem)
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::ZZRingElem)
   @ccall libflint.arb_set_fmpz(x::Ref{ArbFieldElem}, y::Ref{ZZRingElem})::Nothing
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::ZZRingElem, p::Int)
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::ZZRingElem, p::Int)
   @ccall libflint.arb_set_round_fmpz(x::Ref{ArbFieldElem}, y::Ref{ZZRingElem}, p::Int)::Nothing
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::QQFieldElem, p::Int)
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::QQFieldElem, p::Int)
   @ccall libflint.arb_set_fmpq(x::Ref{ArbFieldElem}, y::Ref{QQFieldElem}, p::Int)::Nothing
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::ArbFieldElemOrPtr)
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::TypeOrPtr{ArbFieldElem})
   @ccall libflint.arb_set(x::Ref{ArbFieldElem}, y::Ref{ArbFieldElem})::Nothing
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::Ptr{arb_struct})
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::Ptr{arb_struct})
   @ccall libflint.arb_set(x::Ref{ArbFieldElem}, y::Ptr{arb_struct})::Nothing
 end
 
-function _arb_set(x::Ptr{arb_struct}, y::ArbFieldElemOrPtr)
+function _arb_set(x::Ptr{arb_struct}, y::TypeOrPtr{ArbFieldElem})
   @ccall libflint.arb_set(x::Ptr{arb_struct}, y::Ref{ArbFieldElem})::Nothing
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::ArbFieldElemOrPtr, p::Int)
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::TypeOrPtr{ArbFieldElem}, p::Int)
   @ccall libflint.arb_set_round(x::Ref{ArbFieldElem}, y::Ref{ArbFieldElem}, p::Int)::Nothing
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::AbstractString, p::Int)
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::AbstractString, p::Int)
   s = string(y)
   err = @ccall libflint.arb_set_str(x::Ref{ArbFieldElem}, s::Ptr{UInt8}, p::Int)::Int32
   err == 0 || error("Invalid real string: $(repr(s))")
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::BigFloat)
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::BigFloat)
   m = _mid_ptr(x)
   r = _rad_ptr(x)
   @ccall libflint.arf_set_mpfr(m::Ptr{arf_struct}, y::Ref{BigFloat})::Nothing
   @ccall libflint.mag_zero(r::Ptr{mag_struct})::Nothing
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::BigFloat, p::Int)
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::BigFloat, p::Int)
   _arb_set(x, y)
   @ccall libflint.arb_set_round(x::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, p::Int)::Nothing
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::Integer)
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::Integer)
   _arb_set(x, ZZRingElem(y))
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::Integer, p::Int)
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::Integer, p::Int)
   _arb_set(x, ZZRingElem(y), p)
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::Real)
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::Real)
   _arb_set(x, BigFloat(y))
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::Real, p::Int)
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::Real, p::Int)
   _arb_set(x, BigFloat(y), p)
 end
 
@@ -1977,7 +1977,7 @@ function _arb_set(x::ArbFieldElem, y::Irrational)
   _arb_set(x, y, precision(parent(x)))
 end
 
-function _arb_set(x::ArbFieldElemOrPtr, y::Irrational, p::Int)
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::Irrational, p::Int)
   if y == pi
     @ccall libflint.arb_const_pi(x::Ref{ArbFieldElem}, p::Int)::Nothing
   elseif y == MathConstants.e

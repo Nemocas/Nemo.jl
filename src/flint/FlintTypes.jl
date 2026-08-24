@@ -5519,8 +5519,8 @@ const FlintPuiseuxSeriesFieldElemOrPtr{T <: RingElem} = TypeOrPtr{FlintPuiseuxSe
 const PadicFieldElemOrPtr = TypeOrPtr{PadicFieldElem}
 const QadicFieldElemOrPtr = TypeOrPtr{QadicFieldElem}
 
-const IntegerUnionOrPtr = Union{Integer, ZZRingElemOrPtr}
-const RationalUnionOrPtr = Union{Integer, ZZRingElemOrPtr, Rational, QQFieldElemOrPtr}
+const IntegerUnionOrPtr = Union{Integer, TypeOrPtr{ZZRingElem}}
+const RationalUnionOrPtr = Union{Integer, TypeOrPtr{ZZRingElem}, Rational, TypeOrPtr{QQFieldElem}}
 
 ###############################################################################
 #
