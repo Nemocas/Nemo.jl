@@ -195,9 +195,9 @@ end
 
 for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (://, "acb_div"), (:-,"acb_sub"), (:^,"acb_pow"))
   @eval begin
-    function ($s)(x::ComplexFieldElem, y::ComplexFieldElem, prec::Int = precision(Balls))
+    function ($s)(x::ComplexFieldElem, y::ComplexFieldElem; precision::Int = precision(Balls))
       z = ComplexFieldElem()
-      @ccall libflint.$f(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{ComplexFieldElem}, prec::Int)::Nothing
+      @ccall libflint.$f(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{ComplexFieldElem}, precision::Int)::Nothing
       return z
     end
   end
@@ -206,27 +206,27 @@ end
 for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
   @eval begin
 
-    function ($f)(x::ComplexFieldElem, y::UInt, prec::Int = precision(Balls))
+    function ($f)(x::ComplexFieldElem, y::UInt; precision::Int = precision(Balls))
       z = ComplexFieldElem()
-      @ccall libflint.$("acb_"*s*"_ui")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::UInt, prec::Int)::Nothing
+      @ccall libflint.$("acb_"*s*"_ui")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::UInt, precision::Int)::Nothing
       return z
     end
 
-    function ($f)(x::ComplexFieldElem, y::Int, prec::Int = precision(Balls))
+    function ($f)(x::ComplexFieldElem, y::Int; precision::Int = precision(Balls))
       z = ComplexFieldElem()
-      @ccall libflint.$("acb_"*s*"_si")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Int, prec::Int)::Nothing
+      @ccall libflint.$("acb_"*s*"_si")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Int, precision::Int)::Nothing
       return z
     end
 
-    function ($f)(x::ComplexFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
+    function ($f)(x::ComplexFieldElem, y::ZZRingElem; precision::Int = precision(Balls))
       z = ComplexFieldElem()
-      @ccall libflint.$("acb_"*s*"_fmpz")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{ZZRingElem}, prec::Int)::Nothing
+      @ccall libflint.$("acb_"*s*"_fmpz")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{ZZRingElem}, precision::Int)::Nothing
       return z
     end
 
-    function ($f)(x::ComplexFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
+    function ($f)(x::ComplexFieldElem, y::RealFieldElem; precision::Int = precision(Balls))
       z = ComplexFieldElem()
-      @ccall libflint.$("acb_"*s*"_arb")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{RealFieldElem}, prec::Int)::Nothing
+      @ccall libflint.$("acb_"*s*"_arb")(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::Ref{RealFieldElem}, precision::Int)::Nothing
       return z
     end
   end

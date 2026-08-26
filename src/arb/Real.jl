@@ -614,9 +614,9 @@ end
 
 for (s,f) in ((:+,"arb_add"), (:*,"arb_mul"), (://, "arb_div"), (:-,"arb_sub"))
   @eval begin
-    function ($s)(x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
+    function ($s)(x::RealFieldElem, y::RealFieldElem; precision::Int = precision(Balls))
       z = RealFieldElem()
-      @ccall libflint.$f(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{RealFieldElem}, prec::Int)::Nothing
+      @ccall libflint.$f(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{RealFieldElem}, precision::Int)::Nothing
       return z
     end
   end
@@ -632,29 +632,29 @@ for (f,s) in ((:+, "add"), (:*, "mul"))
 
     #($f)(x::arf, y::RealFieldElem) = ($f)(y, x)
 
-    function ($f)(x::RealFieldElem, y::UInt, prec::Int = precision(Balls))
+    function ($f)(x::RealFieldElem, y::UInt; precision::Int = precision(Balls))
       z = RealFieldElem()
-      @ccall libflint.$("arb_$(s)_ui")(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::UInt, prec::Int)::Nothing
+      @ccall libflint.$("arb_$(s)_ui")(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::UInt, precision::Int)::Nothing
       return z
     end
 
     ($f)(x::UInt, y::RealFieldElem) = ($f)(y, x)
 
-    function ($f)(x::RealFieldElem, y::Int, prec::Int = precision(Balls))
+    function ($f)(x::RealFieldElem, y::Int; precision::Int = precision(Balls))
       z = RealFieldElem()
-      @ccall libflint.$("arb_$(s)_si")(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Int, prec::Int)::Nothing
+      @ccall libflint.$("arb_$(s)_si")(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Int, precision::Int)::Nothing
       return z
     end
 
-    ($f)(x::Int, y::RealFieldElem, prec::Int = precision(Balls)) = ($f)(y, x, prec)
+    ($f)(x::Int, y::RealFieldElem; precision::Int = precision(Balls)) = ($f)(y, x; precision)
 
-    function ($f)(x::RealFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
+    function ($f)(x::RealFieldElem, y::ZZRingElem; precision::Int = precision(Balls))
       z = RealFieldElem()
-      @ccall libflint.$("arb_$(s)_fmpz")(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{ZZRingElem}, prec::Int)::Nothing
+      @ccall libflint.$("arb_$(s)_fmpz")(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{ZZRingElem}, precision::Int)::Nothing
       return z
     end
 
-    ($f)(x::ZZRingElem, y::RealFieldElem, prec::Int = precision(Balls)) = ($f)(y, x, prec)
+    ($f)(x::ZZRingElem, y::RealFieldElem; precision::Int = precision(Balls)) = ($f)(y, x; precision)
   end
 end
 
@@ -667,25 +667,25 @@ end
 
 #-(x::arf, y::RealFieldElem) = -(y - x)
 
-function -(x::RealFieldElem, y::UInt, prec::Int = precision(Balls))
+function -(x::RealFieldElem, y::UInt; precision::Int = precision(Balls))
   z = RealFieldElem()
-  @ccall libflint.arb_sub_ui(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::UInt, prec::Int)::Nothing
+  @ccall libflint.arb_sub_ui(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::UInt, precision::Int)::Nothing
   return z
 end
 
 -(x::UInt, y::RealFieldElem) = -(y - x)
 
-function -(x::RealFieldElem, y::Int, prec::Int = precision(Balls))
+function -(x::RealFieldElem, y::Int; precision::Int = precision(Balls))
   z = RealFieldElem()
-  @ccall libflint.arb_sub_si(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Int, prec::Int)::Nothing
+  @ccall libflint.arb_sub_si(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Int, precision::Int)::Nothing
   return z
 end
 
 -(x::Int, y::RealFieldElem) = -(y - x)
 
-function -(x::RealFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
+function -(x::RealFieldElem, y::ZZRingElem; precision::Int = precision(Balls))
   z = RealFieldElem()
-  @ccall libflint.arb_sub_fmpz(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{ZZRingElem}, prec::Int)::Nothing
+  @ccall libflint.arb_sub_fmpz(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{ZZRingElem}, precision::Int)::Nothing
   return z
 end
 
@@ -714,67 +714,67 @@ end
 #  return z
 #end
 
-function //(x::RealFieldElem, y::UInt, prec::Int = precision(Balls))
+function //(x::RealFieldElem, y::UInt; precision::Int = precision(Balls))
   z = RealFieldElem()
-  @ccall libflint.arb_div_ui(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::UInt, prec::Int)::Nothing
+  @ccall libflint.arb_div_ui(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::UInt, precision::Int)::Nothing
   return z
 end
 
-function //(x::RealFieldElem, y::Int, prec::Int = precision(Balls))
+function //(x::RealFieldElem, y::Int; precision::Int = precision(Balls))
   z = RealFieldElem()
-  @ccall libflint.arb_div_si(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Int, prec::Int)::Nothing
+  @ccall libflint.arb_div_si(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Int, precision::Int)::Nothing
   return z
 end
 
-function //(x::RealFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
+function //(x::RealFieldElem, y::ZZRingElem; precision::Int = precision(Balls))
   z = RealFieldElem()
-  @ccall libflint.arb_div_fmpz(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{ZZRingElem}, prec::Int)::Nothing
+  @ccall libflint.arb_div_fmpz(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{ZZRingElem}, precision::Int)::Nothing
   return z
 end
 
-function //(x::UInt, y::RealFieldElem, prec::Int = precision(Balls))
+function //(x::UInt, y::RealFieldElem; precision::Int = precision(Balls))
   z = parent(y)()
-  @ccall libflint.arb_ui_div(z::Ref{RealFieldElem}, x::UInt, y::Ref{RealFieldElem}, prec::Int)::Nothing
+  @ccall libflint.arb_ui_div(z::Ref{RealFieldElem}, x::UInt, y::Ref{RealFieldElem}, precision::Int)::Nothing
   return z
 end
 
-function //(x::Int, y::RealFieldElem, prec::Int = precision(Balls))
-  z = parent(y)()
-  t = RealFieldElem(x)
-  @ccall libflint.arb_div(z::Ref{RealFieldElem}, t::Ref{RealFieldElem}, y::Ref{RealFieldElem}, prec::Int)::Nothing
-  return z
-end
-
-function //(x::ZZRingElem, y::RealFieldElem, prec::Int = precision(Balls))
+function //(x::Int, y::RealFieldElem; precision::Int = precision(Balls))
   z = parent(y)()
   t = RealFieldElem(x)
-  @ccall libflint.arb_div(z::Ref{RealFieldElem}, t::Ref{RealFieldElem}, y::Ref{RealFieldElem}, prec::Int)::Nothing
+  @ccall libflint.arb_div(z::Ref{RealFieldElem}, t::Ref{RealFieldElem}, y::Ref{RealFieldElem}, precision::Int)::Nothing
   return z
 end
 
-function ^(x::RealFieldElem, y::RealFieldElem, prec::Int = precision(Balls))
-  z = RealFieldElem()
-  @ccall libflint.arb_pow(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{RealFieldElem}, prec::Int)::Nothing
+function //(x::ZZRingElem, y::RealFieldElem; precision::Int = precision(Balls))
+  z = parent(y)()
+  t = RealFieldElem(x)
+  @ccall libflint.arb_div(z::Ref{RealFieldElem}, t::Ref{RealFieldElem}, y::Ref{RealFieldElem}, precision::Int)::Nothing
   return z
 end
 
-function ^(x::RealFieldElem, y::ZZRingElem, prec::Int = precision(Balls))
+function ^(x::RealFieldElem, y::RealFieldElem; precision::Int = precision(Balls))
   z = RealFieldElem()
-  @ccall libflint.arb_pow_fmpz(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{ZZRingElem}, prec::Int)::Nothing
+  @ccall libflint.arb_pow(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{RealFieldElem}, precision::Int)::Nothing
   return z
 end
 
-^(x::RealFieldElem, y::Integer, prec::Int = precision(Balls)) = ^(x, ZZRingElem(y), prec)
-
-function ^(x::RealFieldElem, y::UInt, prec::Int = precision(Balls))
+function ^(x::RealFieldElem, y::ZZRingElem; precision::Int = precision(Balls))
   z = RealFieldElem()
-  @ccall libflint.arb_pow_ui(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::UInt, prec::Int)::Nothing
+  @ccall libflint.arb_pow_fmpz(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{ZZRingElem}, precision::Int)::Nothing
   return z
 end
 
-function ^(x::RealFieldElem, y::QQFieldElem, prec::Int = precision(Balls))
+^(x::RealFieldElem, y::Integer; precision::Int = precision(Balls)) = ^(x, ZZRingElem(y); precision)
+
+function ^(x::RealFieldElem, y::UInt; precision::Int = precision(Balls))
   z = RealFieldElem()
-  @ccall libflint.arb_pow_fmpq(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{QQFieldElem}, prec::Int)::Nothing
+  @ccall libflint.arb_pow_ui(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::UInt, precision::Int)::Nothing
+  return z
+end
+
+function ^(x::RealFieldElem, y::QQFieldElem; precision::Int = precision(Balls))
+  z = RealFieldElem()
+  @ccall libflint.arb_pow_fmpq(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::Ref{QQFieldElem}, precision::Int)::Nothing
   return z
 end
 
