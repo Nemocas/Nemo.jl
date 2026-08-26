@@ -506,20 +506,20 @@ function Base.sqrt(a::QadicFieldElem; check::Bool=true)
   end
 
   av = valuation(a)
-  check && (av % 2) != 0 && error("Unable to take qadic square root")
+  check && (av % 2) != 0 && throw(DomainError(a, "Square root of q-adic does not exist"))
   z = QadicFieldElem(a.N - div(av, 2))
   z.parent = ctx
   res = Bool(@ccall libflint.qadic_sqrt(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Cint)
-  check && !res && error("Square root of p-adic does not exist")
+  check && !res && throw(DomainError(a, "Square root of q-adic does not exist"))
   return z
 end
 
 # Internal: square root in characteristic 2 using a precomputed Artin-Schreier LUP decomposition.
 function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bool=true)
   ctx = parent(a)
-  ctx === data.parent || throw(ArgumentError("precomputation belongs to a different qadic field"))
+  ctx === data.parent || throw(ArgumentError("precomputation belongs to a different q-adic field"))
   av = valuation(a)
-  check && (av % 2) != 0 && error("Unable to take qadic square root")
+  check && (av % 2) != 0 && throw(DomainError(a, "Square root of q-adic does not exist"))
   z = QadicFieldElem(a.N - div(av, 2))
   z.parent = ctx
 
@@ -527,14 +527,15 @@ function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bo
     res = Bool(@ccall libflint._qadic_char2_sqrt_with_precomp(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField}, data.ptr::Ptr{Nothing})::Cint)
   end
 
-  check && !res && error("Square root of p-adic does not exist")
+  check && !res && throw(DomainError(a, "Square root of q-adic does not exist"))
   return z
 end
 
 function is_square_with_sqrt(a::QadicFieldElem)
   try
     return true, sqrt(a)
-  catch
+  catch err
+    typeof(err) == DomainError && err.msg == "Square root of q-adic does not exist" || throw()
     return false, zero(parent(a)) # 2nd compt is arbitrary
   end
 end
@@ -543,7 +544,8 @@ function is_square(a::QadicFieldElem)
   try
     dummy = sqrt(a)
     return true
-  catch
+  catch err
+    typeof(err) == DomainError && err.msg == "Square root of q-adic does not exist" || throw()
     return false
   end
 end
