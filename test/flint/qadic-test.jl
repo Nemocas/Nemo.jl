@@ -379,6 +379,14 @@ end
   @test sqrt(c)^2 == c
 
   @test sqrt(R(121))^2 == R(121)
+
+  @test is_square(a)
+
+  @test is_square_with_sqrt(a^2) == (true, a)
+
+  @test !is_square(b+1)
+
+  @test is_square_with_sqrt(b+1) == (false, zero(R))
 end
 
 @testset "QadicFieldElem.square_root_char2_precomp" begin

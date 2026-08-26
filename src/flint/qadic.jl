@@ -531,6 +531,25 @@ function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bo
   return z
 end
 
+function is_square_with_sqrt(a::QadicFieldElem)
+  try
+    return true, sqrt(a)
+  catch
+    return false, zero(parent(a)) # 2nd compt is arbitrary
+  end
+end
+
+function is_square(a::QadicFieldElem)
+  try
+    dummy = sqrt(a)
+    return true
+  catch
+    return false
+  end
+end
+
+
+
 ###############################################################################
 #
 #   Special functions
