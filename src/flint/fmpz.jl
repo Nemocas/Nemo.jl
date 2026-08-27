@@ -2626,7 +2626,6 @@ May overwrite digits.
 """
 function digits_to_integer!(digits::Vector{ZZRingElem}; base::IntegerUnion = 10)
   # Delegate to the matrix version (immediately above)
-  @req  (base > 1)  "Require base > 1"
   n = length(digits)
   (n == 0) && return ZZ(0)
   return digits_to_integer!(ZZMatrix(n,1, digits); base=base)[1,1]
