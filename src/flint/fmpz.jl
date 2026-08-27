@@ -2590,6 +2590,8 @@ integer in the result returned.  Note: the matrix D is modified by this function
 function digits_to_integer!(D::ZZMatrix; base::IntegerUnion = 10)
   # Code originally by Claus Fieker -- impressively quick!
   nr = nrows(D)
+  @req  (nr > 0)  "Require at least 1 row"
+  (nr == 1) && return D
   bb = ZZRingElem(Val(:raw))
   b = ZZRingElem(Val(:raw))
   set!(b, base)
@@ -2611,15 +2613,7 @@ function digits_to_integer!(D::ZZMatrix; base::IntegerUnion = 10)
   Nemo._fmpz_clear_fn(b)
   # All rows, but the 1st have been set to zero! - or have never been used.
   # So no memory is lost...
-  return D[1:1,1]
-end
-
-
-function _digits_to_integer_claus(digits::Vector{ZZRingElem}, b::ZZRingElem)
-  # Sometimes faster than _digits_to_integer_john! and sometimes slower.
-  # Delegate to the matrix version (immediately above)
-  n = length(digits)
-  return digits_to_integer!(ZZMatrix(n,1, digits), b)[1,1]
+  return D[1:1,:]
 end
 
 
@@ -2631,7 +2625,11 @@ Returns the integer sum (base^j*d_{j+1}) where d_k is the k-th entry of digits.
 May overwrite digits.
 """
 function digits_to_integer!(digits::Vector{ZZRingElem}; base::IntegerUnion = 10)
-  return _digits_to_integer_john!(digits, ZZ(base))
+  # Delegate to the matrix version (immediately above)
+  @req  (base > 1)  "Require base > 1"
+  n = length(digits)
+  (n == 0) && return ZZ(0)
+  return digits_to_integer!(ZZMatrix(n,1, digits); base=base)[1,1]
 end
 
 function digits_to_integer!(digits::Vector{T}; base::IntegerUnion = 10) where { T <: Integer}
