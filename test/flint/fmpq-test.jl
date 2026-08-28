@@ -699,6 +699,7 @@ end
 
 @testset "Rings.QQ.constructors" begin
    @test QQ === fraction_field(ZZ)
+   @test QQField === fraction_field_type(ZZ)
 
    @test QQ(1, 2) isa QQFieldElem
    @test QQ(1, ZZ(2)) isa QQFieldElem
