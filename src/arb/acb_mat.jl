@@ -139,7 +139,7 @@ end
 ################################################################################
 
 function ^(x::AcbMatrix, y::UInt)
-  nrows(x) != ncols(x) && error("Matrix must be square")
+  check_square(x)
   z = similar(x)
   @ccall libflint.acb_mat_pow_ui(z::Ref{AcbMatrix}, x::Ref{AcbMatrix}, y::UInt, precision(base_ring(x))::Int)::Nothing
   return z

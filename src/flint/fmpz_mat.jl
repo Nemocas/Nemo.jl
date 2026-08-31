@@ -333,7 +333,7 @@ end
 ^(x::ZZMatrix, y::ZZRingElem) = _powpow(x, y)
 
 function _powpow(x, y)
-  @req nrows(x) == ncols(x) "Incompatible matrix dimensions"
+  check_square(x)
   if y >= 0
     return pow!(similar(x), x, y)
   else
@@ -412,7 +412,7 @@ function is_invertible_with_inverse(x::ZZMatrix)
 end
 
 function inv(x::ZZMatrix)
-  @req is_square(x) "Matrix not invertible"
+  check_square(x)
   fl, z = is_invertible_with_inverse(x)
   @req fl "Matrix not invertible"
   return z
@@ -627,7 +627,7 @@ end
 ###############################################################################
 
 function charpoly(R::ZZPolyRing, x::ZZMatrix)
-  nrows(x) != ncols(x) && error("Non-square")
+  check_square(x)
   z = R()
   @ccall libflint.fmpz_mat_charpoly(z::Ref{ZZPolyRingElem}, x::Ref{ZZMatrix})::Nothing
   return z
@@ -640,7 +640,7 @@ end
 ###############################################################################
 
 function minpoly(R::ZZPolyRing, x::ZZMatrix)
-  nrows(x) != ncols(x) && error("Non-square")
+  check_square(x)
   z = R()
   @ccall libflint.fmpz_mat_minpoly(z::Ref{ZZPolyRingElem}, x::Ref{ZZMatrix})::Nothing
   return z
@@ -655,7 +655,7 @@ minpoly(x::ZZMatrix) = minpoly(polynomial_ring(ZZ; cached = false)[1], x)
 ###############################################################################
 
 function det(x::ZZMatrix)
-  nrows(x) != ncols(x) && error("Non-square matrix")
+  check_square(x)
   z = ZZRingElem()
   @ccall libflint.fmpz_mat_det(z::Ref{ZZRingElem}, x::Ref{ZZMatrix})::Nothing
   return z
@@ -668,7 +668,7 @@ Return some positive divisor of the determinant of $x$, if the determinant
 is nonzero, otherwise return zero.
 """
 function det_divisor(x::ZZMatrix)
-  nrows(x) != ncols(x) && error("Non-square matrix")
+  check_square(x)
   z = ZZRingElem()
   @ccall libflint.fmpz_mat_det_divisor(z::Ref{ZZRingElem}, x::Ref{ZZMatrix})::Nothing
   return z
@@ -682,7 +682,7 @@ Return the determinant of $x$ given a positive divisor of its determinant. If
 otherwise a heuristic algorithm is used.
 """
 function det_given_divisor(x::ZZMatrix, d::ZZRingElem, proved=true)
-  nrows(x) != ncols(x) && error("Non-square")
+  check_square(x)
   z = ZZRingElem()
   @ccall libflint.fmpz_mat_det_modular_given_divisor(z::Ref{ZZRingElem}, x::Ref{ZZMatrix}, d::Ref{ZZRingElem}, proved::Cint)::Nothing
   return z
@@ -718,7 +718,7 @@ more computation time).  Under a "uniformity assumption" the probability
 of a false positive is about `2^(-modulus_bitsize)`.
 """
 function is_probably_zero_det(M::ZZMatrix; modulus_bitsize::Int = 100)
-  @req  is_square(M)  "matrix must be square"
+  check_square(M)
   @req ((modulus_bitsize >= 20) && (modulus_bitsize <= 1000))  "modulus_bitsize must be between 20 and 1000 (but bigger than about 250 is usually senseless)"
   # Dispose of two trivial cases:
   (nrows(M) == 0) && return false
@@ -753,7 +753,7 @@ Return the Hadamard bound squared for the determinant, i.e. the product
 of the euclidean row-norms squared.
 """
 function hadamard_bound2(M::ZZMatrix)
-  is_square(M) || error("Matrix must be square")
+  check_square(M)
   H = ZZ(1);
   r = ZZ(0)
   n = nrows(M)
@@ -1089,7 +1089,8 @@ See [`lll_gram`](@ref) for the used default parameters which can be overridden b
 supplying an optional context object.
 """
 function lll_gram_with_transform(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
-  @req is_square(x) && is_symmetric(x) "The matrix must be a symmetric square matrix"
+  check_square(x)
+  @req is_symmetric(x) "Matrix must be symmetric"
   # try to recognize the definite case
   if nrows(x) == 0
     return x, x
@@ -1152,7 +1153,8 @@ $\eta = 0.51$. These defaults can be overridden by specifying an optional contex
 object.
 """
 function lll_gram(x::ZZMatrix, ctx::LLLContext = LLLContext(0.99, 0.51, :gram))
-  @req is_square(x) && is_symmetric(x) "The matrix must be a symmetric square matrix"
+  check_square(x)
+  @req is_symmetric(x) "Matrix must be symmetric"
   z = deepcopy(x)
   return lll_gram!(z)
 end
@@ -1787,7 +1789,7 @@ of rows as $a$ and $a$ must be a square matrix. If these conditions are not
 met or $(x, d)$ does not exist, an exception is raised.
 """
 function _solve_rational(a::ZZMatrix, b::ZZMatrix)
-  nrows(a) != ncols(a) && error("Not a square matrix in _solve_rational")
+  check_square(a)
   nrows(b) != nrows(a) && error("Incompatible dimensions in _solve_rational")
   z = similar(b)
   d = ZZRingElem()
@@ -1809,7 +1811,7 @@ rows as $a$ and $a$ must be a square matrix. If these conditions are not met
 or $(x, d)$ does not exist, an exception is raised.
 """
 function _solve_dixon(a::ZZMatrix, b::ZZMatrix)
-  nrows(a) != ncols(a) && error("Not a square matrix in solve")
+  check_square(a)
   nrows(b) != nrows(a) && error("Incompatible dimensions in solve")
   z = similar(b)
   d = ZZRingElem()
@@ -1961,7 +1963,7 @@ end
 ###############################################################################
 
 function tr(x::ZZMatrix)
-  nrows(x) != ncols(x) && error("Not a square matrix in trace")
+  check_square(x)
   d = ZZRingElem()
   @ccall libflint.fmpz_mat_trace(d::Ref{ZZRingElem}, x::Ref{ZZMatrix})::Int
   return d
