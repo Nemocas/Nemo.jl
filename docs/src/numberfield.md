@@ -25,7 +25,7 @@ field element types belong to the `FieldElem` abstract type.
 The Hecke.jl library radically expands on number field functionality, providing
 ideals, orders, class groups, relative extensions, class field theory, etc.
 
-The basic number field element type used in Hecke is the Nemo `AbsSimpleNumField` type, 
+The basic number field type used in Hecke is the Nemo `AbsSimpleNumField` type, 
 making the two libraries tightly integrated.
 
 <https://thofma.github.io/Hecke.jl/stable/>
