@@ -338,14 +338,14 @@ Apply rational reconstruction to all entries in the matrix `a` in the attempt
 to find `D` (over QQ) such that `a - D` is divisible by `b`.
 
 See also [`rational_reconstruction`](@ref) for an explanation of the parameters
-  and [`induce_rational_reconstruction`](@ref) for a version returing the numerator matrix and the denominator seperately.
+  and [`induce_rational_reconstruction`](@ref) for a version returning the numerator matrix and the denominator separately.
 """
 function _induce_rational_reconstruction_nosplit(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = false)
   fl, n, d = _induce_rational_reconstruction( a, b; error_tolerant, unbalanced)
   D = matrix(QQ, n)*QQ(ZZ(1), d)
   return fl, D
 end
- 
+
 function change_prime!(a::fpMatrix, p::UInt)
   @ccall libflint.nmod_mat_set_mod(a::Ref{fpMatrix}, p::UInt)::Nothing
 end
@@ -449,7 +449,7 @@ function dixon_init!(D::DixonCtx, A::ZZMatrix, B::ZZMatrix; side::Symbol = :righ
   if ncB == 1
     return D
   end
-  
+
   pr = ZZRingElem(1)
   xp = next_prime(p, false)
   mA = maximum(abs, A)
@@ -468,19 +468,19 @@ function dixon_init!(D::DixonCtx, A::ZZMatrix, B::ZZMatrix; side::Symbol = :righ
   return D
 end
 
-function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int = 10) 
+function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int = 10)
   if side == :right
     d = deepcopy(B)
     _B = B
   else
     d = transpose(B)
-    _B = transpose(B) 
+    _B = transpose(B)
   end
   @assert ncols(D.A) == nrows(d)
   @assert size(D.x) == size(d)
   #we're solveing Ax=B, always. if side = :left, then the interface transposes
   zero!(D.x)
- 
+
   mA = maximum(abs, D.A)
   mB = maximum(abs, B)
   n = nrows(D.A)
@@ -497,7 +497,7 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
     @ccall libflint.fmpz_mat_scalar_addmul_nmod_mat_fmpz(D.x::Ref{ZZMatrix}, D.y_mod::Ref{fpMatrix}, ppow::Ref{ZZRingElem})::Cvoid
 
     Nemo.mul!(ppow, ppow, D.p)
-    
+
     if ppow > bound
       break
     end
@@ -564,7 +564,7 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
     # CHALLENGE: make the criterion for choosing the stategy smarter!!
     if ncols(_B) == 1
       n = nrows(D.A)
-      GC.@preserve D d begin 
+      GC.@preserve D d begin
         for i=1:n
           Ay_ptr = mat_entry_ptr(D.Ay, i, 1)
           A_ptr = mat_entry_ptr(D.A, i, 1)
@@ -722,7 +722,7 @@ function _renorm(U::ZZMatrix, m::ZZRingElem; start::Int = 1, last::Int = nrows(U
     while true
       R_ptr = Nemo.mat_entry_ptr(R, 1, 1)
       U_ptr = Nemo.mat_entry_ptr(U, i, 1)
-    
+
       for j=1:ncols(U)
         add!(R_ptr, R_ptr, U_ptr)
         mod_sym!(U_ptr, R_ptr, m, t)
@@ -746,7 +746,7 @@ function _renorm(U::ZZMatrix, m::ZZRingElem; start::Int = 1, last::Int = nrows(U
           @assert U.r <= last
           U_ptr = Nemo.mat_entry_ptr(U, i, 1)
           R_ptr = Nemo.mat_entry_ptr(R, 1, 1)
-     
+
           for j=1:ncols(U)
             mod_sym!(U_ptr, R_ptr, m, t)
             sub!(R_ptr, R_ptr, U_ptr)
@@ -817,7 +817,7 @@ end
 # the functions returns
 # - a matrix X in ZZ and a denominator d
 #
-#TODO: 
+#TODO:
 # - _renorm using preinv (to speed things up)
 # - if |U| >> |A| use the Abbott trick: write U in base ? and solve multiple
 #   systems - otherwise the X below needs to be too large and/ or the
@@ -859,7 +859,7 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
   sub!(R, R, 1)
   divexact!(R, m)
   #R = (I-A*B0)/m
-  
+
   tmp_V = zero_matrix(ZZ, max(pr + 10, n), ncols(U))
   RE_tmp = zero_matrix(ZZ, 1, ncols(U))
   view_V = view(tmp_V, :, :)
@@ -1060,7 +1060,7 @@ function det_PauderisStorjohann(A::ZZMatrix, U::AbstractArray= -100:100)
   n = ncols(A)
   DetFactor = ZZ(1)
   while true
-    b = rand(matrix_space(ZZ,n,1),U); 
+    b = rand(matrix_space(ZZ,n,1),U);
     @vprintln(:det,1,"Solving random lin sys using dixon method");
     @vtime :det 2  s,d = Nemo.dixon_solve(A,b)
     if d == 1
@@ -1072,7 +1072,7 @@ function det_PauderisStorjohann(A::ZZMatrix, U::AbstractArray= -100:100)
       @vprintln(:det,1,"*** NOT UNIMODULAR ***");  # extremely unlikely to reach here
     else
       @vprintln(:det,1,"Doing HCOL reduction");
-      T1 = hcol(s, d)  
+      T1 = hcol(s, d)
       det_fac_from_hcol = prod_diagonal(T1);
       new_mat = AbstractAlgebra._solve_triu_left(T1,A)
       @vprintln(:det,1,"orig_mat biggest entry: $(nbits(maximum(abs,A)))");
@@ -1157,7 +1157,7 @@ function det_hcol_hnf(A::ZZMatrix, U::AbstractArray= -100:100; solver=:NEMO_DIXO
   if 2*det_mod_m > M
     det_mod_m -= M
   end
-  
+
   CRT_climb_threshold = 5*Int(floor(Hbits/sqrt(n)))    # constant 5 is empirical (on my computer)
   DetFactor = ZZ(1)
   ZZmodM,_ = residue_ring(ZZ,M);
@@ -1206,7 +1206,7 @@ function det_hcol_hnf(A::ZZMatrix, U::AbstractArray= -100:100; solver=:NEMO_DIXO
       end
     end
     @vprintln(:det,1,"Solving a random linear system...");
-    b = rand(matrix_space(ZZ,n,1),U); 
+    b = rand(matrix_space(ZZ,n,1),U);
     if solver == :NEMO_DIXON
       @vprintln(:det,2,"  ...solving by Nemo.dixon_solve");
       @vtime :det 2   soln2 = Nemo.dixon_solve(A, b);
@@ -1295,7 +1295,7 @@ function det_hcol_hnf(A::ZZMatrix, U::AbstractArray= -100:100; solver=:NEMO_DIXO
     # denom of soln to rnd lin sys was too big, so do hcol jive
     HCOL_IterCounter += 1;
     @vprintln(:det,1,"HCOL (iter = $(HCOL_IterCounter))");
-    T1 = hcol(s, d)  
+    T1 = hcol(s, d)
     det_fac_from_hcol = prod_diagonal(T1);
     @vprintln(:det,1,"  det_fac_from_hcol (bits) = $(nbits(det_fac_from_hcol))");
     @vprintln(:det,2, "  [HCOL] about to solve triangular system")
