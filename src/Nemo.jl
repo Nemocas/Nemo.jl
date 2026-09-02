@@ -643,8 +643,8 @@ end
 const _flint_rand_states = rand_ctx[]
 
 # Data from http://www.mersennewiki.org/index.php/Elliptic_Curve_Method
-const _ecm_B1 = Int[2, 11, 50, 250, 1000, 3000, 11000, 43000, 110000, 260000, 850000, 2900000];
-const _ecm_nC = Int[25, 90, 300, 700, 1800, 5100, 10600, 19300, 49000, 124000, 210000, 340000];
+const _ecm_B1 = Int[2, 11, 50, 250, 1000, 3000, 11000, 43000, 110000, 260000, 850000, 2900000]
+const _ecm_nC = Int[25, 90, 300, 700, 1800, 5100, 10600, 19300, 49000, 124000, 210000, 340000]
 
 const _ecm_B1s = Vector{Int}[_ecm_B1]
 const _ecm_nCs = Vector{Int}[_ecm_nC]
@@ -671,7 +671,7 @@ include("../benchmarks/runbenchmarks.jl")
 function test_module(x, y)
   julia_exe = Base.julia_cmd()
   test_file = joinpath(pkgdir, "test/$x/")
-  test_file = test_file * "$y-test.jl";
+  test_file = test_file * "$y-test.jl"
   test_function_name = "test_"
 
   if x in ["flint", "arb", "antic"]

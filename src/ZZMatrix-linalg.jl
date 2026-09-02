@@ -58,7 +58,7 @@ function is_unimodular(A::ZZMatrix; algorithm=:auto)
     return true
   end
   if nrows(A) == 1
-    return (abs(A[1,1]) == 1);
+    return (abs(A[1,1]) == 1)
   end
   # Compute det mod M -- may later include some more primes
   target_bitsize_modulus = 100 # magic number -- should not be too small!
@@ -77,7 +77,7 @@ function is_unimodular(A::ZZMatrix; algorithm=:auto)
       return false  # obviously not unimodular
     end
     if det_mod_m == 0 # first iteration: so just set the value of det_mod_m
-      det_mod_m = (det_mod_p == 1) ? 1 : -1;
+      det_mod_m = (det_mod_p == 1) ? 1 : -1
     elseif det_mod_m == 1
       if det_mod_p != 1
         return false  # obviously not unimodular
@@ -141,14 +141,17 @@ function _is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEl
   @vprintln(:UnimodVerif,1,"UnimodularVerification: CRT loop")
   # Climb out with CRT:
   # in CRT loop start with 22 bit primes; if we reach threshold (empirical), jump to much larger primes.
-  p = 2^21; stride = 2^10; threshold = 5000000;
+  p = 2^21
+  stride = 2^10
+  threshold = 5000000
   A_mod_p = zero_matrix(Nemo.Native.GF(2), nrows(A), ncols(A))
   while nbits(M) <= Hbits
     @vprint(:UnimodVerif,2,".")
     # Next lines increment p (by random step up to stride) to a prime not dividing M
     if p > threshold && p < threshold+stride
       @vprint(:UnimodVerif,2,"!!")
-      p = 2^56; stride = 2^25;  # p = 2^56 is a good choice on my standard 64-bit machine
+      p = 2^56  # p = 2^56 is a good choice on my standard 64-bit machine
+      stride = 2^25
       continue
     end
     # advance to another prime which does not divide M:
@@ -201,7 +204,7 @@ function _PSH_init(A::ZZMatrix)
   A_mod_m = identity_matrix(base_ring(A), n)
   @vprintln(:UnimodVerif,1,"Starting stage 1 lifting")
   while (m < ModulusLWB)
-    @vprintln(:UnimodVerif,2,"Loop 1: nbits(m) = $(nbits(m))");
+    @vprintln(:UnimodVerif,2,"Loop 1: nbits(m) = $(nbits(m))")
     copy!(A_mod_m, A)
     mm = m^2
     mod_sym!(A_mod_m, mm)
@@ -218,7 +221,7 @@ function _PSH_init(A::ZZMatrix)
 
   # Hadamard bound brings little benefit; anyway, almost never lift all the way
 ###  H = min(hadamard_bound2(A), hadamard_bound2(transpose(A)))
-###  println("nbits(H) = $(nbits(H))");
+###  println("nbits(H) = $(nbits(H))")
   # Compute max num iters in k
   k = (n-1)*(entry_size_bits+log2(n)/2) - (2*log2(n) + entry_size_bits -1)
   k = 2+nbits(ceil(Int,k/log2(m)))
@@ -261,11 +264,11 @@ function _is_unimodular_Pauderis_Storjohann_Hensel(A::ZZMatrix)
     @vprintln(:UnimodVerif,1,"Stage 2 loop: i=$(i)")
 
     mul!(R_bar, R, R)
-    #Next 3 lines do:  M = lift(B0_modm*MatModM(R_bar));
+    #Next 3 lines do:  M = lift(B0_modm*MatModM(R_bar))
     mod_sym!(M, R_bar, m)
     mul!(M, B0, M)
     mod_sym!(M, m)
-    # Next 3 lines do: R = (R_bar - A*M)/m; but with less memory allocation
+    # Next 3 lines do: R = (R_bar - A*M)/m but with less memory allocation
     mul!(R, A, M)
     sub!(R, R_bar, R)
     divexact!(R, m)
@@ -502,11 +505,11 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
       break
     end
 
-    stabilised = i == nexti;
+    stabilised = i == nexti
     i += 1
 
     if stabilised
-      nexti = ceil(Int,(i*1.4)) + 1;
+      nexti = ceil(Int,(i*1.4)) + 1
       #TODO: maybe col by col? to stop doing cols that are already there?
       #main use currently is 1 col anyway
       fl, num, den = _induce_rational_reconstruction(D.x, ppow; unbalanced = true)
@@ -828,7 +831,7 @@ end
 #
 
 function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
-  n = nrows(A);
+  n = nrows(A)
   @assert ncols(A) == ncols(U) == n
   @assert maximum(nbits, A) >= maximum(nbits, U)
 
@@ -892,7 +895,7 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
 
   for i in 1:k
     @vprintln(:UnimodVerif, 1,  "DoublePlusOne: loop: i=$(i)")
-    #@time R_bar = R^2;
+    #@time R_bar = R^2
     mul!(R_bar, R, R)
     vT = view!(view_tmp_V, tmp_V, 1:n, :)
     mod_sym!(vT, R_bar, m)
@@ -1060,26 +1063,26 @@ function det_PauderisStorjohann(A::ZZMatrix, U::AbstractArray= -100:100)
   n = ncols(A)
   DetFactor = ZZ(1)
   while true
-    b = rand(matrix_space(ZZ,n,1),U); 
-    @vprintln(:det,1,"Solving random lin sys using dixon method");
+    b = rand(matrix_space(ZZ,n,1),U)
+    @vprintln(:det,1,"Solving random lin sys using dixon method")
     @vtime :det 2  s,d = Nemo.dixon_solve(A,b)
     if d == 1
-      @vprintln(:det,1,"DOING is_unimodular");
+      @vprintln(:det,1,"DOING is_unimodular")
       @vtime :det 2  fl = is_unimodular(A)
       if fl
-        return DetFactor; # SIGN MIGHT BE WRONG
+        return DetFactor  # SIGN MIGHT BE WRONG
       end
-      @vprintln(:det,1,"*** NOT UNIMODULAR ***");  # extremely unlikely to reach here
+      @vprintln(:det,1,"*** NOT UNIMODULAR ***")  # extremely unlikely to reach here
     else
-      @vprintln(:det,1,"Doing HCOL reduction");
+      @vprintln(:det,1,"Doing HCOL reduction")
       T1 = hcol(s, d)  
-      det_fac_from_hcol = prod_diagonal(T1);
+      det_fac_from_hcol = prod_diagonal(T1)
       new_mat = AbstractAlgebra._solve_triu_left(T1,A)
-      @vprintln(:det,1,"orig_mat biggest entry: $(nbits(maximum(abs,A)))");
-      A = new_mat;
-      @vprintln(:det,1,"reduced mat: biggest entry: $(nbits(maximum(abs,A)))");
-      @vprintln(:det,1,"revised Hadamard bound bitsize $(nbits(hadamard_bound2(new_mat)))");
-      DetFactor *= det_fac_from_hcol;
+      @vprintln(:det,1,"orig_mat biggest entry: $(nbits(maximum(abs,A)))")
+      A = new_mat
+      @vprintln(:det,1,"reduced mat: biggest entry: $(nbits(maximum(abs,A)))")
+      @vprintln(:det,1,"revised Hadamard bound bitsize $(nbits(hadamard_bound2(new_mat)))")
+      DetFactor *= det_fac_from_hcol
     end
   end
 end
@@ -1093,56 +1096,59 @@ end
 # kwarg solver is to choose the linear system solver for
 # solving random linear systems (algorithm :JOHN not yet available).
 function det_hcol_hnf(A::ZZMatrix, U::AbstractArray= -100:100; solver=:NEMO_DIXON)
-  (solver in [:NEMO_DIXON, :JOHN, :OSCAR]) || error("solver must be one of NEMO_DIXON, JOHN, OSCAR");
+  (solver in [:NEMO_DIXON, :JOHN, :OSCAR]) || error("solver must be one of NEMO_DIXON, JOHN, OSCAR")
   n = ncols(A)
-  Hrow = hadamard_bound2(A);
-  Hcol = hadamard_bound2(transpose(A));
+  Hrow = hadamard_bound2(A)
+  Hcol = hadamard_bound2(transpose(A))
   if (Hrow == 0 || Hcol == 0)
-    return ZZ(0);
+    return ZZ(0)
   end
 # ACTIVATE WHEN "is_probably_zero_det" IS AVAILABLE:  is_probably_zero_det(A) && return det(A)
-  Hbits = div(1+min(nbits(Hrow), nbits(Hcol)),2); # abs(det(A)) <= 2^Hbits
-  @vprintln(:det,1,"Hadamard bound in bits $(Hbits)");
-  entry_size = maximum(nbits, A);
-  @vprintln(:det,1,"entry_size = $(entry_size)");
-  HNF_UPB_BITS = max(60, round(Int, 0.5*Hbits/sqrt(n))); # !!! needs reconsideration !!!
-  @vprintln(:det,1,"HNF_UPB_BITS = $(HNF_UPB_BITS)");
+  Hbits = div(1+min(nbits(Hrow), nbits(Hcol)),2)  # abs(det(A)) <= 2^Hbits
+  @vprintln(:det,1,"Hadamard bound in bits $(Hbits)")
+  entry_size = maximum(nbits, A)
+  @vprintln(:det,1,"entry_size = $(entry_size)")
+  HNF_UPB_BITS = max(60, round(Int, 0.5*Hbits/sqrt(n)))  # !!! needs reconsideration !!!
+  @vprintln(:det,1,"HNF_UPB_BITS = $(HNF_UPB_BITS)")
   # Compute det mod M -- may later include some more primes
-  CRT_BITSIZE = min(Hbits, 110);
-  @vprintln(:det,1,"Computing det by crt up to about $(CRT_BITSIZE) bits");
-  p::Int = 2^59 + rand(1:2^40); # start point of primes
-  M = ZZ(1);  det_mod_m = ZZ(0);
-  known_factor = ZZ(1);
+  CRT_BITSIZE = min(Hbits, 110)
+  @vprintln(:det,1,"Computing det by crt up to about $(CRT_BITSIZE) bits")
+  p::Int = 2^59 + rand(1:2^40)  # start point of primes
+  M = ZZ(1)
+  det_mod_m = ZZ(0)
+  known_factor = ZZ(1)
   iter_count = 0
   while nbits(M) < CRT_BITSIZE
     iter_count += 1
-    (iter_count%10 == 0) && @vprint(:det,1,".");
+    (iter_count%10 == 0) && @vprint(:det,1,".")
     p = next_prime(p)
     ZZmodP = Nemo.Native.GF(p)
     det_mod_p = lift(det(map_entries(ZZmodP, A))) # symmetric lift?  handle 0 specially?
     if is_zero(det_mod_p)  # we are very unlikely to happen upon a prime factor, but if we do....
-      known_factor *= p;
+      known_factor *= p
       if nbits(known_factor) > 200
-        return det(A); # we are pretty sure that the det is zero -- cannot handle that case, so delegate to plain old "det"
+        return det(A)  # we are pretty sure that the det is zero -- cannot handle that case, so delegate to plain old "det"
       end
-      continue;  # !!! LAZY BUT SAFE BEHAVIOUR !!!
+      continue  # !!! LAZY BUT SAFE BEHAVIOUR !!!
     end
     # if det_mod_p == 0
     #   ## THIS BLOCK SHOULD PROBABLY BE IN AN AUX FN -- BUT IS IT REALLY WORTH IMPLEMENTING?
     #   The idea is to compute "HNF mod p" quickly from rref, then do an "HCOL" transformation
     #   rk = rref!(A_mod_p)  # hnf_modular_eldiv(A,ZZ(p)) is 20+ times slower
     #   H = lift(A_mod_p)
-    #   det_fac_from_hnf = ZZ(p)^rk;
-    #   HH = parent(H)(p);  # p times identity matrix
-    #   PivotCol = 1;
+    #   det_fac_from_hnf = ZZ(p)^rk
+    #   HH = parent(H)(p)  # p times identity matrix
+    #   PivotCol = 1
     #   for i in 1:n
     #     while PivotCol <= n && H[i, PivotCol] == 0
-    #       PivotCol += 1;
+    #       PivotCol += 1
     #     end
-    #     if PivotCol == n  break; end;
+    #     if PivotCol == n
+    #       break
+    #     end
     #     for j in PivotCol:n
-    #       HH[PivotCol,j] = H[i,j];
-    #     end;
+    #       HH[PivotCol,j] = H[i,j]
+    #     end
     #   end
     #   # HH is now p-modular HNF of A
     #   A = Strassen_Claus.solve_triu_left(HH,A)
@@ -1160,14 +1166,15 @@ function det_hcol_hnf(A::ZZMatrix, U::AbstractArray= -100:100; solver=:NEMO_DIXO
   
   CRT_climb_threshold = 5*Int(floor(Hbits/sqrt(n)))    # constant 5 is empirical (on my computer)
   DetFactor = ZZ(1)
-  ZZmodM,_ = residue_ring(ZZ,M);
+  ZZmodM,_ = residue_ring(ZZ,M)
   #main loop
-  IterCounter = 0;
-  HCOL_IterCounter = 0;  HCOL_bits_gained = 0;
+  IterCounter = 0
+  HCOL_IterCounter = 0
+  HCOL_bits_gained = 0
   while true
-    @vprintln(:det,1,"----- Main loop -----");
+    @vprintln(:det,1,"----- Main loop -----")
     if abs(det_mod_m) == 1
-      @vprintln(:det,1,"Doing is_unimodular");
+      @vprintln(:det,1,"Doing is_unimodular")
       @vtime :det 2  fl = Nemo._is_unimodular_given_det_mod_m(A, Int(det_mod_m), M)
       if fl
         return DetFactor*det_mod_m
@@ -1175,75 +1182,75 @@ function det_hcol_hnf(A::ZZMatrix, U::AbstractArray= -100:100; solver=:NEMO_DIXO
       @assert  false && "How did I get here? (possible but *very* unlikely)"
       # NYI wasn't unimodular so ADD ANOTHER MODULUS ???
     end
-    @vprintln(:det,1,"bitsize ModularDet=$(nbits(det_mod_m))    bitsize M=$(nbits(M))");
+    @vprintln(:det,1,"bitsize ModularDet=$(nbits(det_mod_m))    bitsize M=$(nbits(M))")
     if nbits(abs(det_mod_m)) < nbits(M)-30  &&  nbits(abs(det_mod_m)) < HNF_UPB_BITS
-      @vprintln(:det,1,"HNF because ModularDet is below threshold");
+      @vprintln(:det,1,"HNF because ModularDet is below threshold")
       @vtime :det 2  H = hnf_modular_eldiv(A, abs(det_mod_m))
       det_fac_from_hnf = prod_diagonal(H)
-      @vprintln(:det,1,"  det_fac_from_hnf (bits) = $(nbits(det_fac_from_hnf))");
+      @vprintln(:det,1,"  det_fac_from_hnf (bits) = $(nbits(det_fac_from_hnf))")
       if det_fac_from_hnf > 1
         @vprintln(:det,2,"  [HNF] About to solve triangular system")
 #SLOWER THAN solve          @vtime :det 2   new_mat = AbstractAlgebra._solve_triu_left(H,A)
-        @vtime :det 2  new_mat = solve(H,A;side=:left);
-        @vprintln(:det,2,"  orig_mat biggest entry (bits): $(maximum(nbits,A))");
-        @vprintln(:det,2,"  new_mat biggest entry (bits): $(maximum(nbits,new_mat))");
+        @vtime :det 2  new_mat = solve(H,A;side=:left)
+        @vprintln(:det,2,"  orig_mat biggest entry (bits): $(maximum(nbits,A))")
+        @vprintln(:det,2,"  new_mat biggest entry (bits): $(maximum(nbits,new_mat))")
         DetFactor *= det_fac_from_hnf
         A = new_mat
         # Next block divides det_mod_m by det_fac_from_hnf ensuring that he result is symmetric remainder
-        det_mod_m *= invmod(det_fac_from_hnf,M); # "LAZY BEHAVIOUR" (above) ensures that invmod succeeds
-        det_mod_m = mod(det_mod_m,M);
+        det_mod_m *= invmod(det_fac_from_hnf,M)  # "LAZY BEHAVIOUR" (above) ensures that invmod succeeds
+        det_mod_m = mod(det_mod_m,M)
         if det_mod_m < 0
           if 2*det_mod_m <= -M
-            det_mod_m += M;
+            det_mod_m += M
           end
         else
           if 2*det_mod_m >= M
-            det_mod_m -= M;
+            det_mod_m -= M
           end
         end
-        @vprintln(:det,1,"  Updated det_mod_m is $(det_mod_m)");
-        continue;
+        @vprintln(:det,1,"  Updated det_mod_m is $(det_mod_m)")
+        continue
       end
     end
-    @vprintln(:det,1,"Solving a random linear system...");
-    b = rand(matrix_space(ZZ,n,1),U); 
+    @vprintln(:det,1,"Solving a random linear system...")
+    b = rand(matrix_space(ZZ,n,1),U)
     if solver == :NEMO_DIXON
-      @vprintln(:det,2,"  ...solving by Nemo.dixon_solve");
-      @vtime :det 2   soln2 = Nemo.dixon_solve(A, b);
-      d = soln2[2];
-      s = soln2[1];
+      @vprintln(:det,2,"  ...solving by Nemo.dixon_solve")
+      @vtime :det 2   soln2 = Nemo.dixon_solve(A, b)
+      d = soln2[2]
+      s = soln2[1]
     elseif solver == :JOHN
-      @vprintln(:det,2,"  ...solving using LinSolve");
-      ctx = LinSolveCtx(A);
-      @vtime :det 2  s,d = LinSolve(ctx,b);
+      @vprintln(:det,2,"  ...solving using LinSolve")
+      ctx = LinSolveCtx(A)
+      @vtime :det 2  s,d = LinSolve(ctx,b)
     else # solver == :OSCAR
-      @vprintln(:det,2,"  ...solving using OSCAR solve function");
-      @vtime :det 2  x = solve(matrix(QQ,A),matrix(QQ,b); side = :right);
-      d = lcm(denominator.(collect(x)));
-      s = ZZ.(d * x);
+      @vprintln(:det,2,"  ...solving using OSCAR solve function")
+      @vtime :det 2  x = solve(matrix(QQ,A),matrix(QQ,b); side = :right)
+      d = lcm(denominator.(collect(x)))
+      s = ZZ.(d * x)
     end
     if nbits(d) < 100
-      @vprintln(:det,1,"Soln of lin sys gave det factor $(d)");
+      @vprintln(:det,1,"Soln of lin sys gave det factor $(d)")
     else
-      @vprintln(:det,1,"Soln of lin sys gave det factor with $(nbits(d)) bits");
+      @vprintln(:det,1,"Soln of lin sys gave det factor with $(nbits(d)) bits")
     end
     # If known factor is "close" to Hadamard bound then climb out with CRT
     CRT_bits_to_climb = Hbits - nbits(M) - nbits(d) - nbits(DetFactor)
     if CRT_bits_to_climb < CRT_climb_threshold
-      @vprintln(:det,1,"CRT is worthwhile");
+      @vprintln(:det,1,"CRT is worthwhile")
       DetFactor *= d
-      @vprintln(:det,1,"  nbits(DetFactor) = $(nbits(DetFactor))");
-      @vprintln(:det,1,"  Expected num iters: $(ceil(Int64,(Hbits-Float64(log2(DetFactor)))/log2(p)))");
+      @vprintln(:det,1,"  nbits(DetFactor) = $(nbits(DetFactor))")
+      @vprintln(:det,1,"  Expected num iters: $(ceil(Int64,(Hbits-Float64(log2(DetFactor)))/log2(p)))")
       det_mod_m = lift(ZZmodM(det_mod_m)/d)
       iter_count = 0
       while nbits(M) < Hbits - nbits(DetFactor)
         iter_count += 1
-        (iter_count%100 == 0) && @vprint(:det,2,"  ...$(iter_count)...\r");
+        (iter_count%100 == 0) && @vprint(:det,2,"  ...$(iter_count)...\r")
         # [loop below] Get next prime which does not divide d
         while true
           p = next_prime(p)
           if d%p != 0
-            break;
+            break
           end
         end
         ZZmodP = Nemo.Native.GF(p)
@@ -1254,58 +1261,60 @@ function det_hcol_hnf(A::ZZMatrix, U::AbstractArray= -100:100; solver=:NEMO_DIXO
       if 2*det_mod_m > M
         det_mod_m -= M
       end
-      return det_mod_m*DetFactor;
+      return det_mod_m*DetFactor
     end
     if d == 1
-      @vprintln(:det,1,"Denom was 1 so do new iter [?VERY RARE OCCURRENCE?]");
-      continue;  # neither HNF nor hcol can help here; probably det is 1 or -1
+      @vprintln(:det,1,"Denom was 1 so do new iter [?VERY RARE OCCURRENCE?]")
+      continue  # neither HNF nor hcol can help here; probably det is 1 or -1
     end
     @vprintln(:det,1,"CRT not worthwhile: must climb $(CRT_bits_to_climb); exceeds threshold $(CRT_climb_threshold)")
     if nbits(d) <= HNF_UPB_BITS
       # NOTE: this "then" branch always exits via "continue", it does not "drop through"
-      @vprintln(:det,1,"HNF because lin soln denom is below threshold");
+      @vprintln(:det,1,"HNF because lin soln denom is below threshold")
       if nbits(d) < 60
-        @vprintln(:det,1,"  (indeed denom d = $(d))");
+        @vprintln(:det,1,"  (indeed denom d = $(d))")
       end
       # d may be missing some small prime factors in the largest Smith invariant factor, so
       # if d is "very small", we can increase it by multiplying by powers of 2, 3, 5 or 7:
-      quot = div(2^60,d);
+      quot = div(2^60,d)
       for p in [2,2,2,2,3,3,5,7,11,13,17,19]
-        if p > quot  break;  end
-        d *= p;
-        quot = div(quot,p);
+        if p > quot
+          break
+        end
+        d *= p
+        quot = div(quot,p)
       end
-      @vprintln(:det,1, "  Doing hnf_modular with modulus of size $(nbits(d)) bits");
+      @vprintln(:det,1, "  Doing hnf_modular with modulus of size $(nbits(d)) bits")
       @vtime :det 2  H = hnf_modular_eldiv(A, d)
       det_fac_from_hnf = prod_diagonal(H)
-      @vprintln(:det,1,"  det_fac_from_hnf (bits) = $(nbits(det_fac_from_hnf))");
+      @vprintln(:det,1,"  det_fac_from_hnf (bits) = $(nbits(det_fac_from_hnf))")
       @vprintln(:det,2, "  [HNF] about to solve triangular system")
-# SLOWER THAN solve    @vtime :det 2  new_mat = AbstractAlgebra._solve_triu_left(H,A);
-      @vtime :det 2  new_mat = solve(H,A;side=:left);
-      @vprintln(:det,2,"  orig_mat biggest entry: $(maximum(nbits,A))");
-      @vprintln(:det,2,"  new_mat biggest entry: $(maximum(nbits,new_mat))");
+# SLOWER THAN solve    @vtime :det 2  new_mat = AbstractAlgebra._solve_triu_left(H,A)
+      @vtime :det 2  new_mat = solve(H,A;side=:left)
+      @vprintln(:det,2,"  orig_mat biggest entry: $(maximum(nbits,A))")
+      @vprintln(:det,2,"  new_mat biggest entry: $(maximum(nbits,new_mat))")
       DetFactor *= det_fac_from_hnf
-      det_mod_m = lift(ZZmodM(det_mod_m)/ZZmodM(det_fac_from_hnf));
+      det_mod_m = lift(ZZmodM(det_mod_m)/ZZmodM(det_fac_from_hnf))
       if 2*det_mod_m >= M
         det_mod_m -= M
       end
       A = new_mat
-      continue;
+      continue
     end
     # denom of soln to rnd lin sys was too big, so do hcol jive
-    HCOL_IterCounter += 1;
-    @vprintln(:det,1,"HCOL (iter = $(HCOL_IterCounter))");
+    HCOL_IterCounter += 1
+    @vprintln(:det,1,"HCOL (iter = $(HCOL_IterCounter))")
     T1 = hcol(s, d)  
-    det_fac_from_hcol = prod_diagonal(T1);
-    @vprintln(:det,1,"  det_fac_from_hcol (bits) = $(nbits(det_fac_from_hcol))");
+    det_fac_from_hcol = prod_diagonal(T1)
+    @vprintln(:det,1,"  det_fac_from_hcol (bits) = $(nbits(det_fac_from_hcol))")
     @vprintln(:det,2, "  [HCOL] about to solve triangular system")
 #SLOWER THAN solve    @vtime :det 2  new_mat = AbstractAlgebra._solve_triu_left(T1,A)
-    @vtime :det 2  new_mat = solve(T1,A;side=:left);
-    A = new_mat;
-    DetFactor *= det_fac_from_hcol;
-    HCOL_bits_gained += nbits(det_fac_from_hcol);
-    @vprintln(:det,1,"  Total HCOL bits gained: $(HCOL_bits_gained)");
-    det_mod_m = lift(ZZmodM(det_mod_m)/ZZmodM(det_fac_from_hcol));
+    @vtime :det 2  new_mat = solve(T1,A;side=:left)
+    A = new_mat
+    DetFactor *= det_fac_from_hcol
+    HCOL_bits_gained += nbits(det_fac_from_hcol)
+    @vprintln(:det,1,"  Total HCOL bits gained: $(HCOL_bits_gained)")
+    det_mod_m = lift(ZZmodM(det_mod_m)/ZZmodM(det_fac_from_hcol))
     if 2*det_mod_m >= M
       det_mod_m -= M
     end
