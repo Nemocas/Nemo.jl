@@ -1357,3 +1357,5 @@ Base.Float64(a::QQFieldElem) = Float64(BigFloat(a))
 ###############################################################################
 
 fraction_field(base::ZZRing) = QQ
+
+fraction_field_type(::Type{ZZRing}) = QQField
