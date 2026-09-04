@@ -206,6 +206,7 @@ import AbstractAlgebra: terse
 import AbstractAlgebra: transpose!
 import AbstractAlgebra: truncate!
 import AbstractAlgebra: add_verbosity_scope
+import AbstractAlgebra: add_dodgy_func
 
 AbstractAlgebra.@include_deprecated_bindings()
 
@@ -446,6 +447,7 @@ function __init__()
 
   add_verbosity_scope(:UnimodVerif)
   add_verbosity_scope(:det)
+  add_dodgy_func(:is_prime)
 
   if AbstractAlgebra.should_show_banner() && get(ENV, "NEMO_PRINT_BANNER", "true") != "false"
     show_banner()
