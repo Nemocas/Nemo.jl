@@ -54,6 +54,56 @@ end
   end
 end
 
+@testset "Nemo.mod2_preinv" begin
+  function check_case(a::UInt, n::UInt)
+    ninv = @ccall Nemo.libflint.n_preinvert_limb(n::UInt)::UInt
+    expected = @ccall Nemo.libflint.n_mod2_preinv(a::UInt, n::UInt, ninv::UInt)::UInt
+    @test Nemo.mod2_preinv(a, n, ninv) == expected
+    @test Nemo.mod2_preinv(a, n, ninv) == a % n
+  end
+
+  for n in UInt[
+    0x0000000000000001,
+    0x0000000000000002,
+    0x0000000000000003,
+    0x0000000000000005,
+    0x0000000000000007,
+    0x0000000000000008,
+    0x000000000000000f,
+    0x0000000000000010,
+    0x0000000000000011,
+    0x00000000ffffffff,
+    0x0000000100000000,
+    0x0000000100000001,
+    0x7fffffffffffffff,
+    0x8000000000000000,
+    0x8000000000000001,
+    0xfffffffffffffffd,
+    0xfffffffffffffffe,
+    0xffffffffffffffff,
+  ]
+    for a in UInt[
+      0x0000000000000000,
+      0x0000000000000001,
+      0x0000000000000002,
+      0x0000000000000003,
+      n - 1,
+      n,
+      n + 1,
+      typemax(UInt) - 1,
+      typemax(UInt),
+    ]
+      check_case(a, n)
+    end
+  end
+
+  for _ in 1:10_000
+    n = rand(UInt(1):typemax(UInt))
+    a = rand(UInt)
+    check_case(a, n)
+  end
+end
+
 @testset "zzModRingElem.rand" begin
   R, = residue_ring(ZZ, 13)
 

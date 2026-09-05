@@ -303,7 +303,7 @@ end
 ################################################################################
 
 function *(x::T, y::UInt) where T <: Zmodn_mat
-  y = @ccall libflint.n_mod2_preinv(y::UInt, x.n::UInt, x.ninv::UInt)::UInt
+  y = mod2_preinv(y, x.n, x.ninv)
   return mul!(similar(x), x, y)
 end
 
