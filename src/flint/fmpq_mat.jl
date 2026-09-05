@@ -552,6 +552,8 @@ function rank(x::QQMatrix)
   return r
 end
 
+rank(x::Matrix{QQFieldElem}) = rank(matrix(QQ, x))
+
 ###############################################################################
 #
 #   Reduced row echelon form
