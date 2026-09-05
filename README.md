@@ -22,6 +22,5 @@ The official Nemo repository is at:
 
 Nemo currently provides:
 
-* Wrappers of [FLINT](https://flintlib.org/) (now also containing the previous projects Arb and Antic)
-* Generic polynomial rings, matrix spaces, fraction fields, residue rings, power series
-* finite fields, p-adics, integers, rationals, permutations and characters, number fields
+* Re-exports of AbstractAlgebra.jl's generic polynomial rings, matrix spaces, fraction fields, residue rings, power series, finite fields, p-adics, integers, rationals, permutations and characters, number fields
+* Wrappers of [FLINT](https://flintlib.org/) (now also containing the previous projects Arb, Antic, and Calcium)

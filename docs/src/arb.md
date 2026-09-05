@@ -6,19 +6,23 @@ DocTestSetup = Nemo.doctestsetup()
 
 # [Fixed precision real balls](@id arb_field_section)
 
-Fixed precision real ball arithmetic is supplied by Arb which provides a
+Fixed precision real ball arithmetic is supplied by FLINT which provides a
 ball representation which tracks error bounds rigorously. Real numbers are 
 represented in mid-rad interval form $[m \pm r] = [m-r, m+r]$.
 
-The Arb real field is constructed using the `ArbField` constructor. This
-constructs the parent object for the Arb real field.
+The corresponding Nemo types retain the historical name Arb, from the
+separate library that is now part of FLINT.
+Arb stands for "*a*rbitrary-precision *r*eal *b*alls" (see [Arbitrary precision real balls](@ref real_field_section) for arbitrary precision real balls in Nemo).
+
+The Arb field is constructed using the `ArbField` constructor. This
+constructs the parent object for the Arb field.
 
 The types of real balls in Nemo are given in the following table, along with
 the libraries that provide them and the associated types of the parent objects.
 
  Library | Field                | Element type  | Parent type
 ---------|----------------------|---------------|--------------
-Arb      | $\mathbb{R}$ (balls) | `ArbFieldElem`         | `ArbField`
+FLINT      | $\mathbb{R}$ (balls) | `ArbFieldElem`         | `ArbField`
 
 All the real field types belong to the `Field` abstract type and the types of
 elements in this field, i.e. balls in this case, belong to the `FieldElem`
@@ -34,8 +38,8 @@ Below, we document the additional functionality provided for real balls.
 
 ### Constructors
 
-In order to construct real balls in Nemo, one must first construct the Arb
-real field itself. This is accomplished with the following constructor.
+In order to construct real balls in Nemo, one must first construct the Arb field itself.
+This is accomplished with the following constructor.
 
 ```
 ArbField(prec::Int)
@@ -45,7 +49,7 @@ Return the Arb field with precision in bits `prec` used for operations on
 interval midpoints. The precision used for interval radii is a fixed
 implementation-defined constant (30 bits).
 
-Here is an example of creating an Arb real field and using the resulting
+Here is an example of creating an Arb field and using the resulting
 parent object to coerce values into the resulting field.
 
 **Examples**
@@ -68,17 +72,16 @@ julia> d = RR(12)
 ```
 
 Note that whilst one can coerce double precision floating point values into an
-Arb real field, unless those values can be represented exactly in double
+Arb field, unless those values can be represented exactly in double
 precision the resulting ball can't be any more precise than the double
 precision supplied.
 
 If instead, values can be represented precisely using decimal arithmetic then
-one can supply them to Arb using a string. In this case, Arb will store them to
+one can supply them to the real field using a string. In this case, the real field will store them to
 the precision specified when creating the Arb field.
 
-If the values can be stored precisely as a binary floating point number, Arb
-will store the values exactly. See the function `is_exact` below for more
-information.
+If the values can be stored precisely as a binary floating point number, the Arb field will store the values exactly.
+See the function `is_exact` below for more information.
 
 ### Real ball constructors
 

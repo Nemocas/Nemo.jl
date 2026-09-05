@@ -11,8 +11,7 @@ DocTestSetup = Nemo.doctestsetup()
 Nemo allow the creation of dense, univariate polynomials over any computable
 ring $R$. There are two different kinds of implementation: a generic one for
 the case where no specific implementation exists (provided by AbstractAlgebra.jl), and
-efficient implementations of polynomials over numerous specific rings, usually provided
-by C/C++ libraries.
+efficient implementations of polynomials over numerous specific rings provided by FLINT.
 
 The following table shows each of the polynomial types available in Nemo, the
 base ring $R$, and the Julia/Nemo types for that kind of polynomial (the type
@@ -29,10 +28,10 @@ $\mathbb{Z}/p\mathbb{Z}$ (small prime $p$)  | FLINT               | `fpPolyRingE
 $\mathbb{Z}/p\mathbb{Z}$ (large prime $p$)  | FLINT               | `FpPolyRingElem`        | `FpPolyRing`
 $\mathbb{F}_{p^n}$ (small $p$)              | FLINT               | `fqPolyRepPolyRingElem` | `fqPolyRepPolyRing`
 $\mathbb{F}_{p^n}$ (large $p$)              | FLINT               | `FqPolyRepPolyRingElem` | `FqPolyRepPolyRing`
-$\mathbb{R}$ (arbitrary precision)          | Arb                 | `RealPolyRingElem`      | `RealPolyRing`
-$\mathbb{C}$ (arbitrary precision)          | Arb                 | `ComplexPolyRingElem`   | `ComplexPolyRing`
-$\mathbb{R}$ (fixed precision)              | Arb                 | `ArbPolyRingElem`       | `ArbPolyRing`
-$\mathbb{C}$ (fixed precision)              | Arb                 | `AcbPolyRingElem`       | `AcbPolyRing`
+$\mathbb{R}$ (arbitrary precision)          | FLINT               | `RealPolyRingElem`      | `RealPolyRing`
+$\mathbb{C}$ (arbitrary precision)          | FLINT               | `ComplexPolyRingElem`   | `ComplexPolyRing`
+$\mathbb{R}$ (fixed precision)              | FLINT               | `ArbPolyRingElem`       | `ArbPolyRing`
+$\mathbb{C}$ (fixed precision)              | FLINT               | `AcbPolyRingElem`       | `AcbPolyRing`
 
 The string representation of the variable and the base ring $R$ of a generic
 polynomial is stored in its parent object. 
