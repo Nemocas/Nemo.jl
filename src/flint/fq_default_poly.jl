@@ -786,12 +786,8 @@ function QadicField(f::FqPolyRingElem, prec::Int = 64, var::String = "a"; cached
 
   z = get_cached!(QadicBaseFqPol, (base_field, f), cached) do
     ctx_type = _fq_default_ctx_type(K)
-    if ctx_type == _FQ_DEFAULT_NMOD
-      _K = _get_raw_type(fpField, K)
-    else
-      @assert ctx_type == _FQ_DEFAULT_FMPZ_NMOD
-      _K = _get_raw_type(FpField, K)
-    end
+    @assert ctx_type in (_FQ_DEFAULT_NMOD, _FQ_DEFAULT_FMPZ_NMOD)
+    _K = ctx_type == _FQ_DEFAULT_NMOD ? _get_raw_type(fpField, K) : _get_raw_type(FpField, K)
     ff = map_coefficients(c -> _K(lift(ZZ, c)), f; cached = false)
     return QadicField(ff, prec, var; cached = false, check = check, base_field = base_field)[1]
   end
