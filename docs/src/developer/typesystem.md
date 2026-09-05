@@ -227,9 +227,27 @@ far is that it is not intuitive for developers.
 The most important abstract types in the system are the element types. Their
 hierarchy is shown in the following diagram.
 
-![alt text](img/types.svg)
+```@raw html
+<img src="../img/types.svg" alt="Diagram of element types"/>
+```
+```@raw latex
+\begin{figure}
+\centering
+\includegraphics[max width=\linewidth]{developer/img/types.pdf}
+\caption{Diagram of element types}
+\end{figure}
+```
 
 Most of the element types have a corresponding parent abstract type. These are
 shown in the following diagram.
 
-![alt text](img/types2.svg)
+```@raw html
+<img src="../img/types2.svg" alt="Diagram of parent types"/>
+```
+```@raw latex
+\begin{figure}
+\centering
+\includegraphics[max width=\linewidth]{developer/img/types2.pdf}
+\caption{Diagram of parent types}
+\end{figure}
+```

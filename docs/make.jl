@@ -3,13 +3,22 @@ using Documenter, Nemo, AbstractAlgebra
 DocMeta.setdocmeta!(Nemo, :DocTestSetup, Nemo.doctestsetup(); recursive = true)
 DocMeta.setdocmeta!(AbstractAlgebra, :DocTestSetup, AbstractAlgebra.doctestsetup(); recursive = true)
 
+const render_pdf = "--pdf" in ARGS
+const run_doctests = !("--nodoctests" in ARGS)
+
 makedocs(
-         format = Documenter.HTML(),
+         format = [
+            Documenter.HTML(;
+                size_threshold_warn = 204800,
+                size_threshold = 409600,
+            ),
+            (render_pdf ? (Documenter.LaTeX(),) : ())...,
+         ],
          sitename = "Nemo.jl",
          modules = [Nemo, AbstractAlgebra],
          clean = true,
          checkdocs = :none,
-         doctest = true,
+         doctest = run_doctests,
          pages    = [
                      "index.md",
                      "about.md",
