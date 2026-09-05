@@ -230,26 +230,6 @@ const pkgdir = realpath(joinpath(dirname(@__DIR__)))
 #
 ###############################################################################
 
-# heavily inspired by https://discourse.julialang.org/t/a-minimal-example-with-base-redirect-stdout/64245/8
-function capture_stdout(f::Function)
-  pipe = Pipe()
-  started = Base.Event()
-  writer = @async redirect_stdout(pipe) do
-    notify(started)
-    try
-      f()
-    finally
-      Base.Libc.flush_cstdio()
-      close(pipe.in)
-    end
-  end
-  wait(started)
-  result = readchomp(pipe)
-  wait(writer)
-  close(pipe)
-  return result
-end
-
 function flint_abort()
   error("Problem in the FLINT-Subsystem")
 end
@@ -296,11 +276,16 @@ function Base.showerror(io::IO, e::FlintException)
 end
 
 function flint_throw(err_type::FlintExceptionType, cmsg::Cstring, va_list::Ptr{Cvoid})
-  # use flint_vsprintf once available, see https://github.com/flintlib/flint/issues/2388
-  msg = capture_stdout() do
-    @ccall libflint.flint_vprintf(cmsg::Cstring, va_list::Ptr{Cvoid})::Int
-  end
+  max_length = 1024
+  cmsgf = @ccall libflint.flint_malloc(max_length::Csize_t)::Cstring
+  length = @ccall libflint.flint_vsnprintf(cmsgf::Cstring, max_length::Csize_t, cmsg::Cstring, va_list::Ptr{Cvoid})::Int
   @ccall libflint.flint_va_end(va_list::Ptr{Cvoid})::Nothing
+  msg = unsafe_string(cmsgf)
+  @ccall libflint.flint_free(cmsgf::Cstring)::Nothing
+
+  if length >= max_length
+    msg *= "... (message truncated)"
+  end
   throw(FlintException(err_type, msg))
 end
 

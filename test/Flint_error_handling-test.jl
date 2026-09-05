@@ -72,6 +72,17 @@ end
   @test_throws FlintException(Nemo.FLINT_ERROR, "Foo 2 / 3 bar") @ccall Nemo.libflint.flint_throw(
     Nemo.FLINT_ERROR::Int, "Foo %{fmpq} bar"::Cstring; QQ(2, 3)::Ref{QQFieldElem}
   )::Nothing
+
+  # with message truncation
+  try
+    @ccall Nemo.libflint.flint_throw(
+      Nemo.FLINT_ERROR::Int, "%s"::Cstring; ("A"^2000)::Cstring
+    )::Nothing
+  catch e
+    @test e isa FlintException
+    @test length(e.msg) < 2000
+    @test endswith(e.msg, "... (message truncated)")
+  end
 end
 
 @testset "Flint_error_handling.real-world-example" begin
