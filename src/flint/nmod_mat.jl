@@ -369,7 +369,7 @@ end
 @doc raw"""
     strong_echelon_form(a::zzModMatrix)
 
-Return the strong echeleon form of $a$. The matrix $a$ must have at least as
+Return the strong echelon form of $a$. The matrix $a$ must have at least as
 many rows as columns.
 """
 function strong_echelon_form(a::zzModMatrix)
@@ -482,7 +482,7 @@ function AbstractAlgebra._solve_triu(x::T, y::T) where T <: Zmodn_mat
   return z
 end
 
-#solves upper_triangular_part(B)A = C, 
+#solves upper_triangular_part(B)A = C,
 #if unit == 1, then only the strictly upper triangular part is used
 #and the diagonal is assumed to be 1
 #
@@ -493,7 +493,7 @@ function _solve_triu!(A::T, B::T, C::T, unit::Int = 0) where T <: Zmodn_mat
   @ccall libflint.nmod_mat_solve_triu(A::Ref{T}, B::Ref{T}, C::Ref{T}, unit::Cint)::Cvoid
 end
 
-#solves lower_triangular_part(B)A = C, 
+#solves lower_triangular_part(B)A = C,
 #if unit == 1, then only the strictly lower triangular part is used
 #and the diagonal is assumed to be 1
 function AbstractAlgebra._solve_tril!(A::T, B::T, C::T, unit::Int = 0) where T <: Zmodn_mat

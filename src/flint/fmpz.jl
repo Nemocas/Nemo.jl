@@ -3342,8 +3342,8 @@ promote_rule(::Type{ZZRingElem}, ::Type{T}) where {T <: Integer} = ZZRingElem
 
 
 #output sensitive rational_reconstruction, in particular if
-#numerator is larger than den 
-#used below in rational_reconstruction and, more seriously, in the 
+#numerator is larger than den
+#used below in rational_reconstruction and, more seriously, in the
 #solvers in ZZMatrix-Linalg
 
 function _ratrec!(n::ZZRingElem, d::ZZRingElem, a::ZZRingElem, b::ZZRingElem, N::ZZRingElem = ZZ(), D::ZZRingElem= ZZ())
@@ -3387,7 +3387,7 @@ end
 Tries to solve $ay=x mod b$ for $x,y < sqrt(b/2)$. If possible, returns
   (`true`, $x$, $y$) or (`false`, garbage) if not possible.
 
-If `unbalanced` is set to `true`, a solution is accepted if `nbits(x) + nbits(y) + 30 <= nbits(b)` or if the compined size of smaller than half of the modulus - this allows for the numberator or denominator to be much smaller
+If `unbalanced` is set to `true`, a solution is accepted if `nbits(x) + nbits(y) + 30 <= nbits(b)` or if the compined size of smaller than half of the modulus - this allows for the numerator or denominator to be much smaller
 than the other one.
 
 By default `y` and `b` have to be coprime for a valid solution. It is

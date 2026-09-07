@@ -754,7 +754,7 @@ of the euclidean row-norms squared.
 """
 function hadamard_bound2(M::ZZMatrix)
   check_square(M)
-  H = ZZ(1);
+  H = ZZ(1)
   r = ZZ(0)
   n = nrows(M)
   GC.@preserve M begin
@@ -1391,8 +1391,8 @@ end
 
 #=
 g, e,f = gcdx(a, b)
-U = [1 0 ; -divexact(b, g)*f 1]*[1 1; 0 1];
-V = [e -divexact(b, g) ; f divexact(a, g)];
+U = [1 0 ; -divexact(b, g)*f 1]*[1 1; 0 1]
+V = [e -divexact(b, g) ; f divexact(a, g)]
 
 then U*[ a 0; 0 b] * V = [g 0 ; 0 l]
 =#
