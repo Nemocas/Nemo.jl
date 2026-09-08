@@ -137,7 +137,7 @@ end
 ################################################################################
 
 function ^(x::ComplexMatrix, y::UInt)
-  nrows(x) != ncols(x) && error("Matrix must be square")
+  check_square(x)
   z = similar(x)
   @ccall libflint.acb_mat_pow_ui(z::Ref{ComplexMatrix}, x::Ref{ComplexMatrix}, y::UInt, precision(Balls)::Int)::Nothing
   return z

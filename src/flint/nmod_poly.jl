@@ -804,7 +804,7 @@ end
 ################################################################################
 
 function det(M::Generic.Mat{zzModPolyRingElem})
-  nrows(M) != ncols(M) && error("Not a square matrix in det")
+  check_square(M)
   nrows(M) == 0 && return one(base_ring(M))
 
   if is_prime(modulus(base_ring(M)))

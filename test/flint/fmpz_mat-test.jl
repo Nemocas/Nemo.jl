@@ -472,7 +472,7 @@ end
   @test inv(A)*A == one(S)
 
   a = ZZ[1 1;]
-  @test_throws ArgumentError inv(a)
+  @test_throws DomainError inv(a)
   b = ZZ[1 0; 0 2]
   @test_throws ArgumentError inv(b)
   c = ZZ[1 1; 1 1]
@@ -668,8 +668,8 @@ end
   G = lll_gram(A)
   @test G == A
 
-  @test_throws ArgumentError lll_gram(ZZ[1 0])
-  @test_throws ArgumentError lll_gram_with_transform(ZZ[1 0])
+  @test_throws DomainError lll_gram(ZZ[1 0])
+  @test_throws DomainError lll_gram_with_transform(ZZ[1 0])
   @test_throws ArgumentError lll_gram(ZZ[1 0; 1 1])
   @test_throws ArgumentError lll_gram_with_transform(ZZ[1 0; 1 1])
 
