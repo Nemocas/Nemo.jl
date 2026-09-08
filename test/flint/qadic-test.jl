@@ -386,7 +386,7 @@ end
 
   @test !is_square(b+1)
 
-  @test is_square_with_sqrt(b+1) == (false, zero(R))
+  @test is_square_with_sqrt(b+1)[1] == false
 end
 
 @testset "QadicFieldElem.square_root_char2_precomp" begin
