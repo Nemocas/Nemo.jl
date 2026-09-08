@@ -160,7 +160,7 @@ end
   @test !is_unimodular(N*identity_matrix(ZZ, 11))
 
 
-  @test_throws ArgumentError is_unimodular(matrix(ZZ,0,1,[]))
+  @test_throws DomainError is_unimodular(matrix(ZZ,0,1,[]))
   @test_throws ArgumentError is_unimodular(matrix(ZZ,0,0,[]); algorithm=:WRONG)
 
   U = matrix(ZZ, 3,3,  [ 3, 22, 46, 5, 35, 73, 4, 27, 56])

@@ -130,7 +130,7 @@ function transpose(a::T) where T <: Zmodn_mat
 end
 
 function transpose!(a::T) where T <: Zmodn_mat
-  @req is_square(a) "Matrix must be a square matrix"
+  check_square(a)
   return transpose!(a, a)
 end
 
@@ -338,7 +338,7 @@ end
 ################################################################################
 
 function ^(x::T, y::UInt) where T <: Zmodn_mat
-  nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
+  check_square(x)
   z = similar(x)
   @ccall libflint.nmod_mat_pow(z::Ref{T}, x::Ref{T}, y::UInt)::Nothing
   return z
@@ -369,7 +369,7 @@ end
 @doc raw"""
     strong_echelon_form(a::zzModMatrix)
 
-Return the strong echeleon form of $a$. The matrix $a$ must have at least as
+Return the strong echelon form of $a$. The matrix $a$ must have at least as
 many rows as columns.
 """
 function strong_echelon_form(a::zzModMatrix)
@@ -406,7 +406,7 @@ end
 ################################################################################
 
 function tr(a::T) where T <: Zmodn_mat
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   r = @ccall libflint.nmod_mat_trace(a::Ref{T})::UInt
   return base_ring(a)(r)
 end
@@ -418,7 +418,7 @@ end
 ################################################################################
 
 function det(a::zzModMatrix)
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   nrows(a) == 0 && return one(base_ring(a))
   if is_prime(a.n)
     r = @ccall libflint.nmod_mat_det(a::Ref{zzModMatrix})::UInt
@@ -450,7 +450,7 @@ end
 ################################################################################
 
 function inv(a::zzModMatrix)
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   if is_prime(a.n)
     z = similar(a)
     r = @ccall libflint.nmod_mat_inv(z::Ref{zzModMatrix}, a::Ref{zzModMatrix})::Int
@@ -482,7 +482,7 @@ function AbstractAlgebra._solve_triu(x::T, y::T) where T <: Zmodn_mat
   return z
 end
 
-#solves upper_triangular_part(B)A = C, 
+#solves upper_triangular_part(B)A = C,
 #if unit == 1, then only the strictly upper triangular part is used
 #and the diagonal is assumed to be 1
 #
@@ -493,7 +493,7 @@ function _solve_triu!(A::T, B::T, C::T, unit::Int = 0) where T <: Zmodn_mat
   @ccall libflint.nmod_mat_solve_triu(A::Ref{T}, B::Ref{T}, C::Ref{T}, unit::Cint)::Cvoid
 end
 
-#solves lower_triangular_part(B)A = C, 
+#solves lower_triangular_part(B)A = C,
 #if unit == 1, then only the strictly lower triangular part is used
 #and the diagonal is assumed to be 1
 function AbstractAlgebra._solve_tril!(A::T, B::T, C::T, unit::Int = 0) where T <: Zmodn_mat

@@ -190,7 +190,7 @@ end
 
   # non-square throws
   C = ZZPolyRingMatrix(matrix(R, [x 1; x^2+1 x-1; R(1) x]))
-  @test_throws ArgumentError det(C)
+  @test_throws DomainError det(C)
 end
 
 @testset "ZZPolyRingMatrix.tr" begin
@@ -204,7 +204,7 @@ end
 
   # non-square throws
   C = ZZPolyRingMatrix(matrix(R, [x 1 x+2; x^2+1 x-1 3]))
-  @test_throws ArgumentError tr(C)
+  @test_throws DomainError tr(C)
 end
 
 @testset "ZZPolyRingMatrix.rank" begin

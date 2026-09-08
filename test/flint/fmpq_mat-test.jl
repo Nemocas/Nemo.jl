@@ -498,7 +498,7 @@ end
   @test C*inv(C) == one(S)
 
   a = QQ[1 1;]
-  @test_throws ErrorException inv(a)
+  @test_throws DomainError inv(a)
   a = QQ[1 1; 1 1]
   @test_throws ErrorException inv(a)
 end

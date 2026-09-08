@@ -1,6 +1,7 @@
 testlist = [
 # Aqua.jl
   "Aqua.jl",
+  "ClosureBoxes.jl",
 # Flint integration,
   "Flint_error_handling-test.jl",
 # Julia extensions
