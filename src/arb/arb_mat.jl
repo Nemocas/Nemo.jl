@@ -127,7 +127,7 @@ end
 ################################################################################
 
 function ^(x::ArbMatrix, y::UInt)
-  nrows(x) != ncols(x) && error("Matrix must be square")
+  check_square(x)
   z = similar(x)
   @ccall libflint.arb_mat_pow_ui(z::Ref{ArbMatrix}, x::Ref{ArbMatrix}, y::UInt, precision(base_ring(x))::Int)::Nothing
   return z

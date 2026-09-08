@@ -343,7 +343,7 @@ end
 ###############################################################################
 
 function inv(x::QQMatrix)
-  !is_square(x) && error("Matrix not invertible")
+  check_square(x)
   z = similar(x)
   success = @ccall libflint.fmpq_mat_inv(z::Ref{QQMatrix}, x::Ref{QQMatrix})::Cint
   success == 0 && error("Matrix not invertible")
@@ -402,7 +402,7 @@ end
 ###############################################################################
 
 function charpoly(R::QQPolyRing, x::QQMatrix)
-  nrows(x) != ncols(x) && error("Non-square")
+  check_square(x)
   z = R()
   @ccall libflint.fmpq_mat_charpoly(z::Ref{QQPolyRingElem}, x::Ref{QQMatrix})::Nothing
   return z
@@ -415,7 +415,7 @@ end
 ###############################################################################
 
 function minpoly(R::QQPolyRing, x::QQMatrix)
-  nrows(x) != ncols(x) && error("Non-square")
+  check_square(x)
   z = R()
   @ccall libflint.fmpq_mat_minpoly(z::Ref{QQPolyRingElem}, x::Ref{QQMatrix})::Nothing
   return z
@@ -430,7 +430,7 @@ minpoly(x::QQMatrix) = minpoly(polynomial_ring(QQ; cached = false)[1], x)
 ###############################################################################
 
 function det(x::QQMatrix)
-  nrows(x) != ncols(x) && error("Non-square matrix")
+  check_square(x)
   z = QQFieldElem()
   @ccall libflint.fmpq_mat_det(z::Ref{QQFieldElem}, x::Ref{QQMatrix})::Nothing
   return z
@@ -454,7 +454,7 @@ more computation time).  Under a "uniformity assumption" the probability
 of a false positive is about `2^(-modulus_bitsize)`.
 """
 function is_probably_zero_det(M::QQMatrix; modulus_bitsize::Int = 100)
-  @req  is_square(M)  "matrix must be square"
+  check_square(M)
   @req ((modulus_bitsize >= 20) && (modulus_bitsize <= 1000))  "modulus_bitsize must be between 20 and 1000 (but bigger than about 250 is usually senseless)"
   # Dispose of two trivial cases:
   (nrows(M) == 0) && return false
@@ -584,7 +584,7 @@ Solve $ax = b$ by clearing denominators and using Dixon's algorithm. This is
 usually faster for large systems.
 """
 function _solve_dixon(a::QQMatrix, b::QQMatrix)
-  nrows(a) != ncols(a) && error("Not a square matrix in solve")
+  check_square(a)
   nrows(b) != nrows(a) && error("Incompatible dimensions in solve")
   z = similar(b)
   nonsing = @ccall libflint.fmpq_mat_solve_dixon(z::Ref{QQMatrix}, a::Ref{QQMatrix}, b::Ref{QQMatrix})::Bool
@@ -625,7 +625,7 @@ end
 ###############################################################################
 
 function tr(x::QQMatrix)
-  nrows(x) != ncols(x) && error("Not a square matrix in trace")
+  check_square(x)
   d = QQFieldElem()
   @ccall libflint.fmpq_mat_trace(d::Ref{QQFieldElem}, x::Ref{QQMatrix})::Nothing
   return d

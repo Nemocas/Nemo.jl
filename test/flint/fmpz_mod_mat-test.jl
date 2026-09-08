@@ -539,13 +539,13 @@ end
 
   @test c == Z17(13)
 
-  @test_throws ErrorException tr(b)
+  @test_throws DomainError tr(b)
 
   c = det(a)
 
   @test c == zero(Z17)
 
-  @test_throws ErrorException det(b)
+  @test_throws DomainError det(b)
 
   c = det(aa)
 
@@ -608,7 +608,7 @@ end
 
   @test c == parent(aa)([12 13 1; 14 13 15; 4 4 1])
 
-  @test_throws ErrorException inv(a)
+  @test_throws DomainError inv(a)
 
   @test_throws ErrorException inv(transpose(a)*a)
 
@@ -619,7 +619,7 @@ end
 
   G = matrix(R, 2, 2, [4, 0, 0, 2])
   @test_throws ErrorException inv(G)
-  @test_throws ErrorException inv(matrix(R, 2, 1, [1, 1]))
+  @test_throws DomainError inv(matrix(R, 2, 1, [1, 1]))
 end
 
 @testset "ZZModMatrix.solve over $R with $NFTrait" for (R, NFTrait) in [

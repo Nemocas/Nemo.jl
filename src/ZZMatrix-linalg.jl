@@ -51,7 +51,7 @@ function is_unimodular(A::ZZMatrix; algorithm=:auto)
   # Call this function when no extra info about the matrix is available.
   # It does a preliminary check that det(A) is +/-1 modulo roughly 2^100.
   # If so, then delegate the complete check to is_unimodular_given_det_mod_m
-  @req  is_square(A)  "Matrix must be square"
+  check_square(A)
   @req (algorithm in [:auto, :CRT, :pauderis_storjohann])  "algorithm must be one of [:CRT, :pauderis_storjohann, :auto]"
   # Deal with two trivial cases
   if nrows(A) == 0
@@ -98,7 +98,7 @@ function _is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEl
   # (but we avoid P-S if the space estimate is too large).
   # M is a modulus satisfying M > 2^30;
   # det_mod_m is det(A) mod M [!not checked!]: it is either +1 or -1.
-  is_square(A) || throw(ArgumentError("Matrix must be square"))
+  check_square(A)
   abs(det_mod_m) == 1 || throw(ArgumentError("det_mod_m must be +1 or -1"))
   M >  2^30 || throw(ArgumentError("modulus must be greater than 2^30"))
   (algorithm in [:auto, :CRT, :pauderis_storjohann]) || throw(ArgumentError("algorithm must be one of [:CRT, :pauderis_storjohann, :auto]"))

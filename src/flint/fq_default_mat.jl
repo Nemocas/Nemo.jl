@@ -118,7 +118,7 @@ function transpose(a::FqMatrix)
 end
 
 function transpose!(a::FqMatrix)
-  @req is_square(a) "Matrix must be a square matrix"
+  check_square(a)
   return transpose!(a, a)
 end
 
@@ -318,7 +318,7 @@ end
 ################################################################################
 
 function det(a::FqMatrix)
-  !is_square(a) && error("Non-square matrix")
+  check_square(a)
   n = nrows(a)
   R = base_ring(a)
   if n == 0
@@ -358,7 +358,7 @@ end
 ################################################################################
 
 function inv(a::FqMatrix)
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   z = similar(a)
   r = @ccall libflint.fq_default_mat_inv(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Int
   !Bool(r) && error("Matrix not invertible")
@@ -507,7 +507,7 @@ end
 ################################################################################
 
 function charpoly(R::FqPolyRing, a::FqMatrix)
-  !is_square(a) && error("Matrix must be square")
+  check_square(a)
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   p = R()
   @ccall libflint.fq_default_mat_charpoly(p::Ref{FqPolyRingElem}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
@@ -515,7 +515,7 @@ function charpoly(R::FqPolyRing, a::FqMatrix)
 end
 
 function charpoly_danivlesky!(R::FqPolyRing, a::FqMatrix)
-  !is_square(a) && error("Matrix must be square")
+  check_square(a)
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   p = R()
   @ccall libflint.fq_default_mat_charpoly_danilevsky(p::Ref{FqPolyRingElem}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
@@ -530,7 +530,7 @@ end
 ################################################################################
 
 function minpoly(R::FqPolyRing, a::FqMatrix)
-  !is_square(a) && error("Matrix must be square")
+  check_square(a)
   base_ring(R) != base_ring(a) && error("Must have common base ring")
   m = deepcopy(a)
   p = R()
