@@ -2007,16 +2007,13 @@ remove(x::ZZRingElem, y::Integer) = remove(x, ZZRingElem(y))
 
 remove(x::Integer, y::ZZRingElem) = remove(ZZRingElem(x), y)
 
-function remove(a::UInt, b::UInt)
+@inline function remove(a::UInt, b::UInt)
   b <= 1 && error("Factor <= 1")
   a == 0 && error("Not yet implemented")
-  q = Ref(a)
-  binv = @ccall libflint.n_precompute_inverse(b::UInt)::Float64
-  v = @ccall libflint.n_remove2_precomp(q::Ptr{UInt}, b::UInt, binv::Float64)::Cint
-  return (Int(v), q[])
+  return _remove(a, b)
 end
 
-function remove(a::Int, b::Int)
+@inline function remove(a::Int, b::Int)
   b <= 1 && error("Factor <= 1")
   v, q = remove(abs(a)%UInt, b%UInt)
   return (v, a < 0 ? -q%Int : q%Int)
