@@ -174,7 +174,7 @@ end
 function *(x::fpFieldElem, y::fpFieldElem)
   check_parent(x, y)
   R = parent(x)
-  d = mulmod(x.data, y.data, R.n, R.ninv)
+  d = mulmod_reduced(x.data, y.data, R.n, R.ninv)
   return fpFieldElem(d, R)
 end
 
@@ -297,7 +297,7 @@ function divexact(x::fpFieldElem, y::fpFieldElem; check::Bool=true)
   y == 0 && throw(DivideError())
   R = parent(x)
   yinv = @ccall libflint.n_invmod(y.data::UInt, R.n::UInt)::UInt
-  d = mulmod(x.data, yinv, R.n, R.ninv)
+  d = mulmod_reduced(x.data, yinv, R.n, R.ninv)
   return fpFieldElem(d, R)
 end
 

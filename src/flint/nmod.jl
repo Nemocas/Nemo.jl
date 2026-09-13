@@ -177,18 +177,12 @@ function mulmod(a::UInt, b::UInt, n::UInt, ni::UInt)
   return @ccall libflint.n_mulmod2_preinv(a::UInt, b::UInt, n::UInt, ni::UInt)::UInt
 end
 
-# a mod n, with ninv as above; Julia port of flint's n_mod2_preinv, so that
-# callers can inline the reduction instead of paying for a ccall
-@inline function mod2_preinv(a::UInt, n::UInt, ninv::UInt)
-  @assert !iszero(n)
-
+# For u1 < n_norm, where n_norm = n << leading_zeros(n) and ninv is as above: a candidate
+# for (u1, u0) mod n_norm and the q0 that decides its first correction. One step of
+# Moller-Granlund, "Improved division by invariant integers" (Algorithm 4), as in flint's
+# n_*_preinv functions
+@inline function _mod_preinv_candidate(u1::UInt, u0::UInt, n_norm::UInt, ninv::UInt)
   bits = 8 * sizeof(UInt)
-  norm = leading_zeros(n)
-  n_norm = n << norm
-
-  # split a << norm into two limbs (u1, u0); a >> 64 is a well-defined 0 in Julia
-  u1 = a >> (bits - norm)
-  u0 = a << norm
 
   # q = (q1, q0) approximates (u1, u0) * 2^64 / n_norm via q = u1 * ninv + (u1, u0)
   prod = widemul(ninv, u1)
@@ -197,19 +191,58 @@ end
   q0 += u0
   q1 = q1 + u1 + (q0 < u0)
 
-  # candidate remainder, off by at most one correction step
-  r = u0 - (q1 + 1) * n_norm
+  return u0 - (q1 + 1) * n_norm, q0
+end
+
+# (u1, u0) mod n_norm, still shifted. The corrections are selects: as branches, loops such as
+# sum(x -> data(R(x)), v) over mod2_preinv run up to 16 times slower on an AMD EPYC 9554
+@inline function _mod_preinv_norm(u1::UInt, u0::UInt, n_norm::UInt, ninv::UInt)
+  r, q0 = _mod_preinv_candidate(u1, u0, n_norm, ninv)
   if r > q0
     r += n_norm
   end
+  return r < n_norm ? r : r - n_norm
+end
 
-  return r < n_norm ? (r >> norm) : ((r - n_norm) >> norm)
+# As _mod_preinv_norm, with the corrections as branches: the first is taken almost always, the
+# second almost never. As selects they lie on the path from one product to the next in a chain
+# of multiplications, which then takes 26 instead of 20 clock cycles per product on an AMD
+# EPYC 9554. A call on the rare side keeps the compiler from turning a branch into a select.
+@inline function _mod_preinv_norm_branched(u1::UInt, u0::UInt, n_norm::UInt, ninv::UInt)
+  r, q0 = _mod_preinv_candidate(u1, u0, n_norm, ninv)
+  r = r > q0 ? r + n_norm : _identity_rare(r)
+  return r < n_norm ? r : _sub_rare(r, n_norm)
+end
+
+@noinline _identity_rare(r::UInt) = r
+@noinline _sub_rare(r::UInt, n::UInt) = r - n
+
+# a mod n; Julia port of flint's n_mod2_preinv, so that callers can inline the
+# reduction instead of paying for a ccall
+@inline function mod2_preinv(a::UInt, n::UInt, ninv::UInt)
+  @assert !iszero(n)
+
+  bits = 8 * sizeof(UInt)
+  norm = leading_zeros(n)
+
+  # a << norm as two limbs; a >> 64 is a well-defined 0 in Julia
+  return _mod_preinv_norm(a >> (bits - norm), a << norm, n << norm, ninv) >> norm
+end
+
+# a * b mod n for a, b < n: then a * b < n^2, so the high limb is already below n
+@inline function mulmod_reduced(a::UInt, b::UInt, n::UInt, ni::UInt)
+  bits = 8 * sizeof(UInt)
+  norm = leading_zeros(n)
+  p = widemul(a, b)
+  a_hi = (p >> bits) % UInt
+  a_lo = p % UInt
+  return _mod_preinv_norm_branched((a_hi << norm) + (a_lo >> (bits - norm)), a_lo << norm, n << norm, ni) >> norm
 end
 
 function *(x::zzModRingElem, y::zzModRingElem)
   check_parent(x, y)
   R = parent(x)
-  d = mulmod(x.data, y.data, R.n, R.ninv)
+  d = mulmod_reduced(x.data, y.data, R.n, R.ninv)
   return zzModRingElem(d, R)
 end
 

@@ -104,6 +104,27 @@ end
   end
 end
 
+@testset "Nemo.mulmod_reduced" begin
+  function check_case(a::UInt, b::UInt, n::UInt)
+    ninv = @ccall Nemo.libflint.n_preinvert_limb(n::UInt)::UInt
+    expected = @ccall Nemo.libflint.n_mulmod2_preinv(a::UInt, b::UInt, n::UInt, ninv::UInt)::UInt
+    @test Nemo.mulmod_reduced(a, b, n, ninv) == expected
+    @test Nemo.mulmod_reduced(a, b, n, ninv) == UInt(widemul(a, b) % n)
+  end
+
+  for n in UInt[1, 2, 3, 13, 0xffffffff, 0x100000000, 0x7fffffffffffffff,
+                0x8000000000000000, typemax(UInt) - 58, typemax(UInt)]
+    for a in unique(UInt[0, 1, n ÷ 2, n - 1]), b in unique(UInt[0, 1, n ÷ 2, n - 1])
+      check_case(a, b, n)
+    end
+  end
+
+  for _ in 1:10_000
+    n = rand(Bool) ? rand(UInt(1):typemax(UInt)) : rand(UInt(1):UInt(1000))
+    check_case(rand(UInt(0):n - 1), rand(UInt(0):n - 1), n)
+  end
+end
+
 @testset "zzModRingElem.rand" begin
   R, = residue_ring(ZZ, 13)
 
