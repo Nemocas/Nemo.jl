@@ -463,7 +463,8 @@ function rand(rng::AbstractRNG, S::FlintPuiseuxSeriesRingOrField,
   rand(rng, make(S, val_range, scale_range, v...))
 end
 
-rand(S::FlintPuiseuxSeriesRingOrField, val_range, scale_range, v...) =
+rand(S::FlintPuiseuxSeriesRingOrField, val_range::AbstractUnitRange{Int},
+    scale_range::AbstractUnitRange{Int}, v...) =
 rand(Random.default_rng(), S, val_range, scale_range, v...)
 
 ###############################################################################

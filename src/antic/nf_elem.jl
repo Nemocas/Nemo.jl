@@ -1071,7 +1071,7 @@ end
 
 rand(rng::AbstractRNG, K::AbsSimpleNumField, r::AbstractUnitRange{Int}) = rand(rng, make(K, r))
 
-rand(K::AbsSimpleNumField, r) = rand(Random.default_rng(), K, r)
+rand(K::AbsSimpleNumField, r::AbstractUnitRange{Int}) = rand(Random.default_rng(), K, r)
 
 ###############################################################################
 #
