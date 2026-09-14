@@ -469,6 +469,8 @@ end
 Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundToZero)) = tdiv(x, y)
 Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundUp)) = cdiv(x, y)
 Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundDown)) = fdiv(x, y)
+Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundFromZero)) =
+  signbit(x) == signbit(y) ? cdiv(x, y) : fdiv(x, y)
 
 function divexact(x::ZZRingElem, y::ZZRingElem; check::Bool=true)
   iszero(y) && throw(DivideError())
@@ -828,6 +830,10 @@ Base.divrem(x::ZZRingElem, y::Integer) = Base.divrem(x, ZZ(y))
 Base.divrem(x::ZZRingElem, y::Integer, r::RoundingMode) = Base.divrem(x, ZZ(y), r)
 Base.divrem(x::Integer, y::ZZRingElem) = Base.divrem(ZZ(x), y)
 Base.divrem(x::Integer, y::ZZRingElem, r::RoundingMode) = Base.divrem(ZZ(x), y, r)
+
+# Resolve ambiguity with Base's `divrem(x, y, ::typeof(RoundFromZero))`
+Base.divrem(x::ZZRingElem, y::Integer, r::typeof(RoundFromZero)) = Base.divrem(x, ZZ(y), r)
+Base.divrem(x::Integer, y::ZZRingElem, r::typeof(RoundFromZero)) = Base.divrem(ZZ(x), y, r)
 
 ###############################################################################
 #
