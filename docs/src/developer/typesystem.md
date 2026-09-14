@@ -104,7 +104,7 @@ The first approach is to encapsulate the object in another object which does
 have the desired type. The second approach is to map the object to a different
 one of the required type (e.g. by applying a morphism). The third approach is
 to introduce data fields in the original type which can be changed at runtime,
-unlike its type. All three approaches come with downsides. 
+unlike its type. All three approaches come with downsides.
 
 Encapsulation can be time consuming for the developer as methods which applied
 to the original object do not automatically apply to the encapsulated object.
@@ -115,7 +115,7 @@ for the user to navigate. Moreover, mutation of the resulting object does not
 result in mutation of the original object.
 
 The third option of adding runtime data fields essentially takes one back to
-writing a (possibly bug ridden) interpreter. It relies on the developer 
+writing a (possibly bug ridden) interpreter. It relies on the developer
 implementing outer methods that make use of hand written control statements
 to determine which of a range of inner methods should be applied to the object.
 This misses the benefits of one of the main defining features of Julia, namely
@@ -176,7 +176,7 @@ a hierarchy of abstract types. This parameter is best thought of as a trait,
 independent of the hierarchy of abstract types belonging to `Map`, giving
 additional flexibility to the map types in the system.
 
-For example, `T` may be set to `LinearMap` or `FunctionalMap`. This may be
+For example, `T` may be set to `LinearMap` or `MapFromFunc`. This may be
 useful if one wishes to distinguish maps in other ways, e.g. whether they are
 homomorphisms, isomorphisms, maps with section or retraction etc. As usual,
 offering traits partially gets around the single inheritance problem.
