@@ -96,6 +96,7 @@ testlist = [
   "generic/Matrix-test.jl",
   "generic/Module-test.jl",
   "generic/AbsMSeries-test.jl",
+  "generic/FactoredFraction-test.jl",
 # Miscellaneous tests
   "Benchmark-test.jl",
   "gaussiannumbers/continued_fraction-test.jl",
