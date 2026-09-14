@@ -2553,6 +2553,62 @@ function Base.digits!(a::AbstractVector{T}, n::ZZRingElem; base::T = 10) where T
 end
 
 @doc raw"""
+    digits_to_integer!(D::ZZMatrix; base::ZZRingElem = 10)
+
+Returns a 1-by-c matrix of integers whose k-th entry is sum (base^j*D[j+1, k]) over j=0,1,...nrows(D)-1.
+The k-th column of D contains the digits (in the given base) of the k-th
+integer in the result returned.  Note: the matrix D is modified by this function.
+"""
+function digits_to_integer!(D::ZZMatrix; base::IntegerUnion = 10)
+  # Code originally by Claus Fieker -- impressively quick!
+  nr = nrows(D)
+  @req  (nr > 0)  "Require at least 1 row"
+  (nr == 1) && return D
+  bb = ZZRingElem(Val(:raw))
+  b = ZZRingElem(Val(:raw))
+  set!(b, base)
+  while nr > 1
+    mul!(bb, b, b)
+    for i in 1:div(nr, 2)
+      add_row!(D, b, 2*i, 2*i-1)
+      swap_rows!(D, i, 2*i-1)
+      zero_row!(D, 2*i)  # to release memory early
+    end
+    if is_odd(nr)
+      add_row!(D, bb, nr, div(nr, 2))
+      zero_row!(D, nr)
+    end
+    nr = div(nr, 2)
+    b.d, bb.d = bb.d, b.d  # faster than b = bb;
+  end
+  Nemo._fmpz_clear_fn(bb)
+  Nemo._fmpz_clear_fn(b)
+  # All rows, but the 1st have been set to zero! - or have never been used.
+  # So no memory is lost...
+  return D[1:1,:]
+end
+
+
+@doc raw"""
+    digits_to_integer!(digits::Vector{ZZRingElem}; base::IntegerUnion = 10)
+    digits_to_integer!(digits::Vector{T}; base::IntegerUnion = Int(10)) where { T <: Integer }
+
+Returns the integer sum (base^j*d_{j+1}) where d_k is the k-th entry of digits.
+May overwrite digits.
+"""
+function digits_to_integer!(digits::Vector{ZZRingElem}; base::IntegerUnion = 10)
+  # Delegate to the matrix version (immediately above)
+  n = length(digits)
+  (n == 0) && return ZZ(0)
+  return digits_to_integer!(ZZMatrix(n,1, digits); base=base)[1,1]
+end
+
+function digits_to_integer!(digits::Vector{T}; base::IntegerUnion = 10) where { T <: Integer}
+  return digits_to_integer!(ZZ.(digits); base=ZZ(base))
+end
+
+
+@doc raw"""
     nbits(x::ZZRingElem)
 
 Return the number of binary bits of $x$. We return zero if $x = 0$.
