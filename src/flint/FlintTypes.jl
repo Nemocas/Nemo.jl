@@ -4022,7 +4022,9 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
 
   function zzModMatrix(r::Int, c::Int, n::UInt)
     z = new()
-    if false
+    # The Julia-owned `Vector{Int}` layout assumes 64-bit `Int` and 8-byte limbs.
+    # On 32-bit, pointers often exceed typemax(Int32) and limbs are 4 bytes, so use FLINT.
+    if Sys.WORD_SIZE != 64
       @ccall libflint.nmod_mat_init(z::Ref{zzModMatrix}, r::Int, c::Int, n::UInt)::Nothing
       finalizer(_nmod_mat_clear_fn, z)
     else
@@ -4414,7 +4416,9 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
 
   function fpMatrix(r::Int, c::Int, n::UInt)
     z = new()
-    if false
+    # The Julia-owned `Vector{Int}` layout assumes 64-bit `Int` and 8-byte limbs.
+    # On 32-bit, pointers often exceed typemax(Int32) and limbs are 4 bytes, so use FLINT.
+    if Sys.WORD_SIZE != 64
       @ccall libflint.nmod_mat_init(z::Ref{fpMatrix}, r::Int, c::Int, n::UInt)::Nothing
       finalizer(_gfp_mat_clear_fn, z)
     else
