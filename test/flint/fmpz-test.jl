@@ -717,7 +717,7 @@ end
 
 @testset "divrem and div with other rings" begin
   for (x, y) in [(12, 5), (-12, 5)]
-    for r in [RoundToZero, RoundUp, RoundDown]
+    for r in [RoundToZero, RoundUp, RoundDown, RoundFromZero]
       @test (
         ZZ(Base.div(x, y, r))
         == Base.div(ZZ(x), y, r)
