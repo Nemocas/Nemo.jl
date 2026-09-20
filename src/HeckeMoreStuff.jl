@@ -600,7 +600,7 @@ end
 ################################################################################
 
 # mainly for testing
-function rand(L::LocalizedEuclideanRing{T}, num_scale=(1:1000), den_scale=(1:1000)) where {T<:ZZRingElem}
+function rand(L::LocalizedEuclideanRing{T}, num_scale::AbstractVector=(1:1000), den_scale::AbstractVector=(1:1000)) where {T<:ZZRingElem}
   num = rand(num_scale)
   den = rand(den_scale)
   while gcd(den, prime(L)) != 1
