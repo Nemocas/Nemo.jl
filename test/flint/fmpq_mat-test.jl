@@ -729,6 +729,10 @@ end
   @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), typeof(A))
   @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), A)
 
+  D = solve_init(AbstractAlgebra.Solve.FFLUTrait(), A)
+  @test D isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), QQFieldElem)
+  @test A*solve(D, matrix(QQ, 3, 1, [1, 2, 3]), side = :right) == matrix(QQ, 3, 1, [1, 2, 3])
+
   @test_throws ErrorException solve(C, [ QQ(1) ])
   @test_throws ErrorException solve(C, [ QQ(1) ], side = :right)
   @test_throws ErrorException solve(C, matrix(QQ, 1, 1, [ QQ(1) ]))

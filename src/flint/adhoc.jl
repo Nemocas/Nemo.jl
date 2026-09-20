@@ -4,45 +4,62 @@
 #
 ###############################################################################
 
-function *(a::ZZRingElem, b::AbsPowerSeriesRingElem)
-  len = length(b)
-  z = parent(b)()
-  fit!(z, len)
-  z = set_precision!(z, precision(b))
-  for i = 1:len
-    z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
+# AbstractAlgebra has methods for `T` and `AbsPowerSeriesRingElem{T}` whose lone
+# `T` argument is covariant, so a `ZZRingElem` passed there only forces
+# `ZZRingElem <: T`. They overlap with the methods here for every `T` with
+# `ZZRingElem <: T <: RingElem`, hence each method is defined over that range of
+# `T` as well. Both bounds are needed: a single definition for
+# `AbsPowerSeriesRingElem{ZZRingElem}` covers only a slice of the overlap and
+# leaves the ambiguity, while one without the upper bound would claim calls
+# AbstractAlgebra's methods never matched. The same applies to the other element
+# types in this file.
+for (S, W) in ((:AbsPowerSeriesRingElem, ()),
+               (:(AbsPowerSeriesRingElem{T}), (:(ZZRingElem <: T <: RingElem),)))
+  @eval begin
+    function *(a::ZZRingElem, b::$S) where {$(W...)}
+      len = length(b)
+      z = parent(b)()
+      fit!(z, len)
+      z = set_precision!(z, precision(b))
+      for i = 1:len
+        z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
+      end
+      z = set_length!(z, normalise(z, len))
+      return z
+    end
+
+    *(a::$S, b::ZZRingElem) where {$(W...)} = b*a
+
+    ==(x::$S, y::ZZRingElem) where {$(W...)} =
+      precision(x) == 0 || ((length(x) == 0 && iszero(y))
+                            || (length(x) == 1 && coeff(x, 0) == y))
+
+    ==(x::ZZRingElem, y::$S) where {$(W...)} = y == x
+
+    function divexact(x::$S, y::ZZRingElem; check::Bool=true) where {$(W...)}
+      iszero(y) && throw(DivideError())
+      lenx = length(x)
+      z = parent(x)()
+      fit!(z, lenx)
+      z = set_precision!(z, precision(x))
+      for i = 1:lenx
+        z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y))
+      end
+      return z
+    end
   end
-  z = set_length!(z, normalise(z, len))
-  return z
 end
 
-*(a::AbsPowerSeriesRingElem, b::ZZRingElem) = b*a
-
-==(x::AbsPowerSeriesRingElem, y::ZZRingElem) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
-                                                                     || (length(x) == 1 && coeff(x, 0) == y))
-
-==(x::ZZRingElem, y::AbsPowerSeriesRingElem) = y == x
-
-function divexact(x::AbsPowerSeriesRingElem, y::ZZRingElem; check::Bool=true)
-  iszero(y) && throw(DivideError())
-  lenx = length(x)
-  z = parent(x)()
-  fit!(z, lenx)
-  z = set_precision!(z, precision(x))
-  for i = 1:lenx
-    z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y))
+for W in ((:(T <: RingElement),), (:(ZZRingElem <: T <: RingElem),))
+  @eval function (a::Generic.AbsPowerSeriesRing{T})(b::ZZRingElem) where {$(W...)}
+    if iszero(b)
+      z = Generic.AbsSeries{T}(T[], 0, a.prec_max)
+    else
+      z = Generic.AbsSeries{T}([base_ring(a)(b)], 1, a.prec_max)
+    end
+    z.parent = a
+    return z
   end
-  return z
-end
-
-function (a::Generic.AbsPowerSeriesRing{T})(b::ZZRingElem) where {T <: RingElement}
-  if iszero(b)
-    z = Generic.AbsSeries{T}(T[], 0, a.prec_max)
-  else
-    z = Generic.AbsSeries{T}([base_ring(a)(b)], 1, a.prec_max)
-  end
-  z.parent = a
-  return z
 end
 
 ###############################################################################
@@ -51,49 +68,58 @@ end
 #
 ###############################################################################
 
-function *(a::ZZRingElem, b::RelPowerSeriesRingElem)
-  len = pol_length(b)
-  z = parent(b)()
-  fit!(z, len)
-  z = set_precision!(z, precision(b))
-  z = set_valuation!(z, valuation(b))
-  for i = 1:len
-    z = setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
+# bounded on both sides as in the absolute power series section
+for (S, W) in ((:RelPowerSeriesRingElem, ()),
+               (:(RelPowerSeriesRingElem{T}), (:(ZZRingElem <: T <: RingElem),)))
+  @eval begin
+    function *(a::ZZRingElem, b::$S) where {$(W...)}
+      len = pol_length(b)
+      z = parent(b)()
+      fit!(z, len)
+      z = set_precision!(z, precision(b))
+      z = set_valuation!(z, valuation(b))
+      for i = 1:len
+        z = setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
+      end
+      z = set_length!(z, normalise(z, len))
+      renormalize!(z)
+      return z
+    end
+
+    *(a::$S, b::ZZRingElem) where {$(W...)} = b*a
+
+    ==(x::$S, y::ZZRingElem) where {$(W...)} =
+      precision(x) == 0 || ((pol_length(x) == 0 && iszero(y))
+                            || (pol_length(x) == 1 && valuation(x) == 0
+                                && polcoeff(x, 0) == y))
+
+    ==(x::ZZRingElem, y::$S) where {$(W...)} = y == x
+
+    function divexact(x::$S, y::ZZRingElem; check::Bool=true) where {$(W...)}
+      iszero(y) && throw(DivideError())
+      lenx = pol_length(x)
+      z = parent(x)()
+      fit!(z, lenx)
+      z = set_precision!(z, precision(x))
+      z = set_valuation!(z, valuation(x))
+      for i = 1:lenx
+        z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y; check=check))
+      end
+      return z
+    end
   end
-  z = set_length!(z, normalise(z, len))
-  renormalize!(z)
-  return z
 end
 
-*(a::RelPowerSeriesRingElem, b::ZZRingElem) = b*a
-
-==(x::RelPowerSeriesRingElem, y::ZZRingElem) = precision(x) == 0 ||
-((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
-                                       valuation(x) == 0 && polcoeff(x, 0) == y))
-
-==(x::ZZRingElem, y::RelPowerSeriesRingElem) = y == x
-
-function divexact(x::RelPowerSeriesRingElem, y::ZZRingElem; check::Bool=true)
-  iszero(y) && throw(DivideError())
-  lenx = pol_length(x)
-  z = parent(x)()
-  fit!(z, lenx)
-  z = set_precision!(z, precision(x))
-  z = set_valuation!(z, valuation(x))
-  for i = 1:lenx
-    z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y; check=check))
+for W in ((:(T <: RingElement),), (:(ZZRingElem <: T <: RingElem),))
+  @eval function (a::Generic.RelPowerSeriesRing{T})(b::ZZRingElem) where {$(W...)}
+    if iszero(b)
+      z = Generic.RelSeries{T}(T[], 0, a.prec_max, a.prec_max)
+    else
+      z = Generic.RelSeries{T}([base_ring(a)(b)], 1, a.prec_max, 0)
+    end
+    z.parent = a
+    return z
   end
-  return z
-end
-
-function (a::Generic.RelPowerSeriesRing{T})(b::ZZRingElem) where {T <: RingElement}
-  if iszero(b)
-    z = Generic.RelSeries{T}(T[], 0, a.prec_max, a.prec_max)
-  else
-    z = Generic.RelSeries{T}([base_ring(a)(b)], 1, a.prec_max, 0)
-  end
-  z.parent = a
-  return z
 end
 
 ###############################################################################
@@ -102,64 +128,39 @@ end
 #
 ###############################################################################
 
-function *(a::ZZRingElem, b::PolyRingElem)
-  len = length(b)
-  z = parent(b)()
-  fit!(z, len)
-  for i = 1:len
-    z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
+# bounded on both sides as in the absolute power series section
+for (S, W) in ((:PolyRingElem, ()),
+               (:(PolyRingElem{T}), (:(ZZRingElem <: T <: RingElem),)))
+  @eval begin
+    function *(a::ZZRingElem, b::$S) where {$(W...)}
+      len = length(b)
+      z = parent(b)()
+      fit!(z, len)
+      for i = 1:len
+        z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
+      end
+      z = set_length!(z, normalise(z, len))
+      return z
+    end
+
+    *(a::$S, b::ZZRingElem) where {$(W...)} = b*a
+
+    ==(x::$S, y::ZZRingElem) where {$(W...)} =
+      ((length(x) == 0 && iszero(y)) || (length(x) == 1 && coeff(x, 0) == y))
+
+    ==(x::ZZRingElem, y::$S) where {$(W...)} = y == x
+
+    function divexact(a::$S, b::ZZRingElem; check::Bool=true) where {$(W...)}
+      iszero(b) && throw(DivideError())
+      z = parent(a)()
+      fit!(z, length(a))
+      for i = 1:length(a)
+        z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b; check=check))
+      end
+      z = set_length!(z, length(a))
+      return z
+    end
   end
-  z = set_length!(z, normalise(z, len))
-  return z
-end
-
-*(a::PolyRingElem, b::ZZRingElem) = b*a
-
-==(x::PolyRingElem, y::ZZRingElem) = ((length(x) == 0 && iszero(y))
-                                      || (length(x) == 1 && coeff(x, 0) == y))
-
-==(x::ZZRingElem, y::PolyRingElem) = y == x
-
-function divexact(a::PolyRingElem, b::ZZRingElem; check::Bool=true)
-  iszero(b) && throw(DivideError())
-  z = parent(a)()
-  fit!(z, length(a))
-  for i = 1:length(a)
-    z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b; check=check))
-  end
-  z = set_length!(z, length(a))
-  return z
-end
-
-# ambiguities
-
-function *(a::ZZRingElem, b::PolyRingElem{ZZRingElem})
-  len = length(b)
-  z = parent(b)()
-  fit!(z, len)
-  for i = 1:len
-    z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
-  end
-  z = set_length!(z, normalise(z, len))
-  return z
-end
-
-*(a::PolyRingElem{ZZRingElem}, b::ZZRingElem) = b*a
-
-==(x::PolyRingElem{ZZRingElem}, y::ZZRingElem) = ((length(x) == 0 && iszero(y))
-                                                  || (length(x) == 1 && coeff(x, 0) == y))
-
-==(x::ZZRingElem, y::PolyRingElem{ZZRingElem}) = y == x
-
-function divexact(a::PolyRingElem{ZZRingElem}, b::ZZRingElem; check::Bool=true)
-  iszero(b) && throw(DivideError())
-  z = parent(a)()
-  fit!(z, length(a))
-  for i = 1:length(a)
-    z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b; check=check))
-  end
-  z = set_length!(z, length(a))
-  return z
 end
 
 ###############################################################################
@@ -168,48 +169,33 @@ end
 #
 ###############################################################################
 
-*(a::ResElem, b::ZZRingElem) = parent(a)(data(a) * b)
+# bounded on both sides as in the absolute power series section
+for (S, W) in ((:ResElem, ()),
+               (:(ResElem{T}), (:(ZZRingElem <: T <: RingElem),)))
+  @eval begin
+    *(a::$S, b::ZZRingElem) where {$(W...)} = parent(a)(data(a) * b)
 
-*(a::ZZRingElem, b::ResElem) = parent(b)(a * data(b))
+    *(a::ZZRingElem, b::$S) where {$(W...)} = parent(b)(a * data(b))
 
-+(a::ResElem, b::ZZRingElem) = parent(a)(data(a) + b)
+    +(a::$S, b::ZZRingElem) where {$(W...)} = parent(a)(data(a) + b)
 
-+(a::ZZRingElem, b::ResElem) = parent(b)(a + data(b))
+    +(a::ZZRingElem, b::$S) where {$(W...)} = parent(b)(a + data(b))
 
--(a::ResElem, b::ZZRingElem) = parent(a)(data(a) - b)
+    -(a::$S, b::ZZRingElem) where {$(W...)} = parent(a)(data(a) - b)
 
--(a::ZZRingElem, b::ResElem) = parent(b)(a - data(b))
+    -(a::ZZRingElem, b::$S) where {$(W...)} = parent(b)(a - data(b))
 
-function ==(a::ResElem, b::ZZRingElem)
-  z = base_ring(a)(b)
-  return data(a) == mod(z, modulus(a))
+    function ==(a::$S, b::ZZRingElem) where {$(W...)}
+      z = base_ring(a)(b)
+      return data(a) == mod(z, modulus(a))
+    end
+
+    function ==(a::ZZRingElem, b::$S) where {$(W...)}
+      z = base_ring(b)(a)
+      return data(b) == mod(z, modulus(b))
+    end
+  end
 end
-
-function ==(a::ZZRingElem, b::ResElem)
-  z = base_ring(b)(a)
-  return data(b) == mod(z, modulus(b))
-end
-
-# ambiguities
-
-*(a::ResElem{ZZRingElem}, b::ZZRingElem) = parent(a)(data(a) * b)
-
-*(a::ZZRingElem, b::ResElem{ZZRingElem}) = b*a
-
-+(a::ResElem{ZZRingElem}, b::ZZRingElem) = parent(a)(data(a) + b)
-
-+(a::ZZRingElem, b::ResElem{ZZRingElem}) = b + a
-
--(a::ResElem{ZZRingElem}, b::ZZRingElem) = parent(a)(data(a) - b)
-
--(a::ZZRingElem, b::ResElem{ZZRingElem}) = parent(b)(a - data(b))
-
-function ==(a::ResElem{ZZRingElem}, b::ZZRingElem)
-  z = base_ring(a)(b)
-  return data(a) == mod(z, modulus(a))
-end
-
-==(a::ZZRingElem, b::ResElem{ZZRingElem}) = b == a
 
 ###############################################################################
 #
@@ -322,91 +308,102 @@ end
 #
 ###############################################################################
 
-function *(x::ZZRingElem, y::MatElem)
-  z = similar(y)
-  for i = 1:nrows(y)
-    for j = 1:ncols(y)
-      z[i, j] = x*y[i, j]
+# bounded on both sides as in the absolute power series section, but by
+# `NCRingElem`, which is what AbstractAlgebra's matrix arithmetic takes
+for (S, W) in ((:MatElem, ()),
+               (:(MatElem{T}), (:(ZZRingElem <: T <: NCRingElem),)))
+  @eval begin
+    function *(x::ZZRingElem, y::$S) where {$(W...)}
+      z = similar(y)
+      for i = 1:nrows(y)
+        for j = 1:ncols(y)
+          z[i, j] = x*y[i, j]
+        end
+      end
+      return z
     end
+
+    *(x::$S, y::ZZRingElem) where {$(W...)} = y*x
+
+    function +(x::ZZRingElem, y::$S) where {$(W...)}
+      z = similar(y)
+      R = base_ring(y)
+      for i = 1:nrows(y)
+        for j = 1:ncols(y)
+          if i != j
+            z[i, j] = deepcopy(y[i, j])
+          else
+            z[i, j] = y[i, j] + R(x)
+          end
+        end
+      end
+      return z
+    end
+
+    +(x::$S, y::ZZRingElem) where {$(W...)} = y + x
+
+    function -(x::ZZRingElem, y::$S) where {$(W...)}
+      z = similar(y)
+      R = base_ring(y)
+      for i = 1:nrows(y)
+        for j = 1:ncols(y)
+          if i != j
+            z[i, j] = -y[i, j]
+          else
+            z[i, j] = x - y[i, j]
+          end
+        end
+      end
+      return z
+    end
+
+    function -(x::$S, y::ZZRingElem) where {$(W...)}
+      z = similar(x)
+      R = base_ring(x)
+      for i = 1:nrows(x)
+        for j = 1:ncols(x)
+          if i != j
+            z[i, j] = deepcopy(x[i, j])
+          else
+            z[i, j] = x[i, j] - y
+          end
+        end
+      end
+      return z
+    end
+
+    function ==(x::$S, y::ZZRingElem) where {$(W...)}
+      for i = 1:min(nrows(x), ncols(x))
+        if x[i, i] != y
+          return false
+        end
+      end
+      for i = 1:nrows(x)
+        for j = 1:ncols(x)
+          if i != j && !iszero(x[i, j])
+            return false
+          end
+        end
+      end
+      return true
+    end
+
+    ==(x::ZZRingElem, y::$S) where {$(W...)} = y == x
   end
-  return z
 end
 
-*(x::MatElem, y::ZZRingElem) = y*x
-
-function +(x::ZZRingElem, y::MatElem)
-  z = similar(y)
-  R = base_ring(y)
-  for i = 1:nrows(y)
-    for j = 1:ncols(y)
-      if i != j
-        z[i, j] = deepcopy(y[i, j])
-      else
-        z[i, j] = y[i, j] + R(x)
+# AbstractAlgebra's `divexact` for matrices takes `RingElem`
+for (S, W) in ((:MatElem, ()),
+               (:(MatElem{T}), (:(ZZRingElem <: T <: RingElem),)))
+  @eval function divexact(x::$S, y::ZZRingElem; check::Bool=true) where {$(W...)}
+    z = similar(x)
+    for i = 1:nrows(x)
+      for j = 1:ncols(x)
+        z[i, j] = divexact(x[i, j], y; check=check)
       end
     end
+    return z
   end
-  return z
-end
-
-+(x::MatElem, y::ZZRingElem) = y + x
-
-function -(x::ZZRingElem, y::MatElem)
-  z = similar(y)
-  R = base_ring(y)
-  for i = 1:nrows(y)
-    for j = 1:ncols(y)
-      if i != j
-        z[i, j] = -y[i, j]
-      else
-        z[i, j] = x - y[i, j]
-      end
-    end
-  end
-  return z
-end
-
-function -(x::MatElem, y::ZZRingElem)
-  z = similar(x)
-  R = base_ring(x)
-  for i = 1:nrows(x)
-    for j = 1:ncols(x)
-      if i != j
-        z[i, j] = deepcopy(x[i, j])
-      else
-        z[i, j] = x[i, j] - y
-      end
-    end
-  end
-  return z
-end
-
-function ==(x::MatElem, y::ZZRingElem)
-  for i = 1:min(nrows(x), ncols(x))
-    if x[i, i] != y
-      return false
-    end
-  end
-  for i = 1:nrows(x)
-    for j = 1:ncols(x)
-      if i != j && !iszero(x[i, j])
-        return false
-      end
-    end
-  end
-  return true
-end
-
-==(x::ZZRingElem, y::MatElem) = y == x
-
-function divexact(x::MatElem, y::ZZRingElem; check::Bool=true)
-  z = similar(x)
-  for i = 1:nrows(x)
-    for j = 1:ncols(x)
-      z[i, j] = divexact(x[i, j], y; check=check)
-    end
-  end
-  return z
 end
 
 function (a::Generic.MatSpace{T})(b::ZZMatrix) where {T <: RingElement}
@@ -439,68 +436,89 @@ end
 
 //(x::ZZRingElem, y::T) where {T <: RingElem} = parent(y)(x)//y
 
-function *(a::FracElem, b::ZZRingElem)
-  c = base_ring(a)(b)
-  g = gcd(denominator(a), c)
-  n = numerator(a)*divexact(c, g)
-  d = divexact(denominator(a), g)
-  return parent(a)(n, d)
+# bounded on both sides as in the absolute power series section
+for (S, W) in ((:FracElem, ()),
+               (:(FracElem{T}), (:(ZZRingElem <: T <: RingElem),)))
+  @eval begin
+    function *(a::$S, b::ZZRingElem) where {$(W...)}
+      c = base_ring(a)(b)
+      g = gcd(denominator(a), c)
+      n = numerator(a)*divexact(c, g)
+      d = divexact(denominator(a), g)
+      return parent(a)(n, d)
+    end
+
+    function *(a::ZZRingElem, b::$S) where {$(W...)}
+      c = base_ring(b)(a)
+      g = gcd(denominator(b), c)
+      n = numerator(b)*divexact(c, g)
+      d = divexact(denominator(b), g)
+      return parent(b)(n, d)
+    end
+
+    function +(a::$S, b::ZZRingElem) where {$(W...)}
+      n = numerator(a) + denominator(a)*b
+      d = denominator(a)
+      g = gcd(n, d)
+      return parent(a)(divexact(n, g), divexact(d, g))
+    end
+
+    function -(a::$S, b::ZZRingElem) where {$(W...)}
+      n = numerator(a) - denominator(a)*b
+      d = denominator(a)
+      g = gcd(n, d)
+      return parent(a)(divexact(n, g), divexact(d, g))
+    end
+
+    +(a::ZZRingElem, b::$S) where {$(W...)} = b + a
+
+    function -(a::ZZRingElem, b::$S) where {$(W...)}
+      n = a*denominator(b) - numerator(b)
+      d = denominator(b)
+      g = gcd(n, d)
+      return parent(b)(divexact(n, g), divexact(d, g))
+    end
+
+    ==(x::$S, y::ZZRingElem) where {$(W...)} =
+      (isone(denominator(x)) && numerator(x) == y) || (numerator(x) == denominator(x)*y)
+
+    ==(x::ZZRingElem, y::$S) where {$(W...)} = y == x
+
+    function divexact(a::$S, b::ZZRingElem; check::Bool=true) where {$(W...)}
+      iszero(b) && throw(DivideError())
+      c = base_ring(a)(b)
+      g = gcd(numerator(a), c)
+      n = divexact(numerator(a), g)
+      d = denominator(a)*divexact(c, g)
+      return parent(a)(n, d)
+    end
+
+    function divexact(a::ZZRingElem, b::$S; check::Bool=true) where {$(W...)}
+      iszero(b) && throw(DivideError())
+      c = base_ring(b)(a)
+      g = gcd(numerator(b), c)
+      n = denominator(b)*divexact(c, g)
+      d = divexact(numerator(b), g)
+      return parent(b)(n, d)
+    end
+  end
 end
 
-function *(a::ZZRingElem, b::FracElem)
-  c = base_ring(b)(a)
-  g = gcd(denominator(b), c)
-  n = numerator(b)*divexact(c, g)
-  d = divexact(denominator(b), g)
-  return parent(b)(n, d)
+# AbstractAlgebra's methods for a factored fraction and an element of its base
+# ring overlap the methods above in the same way. Coerce and let it multiply two
+# factored fractions, which keeps the factorization.
+for op in (:+, :-, :*)
+  @eval begin
+    $op(a::Generic.FactoredFracFieldElem{T}, b::ZZRingElem) where {ZZRingElem <: T <: RingElem} =
+      $op(a, parent(a)(b))
+
+    $op(a::ZZRingElem, b::Generic.FactoredFracFieldElem{T}) where {ZZRingElem <: T <: RingElem} =
+      $op(parent(b)(a), b)
+  end
 end
 
-function +(a::FracElem, b::ZZRingElem)
-  n = numerator(a) + denominator(a)*b
-  d = denominator(a)
-  g = gcd(n, d)
-  return parent(a)(divexact(n, g), divexact(d, g))
-end
-
-function -(a::FracElem, b::ZZRingElem)
-  n = numerator(a) - denominator(a)*b
-  d = denominator(a)
-  g = gcd(n, d)
-  return parent(a)(divexact(n, g), divexact(d, g))
-end
-
-+(a::ZZRingElem, b::FracElem) = b + a
-
-function -(a::ZZRingElem, b::FracElem)
-  n = a*denominator(b) - numerator(b)
-  d = denominator(b)
-  g = gcd(n, d)
-  return parent(b)(divexact(n, g), divexact(d, g))
-end
-
-function ==(x::FracElem, y::ZZRingElem)
-  return (isone(denominator(x)) && numerator(x) == y) || (numerator(x) == denominator(x)*y)
-end
-
-==(x::ZZRingElem, y::FracElem) = y == x
-
-function divexact(a::FracElem, b::ZZRingElem; check::Bool=true)
-  iszero(b) && throw(DivideError())
-  c = base_ring(a)(b)
-  g = gcd(numerator(a), c)
-  n = divexact(numerator(a), g)
-  d = denominator(a)*divexact(c, g)
-  return parent(a)(n, d)
-end
-
-function divexact(a::ZZRingElem, b::FracElem; check::Bool=true)
-  iszero(b) && throw(DivideError())
-  c = base_ring(b)(a)
-  g = gcd(numerator(b), c)
-  n = denominator(b)*divexact(c, g)
-  d = divexact(numerator(b), g)
-  return parent(b)(n, d)
-end
+divexact(a::ZZRingElem, b::Generic.FactoredFracFieldElem{T}; check::Bool=true) where {ZZRingElem <: T <: RingElem} =
+  divexact(parent(b)(a), b; check)
 
 function (a::Generic.FracField{T})(b::ZZRingElem) where {T <: RingElem}
   z = Generic.FracFieldElem{T}(base_ring(a)(b), one(base_ring(a)))
