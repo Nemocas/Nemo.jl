@@ -4022,23 +4022,15 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
 
   function zzModMatrix(r::Int, c::Int, n::UInt)
     z = new()
-    if false
-      @ccall libflint.nmod_mat_init(z::Ref{zzModMatrix}, r::Int, c::Int, n::UInt)::Nothing
-      finalizer(_nmod_mat_clear_fn, z)
-    else
-      m = r*c
-      u = Vector{Int}(undef, m + r)
-      z.entries = reinterpret(Ptr{Cvoid}, pointer(u))
-      for i=1:r
-        u[i+m] = z.entries + (i-1)*c*8
-      end
-      z.view_parent = u
-      z.stride = c
-      z.r = r
-      z.c = c
-      @ccall libflint.nmod_mat_set_mod(z::Ref{zzModMatrix}, n::UInt)::Nothing
-      zero!(z)
-    end
+    # The entry buffer is Julia-owned; `view_parent` keeps it alive, so no
+    # finalizer is needed and FLINT must never be asked to clear this matrix.
+    u = zeros(UInt, r*c)
+    z.entries = pointer(u)
+    z.view_parent = u
+    z.r = r
+    z.c = c
+    z.stride = c
+    @ccall libflint.nmod_mat_set_mod(z::Ref{zzModMatrix}, n::UInt)::Nothing
     return z
   end
 
@@ -4414,23 +4406,15 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
 
   function fpMatrix(r::Int, c::Int, n::UInt)
     z = new()
-    if false
-      @ccall libflint.nmod_mat_init(z::Ref{fpMatrix}, r::Int, c::Int, n::UInt)::Nothing
-      finalizer(_gfp_mat_clear_fn, z)
-    else
-      m = r*c
-      u = Vector{Int}(undef, m + r)
-      z.entries = reinterpret(Ptr{Cvoid}, pointer(u))
-      for i=1:r
-        u[i+m] = z.entries + (i-1)*c*8
-      end
-      z.view_parent = u
-      z.stride = c
-      z.r = r
-      z.c = c
-      @ccall libflint.nmod_mat_set_mod(z::Ref{fpMatrix}, n::UInt)::Nothing
-      zero!(z)
-    end
+    # The entry buffer is Julia-owned; `view_parent` keeps it alive, so no
+    # finalizer is needed and FLINT must never be asked to clear this matrix.
+    u = zeros(UInt, r*c)
+    z.entries = pointer(u)
+    z.view_parent = u
+    z.r = r
+    z.c = c
+    z.stride = c
+    @ccall libflint.nmod_mat_set_mod(z::Ref{fpMatrix}, n::UInt)::Nothing
     return z
   end
 
@@ -5368,10 +5352,6 @@ end
 
 function _fq_poly_factor_clear_fn(f::fq_poly_factor)
   @ccall libflint.fq_poly_factor_clear(f::Ref{fq_poly_factor}, f.base_field::Ref{FqPolyRepField})::Nothing
-end
-
-function _nmod_mat_clear_fn(mat::T) where T <: Union{zzModMatrix, fpMatrix}
-  @ccall libflint.nmod_mat_clear(mat::Ref{T})::Nothing
 end
 
 function _nmod_mpoly_clear_fn(a::zzModMPolyRingElem)
