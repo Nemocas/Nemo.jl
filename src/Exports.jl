@@ -429,6 +429,7 @@ export log1p
 export lu
 export lu!
 export matrix_space
+export MatrixMultiplier
 export midpoint
 export mod
 export mod_sym
