@@ -519,6 +519,8 @@ end
     Phi = sum([C[3*i+j+1]*x^i*y^j for i in 0:2 for j in 0:2])
 
     @test Phi == x^2*y+16*x-y^2
+
+    @test lindep(matrix(CC, vals), 150) == C
   end
 end
 
