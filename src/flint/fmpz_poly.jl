@@ -58,8 +58,6 @@ function height(a::ZZPolyRingElem)
   return z
 end
 
-normalise(f::ZZPolyRingElem, ::Int) = degree(f) + 1
-
 function set_length!(x::ZZPolyRingElem, n::Int)
   @ccall libflint._fmpz_poly_set_length(x::Ref{ZZPolyRingElem}, n::Int)::Nothing
   return x
