@@ -505,7 +505,7 @@ end
 # Return value is (bool, value): bool=false means no sqrt exists; bool=true means that the sqrt is the 2nd component
 function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bool=true)  # IGNORE kwarg "check"
   ctx = parent(a)
-  ctx === data.parent || throw(ArgumentError("precomputation belongs to a different q-adic field"))
+  @req ctx === data.parent "precomputation belongs to a different q-adic field"
   av = valuation(a)
   (av % 2) != 0 && return (false, zero(ctx))
   z = QadicFieldElem(a.N - div(av, 2))
