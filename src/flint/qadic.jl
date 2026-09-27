@@ -515,8 +515,7 @@ function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bo
     res = Bool(@ccall libflint._qadic_char2_sqrt_with_precomp(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField}, data.ptr::Ptr{Nothing})::Cint)
   end
 
-  !res &&  return (false, zero(ctx))
-  return (true, z)
+  return (res, z)
 end
 
 function is_square_with_sqrt(a::QadicFieldElem)
