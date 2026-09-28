@@ -2600,11 +2600,11 @@ function digits_to_integer!(digits::Vector{ZZRingElem}; base::IntegerUnion = 10)
   # Delegate to the matrix version (immediately above)
   n = length(digits)
   (n == 0) && return ZZ(0)
-  return digits_to_integer!(ZZMatrix(n,1, digits); base=base)[1,1]
+  return digits_to_integer!(ZZMatrix(n,1, digits); base)[1,1]
 end
 
-function digits_to_integer!(digits::Vector{T}; base::IntegerUnion = 10) where { T <: Integer}
-  return digits_to_integer!(ZZ.(digits); base=ZZ(base))
+function digits_to_integer!(digits::Vector{T}; base::IntegerUnion = 10) where { T <: Integer }
+  return digits_to_integer!(ZZ.(digits); base))
 end
 
 
