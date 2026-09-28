@@ -94,10 +94,6 @@ function Solve.solve_context_type(NF::Solve.MatrixNormalFormTrait,
   return Solve.SolveCtx{T, typeof(NF), MatType, MatType, MatType}
 end
 
-function Solve.solve_context_type(::Solve.FFLUTrait, ::Type{QQFieldElem})
-  return Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait, QQMatrix, ZZMatrix, ZZMatrix}
-end
-
 ################################################################################
 #
 #  (No) lazy transpose

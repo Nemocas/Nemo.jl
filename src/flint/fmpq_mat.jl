@@ -596,11 +596,12 @@ end
 Solve.matrix_normal_form_type(::QQField) = Solve.RREFTrait()
 Solve.matrix_normal_form_type(::QQMatrix) = Solve.RREFTrait()
 
-# fflu is much slower in some cases, so we do an rref (with transformation)
-# here and let flint choose an algorithm, see
-# https://github.com/Nemocas/Nemo.jl/issues/1710.
 function Solve.solve_context_type(::QQField)
-  return Solve.solve_context_type(Solve.RREFTrait(), QQFieldElem)
+  return Solve.solve_context_type(Solve.FFLUTrait(), QQFieldElem)
+end
+
+function Solve.solve_context_type(::Solve.FFLUTrait, ::Type{QQFieldElem})
+  return Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait, QQMatrix, ZZMatrix, ZZMatrix}
 end
 
 function Solve._can_solve_internal_no_check(::Solve.RREFTrait, A::QQMatrix, b::QQMatrix, task::Symbol; side::Symbol = :left)
@@ -620,7 +621,7 @@ end
 
 ###############################################################################
 #
-#   Experimental FFLU Solve context
+#   FFLU Solve context functionality
 #
 ###############################################################################
 
