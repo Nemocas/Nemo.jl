@@ -629,8 +629,8 @@ function Solve._init_reduce(C::Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait})
     return nothing
   end
   A = matrix(C)
-  Aint = zero_matrix(FlintZZ, nrows(A), ncols(A))
-  dA = FlintZZ()
+  Aint = zero_matrix(ZZ, nrows(A), ncols(A))
+  dA = ZZ()
   ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
         (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), Aint, dA, A)
   p = Generic.Perm(nrows(A))
@@ -663,8 +663,8 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{QQFieldElem, Solve.FFLUT
   end
 
   A = matrix(C)
-  Aint = zero_matrix(FlintZZ, ncols(A), nrows(A))
-  dA = FlintZZ()
+  Aint = zero_matrix(ZZ, ncols(A), nrows(A))
+  dA = ZZ()
   ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
         (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), Aint, dA, transpose(A))
   p = Generic.Perm(ncols(A))
@@ -701,11 +701,11 @@ function Solve._can_solve_internal_no_check(::Solve.FFLUTrait, C::Solve.SolveCtx
 end
 
 function Solve._can_solve_internal_no_check_right(::Solve.FFLUTrait, C::Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait}, b::QQMatrix, task::Symbol)
-  bint = zero_matrix(FlintZZ, nrows(b), ncols(b))
-  db = FlintZZ()
+  bint = zero_matrix(ZZ, nrows(b), ncols(b))
+  db = ZZ()
   ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
         (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), bint, db, b)
-  yint = zero_matrix(FlintZZ, ncols(C), ncols(b))
+  yint = zero_matrix(ZZ, ncols(C), ncols(b))
   p = inv(Solve.lu_permutation(C)).d .- 1
   flag = ccall((:fmpz_mat_solve_fflu_precomp, libflint), Cint,
                (Ref{ZZMatrix}, Ptr{Int}, Ref{ZZMatrix}, Ref{ZZMatrix}),
@@ -715,7 +715,7 @@ function Solve._can_solve_internal_no_check_right(::Solve.FFLUTrait, C::Solve.So
     return fl, zero(b, 0, 0), zero(b, 0, 0)
   end
   # We have fl == true, but we still have to check whether this really is a solution
-  y = zero_matrix(FlintQQ, nrows(yint), ncols(yint))
+  y = zero_matrix(QQ, nrows(yint), ncols(yint))
   ccall((:fmpq_mat_set_fmpz_mat_div_fmpz, libflint), Nothing,
         (Ref{QQMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}),
         y, yint, db)
@@ -739,11 +739,11 @@ function Solve._can_solve_internal_no_check_right(::Solve.FFLUTrait, C::Solve.So
 end
 
 function Solve._can_solve_internal_no_check_left(::Solve.FFLUTrait, C::Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait}, b::QQMatrix, task::Symbol)
-  bint = zero_matrix(FlintZZ, ncols(b), nrows(b))
-  db = FlintZZ()
+  bint = zero_matrix(ZZ, ncols(b), nrows(b))
+  db = ZZ()
   ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
         (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), bint, db, transpose(b))
-  yint = zero_matrix(FlintZZ, nrows(C), ncols(bint))
+  yint = zero_matrix(ZZ, nrows(C), ncols(bint))
   p = inv(Solve.lu_permutation_of_transpose(C)).d .- 1
   flag = ccall((:fmpz_mat_solve_fflu_precomp, libflint), Cint,
                (Ref{ZZMatrix}, Ptr{Int}, Ref{ZZMatrix}, Ref{ZZMatrix}),
@@ -753,7 +753,7 @@ function Solve._can_solve_internal_no_check_left(::Solve.FFLUTrait, C::Solve.Sol
     return fl, zero(b, 0, 0), zero(b, 0, 0)
   end
   # We have fl == true, but we still have to check whether this really is a solution
-  y = zero_matrix(FlintQQ, ncols(yint), nrows(yint))
+  y = zero_matrix(QQ, ncols(yint), nrows(yint))
   ccall((:fmpq_mat_set_fmpz_mat_div_fmpz, libflint), Nothing,
         (Ref{QQMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}),
         y, transpose(yint), db)
