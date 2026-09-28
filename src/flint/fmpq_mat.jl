@@ -624,7 +624,7 @@ end
 #
 ###############################################################################
 
-function Solve._init_reduce(C::Solve.SolveCtx{QQFieldElem, FFLUTrait})
+function Solve._init_reduce(C::Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait})
   if isdefined(C, :red)
     return nothing
   end
@@ -657,7 +657,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{QQFieldElem, FFLUTrait})
   return nothing
 end
 
-function Solve._init_reduce_transpose(C::Solve.SolveCtx{QQFieldElem, FFLUTrait})
+function Solve._init_reduce_transpose(C::Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait})
   if isdefined(C, :red_transp)
     return nothing
   end
@@ -691,16 +691,16 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{QQFieldElem, FFLUTrait})
   return nothing
 end
 
-function Solve._can_solve_internal_no_check(::FFLUTrait, C::Solve.SolveCtx{QQFieldElem, FFLUTrait}, b::QQMatrix, task::Symbol; side::Symbol = :left)
+function Solve._can_solve_internal_no_check(::Solve.FFLUTrait, C::Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait}, b::QQMatrix, task::Symbol; side::Symbol = :left)
   # Split up in separate functions to make the compiler happy
   if side === :right
-    return Solve._can_solve_internal_no_check_right(FFLUTrait(), C, b, task)
+    return Solve._can_solve_internal_no_check_right(Solve.FFLUTrait(), C, b, task)
   else
-    return Solve._can_solve_internal_no_check_left(FFLUTrait(), C, b, task)
+    return Solve._can_solve_internal_no_check_left(Solve.FFLUTrait(), C, b, task)
   end
 end
 
-function Solve._can_solve_internal_no_check_right(::FFLUTrait, C::Solve.SolveCtx{QQFieldElem, FFLUTrait}, b::QQMatrix, task::Symbol)
+function Solve._can_solve_internal_no_check_right(::Solve.FFLUTrait, C::Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait}, b::QQMatrix, task::Symbol)
   bint = zero_matrix(FlintZZ, nrows(b), ncols(b))
   db = FlintZZ()
   ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
@@ -738,7 +738,7 @@ function Solve._can_solve_internal_no_check_right(::FFLUTrait, C::Solve.SolveCtx
   end
 end
 
-function Solve._can_solve_internal_no_check_left(::FFLUTrait, C::Solve.SolveCtx{QQFieldElem, FFLUTrait}, b::QQMatrix, task::Symbol)
+function Solve._can_solve_internal_no_check_left(::Solve.FFLUTrait, C::Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait}, b::QQMatrix, task::Symbol)
   bint = zero_matrix(FlintZZ, ncols(b), nrows(b))
   db = FlintZZ()
   ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
