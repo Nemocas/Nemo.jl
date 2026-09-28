@@ -2605,7 +2605,7 @@ function digits_to_integer!(digits::Vector{ZZRingElem}; base::IntegerUnion = 10)
 end
 
 function digits_to_integer!(digits::Vector{T}; base::IntegerUnion = 10) where { T <: Integer }
-  return digits_to_integer!(ZZ.(digits); base))
+  return digits_to_integer!(ZZ.(digits); base)
 end
 
 
