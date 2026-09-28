@@ -2555,7 +2555,8 @@ end
 @doc raw"""
     digits_to_integer!(D::ZZMatrix; base::ZZRingElem = 10)
 
-Given an ``r``-by-``c`` matrix ``D``, returns a 1-by-``c`` matrix of integers whose ``k``-th entry is ``\sum_{j=0}^{r-1} b^j D_{j+1, k}`` where ``b`` is the `base`.
+Given an ``r``-by-``c`` matrix ``D``, returns a 1-by-``c`` matrix of integers whose
+``k``-th entry is ``\sum_{j=0}^{r-1} b^j D_{j+1, k}`` where ``b`` is the `base`.
 The ``k``-th column of ``D`` contains the digits (in the given base) of the ``k``-th
 integer in the result returned.  Note: the matrix ``D`` is modified by this function.
 """
