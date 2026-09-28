@@ -624,11 +624,7 @@ end
 #
 ###############################################################################
 
-function Solve._init_reduce(C::Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait})
-  if isdefined(C, :red)
-    return nothing
-  end
-  A = matrix(C)
+function __fflu_precomp(A::QQMatrix)
   Aint = zero_matrix(ZZ, nrows(A), ncols(A))
   dA = ZZ()
   ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
@@ -641,9 +637,19 @@ function Solve._init_reduce(C::Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait})
             Aint, dLU, p.d, Aint, Cint(false))
   p.d .+= 1
   inv!(p)
+  d = divexact(dA, QQ(dLU))
+
+  return Aint, p, r, d
+end
+
+function Solve._init_reduce(C::Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait})
+  if isdefined(C, :red)
+    return nothing
+  end
+  A = matrix(C)
+  Aint, p, r, d = __fflu_precomp(A)
   Solve.set_rank!(C, r)
   C.lu_perm = p
-  d = divexact(dA, base_ring(C)(dLU))
   C.red = Aint
   C.scaling_factor = d
 
@@ -663,21 +669,9 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{QQFieldElem, Solve.FFLUT
   end
 
   A = matrix(C)
-  Aint = zero_matrix(ZZ, ncols(A), nrows(A))
-  dA = ZZ()
-  ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
-        (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), Aint, dA, transpose(A))
-  p = Generic.Perm(ncols(A))
-  dLU = ZZ()
-  p.d .-= 1
-  r = ccall((:fmpz_mat_fflu, libflint), Int,
-            (Ref{ZZMatrix}, Ref{ZZRingElem}, Ptr{Int}, Ref{ZZMatrix}, Cint),
-            Aint, dLU, p.d, Aint, Cint(false))
-  p.d .+= 1
-  inv!(p)
+  Aint, p, r, d = __fflu_precomp(transpose(A))
   Solve.set_rank!(C, r)
   C.lu_perm_transp = p
-  d = divexact(dA, base_ring(C)(dLU))
   C.red_transp = Aint
   C.scaling_factor_transp = d
 
