@@ -9,6 +9,17 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.56.2](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.56.2) - 2026-09-30
+
+### New or extended functionality
+
+- [#2321](https://github.com/Nemocas/Nemo.jl/pull/2321) Unify `non-square matrix` error messages
+- [#2329](https://github.com/Nemocas/Nemo.jl/pull/2329) New function `digits_to_integer!` (inverse to `digits`)
+
+### Fixed bugs that returned incorrect results
+
+- [#2340](https://github.com/Nemocas/Nemo.jl/pull/2340) Fix three-arg `+`, `-`, `*`, `//` for real and complex fields
+
 ## [0.56.1](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.56.1) - 2026-06-31
 
 ### New or extended functionality
