@@ -767,25 +767,39 @@ preimage(f::FqPolyRingToFqField, x::FqFieldElem) = f.g(x)::FqPolyRingElem
 ################################################################################
 
 function (F::FqField)(p::FqPolyRingElem)
+  # a polynomial over `F` itself is a constant, not a residue
+  if base_ring(p) === F
+    is_constant(p) || throw(InexactError(:FqFieldElem, FqFieldElem, p))
+    return constant_coefficient(p)
+  end
+
   if isdefined(F, :forwardmap)
     parent(p) !== parent(defining_polynomial(F)) && error("Polynomial has wrong coefficient ring")
     return F.forwardmap(p)
   else
-    # F was not created using a defining polynomial
+    # F has no forward map, as for `finite_field(p, d)`. It is absolute, and
+    # the modulus of its FLINT context is its defining polynomial over the
+    # prime field. The calls below reduce an `nmod_poly` or `fmpz_mod_poly`
+    # modulo it.
     @assert is_absolute(F)
-    K = base_field(F)
-    characteristic(base_ring(p)) != characteristic(F) && error("Polynomial has wrong coefficient ring")
-    _fq_ctx_type = _fq_default_ctx_type(K)
+
+    # FLINT stores a polynomial over `k` as an `nmod_poly` or
+    # `fmpz_mod_poly` exactly when the context of `k` has type
+    # `_FQ_DEFAULT_NMOD` or `_FQ_DEFAULT_FMPZ_NMOD`, that is, when `k` is a
+    # prime field stored as residues. Any other `k` would have its
+    # coefficients misread.
+    k = base_ring(p)
+    characteristic(k) == characteristic(F) || error("Polynomial has wrong coefficient ring")
+    y = FqFieldElem(F)
+    _fq_ctx_type = _fq_default_ctx_type(k)
     if _fq_ctx_type == _FQ_DEFAULT_NMOD
-      y = FqFieldElem(F)
       @ccall libflint.fq_default_set_nmod_poly(y::Ref{FqFieldElem}, p::Ref{FqPolyRingElem}, F::Ref{FqField})::Nothing
-      return y
-    else
-      @assert _fq_ctx_type == _FQ_DEFAULT_FMPZ_NMOD
-      y = FqFieldElem(F)
+    elseif _fq_ctx_type == _FQ_DEFAULT_FMPZ_NMOD
       @ccall libflint.fq_default_set_fmpz_mod_poly(y::Ref{FqFieldElem}, p::Ref{FqPolyRingElem}, F::Ref{FqField})::Nothing
-      return y
+    else
+      error("Polynomial has wrong coefficient ring")
     end
+    return y
   end
 end
 
