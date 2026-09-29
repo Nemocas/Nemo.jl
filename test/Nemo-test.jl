@@ -101,6 +101,7 @@ testlist = [
   "Benchmark-test.jl",
   "gaussiannumbers/continued_fraction-test.jl",
   "Native-test.jl",
+  "HeckeMiscFiniteField-test.jl",
   "HeckeMiscLocalization-test.jl",
   "matrix-test.jl",
   "poly-test.jl",
