@@ -84,14 +84,23 @@ end
 ################################################################################
 
 # Make sure we don't use lazy_transpose for any flint backed type
-function Solve.solve_context_type(NF::Solve.MatrixNormalFormTrait,
-                                            ::Type{T}) where {T <: Union{
+const _FlintSolveElemTypes = Union{
   ZZRingElem, QQFieldElem,
   fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem,
   zzModRingElem, ZZModRingElem,
-  RealFieldElem, ArbFieldElem, ComplexFieldElem, AcbFieldElem}}
+  RealFieldElem, ArbFieldElem, ComplexFieldElem, AcbFieldElem}
+
+function Solve.solve_context_type(NF::Solve.MatrixNormalFormTrait,
+                                  ::Type{T}) where {T <: _FlintSolveElemTypes}
   MatType = dense_matrix_type(T)
   return Solve.SolveCtx{T, typeof(NF), MatType, MatType, MatType}
+end
+
+# The FFLU context uses no lazy transpose either, but keeps its reduced matrices
+# over the base ring, as AbstractAlgebra's method of the same name does
+function Solve.solve_context_type(::Solve.FFLUTrait, ::Type{T}) where {T <: _FlintSolveElemTypes}
+  IntMatT = dense_matrix_type(base_ring_type(T))
+  return Solve.SolveCtx{T, Solve.FFLUTrait, dense_matrix_type(T), IntMatT, IntMatT}
 end
 
 ################################################################################
