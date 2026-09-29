@@ -530,7 +530,7 @@ function is_square_with_sqrt(a::QadicFieldElem)
   end
 
   av = valuation(a)
-  (av % 2) != 0 && return (false, zero(ctx))
+  (av % 2) != 0 && return (false, a)
   z = QadicFieldElem(a.N - div(av, 2))
   z.parent = ctx
   res = Bool(@ccall libflint.qadic_sqrt(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Cint)
