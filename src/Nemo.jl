@@ -522,6 +522,8 @@ include("Primes.jl")
 
 include("UnivPoly.jl")
 
+include("ConstantCoercion.jl")
+
 # More functionality for Julia types
 include("julia/Integer.jl")
 include("julia/Rational.jl")

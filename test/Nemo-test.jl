@@ -99,6 +99,7 @@ testlist = [
   "generic/FactoredFraction-test.jl",
 # Miscellaneous tests
   "Benchmark-test.jl",
+  "ConstantCoercion-test.jl",
   "gaussiannumbers/continued_fraction-test.jl",
   "Native-test.jl",
   "HeckeMiscLocalization-test.jl",
