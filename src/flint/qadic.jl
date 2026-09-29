@@ -534,8 +534,7 @@ function is_square_with_sqrt(a::QadicFieldElem)
   z = QadicFieldElem(a.N - div(av, 2))
   z.parent = ctx
   res = Bool(@ccall libflint.qadic_sqrt(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Cint)
-  !res && return (false, zero(ctx))
-  return (true, z)
+  return (res, z)
 end
 
 function is_square(a::QadicFieldElem)
