@@ -177,6 +177,35 @@ function mulmod(a::UInt, b::UInt, n::UInt, ni::UInt)
   return @ccall libflint.n_mulmod2_preinv(a::UInt, b::UInt, n::UInt, ni::UInt)::UInt
 end
 
+# a mod n, with ninv as above; Julia port of flint's n_mod2_preinv, so that
+# callers can inline the reduction instead of paying for a ccall
+@inline function mod2_preinv(a::UInt, n::UInt, ninv::UInt)
+  @assert !iszero(n)
+
+  bits = 8 * sizeof(UInt)
+  norm = leading_zeros(n)
+  n_norm = n << norm
+
+  # split a << norm into two limbs (u1, u0); a >> 64 is a well-defined 0 in Julia
+  u1 = a >> (bits - norm)
+  u0 = a << norm
+
+  # q = (q1, q0) approximates (u1, u0) * 2^64 / n_norm via q = u1 * ninv + (u1, u0)
+  prod = widemul(ninv, u1)
+  q1 = (prod >> bits) % UInt
+  q0 = prod % UInt
+  q0 += u0
+  q1 = q1 + u1 + (q0 < u0)
+
+  # candidate remainder, off by at most one correction step
+  r = u0 - (q1 + 1) * n_norm
+  if r > q0
+    r += n_norm
+  end
+
+  return r < n_norm ? (r >> norm) : ((r - n_norm) >> norm)
+end
+
 function *(x::zzModRingElem, y::zzModRingElem)
   check_parent(x, y)
   R = parent(x)
@@ -440,7 +469,7 @@ function (R::zzModRing)(a::Int)
     d += n
   end
   if d >= n
-    d = @ccall libflint.n_mod2_preinv(d::UInt, n::UInt, ninv::UInt)::UInt
+    d = mod2_preinv(d, n, ninv)
   end
   return zzModRingElem(d, R)
 end
@@ -448,7 +477,7 @@ end
 function (R::zzModRing)(a::UInt)
   n = R.n
   ninv = R.ninv
-  a = @ccall libflint.n_mod2_preinv(a::UInt, n::UInt, ninv::UInt)::UInt
+  a = mod2_preinv(a, n, ninv)
   return zzModRingElem(a, R)
 end
 
