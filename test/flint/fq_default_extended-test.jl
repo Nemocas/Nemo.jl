@@ -268,6 +268,36 @@ end
   Fx, x = F["x"]
   FF, = finite_field(x)
   @test iszero(FF(x))
+
+  # polynomials over the field itself are constants, not residues
+  F2, o = finite_field(5, 2)
+  F2x, w = F2["w"]
+  @test F2(F2x(o)) == o
+  @test F2(zero(F2x)) == zero(F2)
+  @test_throws InexactError F2(w)
+
+  # polynomials over other extension fields are rejected
+  G, g = finite_field(5, 3)
+  @test_throws ErrorException F2(G["y"][1](g))
+  H, h = finite_field(5, 2; cached = false)
+  @test_throws ErrorException F2(H["z"][1](h))
+
+  # any prime field of the same characteristic works
+  @test F2(GF(5; cached = false)["y"][2]) == o
+  E, e = finite_field(prime_field(F2)["t"][2] - 3)
+  @test F2(E["z"][1](e)) == F2(3)
+
+  # characteristic beyond a machine word
+  q = ZZ(1180591620717411303449)
+  Fq2, oq = finite_field(q, 2)
+  @test Fq2(prime_field(Fq2)["y"][2]) == oq
+  Gq, gq = finite_field(q, 3)
+  @test_throws ErrorException Fq2(Gq["y"][1](gq))
+
+  F3, a = finite_field(defining_polynomial(F2))
+  F3x, v = F3["v"]
+  @test F3(F3x(a)) == a
+  @test_throws InexactError F3(v)
 end
 
 @testset "Implicit promotions" begin
