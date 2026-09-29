@@ -542,7 +542,6 @@ function is_square(a::QadicFieldElem)
 end
 
 
-
 ###############################################################################
 #
 #   Special functions
