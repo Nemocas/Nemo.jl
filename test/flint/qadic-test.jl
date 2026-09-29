@@ -382,7 +382,8 @@ end
 
   @test is_square(a)
 
-  @test is_square_with_sqrt(a^2) == (true, a)
+  fl, r = is_square_with_sqrt(a^2)
+  @test fl && r^2 == a^2
 
   @test !is_square(b+1)
 
