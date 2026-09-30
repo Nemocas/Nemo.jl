@@ -1071,7 +1071,7 @@ end
 
 rand(rng::AbstractRNG, K::AbsSimpleNumField, r::AbstractUnitRange{Int}) = rand(rng, make(K, r))
 
-rand(K::AbsSimpleNumField, r) = rand(Random.default_rng(), K, r)
+rand(K::AbsSimpleNumField, r::AbstractUnitRange{Int}) = rand(Random.default_rng(), K, r)
 
 ###############################################################################
 #
@@ -1143,9 +1143,8 @@ function show_cyclo(io::IO, a::AbsSimpleNumField)
 end
 
 function show_cyclo(io::IO, ::MIME"text/plain", a::AbsSimpleNumField)
-  # TODO: change to print something with "cyclotomic" in it
   @assert is_cyclo_type(a)
-  print(io, "Number field with defining polynomial ", defining_polynomial(a))
+  print(io, "Cyclotomic field of order $(get_attribute(a, :cyclo)) with defining polynomial ", defining_polynomial(a))
   println(io)
   io = pretty(io)
   print(io, Indent(), "over ", Lowercase(), QQ, Dedent())

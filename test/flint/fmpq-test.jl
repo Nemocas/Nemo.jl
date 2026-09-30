@@ -112,13 +112,30 @@ end
   @test Rational{BigInt}(QQFieldElem(3, 7)) == 3//7
 
   @test ZZ(QQFieldElem(3)) isa ZZRingElem
-  @test_throws Exception ZZ(QQFieldElem(3, 2))
+  @test ZZ(QQFieldElem(3)) == 3
+  @test_throws InexactError ZZ(QQFieldElem(3, 2))
 
   @test ZZ(3//1) isa ZZRingElem
-  @test_throws Exception ZZ(3//2)
+  @test ZZ(3//1) == 3
+  @test_throws InexactError ZZ(3//2)
 
   @test ZZ(big(3)//1) isa ZZRingElem
-  @test_throws Exception ZZ(big(3)//2)
+  @test ZZ(big(3)//1) == 3
+  @test_throws InexactError ZZ(big(3)//2)
+
+  @test ZZRingElem(QQFieldElem(-3)) isa ZZRingElem
+  @test ZZRingElem(QQFieldElem(-3)) == -3
+  @test_throws InexactError ZZRingElem(QQFieldElem(3, 2))
+
+  @testset "$T" for T in (Int, Int8, UInt, BigInt)
+    @test T(QQFieldElem(3)) isa T
+    @test T(QQFieldElem(3)) == 3
+    @test_throws InexactError T(QQFieldElem(3, 2))
+  end
+  @test Int(QQFieldElem(-3)) == -3
+  @test_throws InexactError UInt(QQFieldElem(-3))
+  @test_throws InexactError Int8(QQFieldElem(128))
+  @test_throws InexactError Int(QQFieldElem(ZZ(2)^64))
 
   @test BigFloat(QQFieldElem(3, 4)) == BigFloat(0.75)
   @test Float64(QQFieldElem(3, 4)) == 0.75
