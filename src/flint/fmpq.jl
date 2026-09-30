@@ -1233,15 +1233,9 @@ end
 
 (a::QQField)(b::QQFieldElem) = b
 
-function (a::ZZRing)(b::QQFieldElem)
-  is_one(_den_ptr(b)) || error("Denominator must be 1")
-  return numerator(b)
-end
+(a::ZZRing)(b::QQFieldElem) = ZZRingElem(b)
 
-function (::ZZRing)(x::Rational{<:IntegerUnion})
-  @assert denominator(x) == 1
-  return ZZRingElem(numerator(x))
-end
+(a::ZZRing)(b::Rational{T}) where {T <: Integer} = ZZRingElem(T(b))
 
 ###############################################################################
 #
@@ -1332,6 +1326,14 @@ function Base.BigFloat(a::QQFieldElem)
 end
 
 Base.Float64(a::QQFieldElem) = Float64(BigFloat(a))
+
+function ZZRingElem(a::QQFieldElem)
+  isinteger(a) || throw(InexactError(:ZZRingElem, ZZRingElem, a))
+  return numerator(a)
+end
+
+(::Type{T})(a::QQFieldElem) where T <: Integer = T(ZZRingElem(a))
+
 
 ###############################################################################
 #
