@@ -239,6 +239,22 @@ end
     @test RxtoF(preimage(RxtoF, c)) == c
   end
 
+  # coercion to and from the base field must agree with the residue map
+  R, o = finite_field(3, 2)
+  Rx, x = R["x"]
+  for i in 1:10
+    g = x^2 + rand(R)*x + rand(R)
+    while !is_irreducible(g)
+      g = x^2 + rand(R)*x + rand(R)
+    end
+    F, RxtoF = Nemo._residue_field(g, absolute = true)
+    c = rand(R)
+    @test F(o) == RxtoF(Rx(o))
+    @test F(c) == RxtoF(Rx(c))
+    @test R(RxtoF(Rx(c))) == c
+    @test_throws ArgumentError R(RxtoF(x))
+  end
+
   R, a = finite_field(ZZRingElem(7), 1, "a")
   Rx, x = R["x"]
   f = x + 2

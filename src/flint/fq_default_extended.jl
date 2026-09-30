@@ -701,6 +701,19 @@ function (a::FqField)(b::FqFieldElem)
     return b
   end
   characteristic(k) != characteristic(a) && error("Coercion impossible")
+
+  # A field defined by a polynomial over k fixes its own embedding of k,
+  # which embed(k, a) need not agree with
+  if k === base_field(a) && isdefined(a, :image_basefield)
+    return (a.image_basefield)(b)::FqFieldElem
+  end
+
+  if a === base_field(k) && isdefined(k, :preimage_basefield)
+    c = (k.preimage_basefield)(b)::FqFieldElem
+    (k.image_basefield)(c) == b || throw(ArgumentError("not an element of the base field"))
+    return c
+  end
+
   if is_absolute(a)
     da = degree(a)
     dk = degree(k)
@@ -713,10 +726,6 @@ function (a::FqField)(b::FqFieldElem)
       f = preimage_map(a, k)
       return f(b)
     end
-  end
-
-  if k === base_field(a)
-    return (a.image_basefield)(b)::FqFieldElem
   end
 
   # To make it work in towers
