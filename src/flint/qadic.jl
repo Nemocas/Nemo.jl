@@ -520,7 +520,10 @@ function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bo
 end
 
 function is_square_with_sqrt(a::QadicFieldElem)
-  is_zero(a) && return (true, a)
+  if is_zero(a)
+    pr = precision(a)
+    return (true, O(parent(a), div(pr+1,2)))
+  end
   ctx = parent(a)
   if prime(ctx) == 2
     precomp_data = get_attribute!(ctx, :char2_sqrt_precomp) do
