@@ -395,6 +395,9 @@ end
   user_data = Nemo.Qadic2SqrtPrecomp(R)
 
   a = 1 + 2^3 + O(R, 2^4)
+  @test Nemo._qadic_char2_sqrt(a-a, user_data)[1]
+  @test Nemo._qadic_char2_sqrt(a-a, user_data)[2] == a-a
+  @test Nemo._qadic_char2_sqrt(a, user_data)[1]
   @test Nemo._qadic_char2_sqrt(a, user_data)[2]^2 == a
 
   a = 1 + 2^3 + 2^4 + O(R, 2^10)
