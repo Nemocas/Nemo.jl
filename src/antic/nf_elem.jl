@@ -1061,17 +1061,33 @@ end
 
 RandomExtensions.maketype(K::AbsSimpleNumField, _) = elem_type(K)
 
+RandomExtensions.maketype(K::AbsSimpleNumField, _, _) = elem_type(K)
+
 function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{AbsSimpleNumFieldElem, AbsSimpleNumField,
-                                                           <:AbstractUnitRange{Int}}})
+                                                           <:AbstractUnitRange}})
   K, r = sp[][1:end]
   R = parent(K.pol)
-  n = degree(K.pol)
-  return K(rand(rng, R, (n-1):(n-1), r))
+  return K(R([rand(rng, r) for _ in 1:degree(K)]))
 end
 
-rand(rng::AbstractRNG, K::AbsSimpleNumField, r::AbstractUnitRange{Int}) = rand(rng, make(K, r))
+function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{AbsSimpleNumFieldElem, AbsSimpleNumField,
+                                                           <:AbstractUnitRange, <:AbstractUnitRange}})
+  K, r, d = sp[][1:end]
+  a = rand(rng, K, r)
+  den = rand(rng, d)
+  iszero(den) && throw(DivideError())
+  return divexact!(a, a, den)
+end
 
-rand(K::AbsSimpleNumField, r) = rand(Random.default_rng(), K, r)
+rand(rng::AbstractRNG, K::AbsSimpleNumField, r::AbstractUnitRange) = rand(rng, make(K, r))
+
+rand(rng::AbstractRNG, K::AbsSimpleNumField, r::AbstractUnitRange, d::AbstractUnitRange) =
+rand(rng, make(K, r, d))
+
+rand(K::AbsSimpleNumField, r::AbstractUnitRange) = rand(Random.default_rng(), K, r)
+
+rand(K::AbsSimpleNumField, r::AbstractUnitRange, d::AbstractUnitRange) =
+rand(Random.default_rng(), K, r, d)
 
 ###############################################################################
 #
