@@ -379,6 +379,15 @@ end
   @test sqrt(c)^2 == c
 
   @test sqrt(R(121))^2 == R(121)
+
+  @test is_square(a)
+
+  fl, r = is_square_with_sqrt(a^2)
+  @test fl && r^2 == a^2
+
+  @test !is_square(b+1)
+
+  @test is_square_with_sqrt(b+1)[1] == false
 end
 
 @testset "QadicFieldElem.square_root_char2_precomp" begin
@@ -386,10 +395,13 @@ end
   user_data = Nemo.Qadic2SqrtPrecomp(R)
 
   a = 1 + 2^3 + O(R, 2^4)
-  @test Nemo._qadic_char2_sqrt(a, user_data)^2 == a
+  @test Nemo._qadic_char2_sqrt(a-a, user_data)[1]
+  @test Nemo._qadic_char2_sqrt(a-a, user_data)[2] == a-a
+  @test Nemo._qadic_char2_sqrt(a, user_data)[1]
+  @test Nemo._qadic_char2_sqrt(a, user_data)[2]^2 == a
 
   a = 1 + 2^3 + 2^4 + O(R, 2^10)
-  @test Nemo._qadic_char2_sqrt(a, user_data)^2 == a
+  @test Nemo._qadic_char2_sqrt(a, user_data)[2]^2 == a
 
   @test_throws DomainError Nemo.Qadic2SqrtPrecomp(QadicField(3, 2)[1])
   S, _ = QadicField(2, 5)

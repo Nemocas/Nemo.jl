@@ -495,31 +495,20 @@ end
 #
 ###############################################################################
 
-function Base.sqrt(a::QadicFieldElem; check::Bool=true)
-  ctx = parent(a)
-  if prime(ctx) == 2
-    precomp_data = get_attribute!(ctx, :char2_sqrt_precomp) do
-      Qadic2SqrtPrecomp(ctx)
-    end::Qadic2SqrtPrecomp
-
-    return _qadic_char2_sqrt(a, precomp_data; check=check)
-  end
-
-  av = valuation(a)
-  check && (av % 2) != 0 && error("Unable to take qadic square root")
-  z = QadicFieldElem(a.N - div(av, 2))
-  z.parent = ctx
-  res = Bool(@ccall libflint.qadic_sqrt(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Cint)
-  check && !res && error("Square root of p-adic does not exist")
+function Base.sqrt(a::QadicFieldElem; check::Bool=true)  # IGNORE kwarg "check"
+  b,z = is_square_with_sqrt(a)
+  !b && throw(DomainError(a, "Square root of q-adic does not exist"))
   return z
 end
 
 # Internal: square root in characteristic 2 using a precomputed Artin-Schreier LUP decomposition.
-function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bool=true)
+# Return value is (bool, value): bool=false means no sqrt exists; bool=true means that the sqrt is the 2nd component
+function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bool=true)  # IGNORE kwarg "check"
   ctx = parent(a)
-  ctx === data.parent || throw(ArgumentError("precomputation belongs to a different qadic field"))
+  @req ctx === data.parent "precomputation belongs to a different q-adic field"
+  is_zero(a) && return (true, O(parent(a), div(precision(a)+1,2)))
   av = valuation(a)
-  check && (av % 2) != 0 && error("Unable to take qadic square root")
+  isodd(av) && return (false, a)
   z = QadicFieldElem(a.N - div(av, 2))
   z.parent = ctx
 
@@ -527,9 +516,35 @@ function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bo
     res = Bool(@ccall libflint._qadic_char2_sqrt_with_precomp(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField}, data.ptr::Ptr{Nothing})::Cint)
   end
 
-  check && !res && error("Square root of p-adic does not exist")
-  return z
+  return (res, z)
 end
+
+function is_square_with_sqrt(a::QadicFieldElem)
+  if is_zero(a)
+    pr = precision(a)
+    return (true, O(parent(a), div(pr+1,2)))
+  end
+  ctx = parent(a)
+  if prime(ctx) == 2
+    precomp_data = get_attribute!(ctx, :char2_sqrt_precomp) do
+      Qadic2SqrtPrecomp(ctx)
+    end::Qadic2SqrtPrecomp
+
+    return _qadic_char2_sqrt(a, precomp_data)
+  end
+
+  av = valuation(a)
+  (av % 2) != 0 && return (false, a)
+  z = QadicFieldElem(a.N - div(av, 2))
+  z.parent = ctx
+  res = Bool(@ccall libflint.qadic_sqrt(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Cint)
+  return (res, z)
+end
+
+function is_square(a::QadicFieldElem)
+  return is_square_with_sqrt(a)[1]
+end
+
 
 ###############################################################################
 #
