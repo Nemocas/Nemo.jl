@@ -548,9 +548,20 @@ Julia matrices use a different data structure than Nemo matrices. Conversion to 
 
 This conversion can be performed with standard Julia syntax, such as the following, where `A` is an `ZZMatrix`:
 
-```julia
-Matrix{Int}(A)
-Matrix{BigInt}(A)
+```jldoctest
+julia> A = ZZ[1 2; 3 4]
+[1   2]
+[3   4]
+
+julia> Matrix{Int}(A)
+2×2 Matrix{Int64}:
+ 1  2
+ 3  4
+
+julia> Matrix{BigInt}(A)
+2×2 Matrix{BigInt}:
+ 1  2
+ 3  4
 ```
 
 In case the matrix cannot be converted without loss, an `InexactError` is thrown: in this case, cast to a matrix of `BigInt`s rather than `Int`s.

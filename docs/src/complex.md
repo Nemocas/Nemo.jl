@@ -422,11 +422,17 @@ const_pi(::ComplexField)
 
 **Examples**
 
-```julia
-CC = complex_field()
-set_precision!(ComplexField, 200) do
-  a = const_pi(CC)
-end
+```jldoctest
+julia> CC = complex_field()
+Complex field
+
+julia> a = const_pi(CC)
+[3.141592653589793239 +/- 5.96e-19]
+
+julia> set_precision!(ComplexField, 200) do
+         println(const_pi(CC))
+       end
+[3.14159265358979323846264338327950288419716939937510582097494 +/- 5.73e-60]
 ```
 
 ### Mathematical and special functions
