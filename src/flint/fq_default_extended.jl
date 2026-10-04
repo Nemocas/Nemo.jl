@@ -707,6 +707,16 @@ end
 #
 ################################################################################
 
+# Whether k is reached from K by iterating base_field, using only steps where
+# the upper field fixes its own embedding of the base field.
+function _is_in_tower(k::FqField, K::FqField)
+  while isdefined(K, :image_basefield)
+    K = base_field(K)
+    K === k && return true
+  end
+  return false
+end
+
 function (a::FqField)(b::FqFieldElem)
   k = parent(b)
   if k === a
@@ -726,7 +736,12 @@ function (a::FqField)(b::FqFieldElem)
     return c
   end
 
-  if is_absolute(a)
+  _is_in_tower(k, a) && return a(base_field(a)(b))::FqFieldElem
+  _is_in_tower(a, k) && return a(base_field(k)(b))::FqFieldElem
+
+  # The lattice of embeddings is keyed by degree(), which is only the
+  # absolute degree for absolute fields
+  if is_absolute(a) && is_absolute(k)
     da = degree(a)
     dk = degree(k)
     if dk < da
@@ -740,7 +755,12 @@ function (a::FqField)(b::FqFieldElem)
     end
   end
 
-  # To make it work in towers
+  # A relative field is related to fields outside its tower only through its
+  # base field
+  if !is_absolute(k)
+    return a(base_field(k)(b))::FqFieldElem
+  end
+
   return a(base_field(a)(b))::FqFieldElem
 end
 

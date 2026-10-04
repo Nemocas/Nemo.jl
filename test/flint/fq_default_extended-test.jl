@@ -287,6 +287,49 @@ end
   @test defining_polynomial(Rx, F) == x + 2
 end
 
+@testset "FqFieldElem.tower_coercion" begin
+  K, a = finite_field(3, 2, "a"; cached = false)
+
+  # every mix of absolute and relative quadratic steps above K
+  for flags in Iterators.product(fill((true, false), 3)...)
+    tower = [K]
+    up = [] # up[i] is the residue map on constants, tower[i] -> tower[i + 1]
+    for absolute in flags
+      F = tower[end]
+      Fx, x = F["x"]
+      f = x^2 + x + rand(F)
+      while !is_irreducible(f)
+        f = x^2 + x + rand(F)
+      end
+      G, FxtoG = Nemo._residue_field(f; absolute)
+      push!(tower, G)
+      push!(up, c -> FxtoG(Fx(c)))
+    end
+
+    for i in 1:length(tower), j in (i + 1):length(tower)
+      to_j = c -> foldl((e, m) -> m(e), up[i:(j - 1)]; init = c)
+
+      for c in (gen(tower[i]), rand(tower[i]))
+        d = to_j(c)
+        @test tower[j](c) == d
+        @test tower[i](d) == c
+        @test c + zero(tower[j]) == d
+      end
+
+      # gen(tower[i]) generates tower[i] over tower[i - 1]
+      d = to_j(gen(tower[i]))
+      for l in 1:(i - 1)
+        @test_throws ArgumentError tower[l](d)
+      end
+    end
+
+    Fp = prime_field(K)
+    @test tower[end](Fp(2)) == 2
+    @test Fp(tower[end](2)) == 2
+    @test_throws ArgumentError Fp(gen(tower[end]))
+  end
+end
+
 @testset "Conversions" begin
   F = GF(2)
   Fx, x = F["x"]
