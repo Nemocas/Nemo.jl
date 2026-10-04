@@ -678,6 +678,18 @@ function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::B
       L.backwardmap = backwardmap
       L.image_basefield = e
       L.preimage_basefield = backwardmap_basefield
+
+      # Coercion between absolute fields goes through the lattice of
+      # embeddings; put e there, so that embed(K, L) and everything derived
+      # from it is compatible with forwardmap. The lattice is keyed by
+      # degree(), which is only the absolute degree for absolute fields.
+      if absolute && is_absolute(K)
+        morph = FinFieldMorphism(K, L, e, backwardmap_basefield)
+        AddOverfield!(K, morph)
+        AddSubfield!(L, morph)
+        transitive_closure(morph)
+      end
+
       return L
     end::FqField
   end
