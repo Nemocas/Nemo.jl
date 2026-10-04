@@ -1061,32 +1061,32 @@ end
 
 RandomExtensions.maketype(K::AbsSimpleNumField, _) = elem_type(K)
 
-RandomExtensions.maketype(K::AbsSimpleNumField, _, _) = elem_type(K)
+RandomExtensions.maketype(K::AbsSimpleNumField, ::AbstractUnitRange, ::AbstractUnitRange) = elem_type(K)
 
 function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{AbsSimpleNumFieldElem, AbsSimpleNumField,
-                                                           <:AbstractUnitRange}})
+                                                           <:AbstractUnitRange{<:IntegerUnion}}})
   K, r = sp[][1:end]
   R = parent(K.pol)
   return K(R([rand(rng, r) for _ in 1:degree(K)]))
 end
 
 function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{AbsSimpleNumFieldElem, AbsSimpleNumField,
-                                                           <:AbstractUnitRange, <:AbstractUnitRange}})
+                                                           <:AbstractUnitRange{<:IntegerUnion}, <:AbstractUnitRange{<:IntegerUnion}}})
   K, r, d = sp[][1:end]
+  0 in d && throw(ArgumentError("denominator range must not contain zero"))
   a = rand(rng, K, r)
   den = rand(rng, d)
-  iszero(den) && throw(DivideError())
   return divexact!(a, a, den)
 end
 
-rand(rng::AbstractRNG, K::AbsSimpleNumField, r::AbstractUnitRange) = rand(rng, make(K, r))
+rand(rng::AbstractRNG, K::AbsSimpleNumField, r::AbstractUnitRange{<:IntegerUnion}) = rand(rng, make(K, r))
 
-rand(rng::AbstractRNG, K::AbsSimpleNumField, r::AbstractUnitRange, d::AbstractUnitRange) =
+rand(rng::AbstractRNG, K::AbsSimpleNumField, r::AbstractUnitRange{<:IntegerUnion}, d::AbstractUnitRange{<:IntegerUnion}) =
 rand(rng, make(K, r, d))
 
-rand(K::AbsSimpleNumField, r::AbstractUnitRange) = rand(Random.default_rng(), K, r)
+rand(K::AbsSimpleNumField, r::AbstractUnitRange{<:IntegerUnion}) = rand(Random.default_rng(), K, r)
 
-rand(K::AbsSimpleNumField, r::AbstractUnitRange, d::AbstractUnitRange) =
+rand(K::AbsSimpleNumField, r::AbstractUnitRange{<:IntegerUnion}, d::AbstractUnitRange{<:IntegerUnion}) =
 rand(Random.default_rng(), K, r, d)
 
 ###############################################################################
@@ -1096,7 +1096,7 @@ rand(Random.default_rng(), K, r, d)
 ###############################################################################
 
 function ConformanceTests.generate_element(K::AbsSimpleNumField)
-  return rand(K, -10:10)
+  return rand(K, -10:10, 1:10)
 end
 
 ###############################################################################

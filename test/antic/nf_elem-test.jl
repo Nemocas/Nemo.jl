@@ -78,8 +78,8 @@ end
   rng2 = copy(rng)
   @test rand(rng, K, -9:9, 1:9) == rand(rng2, K, -9:9)//rand(rng2, 1:9)
 
-  @test_throws DivideError rand(K, 1:1, 0:0)
-  @test_throws DivideError rand(make(K, 1:1, 0:0))
+  @test_throws ArgumentError rand(K, 1:1, 0:0)
+  @test_throws ArgumentError rand(make(K, 1:1, 0:0))
   @test_throws ArgumentError rand(K, 1:0)
   @test_throws ArgumentError rand(K, 1:9, 1:0)
 
