@@ -646,7 +646,7 @@ end
   end
 
   R, x = polynomial_ring(ZZ, "x")
-  @test_throws ErrorException change_base_ring(ZZ, f; parent = R)
+  @test_throws InexactError change_base_ring(ZZ, f; parent = R)
   f = 7*y^2 + 3*y + 2
   @test 7*x^2 + 3*x + 2 == @inferred change_base_ring(ZZ, f; parent = R)
 end
