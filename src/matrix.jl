@@ -98,7 +98,7 @@ end
 # for everything EXCEPT QQFieldElem
 function Solve.solve_context_type(::Solve.FFLUTrait,
                                             ::Type{T}) where {T <: Union{
-  ZZRingElem,
+  ZZRingElem, QQFieldElem,
   fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem,
   zzModRingElem, ZZModRingElem,
   RealFieldElem, ArbFieldElem, ComplexFieldElem, AcbFieldElem}}
