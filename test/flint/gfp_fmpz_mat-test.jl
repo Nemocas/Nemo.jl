@@ -485,7 +485,7 @@ end
 
   @test c == zero(Z17)
 
-  @test_throws ErrorException det(b)
+  @test_throws DomainError det(b)
 
   c = det(aa)
 

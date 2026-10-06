@@ -492,7 +492,7 @@ end
 
   @test c == F17(13)
 
-  @test_throws ErrorException tr(b)
+  @test_throws DomainError tr(b)
 
   c = det(a)
 
