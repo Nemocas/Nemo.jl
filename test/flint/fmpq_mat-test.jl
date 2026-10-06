@@ -721,13 +721,13 @@ end
   @test C isa AbstractAlgebra.solve_context_type(QQ)
   @test C isa AbstractAlgebra.solve_context_type(A)
 
-  @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.RREFTrait()
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), QQFieldElem)
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), QQ())
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), QQField)
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), QQ)
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), typeof(A))
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), A)
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.FFLUTrait()
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), QQFieldElem)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), QQ())
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), QQField)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), QQ)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), typeof(A))
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), A)
 
   @test_throws ErrorException solve(C, [ QQ(1) ])
   @test_throws ErrorException solve(C, [ QQ(1) ], side = :right)
@@ -786,6 +786,17 @@ end
     @test is_zero(K*A)
     @test nrows(K) == 0
   end
+
+  # Make sure RREFTrait() stays supported
+  C = solve_init(AbstractAlgebra.Solve.RREFTrait(), A)
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.RREFTrait()
+  b = [QQ(1), QQ(2), QQ(3), QQ(4), QQ(5)]
+  @test @inferred can_solve(C, b)
+  x = @inferred solve(C, b)
+  @test x * A == b
+  fl, x = @inferred can_solve_with_solution(C, b)
+  @test fl
+  @test x*A == b
 
   N = zero_matrix(QQ, 2, 1)
   C = solve_init(N)
