@@ -182,11 +182,15 @@ end
   @test t isa FqPolyRepMatrix
   @test size(t) == (2, 3)
 
-  for (R, M) in ring_to_mat
+  for R in example_rings
     t = similar(s, R)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
     @test size(t) == size(s)
 
     t = similar(s, R, 2, 3)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
     @test size(t) == (2, 3)
   end
 end

@@ -96,14 +96,18 @@ end
   @test size(t) == (2, 3)
   @test iszero(t)
 
-  for (R, M) in ring_to_mat
+  for R in example_rings
     t = sim_zero(s, R)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
     @test size(t) == size(s)
     if sim_zero == zero
       @test iszero(t)
     end
 
     t = sim_zero(s, R, 2, 3)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
     @test size(t) == (2, 3)
     if sim_zero == zero
       @test iszero(t)
