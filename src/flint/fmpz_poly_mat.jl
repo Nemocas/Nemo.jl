@@ -63,13 +63,6 @@ end
   end
 end
 
-function setindex!(a::ZZPolyRingMatrix, b::ZZPolyRingMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
-  _checkbounds(a, r, c)
-  size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
-  A = view(a, r, c)
-  @ccall libflint.fmpz_poly_mat_set(A::Ref{ZZPolyRingMatrix}, b::Ref{ZZPolyRingMatrix})::Nothing
-end
-
 function deepcopy_internal(d::ZZPolyRingMatrix, dict::IdDict)
   z = ZZPolyRingMatrix(d)
   return z

@@ -61,6 +61,12 @@ end
   A[2, 2] = x^3
   @test A[2, 2] == x^3
 
+  B = ZZPolyRingMatrix(zero_matrix(R, 3, 3))
+  B[2:3, 1:2] = A
+  @test B == ZZPolyRingMatrix(matrix(R, [0 0 0; x+1 x 0; x^2 x^3 0]))
+  @test_throws DimensionMismatch B[1:1, 1:2] = A
+  @test_throws BoundsError B[3:4, 1:2] = A
+
   # iszero / isone
   Z = ZZPolyRingMatrix(zero_matrix(R, 2, 2))
   @test iszero(Z)
