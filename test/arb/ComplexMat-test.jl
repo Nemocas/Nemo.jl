@@ -306,6 +306,15 @@ end
 
   @test A == B
   @test B == A
+
+  D = matrix(RR, [2 3 5; 1 4 7; 9 6 3])
+
+  @test S(D) isa ComplexMatrix
+  @test S(D) == A
+  @test A == D
+  @test D == A
+  @test A != D + 1
+  @test_throws ErrorException S(zero_matrix(RR, 2, 3))
 end
 
 @testset "ComplexMatrix.predicates" begin
