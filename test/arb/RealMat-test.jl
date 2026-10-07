@@ -515,3 +515,14 @@ end
   A = zero_matrix(RR, 0, 0)
   @test contains_zero(norm(A))
 end
+
+@testset "RealMatrix.rounding" begin
+  A = RR[2.2 3.1 5.4; 1.5 4.7 7.2]
+  B = zero_matrix(ZZ, 2, 3)
+  round!(B, A)
+  @test B == ZZ[2 3 5; 2 5 7]
+
+  @test round(ZZRingElem, RR(-2.7)) == -3
+  @test round(ZZRingElem, RR(ZZ(2)^60 + 1)) == ZZ(2)^60 + 1
+  @test_throws InexactError round(ZZRingElem, RR("1 +/- 0.3"))
+end
