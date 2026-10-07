@@ -4919,6 +4919,14 @@ mutable struct FqMatrix <: MatElem{FqFieldElem}
     return z
   end
 
+  function FqMatrix(m::FpMatrix, ctx::FqField)
+    r = nrows(m)
+    c = ncols(m)
+    z = FqMatrix(r, c, ctx)
+    @ccall libflint.fq_default_mat_set_fmpz_mod_mat(z::Ref{FqMatrix}, m::Ref{FpMatrix}, ctx::Ref{FqField})::Nothing
+    return z
+  end
+
   function FqMatrix(m::zzModMatrix, ctx::FqField)
     r = nrows(m)
     c = ncols(m)
