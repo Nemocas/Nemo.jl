@@ -2259,10 +2259,6 @@ mutable struct fqPolyRepMPolyRingElem <: MPolyRingElem{fqPolyRepFieldElem}
     return z
   end
 
-  function fqPolyRepMPolyRingElem(ctx::zzModMPolyRing, a::zzModRingElem)
-    return fqPolyRepMPolyRingElem(ctx, a.data)
-  end
-
   function fqPolyRepMPolyRingElem(ctx::fqPolyRepMPolyRing, a::fqPolyRepFieldElem)
     z = fqPolyRepMPolyRingElem(ctx)
     @ccall libflint.fq_nmod_mpoly_set_fq_nmod(z::Ref{fqPolyRepMPolyRingElem}, a::Ref{fqPolyRepFieldElem}, ctx::Ref{fqPolyRepMPolyRing})::Nothing
