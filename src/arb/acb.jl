@@ -1693,6 +1693,13 @@ function _acb_set(x::TypeOrPtr{AcbFieldElem}, yz::Tuple{AbstractString,AbstractS
   _arb_set(i, yz[2], p)
 end
 
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, yz::Tuple{AbstractFloat,AbstractFloat}, p::Int)
+  r = _real_ptr(x)
+  _arb_set(r, yz[1], p)
+  i = _imag_ptr(x)
+  _arb_set(i, yz[2], p)
+end
+
 function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::Real, p::Int)
   r = _real_ptr(x)
   _arb_set(r, y, p)
