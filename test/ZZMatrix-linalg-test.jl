@@ -108,6 +108,9 @@ end
   A = matrix(ZZ, rand(-ZZ(2)^256:ZZ(2)^256, 8,8));
   AA = kronecker_product(A,A);
   d = Nemo.det_hcol_hnf(AA); # this will (very likely) test the HCOL branch
+
+  @test_throws ErrorException Nemo.det_hcol_hnf(AA; solver = :JOHN)
+  @test_throws ErrorException Nemo.det_hcol_hnf(zero_matrix(ZZ, 2, 2); solver = :JOHN)
 end
 
 @testset "CrtCtx test" begin
