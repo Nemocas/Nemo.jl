@@ -117,6 +117,12 @@
   @test isa(M4, QQMatrix)
   @test base_ring(M4) == QQ
 
+  for d in [3, ZZ(3), big(3), 3//2, big(3)//2, QQ(3, 2)]
+    M5 = QQMatrix(2, 3, d)
+    @test isa(M5, QQMatrix)
+    @test M5 == matrix(QQ, [d 0 0; 0 d 0])
+  end
+
   a = zero_matrix(QQ, 2, 2)
   b = zero_matrix(QQ, 2, 3)
   @test a in [a, b]
