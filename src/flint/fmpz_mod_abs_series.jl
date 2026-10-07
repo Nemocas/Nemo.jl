@@ -379,7 +379,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       elseif length(x) == 1
         z = ZZRingElem()
         @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(z::Ref{ZZRingElem}, x::Ref{($etype)}, 0::Int, x.parent.base_ring.ninv::Ref{($ctype)})::Nothing
-        return @ccall libflint.fmpz_equal(z::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Bool
+        return Bool(@ccall libflint.fmpz_equal(z::Ref{ZZRingElem}, y.data::Ref{ZZRingElem})::Cint)
       else
         return precision(x) == 0 || iszero(y)
       end
