@@ -907,7 +907,7 @@ function (R::FqPolyRing)(g::QQPolyRingElem)
   error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
 end
 
-function AbstractAlgebra._map(R::FqField, g::QQPolyRingElem, parent::FqFieldElem)
+function AbstractAlgebra._map(R::FqField, g::QQPolyRingElem, parent::FqPolyRing)
   @assert R === base_ring(parent)
   return fmpq_poly_to_fq_default_poly_raw!(parent(), g)
 end
