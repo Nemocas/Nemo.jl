@@ -719,6 +719,9 @@ end
   g = 6(x + 1)*y + (x^3 + 2x + 2)
 
   @test resultant(f, g, 2) == 3*x^7+6*x^5-6*x^3+96*x^2+192*x+96
+
+  S, (u, v) = polynomial_ring(QQ, [:x, :y]; cached = false)
+  @test_throws ErrorException resultant(f, u, 2)
 end
 
 @testset "QQMPolyRingElem.discriminant" begin
@@ -820,6 +823,9 @@ end
   R, (x, y, z) = polynomial_ring(QQ, [:x, :y, :z])
 
   @test gcd_with_cofactors(x, y) == (1, x, y)
+
+  S, (u, v, w) = polynomial_ring(QQ, [:x, :y, :z]; cached = false)
+  @test_throws ErrorException gcd_with_cofactors(x, v)
 
   F = FactoredFractionField(R)
   (x, y, z) = map(F, (x, y, z))
