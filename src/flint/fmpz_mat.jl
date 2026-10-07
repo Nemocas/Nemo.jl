@@ -2355,7 +2355,7 @@ function map_entries(P::QQField, x::ZZMatrix)
 end
 
 change_base_ring(R::zzModRing, A::ZZMatrix) = map_entries(R, A)
-change_base_ring(R::fpMatrix, A::ZZMatrix) = map_entries(R, A)
+change_base_ring(R::fpField, A::ZZMatrix) = map_entries(R, A)
 change_base_ring(R::ZZModRing, A::ZZMatrix) = map_entries(R, A)
 change_base_ring(R::QQField, A::ZZMatrix) = map_entries(R, A)
 
