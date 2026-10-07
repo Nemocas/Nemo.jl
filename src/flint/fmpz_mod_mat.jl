@@ -149,31 +149,39 @@ end
 #   manual linear algebra: row and col operations
 #
 ###############################################################################
+
+# The scalar is coerced into base_ring(A), so its modulus has to be a multiple
+# of that of A, as for the generic methods.
+
 function AbstractAlgebra.multiply_row!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::Int, cols::UnitRange{Int}=1:ncols(A))
   @assert 1 <= i <= nrows(A)
   @assert 1 <= first(cols) && last(cols) <= ncols(A)
   c = first(cols)
-  ctx = base_ring(A).ninv
+  R = base_ring(A)
+  t = lift(R(s))
+  ctx = R.ninv
   GC.@preserve A begin
     # these are Ptr{ZZRingElem}
     i_ptr = mat_entry_ptr(A, i, c)
     for k = cols
-      @ccall libflint.fmpz_mod_mul(i_ptr::Ref{ZZRingElem}, i_ptr::Ref{ZZRingElem}, lift(s)::Ref{ZZRingElem}, ctx::Ref{fmpz_mod_ctx_struct})::Nothing
+      @ccall libflint.fmpz_mod_mul(i_ptr::Ref{ZZRingElem}, i_ptr::Ref{ZZRingElem}, t::Ref{ZZRingElem}, ctx::Ref{fmpz_mod_ctx_struct})::Nothing
       i_ptr += sizeof(ZZRingElem)
     end
   end
   return A
 end
 
-function AbstractAlgebra.multiply_column!(A::Zmod_fmpz_mat, s::TypeOrPtr{ZZModRingElem}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
-  @assert 1 <= j <= ncols(A)
+function AbstractAlgebra.multiply_column!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::Int, rows::UnitRange{Int}=1:nrows(A))
+  @assert 1 <= i <= ncols(A)
   @assert 1 <= first(rows)
   @assert last(rows) <= nrows(A)
-  ctx = base_ring(A).ninv
+  R = base_ring(A)
+  t = lift(R(s))
+  ctx = R.ninv
   GC.@preserve A begin
     for k = rows
       i_ptr = mat_entry_ptr(A, k, i)
-      @ccall libflint.fmpz_mod_mul(i_ptr::Ref{ZZRingElem}, i_ptr::Ref{ZZRingElem}, lift(s)::Ref{ZZRingElem}, ctx::Ref{fmpz_mod_ctx_struct})::Nothing
+      @ccall libflint.fmpz_mod_mul(i_ptr::Ref{ZZRingElem}, i_ptr::Ref{ZZRingElem}, t::Ref{ZZRingElem}, ctx::Ref{fmpz_mod_ctx_struct})::Nothing
     end
   end
   return A
@@ -185,7 +193,9 @@ function AbstractAlgebra.add_row!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::Int, j:
   @assert 1 <= j <= nrows(A)
   @assert 1 <= first(cols) && last(cols) <= ncols(A)
   c = first(cols)
-  ctx = base_ring(A).ninv
+  R = base_ring(A)
+  t = lift(R(s))
+  ctx = R.ninv
   GC.@preserve A begin
     # these are Ptr{ZZRingElem}
     i_ptr = mat_entry_ptr(A, i, c)
@@ -193,7 +203,7 @@ function AbstractAlgebra.add_row!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::Int, j:
     for k = cols
       # there is no addmul for fmpz_mod in flint
       # we use the one for fmpz and reduce afterwards
-      addmul!(j_ptr, lift(s), i_ptr)
+      addmul!(j_ptr, t, i_ptr)
       @ccall libflint.fmpz_mod_set_fmpz(j_ptr::Ref{ZZRingElem}, j_ptr::Ref{ZZRingElem}, ctx::Ref{fmpz_mod_ctx_struct})::Nothing
       i_ptr += sizeof(ZZRingElem)
       j_ptr += sizeof(ZZRingElem)
@@ -202,12 +212,14 @@ function AbstractAlgebra.add_row!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::Int, j:
   return A
 end
 
-function AbstractAlgebra.add_column!(A::Zmod_fmpz_mat, s::TypeOrPtr{ZZModRingElem}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
+function AbstractAlgebra.add_column!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
   @assert 1 <= i <= ncols(A)
   @assert 1 <= j <= ncols(A)
   @assert 1 <= first(rows)
   @assert last(rows) <= nrows(A)
-  ctx = base_ring(A).ninv
+  R = base_ring(A)
+  t = lift(R(s))
+  ctx = R.ninv
   GC.@preserve A begin
     for k = rows
       # there is no addmul for fmpz_mod in flint
@@ -215,7 +227,7 @@ function AbstractAlgebra.add_column!(A::Zmod_fmpz_mat, s::TypeOrPtr{ZZModRingEle
       # these are Ptr{ZZRingElem}
       i_ptr = mat_entry_ptr(A, k, i)
       j_ptr = mat_entry_ptr(A, k, j)
-      addmul!(j_ptr, lift(s), i_ptr)
+      addmul!(j_ptr, t, i_ptr)
       @ccall libflint.fmpz_mod_set_fmpz(j_ptr::Ref{ZZRingElem}, j_ptr::Ref{ZZRingElem}, ctx::Ref{fmpz_mod_ctx_struct})::Nothing
     end
   end
