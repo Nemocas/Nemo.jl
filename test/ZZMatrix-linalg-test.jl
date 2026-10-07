@@ -26,6 +26,14 @@ end
     s, d = Nemo.UniCertSolve(A^i, bb)
     @test s*A^i == d*bb
   end
+
+  # No known input reaches the code after the lifting loop, so inspect it:
+  # a variable assigned only inside the loop is read there as a global.
+  ci = only(code_lowered(Nemo.UniCertSolve, (ZZMatrix, ZZMatrix)))
+  refs = GlobalRef[]
+  walk(x) = x isa GlobalRef ? push!(refs, x) : x isa Expr ? foreach(walk, x.args) : nothing
+  foreach(walk, ci.code)
+  @test filter(r -> !isdefined(r.mod, r.name), refs) == GlobalRef[]
 end
 
 @testset "Verify bugfixes" begin

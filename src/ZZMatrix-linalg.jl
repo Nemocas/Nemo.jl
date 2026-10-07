@@ -957,7 +957,7 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
     end
   end
   mu = vcat([_to_base!(t, m) for t = allV]...)
-  tau = _induce_rational_reconstruction(mu, mex; unbalanced = true)
+  tau = _induce_rational_reconstruction(mu, m^(2*ex); unbalanced = true)
   @assert tau[1]
   GC.enable(GC_d)
   return tau[2], tau[3]
