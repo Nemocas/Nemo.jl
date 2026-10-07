@@ -506,7 +506,7 @@ end
 function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bool=true)  # IGNORE kwarg "check"
   ctx = parent(a)
   @req ctx === data.parent "precomputation belongs to a different q-adic field"
-  is_zero(a) && return (true, O(parent(a), div(precision(a)+1,2)))
+  is_zero(a) && return (true, O(parent(a), prime(ctx)^div(precision(a)+1,2)))
   av = valuation(a)
   isodd(av) && return (false, a)
   z = QadicFieldElem(a.N - div(av, 2))
@@ -522,7 +522,7 @@ end
 function is_square_with_sqrt(a::QadicFieldElem)
   if is_zero(a)
     pr = precision(a)
-    return (true, O(parent(a), div(pr+1,2)))
+    return (true, O(parent(a), prime(parent(a))^div(pr+1,2)))
   end
   ctx = parent(a)
   if prime(ctx) == 2
