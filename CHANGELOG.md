@@ -9,6 +9,24 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.57.0](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.57.0) - 2026-10-07
+
+### Breaking changes
+
+> !These changes break compatibility from previous versions!
+
+#### New or extended functionality
+
+- [#2367](https://github.com/Nemocas/Nemo.jl/pull/2367) Add conversions from `QQFieldElem` to `ZZRingElem` and `Integer` types
+
+#### Miscellaneous changes
+
+- [#2234](https://github.com/Nemocas/Nemo.jl/pull/2234) Add `fqPolyRepField` coercions from nmod polynomials (imported from Hecke), add or fix a bunch of `set!` methods
+- [#2364](https://github.com/Nemocas/Nemo.jl/pull/2364) Require `AbstractVector` scales in `rand` for `LocalizedEuclideanRing`, and `AbstractUnitRange{Int}` ranges in `rand` for Laurent and Puiseux series rings
+- [#2369](https://github.com/Nemocas/Nemo.jl/pull/2369) Revert to FFLU for solve contexts over QQ
+- [#2376](https://github.com/Nemocas/Nemo.jl/pull/2376) Change `rand(K::AbsSimpleNumField, r)` to return integer coefficients in `r` (not fractions); add `rand(K, r, d)` with a denominator range `d`
+- [#2378](https://github.com/Nemocas/Nemo.jl/pull/2378) Update AbstractAlgebra to v0.51
+
 ## [0.56.2](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.56.2) - 2026-09-30
 
 ### New or extended functionality
