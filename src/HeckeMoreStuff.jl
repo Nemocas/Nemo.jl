@@ -605,15 +605,6 @@ function rand(L::LocalizedEuclideanRing{T}, num_scale::AbstractVector=(1:1000), 
   return L(num // den)
 end
 
-function rand(L::LocalizedEuclideanRing{T}, num_scale::Vector, den_scale::Integer) where {T<:ZZRingElem}
-  num = rand(num_scale)
-  den = rand(den_scale)
-  while gcd(den, prime(L)) != 1
-    den = rand(den_scale)
-  end
-  return L(num // den)
-end
-
 ################################################################################
 #
 #
