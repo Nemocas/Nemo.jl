@@ -1016,6 +1016,22 @@ end
   end
 end
 
+@testset "ZZMatrix.mul!_vector" begin
+  b = ZZRingElem[7, -8]
+  c = ZZRingElem[1, 0, -1]
+  # entries below and above the cutoff for fmpz_mat_mul_fmpz_vec_ptr
+  for A in (ZZ[1 2; 3 4; 5 6], ZZ(2)^70 * ZZ[1 2; 3 4; 5 6])
+    Ab = [A[i, 1] * b[1] + A[i, 2] * b[2] for i in 1:3]
+    cA = [A[1, j] * c[1] + A[2, j] * c[2] + A[3, j] * c[3] for j in 1:2]
+    GC.@preserve A begin
+      for a in (A, Ref(A), Ptr{ZZMatrix}(pointer_from_objref(A)))
+        @test mul!([ZZ(), ZZ(), ZZ()], a, b) == Ab
+        @test mul!([ZZ(), ZZ()], c, a) == cA
+      end
+    end
+  end
+end
+
 @testset "ZZMatrix.add_one!" begin
   A = ZZ[0 0; 0 0]
   Generic.add_one!(A, 1, 1)
