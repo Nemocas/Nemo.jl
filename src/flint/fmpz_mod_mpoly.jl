@@ -581,6 +581,7 @@ for (etype, rtype, ftype, ctype) in (
     ###############################################################################
 
     function resultant(a::($etype), b::($etype), i::Int)
+      check_parent(a, b)
       n = nvars(parent(a))
       (i <= 0 || i > n) && error("Index must be between 1 and $n")
       z = parent(a)()

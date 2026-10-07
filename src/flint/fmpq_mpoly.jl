@@ -324,6 +324,7 @@ function gcd(a::QQMPolyRingElem, b::QQMPolyRingElem)
 end
 
 function gcd_with_cofactors(a::QQMPolyRingElem, b::QQMPolyRingElem)
+  check_parent(a, b)
   z = parent(a)()
   abar = parent(a)()
   bbar = parent(a)()
@@ -529,6 +530,7 @@ end
 ###############################################################################
 
 function resultant(a::QQMPolyRingElem, b::QQMPolyRingElem, i::Int)
+  check_parent(a, b)
   n = nvars(parent(a))
   (i <= 0 || i > n) && error("Index must be between 1 and $n")
   z = parent(a)()

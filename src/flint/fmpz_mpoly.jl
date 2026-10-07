@@ -317,6 +317,7 @@ function gcd(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
 end
 
 function gcd_with_cofactors(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
+  check_parent(a, b)
   z = parent(a)()
   abar = parent(a)()
   bbar = parent(a)()
@@ -510,6 +511,7 @@ end
 ###############################################################################
 
 function resultant(a::ZZMPolyRingElem, b::ZZMPolyRingElem, i::Int)
+  check_parent(a, b)
   n = nvars(parent(a))
   (i <= 0 || i > n) && error("Index must be between 1 and $n")
   z = parent(a)()

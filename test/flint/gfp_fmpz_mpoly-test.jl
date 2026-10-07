@@ -676,6 +676,9 @@ end
   g = 6(x + 1)*y + (x^3 + 2x + 2)
 
   @test resultant(f, g, 2) == 3*x^7+6*x^5+17*x^3+4*x^2+8*x+4
+
+  S, (u, v) = polynomial_ring(F, [:x, :y]; cached = false)
+  @test_throws ErrorException resultant(f, u, 2)
 end
 
 @testset "FpMPolyRingElem.discriminant" begin
