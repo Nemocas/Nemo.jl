@@ -447,10 +447,6 @@ function rand(R::Union{EuclideanRingResidueRing{ZZRingElem},EuclideanRingResidue
   return R(rand(ZZRingElem(0):(size(R)-1)))
 end
 
-function rand(R::EuclideanRingResidueField{ZZRingElem})
-  return R(rand(ZZRingElem(0):(order(R)-1)))
-end
-
 function rand(R::Union{EuclideanRingResidueRing{fqPolyRepPolyRingElem},EuclideanRingResidueField{fqPolyRepPolyRingElem}})
   r = rand(base_ring(base_ring(R)))
   g = gen(R)
