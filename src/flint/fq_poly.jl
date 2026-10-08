@@ -287,6 +287,22 @@ end
 
 ################################################################################
 #
+#   Exact division
+#
+################################################################################
+
+function divexact(x::FqPolyRepPolyRingElem, y::FqPolyRepPolyRingElem; check::Bool=true)
+  check_parent(x, y)
+  iszero(y) && throw(DivideError())
+  check || return div(x, y)
+
+  q, r = divrem(x, y)
+  iszero(r) || throw(ArgumentError("not an exact division"))
+  return q
+end
+
+################################################################################
+#
 #   Euclidean division
 #
 ################################################################################
