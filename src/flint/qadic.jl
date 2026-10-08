@@ -504,6 +504,7 @@ end
 # Internal: square root in characteristic 2 using a precomputed Artin-Schreier LUP decomposition.
 # Return value is (bool, value): bool=false means no sqrt exists; bool=true means that the sqrt is the 2nd component
 function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bool=true)  # IGNORE kwarg "check"
+  @req !is_zero(a)  "sqrt(0) not handled in this function"
   ctx = parent(a)
   @req ctx === data.parent "precomputation belongs to a different q-adic field"
   av = valuation(a)
@@ -514,16 +515,20 @@ function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bo
   GC.@preserve data begin
     res = Bool(@ccall libflint._qadic_char2_sqrt_with_precomp(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField}, data.ptr::Ptr{Nothing})::Cint)
   end
-
-  return (res, z)
+  # Next few lines are a workaround for a bug in FLINT
+  rel_pr = precision(a)-av
+  (rel_pr < 2) && return (res, z)
+  p = QQ(prime(ctx))
+  return (res, z+O(ctx, p^(div(av,2)+rel_pr-1)))  # z+O(...) workaround for BUG in FLINT
 end
 
 function is_square_with_sqrt(a::QadicFieldElem)
+  ctx = parent(a)
   if is_zero(a)
     pr = precision(a)
-    return (true, O(parent(a), prime(parent(a))^div(pr+1,2)))
+    p = QQ(prime(ctx))  # needs to be QQ in case pr < -1
+    return (true, O(ctx, p^div(pr+1,2)))
   end
-  ctx = parent(a)
   if prime(ctx) == 2
     precomp_data = get_attribute!(ctx, :char2_sqrt_precomp) do
       Qadic2SqrtPrecomp(ctx)
@@ -546,7 +551,7 @@ function is_square(a::QadicFieldElem)
   is_odd(va)  &&  return false
   # Next few lines "truncate" a to its first digit (or first 3 digits if p==2)
   R = parent(a)
-  p = prime(R)
+  p = QQ(prime(R))
   v2 = valuation(R(2))
   trunc_a = a+O(R, p^(1+va+2*v2))  # exponent is va+1, or va+3 if p==2
   return is_square_with_sqrt(trunc_a)[1]
