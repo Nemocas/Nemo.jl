@@ -3326,8 +3326,6 @@ end
 
 ZZRingElem(s::AbstractString) = parse(ZZRingElem, s)
 
-ZZRingElem(z::Integer) = ZZRingElem(BigInt(z))
-
 ZZRingElem(z::Float16) = ZZRingElem(Float64(z))
 
 ZZRingElem(z::Float32) = ZZRingElem(Float64(z))

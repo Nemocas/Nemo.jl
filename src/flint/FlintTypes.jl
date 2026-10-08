@@ -74,9 +74,10 @@ mutable struct ZZRingElem <: RingElem
     return z
   end
 
-  function ZZRingElem(x::BigInt)
+  function ZZRingElem(x::Integer)
+    y = BigInt(x)::BigInt
     z = ZZRingElem()
-    @ccall libflint.fmpz_set_mpz(z::Ref{ZZRingElem}, x::Ref{BigInt})::Nothing
+    @ccall libflint.fmpz_set_mpz(z::Ref{ZZRingElem}, y::Ref{BigInt})::Nothing
     return z
   end
 
