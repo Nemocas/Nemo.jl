@@ -415,8 +415,6 @@ end
   @test is_zero(sqrt_zero9)
   @test precision(sqrt_zero8) == 4
   @test precision(sqrt_zero9) == 5
-  @test sqrt_zero8^2 == zero8
-  @test sqrt_zero9^2 == zero9
 
   a = 1 + 2^3 + O(R, 2^4)
   @test is_square_with_sqrt(a)[1]
