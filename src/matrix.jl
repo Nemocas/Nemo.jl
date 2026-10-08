@@ -1,6 +1,5 @@
-# Types of all FLINT-backed matrices
-const _FieldMatTypes = Union{QQMatrix, fpMatrix, FpMatrix, FqMatrix, fqPolyRepMatrix, FqPolyRepMatrix}
-const _MatTypes = Union{_FieldMatTypes, ZZMatrix, zzModMatrix, ZZModMatrix}
+# The FlintMatElem types with windows, that is, with a `_view_window` method
+const _MatTypes = Union{ZZMatrix, QQMatrix, zzModMatrix, ZZModMatrix, fpMatrix, FpMatrix, FqMatrix, fqPolyRepMatrix, FqPolyRepMatrix}
 
 ################################################################################
 #
@@ -150,7 +149,7 @@ end
 
 # Producing a LazyTransposedMatElem from a flint matrix should always be
 # unintended because the resulting matrix will use generic code and not flint
-Solve.lazy_transpose(A::_MatTypes) = transpose(A)
+Solve.lazy_transpose(A::FlintMatElem) = transpose(A)
 
 ################################################################################
 #
@@ -447,7 +446,7 @@ end
 ###############################################################################
 
 # Unfortunately, there is no fmpq_mat_set_perm etc. in flint
-function *(P::Perm, x::_FieldMatTypes)
+function *(P::Perm, x::FlintMatElem)
   z = similar(x)
   t = base_ring(x)()
   @inbounds for i = 1:nrows(x)
@@ -458,7 +457,7 @@ function *(P::Perm, x::_FieldMatTypes)
   return z
 end
 
-function *(x::_FieldMatTypes, P::Perm)
+function *(x::FlintMatElem, P::Perm)
   z = similar(x)
   t = base_ring(x)()
   @inbounds for i = 1:nrows(x)

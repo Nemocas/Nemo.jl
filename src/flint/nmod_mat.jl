@@ -20,6 +20,9 @@ is_zero_initialized(::Type{zzModMatrix}) = true
 #
 ################################################################################
 
+# v.data is immutable so we can't do anything in-place
+getindex!(v::zzModRingElem, a::zzModMatrix, i::Int, j::Int) = getindex(a, i, j)
+
 @inline function getindex(a::zzModMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   u = getindex_raw(a, i, j)

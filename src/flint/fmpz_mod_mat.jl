@@ -26,6 +26,12 @@ is_zero_initialized(::Type{ZZModMatrix}) = true
   return ZZModRingElem(u, base_ring(a)) # no reduction needed
 end
 
+function getindex!(v::ZZModRingElem, a::ZZModMatrix, i::Int, j::Int)
+  @boundscheck _checkbounds(a, i, j)
+  GC.@preserve a set!(v.data, mat_entry_ptr(a, i, j))
+  return v
+end
+
 # as above, but as a plain ZZRingElem, no bounds checking
 function getindex_raw(a::T, i::Int, j::Int) where T <: Zmod_fmpz_mat
   u = ZZRingElem()

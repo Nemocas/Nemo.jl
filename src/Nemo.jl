@@ -543,7 +543,7 @@ include("julia/Float.jl")
 #
 ################################################################################
 
-function Base.summary(io::IO, A::T) where {T <: _MatTypes}
+function Base.summary(io::IO, A::T) where {T <: FlintMatElem}
   print(io, nrows(A), "x", ncols(A), " ", T)
 end
 
