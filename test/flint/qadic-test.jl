@@ -388,6 +388,18 @@ end
   @test !is_square(b+1)
 
   @test is_square_with_sqrt(b+1)[1] == false
+
+  # for odd p the root is known to precision N - v/2
+  for x in (a, b, c)
+    fl, r = is_square_with_sqrt(x)
+    @test fl && precision(r) == precision(x) - div(valuation(x), 2)
+  end
+
+  # the valuation of zero is its precision, which may be odd or negative
+  for N in (31, 30, -3, -4)
+    fl, r = is_square_with_sqrt(O(R, QQ(7)^N))
+    @test fl && is_zero(r) && precision(r) == cld(N, 2)
+  end
 end
 
 @testset "QadicFieldElem.square_root_char2_precomp" begin
