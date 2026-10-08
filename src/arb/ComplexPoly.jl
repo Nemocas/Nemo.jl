@@ -87,7 +87,7 @@ end
 function polynomial(R::ComplexField, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
   coeffs = map(R, arr)
   coeffs = length(coeffs) == 0 ? ComplexFieldElem[] : coeffs
-  z = ComplexPolyRingElem(coeffs, R.prec)
+  z = ComplexPolyRingElem(coeffs, precision(Balls))
   z.parent = ComplexPolyRing(R, Symbol(var), cached)
   return z
 end
@@ -631,17 +631,17 @@ end
 #
 ###############################################################################
 
-function zero!(z::ComplexPolyRingElemOrPtr)
+function zero!(z::TypeOrPtr{ComplexPolyRingElem})
   @ccall libflint.acb_poly_zero(z::Ref{ComplexPolyRingElem})::Nothing
   return z
 end
 
-function one!(z::ComplexPolyRingElemOrPtr)
+function one!(z::TypeOrPtr{ComplexPolyRingElem})
   @ccall libflint.acb_poly_one(z::Ref{ComplexPolyRingElem})::Nothing
   return z
 end
 
-function neg!(z::ComplexPolyRingElemOrPtr, a::ComplexPolyRingElemOrPtr)
+function neg!(z::TypeOrPtr{ComplexPolyRingElem}, a::TypeOrPtr{ComplexPolyRingElem})
   @ccall libflint.acb_poly_neg(z::Ref{ComplexPolyRingElem}, a::Ref{ComplexPolyRingElem})::Nothing
   return z
 end

@@ -6,19 +6,21 @@ DocTestSetup = Nemo.doctestsetup()
 
 # [Fixed precision complex balls](@id acb_field_section)
 
-Arbitrary precision complex ball arithmetic is supplied by Arb which provides a
+Fixed precision complex ball arithmetic is supplied by FLINT which provides a
 ball representation which tracks error bounds rigorously. Complex numbers are 
 represented in rectangular form $a+bi$ where $a,b$ are `ArbFieldElem` balls.
 
-The Arb complex field is constructed using the `AcbField` constructor. This
-constructs the parent object for the Arb complex field.
+The name AcbField is inherited from FLINT, where it stands for "*a*rbitrary-precision *c*omplex *b*alls".
+
+The Acb field is constructed using the `AcbField` constructor. This
+constructs the parent object for the Acb field.
 
 The types of complex boxes in Nemo are given in the following table, along with
 the libraries that provide them and the associated types of the parent objects.
 
  Library | Field                | Element type   | Parent type
 ---------|----------------------|----------------|--------------
-Arb      | $\mathbb{C}$ (boxes) | `AcbFieldElem` | `AcbField`
+FLINT    | $\mathbb{C}$ (boxes) | `AcbFieldElem` | `AcbField`
 
 All the complex field types belong to the `Field` abstract type and the types of
 elements in this field, i.e. complex boxes in this case, belong to the
@@ -34,18 +36,18 @@ Below, we document the additional functionality provided for complex balls.
 
 ### Complex field constructors
 
-In order to construct complex boxes in Nemo, one must first construct the Arb
-complex field itself. This is accomplished with the following constructor.
+In order to construct complex boxes in Nemo, one must first construct the Acb field itself.
+This is accomplished with the following constructor.
 
 ```
 AcbField(prec::Int)
 ```
 
-Return the Arb complex field with precision in bits `prec` used for operations
+Return the Acb field with precision in bits `prec` used for operations
 on interval midpoints. The precision used for interval radii is a fixed
 implementation-defined constant (30 bits).
 
-Here is an example of creating an Arb complex field and using the resulting
+Here is an example of creating an Acb field and using the resulting
 parent object to coerce values into the resulting field.
 
 **Examples**
@@ -68,17 +70,16 @@ julia> d = CC(12)
 ```
 
 Note that whilst one can coerce double precision floating point values into an
-Arb complex field, unless those values can be represented exactly in double
+Acb field, unless those values can be represented exactly in double
 precision the resulting ball can't be any more precise than the double
 precision supplied.
 
 If instead, values can be represented precisely using decimal arithmetic then
-one can supply them to Arb using a string. In this case, Arb will store them to
-the precision specified when creating the Arb complex field.
+one can supply them to the Acb field using a string. In this case, the Acb field will store them to
+the precision specified when creating the Acb field.
 
-If the values can be stored precisely as a binary floating point number, Arb
-will store the values exactly. See the function `is_exact` below for more
-information.
+If the values can be stored precisely as a binary floating point number, the Acb field will store the values exactly.
+See the function `is_exact` below for more information.
 
 ### Constructors
 
@@ -98,29 +99,27 @@ julia> c = onei(CC)
 
 ## Basic functionality
 
-The following basic functionality is provided by the default Arb complex field
-implementation in Nemo, to support construction of generic rings over complex
-fields. Any custom complex field implementation in Nemo should provide analogues
-of these functions along with the usual arithmetic operations.
+The following basic functionality is provided by the Acb field
+implementation in Nemo, to support construction of generic rings over Acb fields.
 
 ```
 parent_type(::Type{AcbFieldElem})
 ```
 
-Gives the type of the parent object of an Arb complex field element.
+Gives the type of the parent object of an Acb field element.
 
 ```
 elem_type(R::AcbField)
 ```
 
-Given the parent object for an Arb complex field, return the type of elements
+Given the parent object for an Acb field, return the type of elements
 of the field.
 
 ```
 mul!(c::AcbFieldElem, a::AcbFieldElem, b::AcbFieldElem)
 ```
 
-Multiply $a$ by $b$ and set the existing Arb complex field element $c$ to the
+Multiply $a$ by $b$ and set the existing Acb field element $c$ to the
 result. This function is provided for performance reasons as it saves
 allocating a new object for the result and eliminates associated garbage
 collection.
@@ -129,20 +128,18 @@ collection.
 deepcopy(a::AcbFieldElem)
 ```
 
-Return a copy of the Arb complex field element $a$, recursively copying the
-internal data. Arb complex field elements are mutable in Nemo so a shallow
+Return a copy of the Acb field element $a$, recursively copying the
+internal data. Acb field elements are mutable in Nemo so a shallow
 copy is not sufficient.
 
-Given the parent object `R` for an Arb complex field, the following coercion
-functions are provided to coerce various elements into the Arb complex field.
-Developers provide these by overloading the `call` operator for the complex
-field parent objects.
+Given the parent object `R` for an Acb field, the following coercion
+functions are provided to coerce various elements into the Acb field.
 
 ```
 R()
 ```
 
-Coerce zero into the Arb complex field.
+Coerce zero into the Acb field.
 
 ```
 R(n::Integer)
@@ -150,37 +147,37 @@ R(f::ZZRingElem)
 R(q::QQFieldElem)
 ```
 
-Coerce an integer or rational value into the Arb complex field.
+Coerce an integer or rational value into the Acb field.
 
 ```
 R(f::Float64)
 R(f::BigFloat)
 ```
 
-Coerce the given floating point number into the Arb complex field.
+Coerce the given floating point number into the Acb field.
 
 ```
 R(f::AbstractString)
 R(f::AbstractString, g::AbstractString)
 ```
 
-Coerce the decimal number, given as a string, into the Arb complex field. In
+Coerce the decimal number, given as a string, into the Acb field. In
 each case $f$ is the real part and $g$ is the imaginary part.
 
 ```
 R(f::ArbFieldElem)
 ```
 
-Coerce the given Arb real ball into the Arb complex field.
+Coerce the given Arb real ball into the Acb field.
 
 ```
 R(f::AcbFieldElem)
 ```
 
-Take an Arb complex field element that is already in an Arb field and simply
+Take an Acb field element that is already in an Acb field and simply
 return it. A copy of the original is not made.
 
-Here are some examples of coercing elements into the Arb complex field.
+Here are some examples of coercing elements into the Acb field.
 
 ```jldoctest
 julia> RR = ArbField(64)
@@ -207,14 +204,6 @@ nan
 julia> g = CC(RR(3))
 3.0000000000000000000
 ```
-
-In addition to the above, developers of custom complex field types must ensure
-that they provide the equivalent of the function `base_ring(R::AcbField)`
-which should return `Union{}`. In addition to this they should ensure that
-each complex field element contains a field `parent` specifying the parent
-object of the complex field element, or at least supply the equivalent of the
-function `parent(a::AcbFieldElem)` to return the parent object of a complex field
-element.
 
 ### Basic manipulation
 
@@ -323,7 +312,7 @@ false
 
 ### Comparison
 
-Nemo provides a full range of comparison operations for Arb complex boxes. 
+Nemo provides a full range of comparison operations for complex boxes. 
 
 In addition to the standard comparisons, we introduce an exact equality. This is
 distinct from arithmetic equality implemented by `==`, which merely compares up to the

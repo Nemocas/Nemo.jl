@@ -171,10 +171,11 @@
   R, x = finite_field(ZZRingElem(23), 5, "x")
   S = matrix_space(R, 2, 2)
 
-  for R in [ZZ, residue_ring(ZZ, 23)[1], residue_ring(ZZ, ZZ(23))[1], Native.GF(23)]
+  for R in [ZZ, residue_ring(ZZ, 23)[1], residue_ring(ZZ, ZZ(23))[1], Native.GF(23), Native.GF(ZZ(23))]
     M = matrix(R, 2, 2, [1, 2, 3, 4])
 
     @test isa(S(M), MatElem)
+    @test S(M) == S([1 2; 3 4])
   end
 
   F, a = finite_field(5, 2)
@@ -198,12 +199,16 @@ end
   @test t isa FqMatrix
   @test size(t) == (2, 3)
 
-  for (R, M) in ring_to_mat
+  for R in example_rings
     t = similar(s, R)
     @test size(t) == size(s)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
 
     t = similar(s, R, 2, 3)
     @test size(t) == (2, 3)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
   end
 end
 
@@ -524,13 +529,13 @@ end
 
   @test c == F17(13)
 
-  @test_throws ErrorException tr(b)
+  @test_throws DomainError tr(b)
 
   c = det(a)
 
   @test c == zero(F17)
 
-  @test_throws ErrorException det(b)
+  @test_throws DomainError det(b)
 
   c = det(aa)
 
@@ -580,7 +585,7 @@ end
 
   @test c == parent(aa)([12 13 1; 14 13 15; 4 4 1])
 
-  @test_throws ErrorException inv(a)
+  @test_throws DomainError inv(a)
 
   @test_throws ErrorException inv(transpose(a)*a)
 end

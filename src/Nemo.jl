@@ -230,26 +230,6 @@ const pkgdir = realpath(joinpath(dirname(@__DIR__)))
 #
 ###############################################################################
 
-# heavily inspired by https://discourse.julialang.org/t/a-minimal-example-with-base-redirect-stdout/64245/8
-function capture_stdout(f::Function)
-  pipe = Pipe()
-  started = Base.Event()
-  writer = @async redirect_stdout(pipe) do
-    notify(started)
-    try
-      f()
-    finally
-      Base.Libc.flush_cstdio()
-      close(pipe.in)
-    end
-  end
-  wait(started)
-  result = readchomp(pipe)
-  wait(writer)
-  close(pipe)
-  return result
-end
-
 function flint_abort()
   error("Problem in the FLINT-Subsystem")
 end
@@ -296,11 +276,16 @@ function Base.showerror(io::IO, e::FlintException)
 end
 
 function flint_throw(err_type::FlintExceptionType, cmsg::Cstring, va_list::Ptr{Cvoid})
-  # use flint_vsprintf once available, see https://github.com/flintlib/flint/issues/2388
-  msg = capture_stdout() do
-    @ccall libflint.flint_vprintf(cmsg::Cstring, va_list::Ptr{Cvoid})::Int
-  end
+  max_length = 1024
+  cmsgf = @ccall libflint.flint_malloc(max_length::Csize_t)::Cstring
+  length = @ccall libflint.flint_vsnprintf(cmsgf::Cstring, max_length::Csize_t, cmsg::Cstring, va_list::Ptr{Cvoid})::Int
   @ccall libflint.flint_va_end(va_list::Ptr{Cvoid})::Nothing
+  msg = unsafe_string(cmsgf)
+  @ccall libflint.flint_free(cmsgf::Cstring)::Nothing
+
+  if length >= max_length
+    msg *= "... (message truncated)"
+  end
   throw(FlintException(err_type, msg))
 end
 
@@ -643,8 +628,8 @@ end
 const _flint_rand_states = rand_ctx[]
 
 # Data from http://www.mersennewiki.org/index.php/Elliptic_Curve_Method
-const _ecm_B1 = Int[2, 11, 50, 250, 1000, 3000, 11000, 43000, 110000, 260000, 850000, 2900000];
-const _ecm_nC = Int[25, 90, 300, 700, 1800, 5100, 10600, 19300, 49000, 124000, 210000, 340000];
+const _ecm_B1 = Int[2, 11, 50, 250, 1000, 3000, 11000, 43000, 110000, 260000, 850000, 2900000]
+const _ecm_nC = Int[25, 90, 300, 700, 1800, 5100, 10600, 19300, 49000, 124000, 210000, 340000]
 
 const _ecm_B1s = Vector{Int}[_ecm_B1]
 const _ecm_nCs = Vector{Int}[_ecm_nC]
@@ -671,7 +656,7 @@ include("../benchmarks/runbenchmarks.jl")
 function test_module(x, y)
   julia_exe = Base.julia_cmd()
   test_file = joinpath(pkgdir, "test/$x/")
-  test_file = test_file * "$y-test.jl";
+  test_file = test_file * "$y-test.jl"
   test_function_name = "test_"
 
   if x in ["flint", "arb", "antic"]

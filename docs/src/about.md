@@ -13,12 +13,7 @@ Julia programming language. Our aim is to provide a highly performant package co
   - Number Theory
   - Group Theory
 
-Nemo consists of wrappers of specialised C/C++ libraries:
-
-  - FLINT    <http://flintlib.org/>
-  - Arb      <https://arblib.org/>
-  - Antic    <https://github.com/wbhart/antic/>
-  - Calcium  <https://fredrikj.net/calcium/>
+Nemo consists of wrappers of the specialised C library FLINT <http://flintlib.org/>.
 
 Nemo also uses AbstractAlgebra.jl to provide generic constructions over the basic rings
 provided by the above packages.

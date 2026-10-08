@@ -113,12 +113,16 @@ end
   @test t isa ComplexMatrix
   @test size(t) == (2, 3)
 
-  for (R, M) in ring_to_mat
+  for R in example_rings
     t = similar(s, R)
     @test size(t) == size(s)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
 
     t = similar(s, R, 2, 3)
     @test size(t) == (2, 3)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
   end
 end
 
@@ -302,6 +306,15 @@ end
 
   @test A == B
   @test B == A
+
+  D = matrix(RR, [2 3 5; 1 4 7; 9 6 3])
+
+  @test S(D) isa ComplexMatrix
+  @test S(D) == A
+  @test A == D
+  @test D == A
+  @test A != D + 1
+  @test_throws ErrorException S(zero_matrix(RR, 2, 3))
 end
 
 @testset "ComplexMatrix.predicates" begin

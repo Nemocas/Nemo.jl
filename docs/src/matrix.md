@@ -4,17 +4,16 @@ CollapsedDocStrings = true
 DocTestSetup = Nemo.doctestsetup()
 ```
 
-# Matrices
+# Nemo matrices
 
-Nemo allow the creation of dense matrices over any computable ring $R$. There
+Dense matrices can be created over any computable ring R. There
 are two different kinds of implementation: a generic one for the case where no
 specific implementation exists (provided by AbstractAlgebra.jl), and efficient
-implementations of matrices over numerous specific rings, usually provided by C/C++
-libraries.
+implementations of matrices over numerous specific rings provided by FLINT.
 
-The following table shows each of the matrix types available in Nemo, the
-base ring $R$, and the Julia/Nemo types for that kind of matrix (the type
-information is mainly of concern to developers).
+The following table shows the available matrix types, together with their
+base ring R and the corresponding Julia types (the type information is
+mainly of concern to developers).
 
 Base ring                             | Library             | Element type        | Parent type
 --------------------------------------|---------------------|---------------------|----------------------
@@ -26,17 +25,18 @@ $\mathbb{Q}$                          | FLINT               | `QQMatrix`        
 $\mathbb{Z}/p\mathbb{Z}$ (small $p$)  | FLINT               | `fpMatrix`          | `fpMatrixSpace`
 $\mathbb{F}_{p^n}$ (small $p$)        | FLINT               | `fqPolyRepMatrix`   | `fqPolyRepMatrixSpace`
 $\mathbb{F}_{p^n}$ (large $p$)        | FLINT               | `FqPolyRepMatrix`   | `FqPolyRepMatrixSpace`
-$\mathbb{R}$ (arbitrary precision)    | Arb                 | `RealMatrix`        | `RealMatrixSpace`
-$\mathbb{C}$ (arbitrary precision)    | Arb                 | `ComplexMatrix`     | `ComplexMatrixSpace`
-$\mathbb{R}$ (fixed precision)        | Arb                 | `ArbMatrix`         | `ArbMatrixSpace`
-$\mathbb{C}$ (fixed precision)        | Arb                 | `AcbMatrix`         | `AcbMatrixSpace`
+$\mathbb{R}$ (arbitrary precision)    | FLINT               | `RealMatrix`        | `RealMatrixSpace`
+$\mathbb{C}$ (arbitrary precision)    | FLINT               | `ComplexMatrix`     | `ComplexMatrixSpace`
+$\mathbb{R}$ (fixed precision)        | FLINT               | `ArbMatrix`         | `ArbMatrixSpace`
+$\mathbb{C}$ (fixed precision)        | FLINT               | `AcbMatrix`         | `AcbMatrixSpace`
 
 The dimensions and base ring $R$ of a generic matrix are stored in its parent
 object.
 
 All matrix element types belong to the abstract type `MatElem` and all of
-the matrix space types belong to the abstract type `MatSpace`. This enables
-one to write generic functions that can accept any Nemo matrix type.
+the matrix space types belong to the abstract type `MatSpace`. This enables one
+to write generic functions that can accept any matrix type
+described on this page.
 
 Note that the preferred way to create matrices is not to use the type
 constructors but to use the `matrix` function, see also the
@@ -45,15 +45,15 @@ section of the AbstractAlgebra manual.
 
 ## Matrix functionality
 
-All matrix spaces in Nemo provide the matrix functionality of AbstractAlgebra:
+All matrix spaces described on this page provide the generic matrix
+functionality of AbstractAlgebra:
 
 <https://nemocas.github.io/AbstractAlgebra.jl/stable/matrix>
 
-Some of this functionality is provided in Nemo by C libraries, such as FLINT,
-for various specific rings.
+Some of this functionality is implemented by underlying C libraries such as FLINT.
 
-In the following, we list the functionality which is provided in addition to the generic
-matrix functionality, for specific rings in Nemo.
+The following sections describe functionality provided in addition to the
+generic matrix functionality for specific rings.
 
 ### Comparison operators
 
@@ -548,9 +548,20 @@ Julia matrices use a different data structure than Nemo matrices. Conversion to 
 
 This conversion can be performed with standard Julia syntax, such as the following, where `A` is an `ZZMatrix`:
 
-```julia
-Matrix{Int}(A)
-Matrix{BigInt}(A)
+```jldoctest
+julia> A = ZZ[1 2; 3 4]
+[1   2]
+[3   4]
+
+julia> Matrix{Int}(A)
+2×2 Matrix{Int64}:
+ 1  2
+ 3  4
+
+julia> Matrix{BigInt}(A)
+2×2 Matrix{BigInt}:
+ 1  2
+ 3  4
 ```
 
 In case the matrix cannot be converted without loss, an `InexactError` is thrown: in this case, cast to a matrix of `BigInt`s rather than `Int`s.

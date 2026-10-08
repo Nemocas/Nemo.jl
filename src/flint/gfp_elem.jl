@@ -425,7 +425,7 @@ function (R::fpField)(a::Int)
     d += n
   end
   if d >= n
-    d = @ccall libflint.n_mod2_preinv(d::UInt, n::UInt, ninv::UInt)::UInt
+    d = mod2_preinv(d, n, ninv)
   end
   return fpFieldElem(d, R)
 end
@@ -433,7 +433,7 @@ end
 function (R::fpField)(a::UInt)
   n = R.n
   ninv = R.ninv
-  a = @ccall libflint.n_mod2_preinv(a::UInt, n::UInt, ninv::UInt)::UInt
+  a = mod2_preinv(a, n, ninv)
   return fpFieldElem(a, R)
 end
 

@@ -109,7 +109,7 @@ function transpose(a::T) where T <: Zmod_fmpz_mat
 end
 
 function transpose!(a::T) where T <: Zmod_fmpz_mat
-  @req is_square(a) "Matrix must be a square matrix"
+  check_square(a)
   return transpose!(a, a)
 end
 
@@ -165,7 +165,7 @@ function AbstractAlgebra.multiply_row!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::In
   return A
 end
 
-function AbstractAlgebra.multiply_column!(A::Zmod_fmpz_mat, s::ZZModRingElemOrPtr, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
+function AbstractAlgebra.multiply_column!(A::Zmod_fmpz_mat, s::TypeOrPtr{ZZModRingElem}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
   @assert 1 <= j <= ncols(A)
   @assert 1 <= first(rows)
   @assert last(rows) <= nrows(A)
@@ -202,7 +202,7 @@ function AbstractAlgebra.add_row!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::Int, j:
   return A
 end
 
-function AbstractAlgebra.add_column!(A::Zmod_fmpz_mat, s::ZZModRingElemOrPtr, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
+function AbstractAlgebra.add_column!(A::Zmod_fmpz_mat, s::TypeOrPtr{ZZModRingElem}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
   @assert 1 <= i <= ncols(A)
   @assert 1 <= j <= ncols(A)
   @assert 1 <= first(rows)
@@ -295,6 +295,40 @@ function sub!(a::T, b::T, c::T) where T <: Zmod_fmpz_mat
   return a
 end
 
+# matrix x vector, vector x matrix
+
+function mul!(z::Vector{ZZRingElem}, a::T, b::Vector{ZZRingElem}) where T <: Zmod_fmpz_mat
+  @ccall libflint.fmpz_mod_mat_mul_fmpz_vec_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ref{T}, b::Ptr{Ref{ZZRingElem}}, length(b)::Int, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return z
+end
+
+function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::T) where T <: Zmod_fmpz_mat
+  @ccall libflint.fmpz_mod_mat_fmpz_vec_mul_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ptr{Ref{ZZRingElem}}, length(a)::Int, b::Ref{T}, base_ring(b).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return z
+end
+
+# matrix x scalar, scalar x matrix
+
+function mul!(a::T, b::T, c::ZZRingElem) where T <: Zmod_fmpz_mat
+  @ccall libflint.fmpz_mod_mat_scalar_mul_fmpz(a::Ref{T}, b::Ref{T}, c::Ref{ZZRingElem}, base_ring(b).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return a
+end
+
+function mul!(a::T, b::T, c::Int) where T <: Zmod_fmpz_mat
+  @ccall libflint.fmpz_mod_mat_scalar_mul_si(a::Ref{T}, b::Ref{T}, c::Int, base_ring(b).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return a
+end
+
+mul!(a::T, b::T, c::Integer) where T <: Zmod_fmpz_mat = mul!(a, b, flintify(c))
+
+mul!(a::T, b::IntegerUnion, c::T) where T <: Zmod_fmpz_mat = mul!(a, c, b)
+
+mul!(a::ZZModMatrix, b::ZZModMatrix, c::ZZModRingElem) = mul!(a, b, c.data)
+mul!(a::ZZModMatrix, b::ZZModRingElem, c::ZZModMatrix) = mul!(a, c, b)
+
+mul!(a::FpMatrix, b::FpMatrix, c::FpFieldElem) = mul!(a, b, c.data)
+mul!(a::FpMatrix, b::FpFieldElem, c::FpMatrix) = mul!(a, c, b)
+
 function Generic.add_one!(a::ZZModMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   GC.@preserve a begin
@@ -344,7 +378,7 @@ end
 ################################################################################
 
 function ^(x::T, y::Int) where {T<:Zmod_fmpz_mat}
-  nrows(x) != ncols(x) && error("Incompatible matrix dimensions")
+  check_square(x)
   if y < 0
     x = inv(x)
     y = -y
@@ -413,7 +447,7 @@ end
 ################################################################################
 
 function tr(a::T) where T <: Zmod_fmpz_mat
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   R = base_ring(a)
   r = ZZRingElem()
   @ccall libflint.fmpz_mod_mat_trace(r::Ref{ZZRingElem}, a::Ref{T}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
@@ -427,7 +461,7 @@ end
 ################################################################################
 
 function det(a::ZZModMatrix)
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   z = ZZRingElem()
   r = @ccall libflint.fmpz_mod_mat_det(z::Ref{ZZRingElem}, a::Ref{ZZModMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return base_ring(a)(z)
@@ -458,7 +492,7 @@ end
 ################################################################################
 
 function inv(a::ZZModMatrix)
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   if is_probable_prime(modulus(base_ring(a)))
     X, d = pseudo_inv(a)
     if !is_unit(d)
@@ -477,7 +511,7 @@ function inv(a::ZZModMatrix)
 end
 
 function inv(a::T) where T <: Zmod_fmpz_mat
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   z = similar(a)
   r = @ccall libflint.fmpz_mod_mat_inv(z::Ref{T}, a::Ref{T}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Int
   !Bool(r) && error("Matrix not invertible")

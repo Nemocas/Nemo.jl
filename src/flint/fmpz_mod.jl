@@ -420,7 +420,7 @@ function pow!(z::ZZModRingElem, x::ZZModRingElem, n::Integer)
   return z
 end
 
-function pow!(z::ZZModRingElem, x::ZZModRingElem, n::ZZRingElemOrPtr)
+function pow!(z::ZZModRingElem, x::ZZModRingElem, n::TypeOrPtr{ZZRingElem})
   R = parent(z)
   ok = Bool(@ccall libflint.fmpz_mod_pow_fmpz(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, n::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Cint)
   if !ok
@@ -446,19 +446,6 @@ function rand(rng::AbstractRNG, R::Random.SamplerSimple{ZZModRing})
 end
 
 Random.gentype(::Type{ZZModRing}) = elem_type(ZZModRing)
-
-# define rand(make(::ZZModRing, arr)), where arr is any abstract array with integer or ZZRingElem entries
-
-RandomExtensions.maketype(R::ZZModRing, _) = elem_type(R)
-
-rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{ZZModRingElem,ZZModRing,<:AbstractArray{<:IntegerUnion}}}) =
-sp[][1](rand(rng, sp[][2]))
-
-# define rand(::ZZModRing, arr), where arr is any abstract array with integer or ZZRingElem entries
-
-rand(r::Random.AbstractRNG, R::ZZModRing, b::AbstractArray) = rand(r, make(R, b))
-
-rand(R::ZZModRing, b::AbstractArray) = rand(Random.default_rng(), R, b)
 
 ###############################################################################
 #

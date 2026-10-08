@@ -48,7 +48,48 @@ end
   R, x = polynomial_ring(QQ, "x")
   K, a = number_field(x^3 + 3x + 1, "a")
 
-  test_rand(K, 1:9)
+  for r in (1:9, -9:9, Int8(-9):Int8(9), UInt(1):UInt(9),
+            big(-9):big(9), ZZ(-9):ZZ(9), Base.OneTo(9))
+    test_rand(K, r) do z
+      @test denominator(z) == 1
+      @test all(i -> first(r) <= coeff(z, i) <= last(r), 0:degree(K) - 1)
+    end
+  end
+
+  test_rand(K, 0:0) do z
+    @test iszero(z)
+  end
+  @test rand(K, 3:3) == 3 + 3a + 3a^2
+
+  for d in (2:9, -9:-2, Int8(2):Int8(9), big(2):big(9), ZZ(2):ZZ(9))
+    test_rand(K, 1:1, d) do z
+      @test denominator(z) in abs.(d)
+      @test all(i -> coeff(z, i) == coeff(z, 0), 1:degree(K) - 1)
+      @test (first(d) < 0 ? -1 : 1) * numerator(coeff(z, 0)) == 1
+    end
+  end
+
+  test_rand(K, 0:0, 1:9) do z
+    @test iszero(z)
+  end
+  @test rand(K, 3:3, 2:2) == (3 + 3a + 3a^2)//2
+
+  rng = MersenneTwister(42)
+  rng2 = copy(rng)
+  @test rand(rng, K, -9:9, 1:9) == rand(rng2, K, -9:9)//rand(rng2, 1:9)
+
+  @test_throws ArgumentError rand(K, 1:1, 0:0)
+  @test_throws ArgumentError rand(make(K, 1:1, 0:0))
+  @test_throws ArgumentError rand(K, 1:0)
+  @test_throws ArgumentError rand(K, 1:9, 1:0)
+
+  L, b = number_field(x - 2, "b")
+  test_rand(L, -9:9) do z
+    @test denominator(z) == 1
+    @test -9 <= coeff(z, 0) <= 9
+  end
+  @test rand(L, 3:3) == L(3)
+  @test rand(L, 3:3, 2:2) == L(3//2)
 end
 
 @testset "AbsSimpleNumFieldElem.printing" begin

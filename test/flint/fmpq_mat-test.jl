@@ -117,6 +117,12 @@
   @test isa(M4, QQMatrix)
   @test base_ring(M4) == QQ
 
+  for d in [3, ZZ(3), big(3), 3//2, big(3)//2, QQ(3, 2)]
+    M5 = QQMatrix(2, 3, d)
+    @test isa(M5, QQMatrix)
+    @test M5 == matrix(QQ, [d 0 0; 0 d 0])
+  end
+
   a = zero_matrix(QQ, 2, 2)
   b = zero_matrix(QQ, 2, 3)
   @test a in [a, b]
@@ -138,12 +144,16 @@ end
   @test t isa QQMatrix
   @test size(t) == (2, 3)
 
-  for (R, M) in ring_to_mat
+  for R in example_rings
     t = similar(s, R)
     @test size(t) == size(s)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
 
     t = similar(s, R, 2, 3)
     @test size(t) == (2, 3)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
   end
 end
 
@@ -498,7 +508,7 @@ end
   @test C*inv(C) == one(S)
 
   a = QQ[1 1;]
-  @test_throws ErrorException inv(a)
+  @test_throws DomainError inv(a)
   a = QQ[1 1; 1 1]
   @test_throws ErrorException inv(a)
 end
@@ -721,13 +731,13 @@ end
   @test C isa AbstractAlgebra.solve_context_type(QQ)
   @test C isa AbstractAlgebra.solve_context_type(A)
 
-  @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.RREFTrait()
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), QQFieldElem)
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), QQ())
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), QQField)
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), QQ)
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), typeof(A))
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), A)
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.FFLUTrait()
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), QQFieldElem)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), QQ())
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), QQField)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), QQ)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), typeof(A))
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), A)
 
   @test_throws ErrorException solve(C, [ QQ(1) ])
   @test_throws ErrorException solve(C, [ QQ(1) ], side = :right)
@@ -786,6 +796,17 @@ end
     @test is_zero(K*A)
     @test nrows(K) == 0
   end
+
+  # Make sure RREFTrait() stays supported
+  C = solve_init(AbstractAlgebra.Solve.RREFTrait(), A)
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.RREFTrait()
+  b = [QQ(1), QQ(2), QQ(3), QQ(4), QQ(5)]
+  @test @inferred can_solve(C, b)
+  x = @inferred solve(C, b)
+  @test x * A == b
+  fl, x = @inferred can_solve_with_solution(C, b)
+  @test fl
+  @test x*A == b
 
   N = zero_matrix(QQ, 2, 1)
   C = solve_init(N)

@@ -135,7 +135,7 @@ end
 ################################################################################
 
 function det(a::fpMatrix)
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   r = @ccall libflint.nmod_mat_det(a::Ref{fpMatrix})::UInt
   return base_ring(a)(r)
 end
@@ -219,7 +219,7 @@ promote_rule(::Type{fpMatrix}, ::Type{ZZRingElem}) = fpMatrix
 ################################################################################
 
 function inv(a::fpMatrix)
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   z = similar(a)
   r = @ccall libflint.nmod_mat_inv(z::Ref{fpMatrix}, a::Ref{fpMatrix})::Int
   !Bool(r) && error("Matrix not invertible")

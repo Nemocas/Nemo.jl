@@ -182,12 +182,16 @@ end
   @test t isa zzModMatrix
   @test size(t) == (2, 3)
 
-  for (R, M) in ring_to_mat
+  for R in example_rings
     t = similar(s, R)
     @test size(t) == size(s)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
 
     t = similar(s, R, 2, 3)
     @test size(t) == (2, 3)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
   end
 end
 
@@ -435,6 +439,23 @@ end
   @test_throws ErrorException Z2(1)*a
 end
 
+@testset "zzModMatrix.scalar_mul!" begin
+  R, = residue_ring(ZZ, 101)
+
+  a = matrix(R, [1 2; 3 4])
+
+  # scalar mul! reaches the FLINT-backed specialization for every integer scalar
+  # type; only the returned value is required to be correct.
+  for s in (3, -3, big(3), ZZ(3), UInt(3), R(3))
+    c = zero(a)
+    c = mul!(c, a, s)
+    @test c == a * s
+    c = zero(a)
+    c = mul!(c, s, a)
+    @test c == a * s
+  end
+end
+
 @testset "zzModMatrix.comparison" begin
   Z17, = residue_ring(ZZ,17)
 
@@ -484,7 +505,7 @@ end
 
   # issue Oscar.jl#4590
   a = matrix(Z17, [2 3])
-  @test_throws ErrorException a^2
+  @test_throws DomainError a^2
 end
 
 @testset "zzModMatrix.row_echelon_form" begin
@@ -557,13 +578,13 @@ end
 
   @test c == Z17(13)
 
-  @test_throws ErrorException tr(b)
+  @test_throws DomainError tr(b)
 
   c = det(a)
 
   @test c == zero(Z17)
 
-  @test_throws ErrorException det(b)
+  @test_throws DomainError det(b)
 
   c = det(aa)
 
@@ -619,7 +640,7 @@ end
 
   @test c == parent(aa)([12 13 1; 14 13 15; 4 4 1])
 
-  @test_throws ErrorException inv(a)
+  @test_throws DomainError inv(a)
 
   @test_throws ErrorException inv(transpose(a)*a)
 
@@ -630,7 +651,7 @@ end
 
   G = matrix(R, 2, 2, [4, 0, 0, 2])
   @test_throws ErrorException inv(G)
-  @test_throws ErrorException inv(matrix(R, 2, 1, [1, 1]))
+  @test_throws DomainError inv(matrix(R, 2, 1, [1, 1]))
 end
 
 @testset "ZZModMatrix.solve over $R with $NFTrait" for (R, NFTrait) in [

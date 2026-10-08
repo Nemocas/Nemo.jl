@@ -239,6 +239,35 @@ end
     @test RxtoF(preimage(RxtoF, c)) == c
   end
 
+  # coercion to and from the base field must agree with the residue map
+  R, o = finite_field(3, 2)
+  Rx, x = R["x"]
+  for i in 1:10
+    g = x^2 + rand(R)*x + rand(R)
+    while !is_irreducible(g)
+      g = x^2 + rand(R)*x + rand(R)
+    end
+    F, RxtoF = Nemo._residue_field(g, absolute = true)
+    c = rand(R)
+    @test F(o) == RxtoF(Rx(o))
+    @test F(c) == RxtoF(Rx(c))
+    @test R(RxtoF(Rx(c))) == c
+    @test_throws ArgumentError R(RxtoF(x))
+  end
+
+  # coercion must be transitive in a tower of such fields
+  K, a = finite_field(2, 2, "a"; cached = false)
+  Kx, x = K["x"]
+  L, KxtoL = Nemo._residue_field(x^2 + x + a, absolute = true)
+  Ly, y = L["y"]
+  M, LytoM = Nemo._residue_field(y^2 + y + gen(L)^3, absolute = true)
+  @test L(a) == KxtoL(Kx(a))
+  @test M(gen(L)) == LytoM(Ly(gen(L)))
+  @test M(a) == M(L(a))
+  @test K(M(L(a))) == a
+  @test (a + zero(L)) + zero(M) == a + (zero(L) + zero(M))
+  @test M(GF(2, 4)(a)) == M(a)
+
   R, a = finite_field(ZZRingElem(7), 1, "a")
   Rx, x = R["x"]
   f = x + 2

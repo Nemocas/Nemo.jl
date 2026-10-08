@@ -639,14 +639,20 @@ end
             residue_ring(ZZ, ZZ(13))[1],
             Native.GF(13),
             Native.GF(ZZ(13)),
-            GF(13)]
+            GF(13),
+            finite_field(13, 2)[1]]
     Rx, x = R["x"]
     g = @inferred change_base_ring(R, f; parent = Rx)
     @test g == 4*x^2 + 8*x + 2
+    @test (@which AbstractAlgebra._map(R, f, Rx)).module === Nemo
   end
 
+  R = GF(5)
+  Rx, x = R["x"]
+  @test_throws FlintException change_base_ring(R, f; parent = Rx)
+
   R, x = polynomial_ring(ZZ, "x")
-  @test_throws ErrorException change_base_ring(ZZ, f; parent = R)
+  @test_throws InexactError change_base_ring(ZZ, f; parent = R)
   f = 7*y^2 + 3*y + 2
   @test 7*x^2 + 3*x + 2 == @inferred change_base_ring(ZZ, f; parent = R)
 end

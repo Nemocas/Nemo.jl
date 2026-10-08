@@ -96,15 +96,19 @@ end
   @test size(t) == (2, 3)
   @test iszero(t)
 
-  for (R, M) in ring_to_mat
+  for R in example_rings
     t = sim_zero(s, R)
     @test size(t) == size(s)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
     if sim_zero == zero
       @test iszero(t)
     end
 
     t = sim_zero(s, R, 2, 3)
     @test size(t) == (2, 3)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
     if sim_zero == zero
       @test iszero(t)
     end
@@ -156,6 +160,11 @@ end
   @test map_entries(F, A) == F[1 2 3; 4 5 6]
   R, _ = residue_ring(ZZ, ZZ(10))
   @test map_entries(R, A) == R[1 2 3; 4 5 6]
+
+  for R in [residue_ring(ZZ, 10)[1], Native.GF(11), residue_ring(ZZ, ZZ(10))[1], QQ]
+    @test change_base_ring(R, A) == R[1 2 3; 4 5 6]
+    @test (@which change_base_ring(R, A)).module === Nemo
+  end
 end
 
 @testset "ZZMatrix.manipulation" begin
@@ -472,7 +481,7 @@ end
   @test inv(A)*A == one(S)
 
   a = ZZ[1 1;]
-  @test_throws ArgumentError inv(a)
+  @test_throws DomainError inv(a)
   b = ZZ[1 0; 0 2]
   @test_throws ArgumentError inv(b)
   c = ZZ[1 1; 1 1]
@@ -668,8 +677,8 @@ end
   G = lll_gram(A)
   @test G == A
 
-  @test_throws ArgumentError lll_gram(ZZ[1 0])
-  @test_throws ArgumentError lll_gram_with_transform(ZZ[1 0])
+  @test_throws DomainError lll_gram(ZZ[1 0])
+  @test_throws DomainError lll_gram_with_transform(ZZ[1 0])
   @test_throws ArgumentError lll_gram(ZZ[1 0; 1 1])
   @test_throws ArgumentError lll_gram_with_transform(ZZ[1 0; 1 1])
 

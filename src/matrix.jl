@@ -94,6 +94,18 @@ function Solve.solve_context_type(NF::Solve.MatrixNormalFormTrait,
   return Solve.SolveCtx{T, typeof(NF), MatType, MatType, MatType}
 end
 
+# Resolve an ambiguity with AbstractAlgebra by explicitly throwing an error
+# for everything EXCEPT QQFieldElem
+function Solve.solve_context_type(::Solve.FFLUTrait,
+                                            ::Type{T}) where {T <: Union{
+  ZZRingElem, QQFieldElem,
+  fpFieldElem, FpFieldElem, FqFieldElem, fqPolyRepFieldElem, FqPolyRepFieldElem,
+  zzModRingElem, ZZModRingElem,
+  RealFieldElem, ArbFieldElem, ComplexFieldElem, AcbFieldElem}}
+
+  error("FFLU is only available for fraction fields")
+end
+
 ################################################################################
 #
 #  (No) lazy transpose

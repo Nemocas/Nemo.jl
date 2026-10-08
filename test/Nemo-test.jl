@@ -1,6 +1,7 @@
 testlist = [
 # Aqua.jl
   "Aqua.jl",
+  "ClosureBoxes.jl",
 # Flint integration,
   "Flint_error_handling-test.jl",
 # Julia extensions
@@ -95,10 +96,12 @@ testlist = [
   "generic/Matrix-test.jl",
   "generic/Module-test.jl",
   "generic/AbsMSeries-test.jl",
+  "generic/FactoredFraction-test.jl",
 # Miscellaneous tests
   "Benchmark-test.jl",
   "gaussiannumbers/continued_fraction-test.jl",
   "Native-test.jl",
+  "HeckeMiscFiniteField-test.jl",
   "HeckeMiscLocalization-test.jl",
   "matrix-test.jl",
   "poly-test.jl",

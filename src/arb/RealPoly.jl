@@ -539,17 +539,17 @@ end
 #
 ###############################################################################
 
-function zero!(z::RealPolyRingElemOrPtr)
+function zero!(z::TypeOrPtr{RealPolyRingElem})
   @ccall libflint.arb_poly_zero(z::Ref{RealPolyRingElem})::Nothing
   return z
 end
 
-function one!(z::RealPolyRingElemOrPtr)
+function one!(z::TypeOrPtr{RealPolyRingElem})
   @ccall libflint.arb_poly_one(z::Ref{RealPolyRingElem})::Nothing
   return z
 end
 
-function neg!(z::RealPolyRingElemOrPtr, a::RealPolyRingElemOrPtr)
+function neg!(z::TypeOrPtr{RealPolyRingElem}, a::TypeOrPtr{RealPolyRingElem})
   @ccall libflint.arb_poly_neg(z::Ref{RealPolyRingElem}, a::Ref{RealPolyRingElem})::Nothing
   return z
 end

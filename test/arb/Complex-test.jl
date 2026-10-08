@@ -519,6 +519,8 @@ end
     Phi = sum([C[3*i+j+1]*x^i*y^j for i in 0:2 for j in 0:2])
 
     @test Phi == x^2*y+16*x-y^2
+
+    @test lindep(matrix(CC, vals), 150) == C
   end
 end
 
@@ -564,4 +566,13 @@ end
   res = Nemo.integrate(CC, exp, 0, 1, rel_tol = 1.0e-6, abs_tol = 1.0e-6)
   @test overlaps(res, CC(const_e(parent(real(zero(CC))))) - 1)
   @test radius(real(res)) < 1.0e-6
+end
+
+@testset "#1925" begin
+  C = complex_field()
+
+  @test C(1)+C(1)+1 == (C(1)+C(1))+1
+  @test C(1)+1+1 == (C(1)+1)+1
+  @test C(2)*C(2)*2 == (C(2)*C(2))*2
+  @test C(2)*2*2 == (C(2)*2)*2
 end
