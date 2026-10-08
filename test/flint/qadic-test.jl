@@ -422,6 +422,15 @@ end
 
   a = 1 + 2^3 + 2^4 + O(R, 2^10)
   @test is_square_with_sqrt(a)[2]^2 == a
+
+  @test !is_square(R(2))
+  @test !is_square(R(3))
+
+  # error paths not reachable through the public API
+  user_data = Nemo.Qadic2SqrtPrecomp(R)
+  @test_throws DomainError Nemo.Qadic2SqrtPrecomp(QadicField(3, 2)[1])
+  S, _ = QadicField(2, 5)
+  @test_throws ArgumentError Nemo._qadic_char2_sqrt(S(1), user_data)
 end
 
 @testset "QadicFieldElem.square_root_char2" begin
