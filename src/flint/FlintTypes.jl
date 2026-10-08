@@ -2259,10 +2259,6 @@ mutable struct fqPolyRepMPolyRingElem <: MPolyRingElem{fqPolyRepFieldElem}
     return z
   end
 
-  function fqPolyRepMPolyRingElem(ctx::zzModMPolyRing, a::zzModRingElem)
-    return fqPolyRepMPolyRingElem(ctx, a.data)
-  end
-
   function fqPolyRepMPolyRingElem(ctx::fqPolyRepMPolyRing, a::fqPolyRepFieldElem)
     z = fqPolyRepMPolyRingElem(ctx)
     @ccall libflint.fq_nmod_mpoly_set_fq_nmod(z::Ref{fqPolyRepMPolyRingElem}, a::Ref{fqPolyRepFieldElem}, ctx::Ref{fqPolyRepMPolyRing})::Nothing
@@ -4916,6 +4912,14 @@ mutable struct FqMatrix <: MatElem{FqFieldElem}
     c = ncols(m)
     z = FqMatrix(r, c, ctx)
     @ccall libflint.fq_default_mat_set_fmpz_mod_mat(z::Ref{FqMatrix}, m::Ref{ZZModMatrix}, ctx::Ref{FqField})::Nothing
+    return z
+  end
+
+  function FqMatrix(m::FpMatrix, ctx::FqField)
+    r = nrows(m)
+    c = ncols(m)
+    z = FqMatrix(r, c, ctx)
+    @ccall libflint.fq_default_mat_set_fmpz_mod_mat(z::Ref{FqMatrix}, m::Ref{FpMatrix}, ctx::Ref{FqField})::Nothing
     return z
   end
 

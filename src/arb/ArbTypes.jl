@@ -994,9 +994,9 @@ mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
     return z
   end
 
-  function ComplexMatrix(a::ArbMatrix, prec::Int)
+  function ComplexMatrix(a::RealMatrix, prec::Int)
     z = ComplexMatrix(a.r, a.c)
-    @ccall libflint.acb_mat_set_round_arb_mat(z::Ref{ComplexMatrix}, a::Ref{ArbMatrix}, prec::Int)::Nothing
+    @ccall libflint.acb_mat_set_round_arb_mat(z::Ref{ComplexMatrix}, a::Ref{RealMatrix}, prec::Int)::Nothing
     return z
   end
 

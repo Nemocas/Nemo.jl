@@ -20,7 +20,7 @@ function benchmark_solve_poly()
     end
   end
 
-  tt = @elapsed _solve_rational(M, b)
+  tt = @elapsed Nemo.AbstractAlgebra._solve_rational(M, b)
   println("$tt")
 end
 

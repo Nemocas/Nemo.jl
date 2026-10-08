@@ -1041,7 +1041,7 @@ function QQMatrix(r::Int, c::Int, d::RationalUnion)
   z = QQMatrix(r, c)
   GC.@preserve z for i = 1:min(r, c)
     el = mat_entry_ptr(z, i, i)
-    set!(el, d)
+    set!(el, flintify(d))
   end
   return z
 end

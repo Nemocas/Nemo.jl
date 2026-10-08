@@ -240,14 +240,21 @@ end
   d = R(3)
 
   @test d == 3
+  @test d == S(3)
+  @test d != S(4)
 
   @test c == ZZ(1)
+  @test c == S(1)
 
   @test ZZ(0) != a
+  @test S(0) != a
+  @test S(0) == R()
 
   @test 2 == b
+  @test S(2) == b
 
   @test ZZ(1) == c
+  @test S(1) == c
 end
 
 @testset "ZZModAbsPowerSeriesRingElem.powering" begin

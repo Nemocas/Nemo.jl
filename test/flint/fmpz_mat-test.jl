@@ -160,6 +160,11 @@ end
   @test map_entries(F, A) == F[1 2 3; 4 5 6]
   R, _ = residue_ring(ZZ, ZZ(10))
   @test map_entries(R, A) == R[1 2 3; 4 5 6]
+
+  for R in [residue_ring(ZZ, 10)[1], Native.GF(11), residue_ring(ZZ, ZZ(10))[1], QQ]
+    @test change_base_ring(R, A) == R[1 2 3; 4 5 6]
+    @test (@which change_base_ring(R, A)).module === Nemo
+  end
 end
 
 @testset "ZZMatrix.manipulation" begin
