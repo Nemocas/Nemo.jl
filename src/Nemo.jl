@@ -487,6 +487,16 @@ const TypeOrPtr{T} = Union{T, Ref{T}, Ptr{T}} where T
 
 ###############################################################################
 #
+#   Matrices wrapping a FLINT matrix struct
+#
+###############################################################################
+
+# Every subtype starts with the fields `entries`, `r`, `c`, `stride` of the
+# FLINT struct it wraps.
+abstract type FlintMatElem{T} <: MatElem{T} end
+
+###############################################################################
+#
 #   Load Nemo Rings/Fields/etc
 #
 ###############################################################################

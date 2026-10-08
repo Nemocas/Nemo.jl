@@ -70,10 +70,6 @@ function deepcopy_internal(a::ZZModMatrix, dict::IdDict)
   return z
 end
 
-number_of_rows(a::T) where T <: Zmod_fmpz_mat = a.r
-
-number_of_columns(a::T) where T <: Zmod_fmpz_mat = a.c
-
 base_ring(a::T) where T <: Zmod_fmpz_mat = a.base_ring
 
 function one(a::ZZModMatrixSpace)
@@ -776,4 +772,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::ZZModMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(ZZRingElem)
+_entry_size(::Type{ZZModMatrix}) = sizeof(ZZRingElem)

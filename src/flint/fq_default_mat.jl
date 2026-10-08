@@ -62,14 +62,6 @@ function deepcopy_internal(a::FqMatrix, dict::IdDict)
   return z
 end
 
-function number_of_rows(a::FqMatrix)
-  return @ccall libflint.fq_default_mat_nrows(a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Int
-end
-
-function number_of_columns(a::FqMatrix)
-  return @ccall libflint.fq_default_mat_ncols(a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Int
-end
-
 base_ring(a::FqMatrix) = a.base_ring
 
 function one(a::FqMatrixSpace)

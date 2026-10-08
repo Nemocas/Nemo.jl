@@ -198,3 +198,37 @@ end
   @test !is_unimodular(M; algorithm=:pauderis_storjohann)
   @test !is_unimodular(M; algorithm=:auto)
 end
+
+@testset "Access through Ref and Ptr" begin
+  # one field for each kind of fq_default context
+  Fqs = [GF(3, 2), GF(1048583, 2), GF(ZZ(10)^30 + 57, 2), GF(7), GF(ZZ(10)^30 + 57)]
+  @test allunique(Nemo._fq_default_ctx_type.(Fqs))
+
+  rings = [ZZ, QQ, residue_ring(ZZ, 12)[1], residue_ring(ZZ, ZZ(12))[1],
+           Native.GF(7), Native.GF(ZZ(7)),
+           Native.finite_field(7, 2, :a)[1], Native.finite_field(ZZ(7), 2, :a)[1],
+           RealField(), ArbField(64), ComplexField(), AcbField(64), Fqs...]
+  mats = Any[matrix(R, [1 2 3 4; 5 6 7 8; 9 10 11 12]) for R in rings]
+  push!(mats, Nemo.ZZPolyRingMatrix(matrix(ZZ[:x][1], [1 2 3 4; 5 6 7 8; 9 10 11 12])))
+  # the stride of a view differs from its number of columns
+  views = [view(A, 2:3, 2:3) for A in mats if A isa Nemo._MatTypes]
+  @test all(A -> size(A) == (3, 4), mats)
+  @test all(A -> size(A) == (2, 2), views)
+
+  for A in vcat(mats, views)
+    GC.@preserve A begin
+      # FLINT computes the same address when it sets up a window
+      if A isa Nemo._MatTypes
+        @test Nemo.mat_entry_ptr(A, 2, 2) == view(A, 2:2, 2:2).entries
+      end
+
+      for a in (Ref(A), Ptr{typeof(A)}(pointer_from_objref(A)))
+        @test nrows(a) == nrows(A)
+        @test ncols(a) == ncols(A)
+        @test is_square(a) == is_square(A)
+        A isa FqMatrix && continue
+        @test Nemo.mat_entry_ptr(a, 2, 2) == Nemo.mat_entry_ptr(A, 2, 2)
+      end
+    end
+  end
+end

@@ -63,10 +63,6 @@ function one(x::ArbMatrixSpace)
   return one!(x())
 end
 
-number_of_rows(a::ArbMatrix) = a.r
-
-number_of_columns(a::ArbMatrix) = a.c
-
 function deepcopy_internal(x::ArbMatrix, dict::IdDict)
   z = ArbMatrix(base_ring(x), undef, nrows(x), ncols(x))
   @ccall libflint.arb_mat_set(z::Ref{ArbMatrix}, x::Ref{ArbMatrix})::Nothing
@@ -748,8 +744,7 @@ end
 #
 ################################################################################
 
-@inline mat_entry_ptr(A::ArbMatrix, i::Int, j::Int) = 
-@ccall libflint.arb_mat_entry_ptr(A::Ref{ArbMatrix}, (i-1)::Int, (j-1)::Int)::Ptr{ArbFieldElem}
+_entry_size(::Type{ArbMatrix}) = sizeof(arb_struct)
 
 ###############################################################################
 #

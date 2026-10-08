@@ -22,10 +22,6 @@ is_zero_initialized(::Type{ZZPolyRingMatrix}) = true
 #
 ###############################################################################
 
-@inline number_of_rows(a::ZZPolyRingMatrix) = a.r
-
-@inline number_of_columns(a::ZZPolyRingMatrix) = a.c
-
 function getindex!(v::ZZPolyRingElem, a::ZZPolyRingMatrix, r::Int, c::Int)
   @boundscheck _checkbounds(a, r, c)
   GC.@preserve a begin
@@ -234,11 +230,7 @@ end
 
 # Size of the C fmpz_poly_struct (coeffs pointer + alloc + length), without
 # the Julia-only parent field.
-const SIZEOF_FMPZ_POLY_STRUCT = 3 * sizeof(Int)
-
-function mat_entry_ptr(A::ZZPolyRingMatrix, i::Int, j::Int)
-  return Ptr{ZZPolyRingElem}(UInt(A.entries) + UInt(((i - 1) * A.stride + (j - 1)) * SIZEOF_FMPZ_POLY_STRUCT))
-end
+_entry_size(::Type{ZZPolyRingMatrix}) = 3 * sizeof(Int)
 
 ###############################################################################
 #

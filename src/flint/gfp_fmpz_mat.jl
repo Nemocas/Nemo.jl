@@ -78,10 +78,6 @@ function deepcopy_internal(a::FpMatrix, dict::IdDict)
   return z
 end
 
-number_of_rows(a::FpMatrix) = a.r
-
-number_of_columns(a::FpMatrix) = a.c
-
 base_ring(a::FpMatrix) = a.base_ring
 
 function one(a::FpMatrixSpace)
@@ -347,4 +343,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::FpMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(ZZRingElem)
+_entry_size(::Type{FpMatrix}) = sizeof(ZZRingElem)

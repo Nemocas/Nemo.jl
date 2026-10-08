@@ -4,6 +4,42 @@ const _MatTypes = Union{_FieldMatTypes, ZZMatrix, zzModMatrix, ZZModMatrix}
 
 ################################################################################
 #
+#  Access through `Ref` and `Ptr`
+#
+################################################################################
+
+# A `Ptr` to a FlintMatElem may point to a bare C struct, so single words are
+# loaded through it, not the Julia object. Asserting the type of `a[]` keeps
+# inference concrete for an abstract `Ref{T}`.
+
+number_of_rows(a::FlintMatElem) = a.r
+number_of_rows(a::Ref{T}) where {T <: FlintMatElem} = number_of_rows(a[]::T)
+number_of_rows(a::Ptr{<:FlintMatElem}) = unsafe_load(Ptr{Int}(a), 2)
+
+number_of_columns(a::FlintMatElem) = a.c
+number_of_columns(a::Ref{T}) where {T <: FlintMatElem} = number_of_columns(a[]::T)
+number_of_columns(a::Ptr{<:FlintMatElem}) = unsafe_load(Ptr{Int}(a), 3)
+
+is_square(a::Ref{<:FlintMatElem}) = nrows(a) == ncols(a)
+
+_entries(a::FlintMatElem) = a.entries
+_entries(a::Ref{T}) where {T <: FlintMatElem} = _entries(a[]::T)
+_entries(a::Ptr{T}) where {T <: FlintMatElem} = unsafe_load(Ptr{fieldtype(T, :entries)}(a))
+
+_stride(a::FlintMatElem) = a.stride
+_stride(a::Ref{T}) where {T <: FlintMatElem} = _stride(a[]::T)
+_stride(a::Ptr{<:FlintMatElem}) = unsafe_load(Ptr{Int}(a), 4)
+
+# `_entry_size(T)` is the size of the C struct of one entry, which is smaller
+# than the Julia element type if that has fields of its own, such as a parent.
+# For FqMatrix it depends on the base ring, so there is none: FqMatrix has a
+# method of its own and no entry pointers through a `Ref` or `Ptr`.
+function mat_entry_ptr(A::TypeOrPtr{T}, i::Int, j::Int) where {T <: FlintMatElem}
+  return _entries(A) + ((i - 1) * _stride(A) + (j - 1)) * _entry_size(T)
+end
+
+################################################################################
+#
 #  common functionality for views
 #
 ################################################################################
