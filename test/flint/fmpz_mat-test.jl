@@ -1076,3 +1076,22 @@ end
   add_column!(A, -3, 2, 3, 1:1)
   @test A == ZZ[0 3 5; 0 6 21]
 end
+
+@testset "ZZMatrix.multiply_column!" begin
+  for s in (ZZ(3), 3)
+    A = ZZ[2 3 5; 4 6 3]
+
+    multiply_column!(A, s, 1)
+    @test A == ZZ[6 3 5; 12 6 3]
+
+    multiply_column!(A, s, 3, 2:2)
+    @test A == ZZ[6 3 5; 12 6 9]
+
+    # an Int in fourth position is a row, not a second column
+    multiply_column!(A, s, 3, 1)
+    @test A == ZZ[6 3 15; 12 6 9]
+
+    @test_throws AssertionError multiply_column!(A, s, 4)
+    @test_throws AssertionError multiply_column!(A, s, 1, 1:3)
+  end
+end

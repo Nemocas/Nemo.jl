@@ -1573,8 +1573,8 @@ function AbstractAlgebra.multiply_row!(A::ZZMatrix, s::Union{Int, TypeOrPtr{ZZRi
   return A
 end
 
-function AbstractAlgebra.multiply_column!(A::ZZMatrix, s::Union{Int, TypeOrPtr{ZZRingElem}}, i::Int, j::Int, rows::UnitRange{Int}=1:nrows(A))
-  @assert 1 <= j <= ncols(A)
+function AbstractAlgebra.multiply_column!(A::ZZMatrix, s::Union{Int, TypeOrPtr{ZZRingElem}}, i::Int, rows::UnitRange{Int}=1:nrows(A))
+  @assert 1 <= i <= ncols(A)
   @assert 1 <= first(rows)
   @assert last(rows) <= nrows(A)
   GC.@preserve A begin
