@@ -186,6 +186,15 @@ function Base.round(::Type{ZZRingElem}, x::ArbFieldElem)
   end
 end
 
+function Base.round(::Type{ZZRingElem}, x::RealFieldElem)
+  if radius(x) > 1e-1
+    throw(InexactError(:round, ZZRingElem, x))
+  end
+  return setprecision(BigFloat, precision(Balls)) do
+    round(ZZRingElem, BigFloat(x))
+  end
+end
+
 function Base.round(::Type{ZZMatrix}, C::ArbMatrix)
   v = zero_matrix(ZZ, nrows(C), ncols(C))
 
