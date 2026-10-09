@@ -144,6 +144,8 @@ begin
         end
 
         @test setcoeff!(gen(S, 1), 1, R(2)) == 2*gen(S, 1)
+        @test setcoeff!(gen(S, 1), 1, 2) == 2*gen(S, 1)
+        @test setcoeff!(gen(S, 1), 1, ZZ(2)) == 2*gen(S, 1)
 
         f = rand(S, 0:5, 0:100)
 
