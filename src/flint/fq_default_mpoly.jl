@@ -425,6 +425,10 @@ function setcoeff!(a::FqMPolyRingElem, n::Int, c::FqFieldElem)
   return a
 end
 
+setcoeff!(a::FqMPolyRingElem, i::Int, c::Integer) = setcoeff!(a, i, base_ring(parent(a))(c))
+
+setcoeff!(a::FqMPolyRingElem, i::Int, c::ZZRingElem) = setcoeff!(a, i, base_ring(parent(a))(c))
+
 function setcoeff!(a::FqMPolyRingElem, n::Vector{Int}, c)
   return setcoeff!(a, n, base_ring(a)(c)::FqFieldElem)
 end
