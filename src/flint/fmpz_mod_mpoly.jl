@@ -19,7 +19,7 @@ for (etype, rtype, ftype, ctype) in (
 
     elem_type(::Type{($rtype)}) = ($etype)
 
-    mpoly_type(::Type{FpFieldElem}) = FpMPolyRingElem
+    mpoly_type(::Type{$ctype}) = $etype
 
     symbols(a::($rtype)) = a.S
 
@@ -44,7 +44,7 @@ for (etype, rtype, ftype, ctype) in (
 
     function internal_ordering(a::($rtype))
       b = a.ord
-      #   b = @ccall libflint.fmpz_mod_mpoly_ctx_ord(a::Ref{zzModMPolyRing})::Cint
+      #   b = @ccall libflint.fmpz_mod_mpoly_ctx_ord(a::Ref{($rtype)})::Cint
       return flint_orderings[b + 1]
     end
 
