@@ -257,6 +257,17 @@ end
   @test a[2,2] == F4(4)
   @test_throws BoundsError a[-2,2] = F4(4)
 
+  u = F4(3)
+  GC.@preserve u b begin
+    @test b[1,1] == u
+    for uu in (Ref(u), Ptr{FqFieldElem}(pointer_from_objref(u)), Nemo.mat_entry_ptr(b, 1, 1))
+      a[2,2] = F4(4)
+      a[2,2] = uu
+      @test a[2,2] == u
+      @test_throws BoundsError a[-2,2] = uu
+    end
+  end
+
   a[1,2] = 5
 
   @test a[1,2] == F4(5)
