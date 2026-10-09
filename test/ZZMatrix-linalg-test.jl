@@ -26,6 +26,14 @@ end
     s, d = Nemo.UniCertSolve(A^i, bb)
     @test s*A^i == d*bb
   end
+
+  # No known input reaches the code after the lifting loop, so inspect it:
+  # a variable assigned only inside the loop is read there as a global.
+  ci = only(code_lowered(Nemo.UniCertSolve, (ZZMatrix, ZZMatrix)))
+  refs = GlobalRef[]
+  walk(x) = x isa GlobalRef ? push!(refs, x) : x isa Expr ? foreach(walk, x.args) : nothing
+  foreach(walk, ci.code)
+  @test filter(r -> !isdefined(r.mod, r.name), refs) == GlobalRef[]
 end
 
 @testset "Verify bugfixes" begin
@@ -100,6 +108,9 @@ end
   A = matrix(ZZ, rand(-ZZ(2)^256:ZZ(2)^256, 8,8));
   AA = kronecker_product(A,A);
   d = Nemo.det_hcol_hnf(AA); # this will (very likely) test the HCOL branch
+
+  @test_throws ErrorException Nemo.det_hcol_hnf(AA; solver = :JOHN)
+  @test_throws ErrorException Nemo.det_hcol_hnf(zero_matrix(ZZ, 2, 2); solver = :JOHN)
 end
 
 @testset "CrtCtx test" begin

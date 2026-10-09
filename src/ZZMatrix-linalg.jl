@@ -957,7 +957,7 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
     end
   end
   mu = vcat([_to_base!(t, m) for t = allV]...)
-  tau = _induce_rational_reconstruction(mu, mex; unbalanced = true)
+  tau = _induce_rational_reconstruction(mu, m^(2*ex); unbalanced = true)
   @assert tau[1]
   GC.enable(GC_d)
   return tau[2], tau[3]
@@ -1094,9 +1094,9 @@ end
 # det_PauderisStorjohann when there are "many" non-trivial
 # Smith invariant factors.
 # kwarg solver is to choose the linear system solver for
-# solving random linear systems (algorithm :JOHN not yet available).
+# solving random linear systems.
 function det_hcol_hnf(A::ZZMatrix, U::AbstractArray= -100:100; solver=:NEMO_DIXON)
-  (solver in [:NEMO_DIXON, :JOHN, :OSCAR]) || error("solver must be one of NEMO_DIXON, JOHN, OSCAR")
+  (solver in [:NEMO_DIXON, :OSCAR]) || error("solver must be one of NEMO_DIXON, OSCAR")
   n = ncols(A)
   Hrow = hadamard_bound2(A)
   Hcol = hadamard_bound2(transpose(A))
@@ -1219,10 +1219,6 @@ function det_hcol_hnf(A::ZZMatrix, U::AbstractArray= -100:100; solver=:NEMO_DIXO
       @vtime :det 2   soln2 = Nemo.dixon_solve(A, b)
       d = soln2[2]
       s = soln2[1]
-    elseif solver == :JOHN
-      @vprintln(:det,2,"  ...solving using LinSolve")
-      ctx = LinSolveCtx(A)
-      @vtime :det 2  s,d = LinSolve(ctx,b)
     else # solver == :OSCAR
       @vprintln(:det,2,"  ...solving using OSCAR solve function")
       @vtime :det 2  x = solve(matrix(QQ,A),matrix(QQ,b); side = :right)
