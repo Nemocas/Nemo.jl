@@ -20,6 +20,9 @@ is_zero_initialized(::Type{zzModMatrix}) = true
 #
 ################################################################################
 
+# v.data is immutable so we can't do anything in-place
+getindex!(v::zzModRingElem, a::zzModMatrix, i::Int, j::Int) = getindex(a, i, j)
+
 @inline function getindex(a::zzModMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   u = getindex_raw(a, i, j)
@@ -85,10 +88,6 @@ function deepcopy_internal(a::zzModMatrix, dict::IdDict)
   @ccall libflint.nmod_mat_set(z::Ref{zzModMatrix}, a::Ref{zzModMatrix})::Nothing
   return z
 end
-
-number_of_rows(a::T) where T <: Zmodn_mat = a.r
-
-number_of_columns(a::T) where T <: Zmodn_mat = a.c
 
 base_ring(a::T) where T <: Zmodn_mat = a.base_ring
 
@@ -776,4 +775,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::Zmodn_mat, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(UInt)
+_entry_size(::Type{<:Zmodn_mat}) = sizeof(UInt)

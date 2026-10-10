@@ -69,10 +69,6 @@ function deepcopy_internal(a::fqPolyRepMatrix, dict::IdDict)
   return z
 end
 
-number_of_rows(a::fqPolyRepMatrix) = a.r
-
-number_of_columns(a::fqPolyRepMatrix) = a.c
-
 base_ring(a::fqPolyRepMatrix) = a.base_ring
 
 function one(a::fqPolyRepMatrixSpace)
@@ -634,4 +630,4 @@ end
 #   norm :: Int
 # The `parent` member of struct fqPolyRepFieldElem is not replicated in each
 # struct member, so we cannot simply use `sizeof(fqPolyRepFieldElem)`.
-mat_entry_ptr(A::fqPolyRepMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * (sizeof(Ptr) + 5 * sizeof(Int))
+_entry_size(::Type{fqPolyRepMatrix}) = sizeof(Ptr) + 5 * sizeof(Int)

@@ -75,10 +75,6 @@ function one(x::AcbMatrixSpace)
   return one!(x())
 end
 
-number_of_rows(a::AcbMatrix) = a.r
-
-number_of_columns(a::AcbMatrix) = a.c
-
 function deepcopy_internal(x::AcbMatrix, dict::IdDict)
   z = similar(x)
   @ccall libflint.acb_mat_set(z::Ref{AcbMatrix}, x::Ref{AcbMatrix})::Nothing
@@ -804,8 +800,7 @@ end
 #
 ################################################################################
 
-@inline mat_entry_ptr(A::AcbMatrix, i::Int, j::Int) = 
-@ccall libflint.acb_mat_entry_ptr(A::Ref{AcbMatrix}, (i-1)::Int, (j-1)::Int)::Ptr{AcbFieldElem}
+_entry_size(::Type{AcbMatrix}) = sizeof(acb_struct)
 
 ###############################################################################
 #

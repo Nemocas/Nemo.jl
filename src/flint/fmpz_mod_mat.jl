@@ -26,6 +26,12 @@ is_zero_initialized(::Type{ZZModMatrix}) = true
   return ZZModRingElem(u, base_ring(a)) # no reduction needed
 end
 
+function getindex!(v::ZZModRingElem, a::ZZModMatrix, i::Int, j::Int)
+  @boundscheck _checkbounds(a, i, j)
+  GC.@preserve a set!(v.data, mat_entry_ptr(a, i, j))
+  return v
+end
+
 # as above, but as a plain ZZRingElem, no bounds checking
 function getindex_raw(a::T, i::Int, j::Int) where T <: Zmod_fmpz_mat
   u = ZZRingElem()
@@ -69,10 +75,6 @@ function deepcopy_internal(a::ZZModMatrix, dict::IdDict)
   @ccall libflint.fmpz_mod_mat_set(z::Ref{ZZModMatrix}, a::Ref{ZZModMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
-
-number_of_rows(a::T) where T <: Zmod_fmpz_mat = a.r
-
-number_of_columns(a::T) where T <: Zmod_fmpz_mat = a.c
 
 base_ring(a::T) where T <: Zmod_fmpz_mat = a.base_ring
 
@@ -776,4 +778,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::ZZModMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(ZZRingElem)
+_entry_size(::Type{ZZModMatrix}) = sizeof(ZZRingElem)

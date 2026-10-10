@@ -3879,7 +3879,7 @@ const QQMatrixSpace = AbstractAlgebra.Generic.MatSpace{QQFieldElem}
 
 QQMatrixSpace(r::Int, c::Int) = QQMatrixSpace(QQ, r, c)
 
-mutable struct QQMatrix <: MatElem{QQFieldElem}
+mutable struct QQMatrix <: FlintMatElem{QQFieldElem}
   entries::Ptr{QQFieldElem}
   r::Int
   c::Int
@@ -3919,7 +3919,7 @@ const ZZMatrixSpace = AbstractAlgebra.Generic.MatSpace{ZZRingElem}
 
 ZZMatrixSpace(r::Int, c::Int) = ZZMatrixSpace(ZZ, r, c)
 
-mutable struct ZZMatrix <: MatElem{ZZRingElem}
+mutable struct ZZMatrix <: FlintMatElem{ZZRingElem}
   entries::Ptr{ZZRingElem}
   r::Int
   c::Int
@@ -3955,7 +3955,7 @@ end
 #
 ###############################################################################
 
-mutable struct ZZPolyRingMatrix <: MatElem{ZZPolyRingElem}
+mutable struct ZZPolyRingMatrix <: FlintMatElem{ZZPolyRingElem}
   entries::Ptr{ZZPolyRingElem}
   r::Int
   c::Int
@@ -3994,7 +3994,7 @@ end
 
 const zzModMatrixSpace = AbstractAlgebra.Generic.MatSpace{zzModRingElem}
 
-mutable struct zzModMatrix <: MatElem{zzModRingElem}
+mutable struct zzModMatrix <: FlintMatElem{zzModRingElem}
   entries::Ptr{UInt}
   r::Int                  # Int
   c::Int                  # Int
@@ -4132,7 +4132,7 @@ end
 
 const ZZModMatrixSpace = AbstractAlgebra.Generic.MatSpace{ZZModRingElem}
 
-mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
+mutable struct ZZModMatrix <: FlintMatElem{ZZModRingElem}
   entries::Ptr{ZZRingElem}
   r::Int
   c::Int
@@ -4278,7 +4278,7 @@ end
 
 const FpMatrixSpace = AbstractAlgebra.Generic.MatSpace{FpFieldElem}
 
-mutable struct FpMatrix <: MatElem{FpFieldElem}
+mutable struct FpMatrix <: FlintMatElem{FpFieldElem}
   entries::Ptr{ZZRingElem}
   r::Int
   c::Int
@@ -4378,7 +4378,7 @@ end
 
 const fpMatrixSpace = AbstractAlgebra.Generic.MatSpace{fpFieldElem}
 
-mutable struct fpMatrix <: MatElem{fpFieldElem}
+mutable struct fpMatrix <: FlintMatElem{fpFieldElem}
   entries::Ptr{UInt}
   r::Int                  # Int
   c::Int                  # Int
@@ -4847,9 +4847,14 @@ end
 
 const FqMatrixSpace = AbstractAlgebra.Generic.MatSpace{FqFieldElem}
 
-mutable struct FqMatrix <: MatElem{FqFieldElem}
-  # fq_default_mat_struct is 56 bytes on 64 bit machine
-  opaque::NTuple{56, Int8}
+mutable struct FqMatrix <: FlintMatElem{FqFieldElem}
+  # fq_default_mat_struct is a union of FLINT matrix structs. They all start
+  # with these four fields; nmod_mat_struct, the largest, has three more words.
+  entries::Ptr{FqFieldElem}
+  r::Int
+  c::Int
+  stride::Int
+  opaque::NTuple{3, UInt}
   # end of flint struct
 
   base_ring::FqField
@@ -4949,7 +4954,7 @@ end
 
 const FqPolyRepMatrixSpace = AbstractAlgebra.Generic.MatSpace{FqPolyRepFieldElem}
 
-mutable struct FqPolyRepMatrix <: MatElem{FqPolyRepFieldElem}
+mutable struct FqPolyRepMatrix <: FlintMatElem{FqPolyRepFieldElem}
   entries::Ptr{FqPolyRepFieldElem}
   r::Int
   c::Int
@@ -5026,7 +5031,7 @@ end
 
 const fqPolyRepMatrixSpace = AbstractAlgebra.Generic.MatSpace{fqPolyRepFieldElem}
 
-mutable struct fqPolyRepMatrix <: MatElem{fqPolyRepFieldElem}
+mutable struct fqPolyRepMatrix <: FlintMatElem{fqPolyRepFieldElem}
   entries::Ptr{fqPolyRepFieldElem}
   r::Int
   c::Int
