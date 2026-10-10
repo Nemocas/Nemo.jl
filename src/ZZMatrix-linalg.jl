@@ -1096,20 +1096,22 @@ end
 # kwarg solver is to choose the linear system solver for
 # solving random linear systems (algorithm :JOHN not yet available).
 function det_hcol_hnf(A::ZZMatrix, U::AbstractArray= -100:100; solver=:NEMO_DIXON)
-  (solver in [:NEMO_DIXON, :JOHN, :OSCAR]) || error("solver must be one of NEMO_DIXON, JOHN, OSCAR")
+  @req  is_square(A)  "Matrix must be square"
+  (solver in [:NEMO_DIXON, :JOHN, :OSCAR]) || error("solver must be one of NEMO_DIXON, JOHN, OSCAR");
   n = ncols(A)
+  (n == 0)  &&  return ZZ(1)
+  (n == 1)  &&  return A[1,1]
   Hrow = hadamard_bound2(A)
   Hcol = hadamard_bound2(transpose(A))
-  if (Hrow == 0 || Hcol == 0)
-    return ZZ(0)
-  end
-# ACTIVATE WHEN "is_probably_zero_det" IS AVAILABLE:  is_probably_zero_det(A) && return det(A)
-  Hbits = div(1+min(nbits(Hrow), nbits(Hcol)),2)  # abs(det(A)) <= 2^Hbits
-  @vprintln(:det,1,"Hadamard bound in bits $(Hbits)")
-  entry_size = maximum(nbits, A)
-  @vprintln(:det,1,"entry_size = $(entry_size)")
-  HNF_UPB_BITS = max(60, round(Int, 0.5*Hbits/sqrt(n)))  # !!! needs reconsideration !!!
-  @vprintln(:det,1,"HNF_UPB_BITS = $(HNF_UPB_BITS)")
+  (Hrow == 0 || Hcol == 0)  &&  return ZZ(0)
+  is_probably_zero_det(A)  &&  return det(A)
+  # At this point A has size at least 2x2, and we know that det(A) is non-zero
+  Hbits = div(1+min(nbits(Hrow), nbits(Hcol)),2); # abs(det(A)) <= 2^Hbits
+  @vprintln(:det,1,"Hadamard bound in bits $(Hbits)");
+  entry_size = maximum(nbits, A);
+  @vprintln(:det,1,"entry_size = $(entry_size)");
+  HNF_UPB_BITS = max(60, round(Int, 0.5*Hbits/sqrt(n))); # !!! needs reconsideration !!!
+  @vprintln(:det,1,"HNF_UPB_BITS = $(HNF_UPB_BITS)");
   # Compute det mod M -- may later include some more primes
   CRT_BITSIZE = min(Hbits, 110)
   @vprintln(:det,1,"Computing det by crt up to about $(CRT_BITSIZE) bits")
