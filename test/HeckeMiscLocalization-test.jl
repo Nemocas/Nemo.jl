@@ -272,4 +272,16 @@
     @test isone(L(x^2 + 3x)) == false
     @test is_unit(L((x^3 + 5) // (x^3 + 5)))
   end
+
+  @testset "rand" begin
+    L = localization(R, 19)
+    for i in 1:20
+      a = rand(L, 1:10, [1, 19, 38])
+      @test parent(a) == L
+      @test a in L.(1:10)
+    end
+
+    # both scales must be collections to sample from
+    @test !hasmethod(rand, Tuple{typeof(L), Vector{Int}, Int})
+  end
 end

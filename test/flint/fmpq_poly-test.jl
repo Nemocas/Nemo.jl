@@ -662,3 +662,14 @@ end
   f = 7//5*y^2 + 3//2*y + 2
   @test digits(f) == [2, 3//2, 7//5]
 end
+
+@testset "QQPolyRingElem.roots_finite_field" begin
+  S, y = polynomial_ring(QQ, "y")
+  for R in [Native.GF(7), Native.finite_field(7, 2, "a")[1]]
+    @test issetequal(roots(R, y^2 - 1), [R(1), R(6)])
+    @test issetequal(roots(R, 1//3*y^2 - 1//3), [R(1), R(6)])
+    @test isempty(roots(R, 7*y + 1))
+  end
+  @test isempty(roots(Native.GF(7), y^2 + 1))
+  @test length(roots(Native.finite_field(7, 2, "a")[1], y^2 + 1)) == 2
+end

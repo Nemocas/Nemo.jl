@@ -447,10 +447,6 @@ function rand(R::Union{EuclideanRingResidueRing{ZZRingElem},EuclideanRingResidue
   return R(rand(ZZRingElem(0):(size(R)-1)))
 end
 
-function rand(R::EuclideanRingResidueField{ZZRingElem})
-  return R(rand(ZZRingElem(0):(order(R)-1)))
-end
-
 function rand(R::Union{EuclideanRingResidueRing{fqPolyRepPolyRingElem},EuclideanRingResidueField{fqPolyRepPolyRingElem}})
   r = rand(base_ring(base_ring(R)))
   g = gen(R)
@@ -601,15 +597,6 @@ end
 
 # mainly for testing
 function rand(L::LocalizedEuclideanRing{T}, num_scale::AbstractVector=(1:1000), den_scale::AbstractVector=(1:1000)) where {T<:ZZRingElem}
-  num = rand(num_scale)
-  den = rand(den_scale)
-  while gcd(den, prime(L)) != 1
-    den = rand(den_scale)
-  end
-  return L(num // den)
-end
-
-function rand(L::LocalizedEuclideanRing{T}, num_scale::Vector, den_scale::Integer) where {T<:ZZRingElem}
   num = rand(num_scale)
   den = rand(den_scale)
   while gcd(den, prime(L)) != 1
