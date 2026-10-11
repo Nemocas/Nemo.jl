@@ -155,9 +155,7 @@ Base.length(V::MatrixView) = length(V.A)
 
 Base.getindex(V::MatrixView, i::Int) = V.A[i]
 
-Base.setindex!(V::MatrixView, z::ZZRingElem, i::Int) = (V.A[i] = z)
-
-Base.setindex!(V::MatrixView, z, i::Int) = setindex!(V, ZZ(z), i)
+Base.setindex!(V::MatrixView, z, i::Int) = (V.A[i] = z)
 
 Base.size(V::MatrixView) = (length(V.A), )
 

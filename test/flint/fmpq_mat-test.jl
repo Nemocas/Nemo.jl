@@ -266,6 +266,8 @@ end
   @test collect(v) == [4, 5, 6]
   v[2] = 7
   @test A == S([1 2 3; 4 7 6; 7 8 9])
+  v[3] = QQ(1, 2)
+  @test A == S([1 2 3; 4 7 1//2; 7 8 9])
   A = S([1 2 3; 4 5 6; 7 8 9])
   v = @view A[:, 3]
   @test v isa AbstractVector{elem_type(QQ)}
@@ -274,6 +276,8 @@ end
   @test collect(v) == [3, 6, 9]
   v[1] = 1
   @test A == S([1 2 1; 4 5 6; 7 8 9])
+  v[2] = 1//3
+  @test A == S([1 2 1; 4 5 1//3; 7 8 9])
 end
 
 @testset "QQMatrix.sub" begin
