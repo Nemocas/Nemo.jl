@@ -926,7 +926,7 @@ end #for
 #
 ################################################################################
 
-function divexact(f::FpMPolyRingElem, a::fpFieldElem; check::Bool=true)
+function divexact(f::FpMPolyRingElem, a::FpFieldElem; check::Bool=true)
   return f*inv(a)
 end
 
