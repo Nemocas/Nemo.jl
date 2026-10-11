@@ -3962,11 +3962,17 @@ mutable struct ZZPolyRingMatrix <: FlintMatElem{ZZPolyRingElem}
   stride::Int
   # end flint struct
   base_ring::ZZPolyRing
+  view_parent
 
   # MatElem interface
   function ZZPolyRingMatrix(R::ZZPolyRing, ::UndefInitializer, r::Int, c::Int)
     z = ZZPolyRingMatrix(r, c, R)
     return z
+  end
+
+  # Used by view, not finalised!!
+  function ZZPolyRingMatrix()
+    return new()
   end
 
   function ZZPolyRingMatrix(r::Int, c::Int, R::ZZPolyRing)

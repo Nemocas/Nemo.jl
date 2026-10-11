@@ -576,41 +576,6 @@ end
 
 ################################################################################
 #
-#  Windowing
-#
-################################################################################
-
-function _view_window(x::zzModMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
-
-  _checkrange_or_empty(nrows(x), r1, r2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  _checkrange_or_empty(ncols(x), c1, c2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  if (r1 > r2)
-    r1 = 1
-    r2 = 0
-  end
-  if (c1 > c2)
-    c1 = 1
-    c2 = 0
-  end
-
-  z = zzModMatrix()
-  z.base_ring = x.base_ring
-  z.view_parent = x
-  @ccall libflint.nmod_mat_window_init(z::Ref{zzModMatrix}, x::Ref{zzModMatrix}, (r1 - 1)::Int, (c1 - 1)::Int, r2::Int, c2::Int)::Nothing
-  finalizer(_nmod_mat_window_clear_fn, z)
-  return z
-end
-
-function _nmod_mat_window_clear_fn(a::zzModMatrix)
-  @ccall libflint.nmod_mat_window_clear(a::Ref{zzModMatrix})::Nothing
-end
-
-################################################################################
-#
 #  Concatenation
 #
 ################################################################################

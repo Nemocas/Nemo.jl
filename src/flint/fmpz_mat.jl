@@ -22,36 +22,6 @@ is_zero_initialized(::Type{ZZMatrix}) = true
 #
 ###############################################################################
 
-function _checkrange_or_empty(l::Int, start::Int, stop::Int)
-  (stop < start) ||
-  (_checkbounds(l, start) &&
-   _checkbounds(l, stop))
-end
-
-function _view_window(x::ZZMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
-
-  _checkrange_or_empty(nrows(x), r1, r2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  _checkrange_or_empty(ncols(x), c1, c2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  if (r1 > r2)
-    r1 = 1
-    r2 = 0
-  end
-  if (c1 > c2)
-    c1 = 1
-    c2 = 0
-  end
-
-  b = ZZMatrix()
-  b.view_parent = x
-  @ccall libflint.fmpz_mat_window_init(b::Ref{ZZMatrix}, x::Ref{ZZMatrix}, (r1 - 1)::Int, (c1 - 1)::Int, r2::Int, c2::Int)::Nothing
-  finalizer(_fmpz_mat_window_clear_fn, b)
-  return b
-end
-
 function Base.reshape(x::ZZMatrix, r::Int, c::Int)
   @assert nrows(x) * ncols(x) == r*c
   @assert r == 1
@@ -59,12 +29,7 @@ function Base.reshape(x::ZZMatrix, r::Int, c::Int)
   b = ZZMatrix()
   b.view_parent = x
   @ccall libflint.fmpz_mat_window_init(b::Ref{ZZMatrix}, x::Ref{ZZMatrix}, 0::Int, 0::Int, r::Int, c::Int)::Nothing
-  finalizer(_fmpz_mat_window_clear_fn, b)
   return b
-end
-
-function _fmpz_mat_window_clear_fn(a::ZZMatrix)
-  @ccall libflint.fmpz_mat_window_clear(a::Ref{ZZMatrix})::Nothing
 end
 
 ###############################################################################

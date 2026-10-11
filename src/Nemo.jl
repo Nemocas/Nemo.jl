@@ -492,7 +492,8 @@ const TypeOrPtr{T} = Union{T, Ref{T}, Ptr{T}} where T
 ###############################################################################
 
 # Every subtype starts with the fields `entries`, `r`, `c`, `stride` of the
-# FLINT struct it wraps.
+# FLINT struct it wraps. For windows it has a field `view_parent` and a
+# constructor without arguments that sets no finalizer.
 abstract type FlintMatElem{T} <: MatElem{T} end
 
 ###############################################################################

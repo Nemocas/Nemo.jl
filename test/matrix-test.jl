@@ -237,16 +237,13 @@ end
 @testset "Access through Ref and Ptr" begin
   mats = flint_mat_examples()
   # the stride of a view differs from its number of columns
-  views = [view(A, 2:3, 2:3) for A in mats if A isa Nemo._MatTypes]
+  views = [view(A, 2:3, 2:3) for A in mats]
   @test all(A -> size(A) == (3, 4), mats)
   @test all(A -> size(A) == (2, 2), views)
 
   for A in vcat(mats, views)
     GC.@preserve A begin
-      # FLINT computes the same address when it sets up a window
-      if A isa Nemo._MatTypes
-        @test Nemo.mat_entry_ptr(A, 2, 2) == view(A, 2:2, 2:2).entries
-      end
+      @test Nemo.mat_entry_ptr(A, 2, 2) == view(A, 2:2, 2:2).entries
 
       for a in (Ref(A), Ptr{typeof(A)}(pointer_from_objref(A)))
         @test nrows(a) == nrows(A)
@@ -256,5 +253,71 @@ end
         @test Nemo.mat_entry_ptr(a, 2, 2) == Nemo.mat_entry_ptr(A, 2, 2)
       end
     end
+  end
+end
+
+@testset "Views of FlintMatElem" begin
+  @testset "$(typeof(A))" for A in flint_mat_examples()
+    T = typeof(A)
+    R = base_ring(A)
+    A0 = deepcopy(A)
+
+    V = @inferred view(A, 2:3, 2:4)
+    @test V isa T
+    @test size(V) == (2, 3)
+    @test base_ring(V) == R
+    @test all(V[i, j] == A[i + 1, j + 1] for i in 1:2, j in 1:3)
+
+    # a view of a view; the stride of neither is its number of columns
+    W = @inferred view(V, 2:2, 2:3)
+    @test W isa T
+    @test size(W) == (1, 2)
+    @test W[1, 1] == A[3, 3] && W[1, 2] == A[3, 4]
+
+    # FLINT takes a view wherever it takes a matrix; nmod_mat_neg is what
+    # reads the modulus of its argument
+    U = view(A, 1:3, 2:3)
+    @test -V == -A0[2:3, 2:4]
+    @test V + V == A0[2:3, 2:4] + A0[2:3, 2:4]
+    @test V * U == A0[2:3, 2:4] * A0[1:3, 2:3]
+
+    # a write through a view is seen in the parent
+    V[1, 2] = R(42)
+    @test A[2, 3] == R(42)
+    W[1, 1] = R(43)
+    @test A[3, 3] == R(43)
+    @test V[2, 2] == R(43)
+
+    # `sub` and indexing with ranges copy
+    A1 = deepcopy(A)
+    for S in (sub(A, 2:3, 2:4), sub(A, 2, 2, 3, 4), A[2:3, 2:4])
+      @test S isa T
+      @test S == V
+      S[1, 2] = R(5)
+      @test A == A1
+    end
+
+    @test view(A, :, :) == A
+    @test view(A, 2:2, :) == A[2:2, :]
+    @test view(A, :, 3:4) == A[:, 3:4]
+    @test collect(view(A, 2, :)) == [A[2, j] for j in 1:4]
+    @test collect(view(A, :, 3)) == [A[i, 3] for i in 1:3]
+
+    @test size(view(A, 2:1, 1:4)) == (0, 4)
+    @test size(view(A, 1:3, 3:2)) == (3, 0)
+    @test size(view(A, 5:4, 6:5)) == (0, 0)
+    @test_throws BoundsError view(A, 1:4, 1:4)
+    @test_throws BoundsError view(A, 0:1, 1:4)
+    @test_throws BoundsError view(A, 1:3, 2:5)
+
+    Z = zero(A, 0, 0)
+    @test size(view(Z, 1:0, 1:0)) == (0, 0)
+    @test size(view(Z, :, :)) == (0, 0)
+    @test_throws BoundsError view(Z, 1:1, 1:0)
+
+    # a view keeps its parent alive
+    V = view(deepcopy(A0), 2:3, 2:4)
+    GC.gc()
+    @test V == A0[2:3, 2:4]
   end
 end
