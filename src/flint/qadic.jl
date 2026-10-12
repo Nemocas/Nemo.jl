@@ -515,11 +515,12 @@ function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bo
   GC.@preserve data begin
     res = Bool(@ccall libflint._qadic_char2_sqrt_with_precomp(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField}, data.ptr::Ptr{Nothing})::Cint)
   end
-  # Next few lines are a workaround for a bug in FLINT
+  # A unit known mod 2^n has its root determined only mod 2^(n-1) if n >= 2,
+  # so drop the last digit: FLINT computes to whatever precision z has.
   rel_pr = precision(a)-av
   (rel_pr < 2) && return (res, z)
   p = QQ(prime(ctx))
-  return (res, z+O(ctx, p^(div(av,2)+rel_pr-1)))  # z+O(...) workaround for BUG in FLINT
+  return (res, z+O(ctx, p^(div(av,2)+rel_pr-1)))
 end
 
 function is_square_with_sqrt(a::QadicFieldElem)
