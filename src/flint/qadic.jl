@@ -550,11 +550,10 @@ function is_square(a::QadicFieldElem)
   is_zero(a)  &&  return true
   va = valuation(a)
   is_odd(va)  &&  return false
-  # Next few lines "truncate" a to its first digit (or first 3 digits if p==2)
+  # squareness is decided by the first digit of a, or the first 3 if p == 2
   R = parent(a)
-  p = QQ(prime(R))
-  v2 = valuation(R(2))
-  trunc_a = a+O(R, p^(1+va+2*v2))  # exponent is va+1, or va+3 if p==2
+  p = prime(R)
+  trunc_a = a + O(R, QQ(p)^(va + (p == 2 ? 3 : 1)))
   return is_square_with_sqrt(trunc_a)[1]
 end
 
