@@ -770,7 +770,7 @@ function hadamard_bound2(M::ZZMatrix)
   return H
 end
 
-function maximum(::typeof(nbits), M::ZZMatrix)
+function maximum(::typeof(nbits), M::ZZMatrixOrPtr)
   mx = 0
   n = nrows(M)
   m = ncols(M)
