@@ -416,6 +416,7 @@ end
   @test precision(sqrt_zero8) == 4
   @test precision(sqrt_zero9) == 5
 
+  # for p = 2 the root is known to one digit less than for odd p
   a = 1 + 2^3 + O(R, 2^4)
   @test is_square_with_sqrt(a)[1]
   @test is_square_with_sqrt(a)[2]^2 == a
