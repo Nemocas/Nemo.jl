@@ -1590,8 +1590,7 @@ end
 #
 ###############################################################################
 
-Solve.matrix_normal_form_type(::ZZRing) = Solve.HermiteFormTrait()
-Solve.matrix_normal_form_type(::ZZMatrix) = Solve.HermiteFormTrait()
+Solve.matrix_normal_form_type(::Type{ZZRing}) = Solve.HermiteFormTrait()
 
 function Solve._can_solve_internal_no_check(::Solve.HermiteFormTrait, A::ZZMatrix, b::ZZMatrix, task::Symbol; side::Symbol = :left)
   if side === :left
