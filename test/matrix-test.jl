@@ -227,6 +227,10 @@ end
     @test PA isa typeof(A) && AQ isa typeof(A)
     @test all(PA[P[i], j] == A[i, j] for i in 1:3, j in 1:4)
     @test all(AQ[i, Q[j]] == A[i, j] for i in 1:3, j in 1:4)
+
+    # the degree of the permutation has to match
+    @test_throws DimensionMismatch Q * A
+    @test_throws DimensionMismatch A * P
   end
 end
 

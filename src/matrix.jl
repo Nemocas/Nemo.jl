@@ -445,8 +445,11 @@ end
 #
 ###############################################################################
 
-# Unfortunately, there is no fmpq_mat_set_perm etc. in flint
+# Unfortunately, there is no fmpq_mat_set_perm etc. in flint.
+# The loops run without bounds checks, which is only safe if the degree of `P`
+# is the number of rows or columns it permutes.
 function *(P::Perm, x::FlintMatElem)
+  length(P.d) == nrows(x) || throw(DimensionMismatch("permutation of degree $(length(P.d)) cannot act on $(nrows(x)) rows"))
   z = similar(x)
   t = base_ring(x)()
   @inbounds for i = 1:nrows(x)
@@ -458,6 +461,7 @@ function *(P::Perm, x::FlintMatElem)
 end
 
 function *(x::FlintMatElem, P::Perm)
+  length(P.d) == ncols(x) || throw(DimensionMismatch("permutation of degree $(length(P.d)) cannot act on $(ncols(x)) columns"))
   z = similar(x)
   t = base_ring(x)()
   @inbounds for i = 1:nrows(x)
