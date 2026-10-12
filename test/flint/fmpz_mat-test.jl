@@ -883,7 +883,9 @@ end
   L_triang = matrix(ZZ, 3, 3, [1,0,0, 2,3,0, 4,5,6])
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(ZZ) === AbstractAlgebra.Solve.HermiteFormTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(ZZ)) === AbstractAlgebra.Solve.HermiteFormTrait()
   @test AbstractAlgebra.Solve.matrix_normal_form_type(U_triang) === AbstractAlgebra.Solve.HermiteFormTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(U_triang)) === AbstractAlgebra.Solve.HermiteFormTrait()
   @test AbstractAlgebra.Solve.matrix_normal_form_type(L_triang) === AbstractAlgebra.Solve.HermiteFormTrait()
 
   X = matrix(ZZ, 3, 2, [3,1, 4,1, 5,9])
@@ -944,7 +946,9 @@ end
 
   C = solve_init(A)
   @test C isa AbstractAlgebra.solve_context_type(ZZ)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(ZZ))
   @test C isa AbstractAlgebra.solve_context_type(A)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.HermiteFormTrait()
   @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.HermiteFormTrait(), ZZRingElem)

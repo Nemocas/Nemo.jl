@@ -421,3 +421,22 @@ end
   @test !Nemo.is_cyclo_type(k)
   @test Nemo.is_maxreal_type(k)
 end
+
+@testset "AbsSimpleNumFieldElem.Solve" begin
+  R, x = polynomial_ring(QQ, :x)
+  K, a = number_field(x^3 + 3x + 1, :a)
+  A = matrix(K, [1 a; a^2 1])
+
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(K) === AbstractAlgebra.Solve.FFLUTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(K)) === AbstractAlgebra.Solve.FFLUTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(A) === AbstractAlgebra.Solve.FFLUTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(A)) === AbstractAlgebra.Solve.FFLUTrait()
+
+  C = solve_init(A)
+  @test C isa AbstractAlgebra.solve_context_type(K)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(K))
+  @test C isa AbstractAlgebra.solve_context_type(A)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.LUTrait()
+  @test solve(C, [K(1), a]) == solve(A, [K(1), a])
+end
