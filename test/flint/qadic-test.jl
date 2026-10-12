@@ -424,6 +424,7 @@ end
 
   a = 1 + 2^3 + 2^4 + O(R, 2^10)
   @test is_square_with_sqrt(a)[2]^2 == a
+  @test precision(is_square_with_sqrt(a)[2]) == 9
 
   @test !is_square(R(2))
   @test !is_square(R(3))
