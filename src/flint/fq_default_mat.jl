@@ -33,16 +33,21 @@ end
   return z
 end
 
-# A `Ptr` has no parent to coerce from, so it must point to an element of `K`.
-_coerce_entry(K::FqField, u::FqFieldElem) = K(u)
-_coerce_entry(K::FqField, u::Ref{FqFieldElem}) = K(u[]::FqFieldElem)
-_coerce_entry(::FqField, u::Ptr{FqFieldElem}) = u
-
-@inline function setindex!(a::FqMatrix, u::TypeOrPtr{FqFieldElem}, i::Int, j::Int)
+@inline function setindex!(a::FqMatrix, u::FqFieldElem, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
-  uu = _coerce_entry(base_ring(a), u)
+  uu = base_ring(a)(u)
   @ccall libflint.fq_default_mat_entry_set(
     a::Ref{FqMatrix}, (i-1)::Int, (j-1)::Int, uu::Ref{FqFieldElem}, base_ring(a)::Ref{FqField}
+  )::Nothing
+end
+
+@inline setindex!(a::FqMatrix, u::Ref{FqFieldElem}, i::Int, j::Int) = setindex!(a, u[], i, j)
+
+# must point to an element of `base_ring(a)`
+@inline function setindex!(a::FqMatrix, u::Ptr{FqFieldElem}, i::Int, j::Int)
+  @boundscheck _checkbounds(a, i, j)
+  @ccall libflint.fq_default_mat_entry_set(
+    a::Ref{FqMatrix}, (i-1)::Int, (j-1)::Int, u::Ref{FqFieldElem}, base_ring(a)::Ref{FqField}
   )::Nothing
 end
 
