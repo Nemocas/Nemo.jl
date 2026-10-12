@@ -88,10 +88,6 @@ function setindex!(a::QQMatrix, b::QQMatrix, r::UnitRange{Int64}, c::UnitRange{I
   set!(A, b)
 end
 
-number_of_rows(a::QQMatrix) = a.r
-
-number_of_columns(a::QQMatrix) = a.c
-
 iszero(a::QQMatrix) = @ccall libflint.fmpq_mat_is_zero(a::Ref{QQMatrix})::Bool
 
 function isone(a::QQMatrix)
@@ -1058,7 +1054,7 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::QQMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(QQFieldElem)
+_entry_size(::Type{QQMatrix}) = sizeof(QQFieldElem)
 
 ################################################################################
 #

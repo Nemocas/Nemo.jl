@@ -61,10 +61,6 @@ function one(x::RealMatrixSpace)
   return one!(x())
 end
 
-number_of_rows(a::RealMatrix) = a.r
-
-number_of_columns(a::RealMatrix) = a.c
-
 function deepcopy_internal(x::RealMatrix, dict::IdDict)
   z = RealMatrix(nrows(x), ncols(x))
   @ccall libflint.arb_mat_set(z::Ref{RealMatrix}, x::Ref{RealMatrix})::Nothing
@@ -735,8 +731,7 @@ end
 #
 ################################################################################
 
-@inline mat_entry_ptr(A::RealMatrix, i::Int, j::Int) = 
-@ccall libflint.arb_mat_entry_ptr(A::Ref{RealMatrix}, (i-1)::Int, (j-1)::Int)::Ptr{RealFieldElem}
+_entry_size(::Type{RealMatrix}) = sizeof(arb_struct)
 
 ###############################################################################
 #

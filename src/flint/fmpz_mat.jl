@@ -105,10 +105,6 @@ function setindex!(a::ZZMatrix, b::ZZMatrix, r::UnitRange{Int64}, c::UnitRange{I
   set!(A, b)
 end
 
-@inline number_of_rows(a::ZZMatrix) = a.r
-
-@inline number_of_columns(a::ZZMatrix) = a.c
-
 iszero(a::ZZMatrix) = @ccall libflint.fmpz_mat_is_zero(a::Ref{ZZMatrix})::Bool
 
 function isone(a::ZZMatrix)
@@ -2443,4 +2439,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::ZZMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(ZZRingElem)
+_entry_size(::Type{ZZMatrix}) = sizeof(ZZRingElem)

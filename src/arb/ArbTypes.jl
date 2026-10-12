@@ -775,11 +775,11 @@ base_ring(a::AcbPolyRing) = a.base_ring
 
 const RealMatrixSpace = AbstractAlgebra.Generic.MatSpace{RealFieldElem}
 
-mutable struct RealMatrix <: MatElem{RealFieldElem}
-  entries::Ptr{Nothing}
+mutable struct RealMatrix <: FlintMatElem{RealFieldElem}
+  entries::Ptr{RealFieldElem}
   r::Int
   c::Int
-  rows::Ptr{Nothing}
+  stride::Int
   #base_ring::ArbField
 
   # MatElem interface
@@ -863,11 +863,11 @@ end
 
 const ArbMatrixSpace = AbstractAlgebra.Generic.MatSpace{ArbFieldElem}
 
-mutable struct ArbMatrix <: MatElem{ArbFieldElem}
-  entries::Ptr{Nothing}
+mutable struct ArbMatrix <: FlintMatElem{ArbFieldElem}
+  entries::Ptr{ArbFieldElem}
   r::Int
   c::Int
-  rows::Ptr{Nothing}
+  stride::Int
   base_ring::ArbField
 
   # MatElem interface
@@ -959,11 +959,11 @@ end
 
 const ComplexMatrixSpace = AbstractAlgebra.Generic.MatSpace{ComplexFieldElem}
 
-mutable struct ComplexMatrix <: MatElem{ComplexFieldElem}
-  entries::Ptr{Nothing}
+mutable struct ComplexMatrix <: FlintMatElem{ComplexFieldElem}
+  entries::Ptr{ComplexFieldElem}
   r::Int
   c::Int
-  rows::Ptr{Nothing}
+  stride::Int
   #base_ring::AcbField
 
   # MatElem interface
@@ -1147,11 +1147,11 @@ end
 
 const AcbMatrixSpace = AbstractAlgebra.Generic.MatSpace{AcbFieldElem}
 
-mutable struct AcbMatrix <: MatElem{AcbFieldElem}
-  entries::Ptr{Nothing}
+mutable struct AcbMatrix <: FlintMatElem{AcbFieldElem}
+  entries::Ptr{AcbFieldElem}
   r::Int
   c::Int
-  rows::Ptr{Nothing}
+  stride::Int
   base_ring::AcbField
 
   # MatElem interface

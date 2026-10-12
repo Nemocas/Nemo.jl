@@ -418,6 +418,18 @@ end
   C = transpose(A)*A
 
   @test transpose(C) == C
+
+  D = ZZ[1 2; 3 4]
+  E = ZZ[1 2 3; 4 5 6]
+  GC.@preserve D E begin
+    for (d, e) in ((D, E), (Ref(D), Ref(E)),
+                   (Ptr{ZZMatrix}(pointer_from_objref(D)), Ptr{ZZMatrix}(pointer_from_objref(E))))
+      set!(D, ZZ[1 2; 3 4])
+      @test transpose!(d) === d
+      @test D == ZZ[1 3; 2 4]
+      @test_throws ArgumentError transpose!(e)
+    end
+  end
 end
 
 @testset "ZZMatrix.row_col_swapping" begin

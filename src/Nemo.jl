@@ -487,6 +487,16 @@ const TypeOrPtr{T} = Union{T, Ref{T}, Ptr{T}} where T
 
 ###############################################################################
 #
+#   Matrices wrapping a FLINT matrix struct
+#
+###############################################################################
+
+# Every subtype starts with the fields `entries`, `r`, `c`, `stride` of the
+# FLINT struct it wraps.
+abstract type FlintMatElem{T} <: MatElem{T} end
+
+###############################################################################
+#
 #   Load Nemo Rings/Fields/etc
 #
 ###############################################################################
@@ -533,7 +543,7 @@ include("julia/Float.jl")
 #
 ################################################################################
 
-function Base.summary(io::IO, A::T) where {T <: _MatTypes}
+function Base.summary(io::IO, A::T) where {T <: FlintMatElem}
   print(io, nrows(A), "x", ncols(A), " ", T)
 end
 

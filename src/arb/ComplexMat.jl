@@ -73,10 +73,6 @@ function one(x::ComplexMatrixSpace)
   return one!(x())
 end
 
-number_of_rows(a::ComplexMatrix) = a.r
-
-number_of_columns(a::ComplexMatrix) = a.c
-
 function deepcopy_internal(x::ComplexMatrix, dict::IdDict)
   z = similar(x)
   @ccall libflint.acb_mat_set(z::Ref{ComplexMatrix}, x::Ref{ComplexMatrix})::Nothing
@@ -796,8 +792,7 @@ end
 #
 ################################################################################
 
-@inline mat_entry_ptr(A::ComplexMatrix, i::Int, j::Int) = 
-@ccall libflint.acb_mat_entry_ptr(A::Ref{ComplexMatrix}, (i-1)::Int, (j-1)::Int)::Ptr{ComplexFieldElem}
+_entry_size(::Type{ComplexMatrix}) = sizeof(acb_struct)
 
 
 
