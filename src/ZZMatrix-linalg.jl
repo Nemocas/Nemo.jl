@@ -956,11 +956,8 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
       GC.enable(false)
     end
   end
-  mu = vcat([_to_base!(t, m) for t = allV]...)
-  tau = _induce_rational_reconstruction(mu, m^(2*ex); unbalanced = true)
-  @assert tau[1]
   GC.enable(GC_d)
-  return tau[2], tau[3]
+  error("UniCertSolve failed to find a solution")
 end
 
 #inplace conversion
