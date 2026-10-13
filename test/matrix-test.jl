@@ -243,8 +243,6 @@ end
 
   for A in vcat(mats, views)
     GC.@preserve A begin
-      @test Nemo.mat_entry_ptr(A, 2, 2) == view(A, 2:2, 2:2).entries
-
       for a in (Ref(A), Ptr{typeof(A)}(pointer_from_objref(A)))
         @test nrows(a) == nrows(A)
         @test ncols(a) == ncols(A)
@@ -319,5 +317,48 @@ end
     V = view(deepcopy(A0), 2:3, 2:4)
     GC.gc()
     @test V == A0[2:3, 2:4]
+  end
+end
+
+# FLINT's `*_mat_window_init`, zero based as in C
+for (T, f) in ((ZZMatrix, :fmpz_mat_window_init), (QQMatrix, :fmpq_mat_window_init),
+               (zzModMatrix, :nmod_mat_window_init), (fpMatrix, :nmod_mat_window_init),
+               (RealMatrix, :arb_mat_window_init), (ArbMatrix, :arb_mat_window_init),
+               (ComplexMatrix, :acb_mat_window_init), (AcbMatrix, :acb_mat_window_init),
+               (Nemo.ZZPolyRingMatrix, :fmpz_poly_mat_window_init))
+  @eval function flint_window_init!(W::$T, A::$T, r1::Int, c1::Int, r2::Int, c2::Int)
+    @ccall Nemo.libflint.$f(W::Ref{$T}, A::Ref{$T}, r1::Int, c1::Int, r2::Int, c2::Int)::Nothing
+  end
+end
+
+for (T, f, C, ctx) in ((ZZModMatrix, :fmpz_mod_mat_window_init, Nemo.fmpz_mod_ctx_struct, :(base_ring(A).ninv)),
+                       (FpMatrix, :fmpz_mod_mat_window_init, Nemo.fmpz_mod_ctx_struct, :(base_ring(A).ninv)),
+                       (fqPolyRepMatrix, :fq_nmod_mat_window_init, fqPolyRepField, :(base_ring(A))),
+                       (FqPolyRepMatrix, :fq_mat_window_init, FqPolyRepField, :(base_ring(A))),
+                       (FqMatrix, :fq_default_mat_window_init, FqField, :(base_ring(A))))
+  @eval function flint_window_init!(W::$T, A::$T, r1::Int, c1::Int, r2::Int, c2::Int)
+    @ccall Nemo.libflint.$f(W::Ref{$T}, A::Ref{$T}, r1::Int, c1::Int, r2::Int, c2::Int, $ctx::Ref{$C})::Nothing
+  end
+end
+
+# the first `k` words of the FLINT struct of `A`
+struct_words(A, k) = GC.@preserve A [unsafe_load(Ptr{UInt}(pointer_from_objref(A)), i) for i in 1:k]
+
+# A view has no finalizer, which is right only while a FLINT window owns no
+# memory: `*_mat_window_init` must set up nothing but the struct `view` builds.
+@testset "Views are FLINT windows" begin
+  for A in flint_mat_examples()
+    # an nmod_mat has its modulus after `entries, r, c, stride`
+    nmod = A isa Union{zzModMatrix, fpMatrix} ||
+           (A isa FqMatrix && Nemo._fq_default_ctx_type(base_ring(A)) == Nemo._FQ_DEFAULT_NMOD)
+    k = nmod ? 7 : 4
+
+    # the stride of `B` differs from its number of columns
+    B = view(A, 2:3, 2:4)
+    for (M, r, c) in ((A, 2:3, 2:4), (A, 1:3, 1:4), (B, 2:2, 2:3))
+      W = typeof(M)()
+      flint_window_init!(W, M, first(r) - 1, first(c) - 1, last(r), last(c))
+      @test struct_words(W, k) == struct_words(view(M, r, c), k)
+    end
   end
 end
