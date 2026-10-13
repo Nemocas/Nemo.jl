@@ -344,8 +344,9 @@ end
 # the first `k` words of the FLINT struct of `A`
 struct_words(A, k) = GC.@preserve A [unsafe_load(Ptr{UInt}(pointer_from_objref(A)), i) for i in 1:k]
 
-# A view has no finalizer, which is right only while a FLINT window owns no
-# memory: `*_mat_window_init` must set up nothing but the struct `view` builds.
+# Nemo builds a view without calling FLINT and gives it no finalizer. This test
+# guards against a future FLINT whose `*_mat_window_init` sets up a different
+# struct, for example one owning memory that `*_mat_window_clear` has to free.
 @testset "Views are FLINT windows" begin
   for A in flint_mat_examples()
     # an nmod_mat has its modulus after `entries, r, c, stride`
