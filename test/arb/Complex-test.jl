@@ -1,6 +1,10 @@
 RR = real_field()
 CC = complex_field()
 
+@testset "ComplexFieldElem.conformance_tests" begin
+  ConformanceTests.test_Field_interface(CC)
+end
+
 @testset "ComplexFieldElem.constructors" begin
   @test complex_field() === CC
   @test isa(CC, ComplexField)

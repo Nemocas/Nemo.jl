@@ -2034,3 +2034,14 @@ function _rand_rational_in_ball(x::RealFieldElem)
   @ccall libflint.arb_get_rand_fmpq(z::Ref{QQFieldElem}, state::Ref{rand_ctx}, x::Ref{RealFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
+
+################################################################################
+#
+#  Conformance test element generation
+#
+################################################################################
+
+# `:randtest_special` is left out: NaN and infinities are not field elements.
+function ConformanceTests.generate_element(R::RealField)
+  return rand(R; randtype=rand((:urandom, :randtest, :randtest_exact, :randtest_precise, :randtest_wide)))
+end

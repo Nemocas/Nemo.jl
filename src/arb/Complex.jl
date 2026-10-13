@@ -1780,3 +1780,14 @@ function rand(r::ComplexField, prec::Int = precision(Balls); randtype::Symbol=:u
 
   return x
 end
+
+################################################################################
+#
+#  Conformance test element generation
+#
+################################################################################
+
+# `:randtest_special` is left out: NaN and infinities are not field elements.
+function ConformanceTests.generate_element(R::ComplexField)
+  return rand(R; randtype=rand((:urandom, :randtest, :randtest_precise, :randtest_param)))
+end

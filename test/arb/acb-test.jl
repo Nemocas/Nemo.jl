@@ -1,6 +1,10 @@
 RR = ArbField(64)
 CC = AcbField(64)
 
+@testset "AcbFieldElem.conformance_tests" begin
+  ConformanceTests.test_Field_interface(CC)
+end
+
 @testset "AcbFieldElem.constructors" begin
   @test isa(CC, AcbField)
   @test isa(CC(2), FieldElem)

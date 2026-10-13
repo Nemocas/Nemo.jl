@@ -1,5 +1,9 @@
 RR = ArbField(64)
 
+@testset "ArbFieldElem.conformance_tests" begin
+  ConformanceTests.test_Field_interface(RR)
+end
+
 @testset "ArbFieldElem.constructors" begin
   @test isa(RR, ArbField)
   @test isa(RR(2), FieldElem)

@@ -1,5 +1,9 @@
 RR = real_field()
 
+@testset "RealFieldElem.conformance_tests" begin
+  ConformanceTests.test_Field_interface(RR)
+end
+
 @testset "RealFieldElem.precision" begin
   old_prec = precision(RealField)
 

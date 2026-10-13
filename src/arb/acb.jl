@@ -1836,3 +1836,14 @@ function rand(r::AcbField; randtype::Symbol=:urandom)
 
   return x
 end
+
+################################################################################
+#
+#  Conformance test element generation
+#
+################################################################################
+
+# `:randtest_special` is left out: NaN and infinities are not field elements.
+function ConformanceTests.generate_element(R::AcbField)
+  return rand(R; randtype=rand((:urandom, :randtest, :randtest_precise, :randtest_param)))
+end
