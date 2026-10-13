@@ -346,6 +346,17 @@ function Base.hash(x::RealFieldElem, h::UInt)
   return h
 end
 
+@doc raw"""
+    isapprox(x::RealFieldElem, y::RealFieldElem; atol::Real=0, rtol::Real=0)
+
+Return `true` if the balls $x$ and $y$ may contain numbers that differ by at
+most `max(atol, rtol*max(abs(x), abs(y)))`. With the default tolerances this
+is `overlaps(x, y)`.
+"""
+function Base.isapprox(x::RealFieldElem, y::RealFieldElem; atol::Real=0, rtol::Real=0)
+  return _isapprox_ball(x, y, atol, rtol)
+end
+
 function ==(x::RealFieldElem, y::RealFieldElem)
   return Bool(@ccall libflint.arb_eq(x::Ref{RealFieldElem}, y::Ref{RealFieldElem})::Cint)
 end

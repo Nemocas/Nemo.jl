@@ -316,6 +316,7 @@ minimum of the precisions of its operands.
 
 ```@docs
 isequal(::ComplexFieldElem, ::ComplexFieldElem)
+isapprox(::ComplexFieldElem, ::ComplexFieldElem)
 ```
 
 A full range of ad hoc comparison operators is provided. These are implemented directly

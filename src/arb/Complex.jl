@@ -296,6 +296,17 @@ function Base.hash(x::ComplexFieldElem, h::UInt)
   return h
 end
 
+@doc raw"""
+    isapprox(x::ComplexFieldElem, y::ComplexFieldElem; atol::Real=0, rtol::Real=0)
+
+Return `true` if the boxes $x$ and $y$ may contain numbers that differ by at
+most `max(atol, rtol*max(abs(x), abs(y)))`. With the default tolerances this
+is `overlaps(x, y)`.
+"""
+function Base.isapprox(x::ComplexFieldElem, y::ComplexFieldElem; atol::Real=0, rtol::Real=0)
+  return _isapprox_ball(x, y, atol, rtol)
+end
+
 function ==(x::ComplexFieldElem, y::ComplexFieldElem)
   r = @ccall libflint.acb_eq(x::Ref{ComplexFieldElem}, y::Ref{ComplexFieldElem})::Cint
   return Bool(r)

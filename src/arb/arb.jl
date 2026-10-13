@@ -351,6 +351,28 @@ function Base.hash(x::ArbFieldElem, h::UInt)
   return h
 end
 
+# Whether the balls or boxes `x` and `y` may be within the given tolerance of
+# each other.
+function _isapprox_ball(x, y, atol::Real, rtol::Real)
+  overlaps(x, y) && return true
+  iszero(atol) && iszero(rtol) && return false
+
+  d = abs(x - y)
+  tol = max(parent(d)(atol), rtol * max(abs(x), abs(y)))
+  return !(d > tol)
+end
+
+@doc raw"""
+    isapprox(x::ArbFieldElem, y::ArbFieldElem; atol::Real=0, rtol::Real=0)
+
+Return `true` if the balls $x$ and $y$ may contain numbers that differ by at
+most `max(atol, rtol*max(abs(x), abs(y)))`. With the default tolerances this
+is `overlaps(x, y)`.
+"""
+function Base.isapprox(x::ArbFieldElem, y::ArbFieldElem; atol::Real=0, rtol::Real=0)
+  return _isapprox_ball(x, y, atol, rtol)
+end
+
 function ==(x::ArbFieldElem, y::ArbFieldElem)
   return Bool(@ccall libflint.arb_eq(x::Ref{ArbFieldElem}, y::Ref{ArbFieldElem})::Cint)
 end
