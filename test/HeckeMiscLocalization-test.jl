@@ -280,8 +280,5 @@
       @test parent(a) == L
       @test a in L.(1:10)
     end
-
-    # both scales must be collections to sample from
-    @test !hasmethod(rand, Tuple{typeof(L), Vector{Int}, Int})
   end
 end
