@@ -1693,7 +1693,7 @@ function _acb_set(x::TypeOrPtr{AcbFieldElem}, yz::Tuple{AbstractString,AbstractS
   _arb_set(i, yz[2], p)
 end
 
-function _acb_set(x::TypeOrPtr{AcbFieldElem}, yz::Tuple{AbstractFloat,AbstractFloat}, p::Int)
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, yz::Tuple{T,T}, p::Int) where {T <: Union{Float64,BigFloat}}
   r = _real_ptr(x)
   _arb_set(r, yz[1], p)
   i = _imag_ptr(x)
