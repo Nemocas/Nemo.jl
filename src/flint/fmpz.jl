@@ -428,11 +428,13 @@ conj(x::ZZRingElem) = x
 #
 ###############################################################################
 
-# Metaprogram to define functions +, -, *, gcd, lcm,
-#                                 &, |, $ (xor)
+for (fJ, fC) in ((:+, :add!), (:-, :sub!), (:*, :mul!))
+  @eval ($fJ)(x::ZZRingElem, y::ZZRingElem) = $fC(ZZRingElem(), x, y)
+end
 
-for (fJ, fC) in ((:+, :add), (:-,:sub), (:*, :mul),
-                 (:&, :and), (:|, :or), (:xor, :xor))
+# Metaprogram to define functions &, |, $ (xor)
+
+for (fJ, fC) in ((:&, :and), (:|, :or), (:xor, :xor))
   @eval begin
     function ($fJ)(x::ZZRingElem, y::ZZRingElem)
       z = ZZRingElem()
@@ -442,17 +444,10 @@ for (fJ, fC) in ((:+, :add), (:-,:sub), (:*, :mul),
   end
 end
 
-# Metaprogram to define functions fdiv, cdiv, tdiv, div
-
-for (fJ, fC) in ((:fdiv, :fdiv_q), (:cdiv, :cdiv_q), (:tdiv, :tdiv_q),
-                 (:div, :fdiv_q))
-  @eval begin
-    function ($fJ)(x::ZZRingElem, y::ZZRingElem)
-      iszero(y) && throw(DivideError())
-      z = ZZRingElem()
-      @ccall libflint.$("fmpz_$fC")(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
-      return z
-    end
+for (fJ, fC) in ((:fdiv, :fdiv!), (:cdiv, :cdiv!), (:tdiv, :tdiv!), (:div, :fdiv!))
+  @eval function ($fJ)(x::ZZRingElem, y::ZZRingElem)
+    iszero(y) && throw(DivideError())
+    return $fC(ZZRingElem(), x, y)
   end
 end
 
@@ -461,9 +456,7 @@ end
 # Here we set Base.div to a version that agrees with Base
 function Base.div(x::ZZRingElem, y::ZZRingElem)
   iszero(y) && throw(DivideError())
-  z = ZZRingElem()
-  @ccall libflint.fmpz_tdiv_q(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
-  return z
+  return tdiv!(ZZRingElem(), x, y)
 end
 
 Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundToZero)) = tdiv(x, y)
