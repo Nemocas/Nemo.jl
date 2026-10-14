@@ -72,9 +72,9 @@ zero(a::fqPolyRepField) = zero!(a())
 
 one(a::fqPolyRepField) = one!(a())
 
-iszero(a::fqPolyRepFieldElem) = @ccall libflint.fq_nmod_is_zero(a::Ref{fqPolyRepFieldElem}, a.parent::Ref{fqPolyRepField})::Bool
+iszero(a::fqPolyRepFieldElem) = @ccall libflint.fq_nmod_is_zero(a::Ref{fqPolyRepFieldElem}, parent(a)::Ref{fqPolyRepField})::Bool
 
-isone(a::fqPolyRepFieldElem) = @ccall libflint.fq_nmod_is_one(a::Ref{fqPolyRepFieldElem}, a.parent::Ref{fqPolyRepField})::Bool
+isone(a::fqPolyRepFieldElem) = @ccall libflint.fq_nmod_is_one(a::Ref{fqPolyRepFieldElem}, parent(a)::Ref{fqPolyRepField})::Bool
 
 function gen(a::fqPolyRepField)
   d = a()
@@ -110,8 +110,8 @@ end
 ###############################################################################
 
 function expressify(a::fqPolyRepFieldElem; context = nothing)
-  x = unsafe_string(reinterpret(Cstring, a.parent.var))
-  d = degree(a.parent)
+  x = unsafe_string(reinterpret(Cstring, parent(a).var))
+  d = degree(parent(a))
 
   sum = Expr(:call, :+)
   for k in (d - 1):-1:0
@@ -183,21 +183,21 @@ pretty_eq(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem) = (x == y)
 function +(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
   check_parent(x, y)
   z = parent(y)()
-  @ccall libflint.fq_nmod_add(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, y.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_add(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, parent(y)::Ref{fqPolyRepField})::Nothing
   return z
 end
 
 function -(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
   check_parent(x, y)
   z = parent(y)()
-  @ccall libflint.fq_nmod_sub(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, y.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_sub(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, parent(y)::Ref{fqPolyRepField})::Nothing
   return z
 end
 
 function *(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
   check_parent(x, y)
   z = parent(y)()
-  @ccall libflint.fq_nmod_mul(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, y.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_mul(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, parent(y)::Ref{fqPolyRepField})::Nothing
   return z
 end
 
@@ -209,7 +209,7 @@ end
 
 function *(x::Int, y::fqPolyRepFieldElem)
   z = parent(y)()
-  @ccall libflint.fq_nmod_mul_si(z::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, x::Int, y.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_mul_si(z::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, x::Int, parent(y)::Ref{fqPolyRepField})::Nothing
   return z
 end
 
@@ -221,7 +221,7 @@ end
 
 function *(x::ZZRingElem, y::fqPolyRepFieldElem)
   z = parent(y)()
-  @ccall libflint.fq_nmod_mul_fmpz(z::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, x::Ref{ZZRingElem}, y.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_mul_fmpz(z::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, x::Ref{ZZRingElem}, parent(y)::Ref{fqPolyRepField})::Nothing
   return z
 end
 
@@ -255,7 +255,7 @@ function ^(x::fqPolyRepFieldElem, y::Int)
     y = -y
   end
   z = parent(x)()
-  @ccall libflint.fq_nmod_pow_ui(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Int, x.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_pow_ui(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Int, parent(x)::Ref{fqPolyRepField})::Nothing
   return z
 end
 
@@ -265,7 +265,7 @@ function ^(x::fqPolyRepFieldElem, y::ZZRingElem)
     y = -y
   end
   z = parent(x)()
-  @ccall libflint.fq_nmod_pow(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{ZZRingElem}, x.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_pow(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{ZZRingElem}, parent(x)::Ref{fqPolyRepField})::Nothing
   return z
 end
 
@@ -277,7 +277,7 @@ end
 
 function ==(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
   check_parent(x, y)
-  @ccall libflint.fq_nmod_equal(x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, y.parent::Ref{fqPolyRepField})::Bool
+  @ccall libflint.fq_nmod_equal(x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, parent(y)::Ref{fqPolyRepField})::Bool
 end
 
 ###############################################################################
@@ -303,7 +303,7 @@ end
 function inv(x::fqPolyRepFieldElem)
   iszero(x) && throw(DivideError())
   z = parent(x)()
-  @ccall libflint.fq_nmod_inv(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, x.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_inv(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, parent(x)::Ref{fqPolyRepField})::Nothing
   return z
 end
 
@@ -317,7 +317,7 @@ function divexact(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem; check::Bool=true
   check_parent(x, y)
   iszero(y) && throw(DivideError())
   z = parent(y)()
-  @ccall libflint.fq_nmod_div(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, y.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_div(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, parent(y)::Ref{fqPolyRepField})::Nothing
   return z
 end
 
@@ -353,36 +353,36 @@ divexact(x::ZZRingElem, y::fqPolyRepFieldElem; check::Bool=true) = divexact(pare
 
 function sqrt(x::fqPolyRepFieldElem; check::Bool=true)
   z = parent(x)()
-  res = Bool(@ccall libflint.fq_nmod_sqrt(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, x.parent::Ref{fqPolyRepField})::Cint)
+  res = Bool(@ccall libflint.fq_nmod_sqrt(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, parent(x)::Ref{fqPolyRepField})::Cint)
   check && !res && error("Not a square")
   return z
 end
 
 function is_square(x::fqPolyRepFieldElem)
-  return Bool(@ccall libflint.fq_nmod_is_square(x::Ref{fqPolyRepFieldElem}, x.parent::Ref{fqPolyRepField})::Cint)
+  return Bool(@ccall libflint.fq_nmod_is_square(x::Ref{fqPolyRepFieldElem}, parent(x)::Ref{fqPolyRepField})::Cint)
 end
 
 function is_square_with_sqrt(x::fqPolyRepFieldElem)
   z = parent(x)()
-  flag = @ccall libflint.fq_nmod_sqrt(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, x.parent::Ref{fqPolyRepField})::Cint
+  flag = @ccall libflint.fq_nmod_sqrt(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, parent(x)::Ref{fqPolyRepField})::Cint
   return (Bool(flag), z)
 end
 
 function pth_root(x::fqPolyRepFieldElem)
   z = parent(x)()
-  @ccall libflint.fq_nmod_pth_root(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, x.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_pth_root(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, parent(x)::Ref{fqPolyRepField})::Nothing
   return z
 end
 
 function tr(x::fqPolyRepFieldElem)
   z = ZZRingElem()
-  @ccall libflint.fq_nmod_trace(z::Ref{ZZRingElem}, x::Ref{fqPolyRepFieldElem}, x.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_trace(z::Ref{ZZRingElem}, x::Ref{fqPolyRepFieldElem}, parent(x)::Ref{fqPolyRepField})::Nothing
   return parent(x)(z)
 end
 
 function norm(x::fqPolyRepFieldElem)
   z = ZZRingElem()
-  @ccall libflint.fq_nmod_norm(z::Ref{ZZRingElem}, x::Ref{fqPolyRepFieldElem}, x.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_norm(z::Ref{ZZRingElem}, x::Ref{fqPolyRepFieldElem}, parent(x)::Ref{fqPolyRepField})::Nothing
   return parent(x)(z)
 end
 
@@ -424,17 +424,17 @@ end
 ###############################################################################
 
 function zero!(z::fqPolyRepFieldElem)
-  @ccall libflint.fq_nmod_zero(z::Ref{fqPolyRepFieldElem}, z.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_zero(z::Ref{fqPolyRepFieldElem}, parent(z)::Ref{fqPolyRepField})::Nothing
   return z
 end
 
 function one!(z::fqPolyRepFieldElem)
-  @ccall libflint.fq_nmod_one(z::Ref{fqPolyRepFieldElem}, z.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_one(z::Ref{fqPolyRepFieldElem}, parent(z)::Ref{fqPolyRepField})::Nothing
   return z
 end
 
 function neg!(z::fqPolyRepFieldElem, a::fqPolyRepFieldElem)
-  @ccall libflint.fq_nmod_neg(z::Ref{fqPolyRepFieldElem}, a::Ref{fqPolyRepFieldElem}, a.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_neg(z::Ref{fqPolyRepFieldElem}, a::Ref{fqPolyRepFieldElem}, parent(a)::Ref{fqPolyRepField})::Nothing
   return z
 end
 
@@ -469,12 +469,12 @@ function set!(z::fqPolyRepFieldElem, x::TypeOrPtr{zzModPolyRingElem})
 end
 
 function mul!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
-  @ccall libflint.fq_nmod_mul(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, y.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_mul(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, parent(y)::Ref{fqPolyRepField})::Nothing
   return z
 end
 
 function add!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
-  @ccall libflint.fq_nmod_add(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, x.parent::Ref{fqPolyRepField})::Nothing
+  @ccall libflint.fq_nmod_add(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, parent(x)::Ref{fqPolyRepField})::Nothing
   return z
 end
 
