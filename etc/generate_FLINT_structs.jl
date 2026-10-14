@@ -84,9 +84,9 @@ end
 
 function convert_union(str::AbstractString)
   substitutions = Pair{Regex,Union{SubstitutionString,Function}}[
-    regex_typedef_union_values_name => s"struct \2\n  uniondata::NTuple{maximum(sizeof, (\1  )), UInt8}\nend",                                 # whole typedef union construct
-    regex_union_unionname_values => s"struct union_\1\n  uniondata::NTuple{maximum(sizeof, (\2  )), UInt8}\nend",                             # whole union construct
-    regex_typedef_union_unionname_values_name => s"struct \3\n  uniondata::NTuple{maximum(sizeof, (\2  )), UInt8}\nend\nconst union_\1 = \3", # whole typedef union construct with two names
+    regex_typedef_union_values_name => s"struct \2\n  uniondata::NTuple{cld(maximum(sizeof, (\1  )), sizeof(UInt)), UInt}\nend",                                 # whole typedef union construct
+    regex_union_unionname_values => s"struct union_\1\n  uniondata::NTuple{cld(maximum(sizeof, (\2  )), sizeof(UInt)), UInt}\nend",                             # whole union construct
+    regex_typedef_union_unionname_values_name => s"struct \3\n  uniondata::NTuple{cld(maximum(sizeof, (\2  )), sizeof(UInt)), UInt}\nend\nconst union_\1 = \3", # whole typedef union construct with two names
     r"^ +([a-z_]+) +([A-Za-z0-9_]+);"m => s"    \1,",
   ]
   for substitution in substitutions
