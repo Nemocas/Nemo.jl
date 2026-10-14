@@ -95,6 +95,21 @@ function convert_union(str::AbstractString)
   return str
 end
 
+# `ulong` and `slong` are platform dependent in flint.h and defined by hand in the template
+const ignored_constructs = r"^typedef .* (ulong|slong);$"
+
+# Every type construct in the header must be covered by some match,
+# otherwise a FLINT change would silently drop a type.
+function check_all_constructs_matched(str::String, matches::Vector{RegexMatch})
+  covered = [m.offset:(m.offset + ncodeunits(m.match) - 1) for m in matches]
+  unmatched = String[]
+  for m in eachmatch(r"^(typedef|struct|enum|union)\b.*$"m, str)
+    occursin(ignored_constructs, m.match) && continue
+    any(r -> m.offset in r, covered) || push!(unmatched, m.match)
+  end
+  isempty(unmatched) || error("Unhandled constructs:\n" * join(unmatched, "\n"))
+end
+
 function c2julia(str::String)
   preprocessing = Pair{Regex,String}[
     r"^//(.*)$"m => "",                     # remove line comment
@@ -134,9 +149,9 @@ function c2julia(str::String)
     r"^#define +([A-Za-z_]+) +\(([A-Za-z0-9+*() ]+)\) *$"m => s"const \1 = \2",   # defines of more complex constants
   ]
   combined_regex = Regex(join(map(re -> re.pattern, first.(substitutions)), "|"), "m")
-  output = join(
-    map(m -> replace(m.match, substitutions...), eachmatch(combined_regex, str)), "\n\n"
-  )
+  matches = collect(eachmatch(combined_regex, str))
+  check_all_constructs_matched(str, matches)
+  output = join(map(m -> replace(m.match, substitutions...), matches), "\n\n")
   output = replace(output, r"\h*\n" => "\n") # remove trailing whitespace
   return output
 end
