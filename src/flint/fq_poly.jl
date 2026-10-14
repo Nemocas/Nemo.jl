@@ -104,24 +104,18 @@ end
 ################################################################################
 
 function +(x::FqPolyRepPolyRingElem, y::FqPolyRepPolyRingElem)
-  check_parent(x,y)
-  z = parent(x)()
-  @ccall libflint.fq_poly_add(z::Ref{FqPolyRepPolyRingElem}, x::Ref{FqPolyRepPolyRingElem}, y::Ref{FqPolyRepPolyRingElem}, base_ring(parent(x))::Ref{FqPolyRepField})::Nothing
-  return z
+  check_parent(x, y)
+  return add!(parent(x)(), x, y)
 end
 
 function -(x::FqPolyRepPolyRingElem, y::FqPolyRepPolyRingElem)
-  check_parent(x,y)
-  z = parent(x)()
-  @ccall libflint.fq_poly_sub(z::Ref{FqPolyRepPolyRingElem}, x::Ref{FqPolyRepPolyRingElem}, y::Ref{FqPolyRepPolyRingElem}, base_ring(parent(x))::Ref{FqPolyRepField})::Nothing
-  return z
+  check_parent(x, y)
+  return sub!(parent(x)(), x, y)
 end
 
 function *(x::FqPolyRepPolyRingElem, y::FqPolyRepPolyRingElem)
-  check_parent(x,y)
-  z = parent(x)()
-  @ccall libflint.fq_poly_mul(z::Ref{FqPolyRepPolyRingElem}, x::Ref{FqPolyRepPolyRingElem}, y::Ref{FqPolyRepPolyRingElem}, base_ring(parent(x))::Ref{FqPolyRepField})::Nothing
-  return z
+  check_parent(x, y)
+  return mul!(parent(x)(), x, y)
 end
 
 ################################################################################
