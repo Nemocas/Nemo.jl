@@ -40,11 +40,6 @@ function set_length!(x::T, n::Int) where {T <: Zmodn_fmpz_poly}
   return x
 end
 
-function degree(x::T) where {T <: Zmodn_fmpz_poly}
-  return x.length - 1
-  #   return @ccall libflint.fmpz_mod_poly_degree(x::Ref{T}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Int
-end
-
 function coeff(x::T, n::Int) where {T <: Zmodn_fmpz_poly}
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   z = ZZRingElem()

@@ -59,8 +59,6 @@ function set_length!(x::T, n::Int) where {T <: Zmodn_poly}
   return x
 end
 
-degree(x::T) where T <: Zmodn_poly = @ccall libflint.nmod_poly_degree(x::Ref{T})::Int
-
 function coeff(x::T, n::Int) where T <: Zmodn_poly
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   return base_ring(x)(@ccall libflint.nmod_poly_get_coeff_ui(x::Ref{T}, n::Int)::UInt)
