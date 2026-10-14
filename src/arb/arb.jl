@@ -632,14 +632,8 @@ Base.signbit(x::ArbFieldElem) = signbit(sign(Int, x))
 #
 ################################################################################
 
-for (s,f) in ((:+,"arb_add"), (:*,"arb_mul"), (://, "arb_div"), (:-,"arb_sub"))
-  @eval begin
-    function ($s)(x::ArbFieldElem, y::ArbFieldElem)
-      z = parent(x)()
-      @ccall libflint.$f(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, y::Ref{ArbFieldElem}, precision(parent(x))::Int)::Nothing
-      return z
-    end
-  end
+for (f, s) in ((:+, :add!), (:-, :sub!), (:*, :mul!), (://, :div!))
+  @eval ($f)(x::ArbFieldElem, y::ArbFieldElem) = $s(parent(x)(), x, y)
 end
 
 for (f,s) in ((:+, "add"), (:*, "mul"))
