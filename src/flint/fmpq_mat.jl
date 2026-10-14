@@ -142,16 +142,6 @@ end
 #
 ################################################################################
 
-function transpose(a::QQMatrix)
-  z = similar(a, ncols(a), nrows(a))
-  return transpose!(z, a)
-end
-
-function transpose!(a::QQMatrixOrPtr)
-  @req is_square(a) "Matrix must be a square matrix"
-  return transpose!(a, a)
-end
-
 function transpose!(z::QQMatrixOrPtr, a::QQMatrixOrPtr)
   @ccall libflint.fmpq_mat_transpose(z::Ref{QQMatrix}, a::Ref{QQMatrix})::Nothing
   return z

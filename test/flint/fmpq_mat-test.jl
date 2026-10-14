@@ -459,12 +459,12 @@ end
   D = QQ[1 2; 3 4]
   E = QQ[1 2 3; 4 5 6]
   GC.@preserve D E begin
-    for (d, e) in ((Ref(D), Ref(E)),
+    for (d, e) in ((D, E), (Ref(D), Ref(E)),
                    (Ptr{QQMatrix}(pointer_from_objref(D)), Ptr{QQMatrix}(pointer_from_objref(E))))
       set!(D, QQ[1 2; 3 4])
       @test transpose!(d) === d
       @test D == QQ[1 3; 2 4]
-      @test_throws ArgumentError transpose!(e)
+      @test_throws DomainError transpose!(e)
     end
   end
 end

@@ -445,7 +445,7 @@ end
       set!(D, ZZ[1 2; 3 4])
       @test transpose!(d) === d
       @test D == ZZ[1 3; 2 4]
-      @test_throws ArgumentError transpose!(e)
+      @test_throws DomainError transpose!(e)
     end
   end
 end

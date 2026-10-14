@@ -178,6 +178,22 @@ end
   C = transpose(A)*A
 
   @test overlaps(transpose(C), C)
+
+  E = matrix(RR, [1 2 3; 4 5 6])
+  Z = similar(E, 3, 2)
+  @test transpose!(Z, E) === Z
+  @test Z == matrix(RR, [1 4; 2 5; 3 6])
+
+  D = matrix(RR, [1 2; 3 4])
+  GC.@preserve D E begin
+    for (d, e) in ((D, E), (Ref(D), Ref(E)),
+                   (Ptr{RealMatrix}(pointer_from_objref(D)), Ptr{RealMatrix}(pointer_from_objref(E))))
+      @test transpose!(d) === d
+      @test D == matrix(RR, [1 3; 2 4])
+      transpose!(D)
+      @test_throws DomainError transpose!(e)
+    end
+  end
 end
 
 @testset "RealMatrix.binary_ops" begin

@@ -111,16 +111,6 @@ isequal(a::FqPolyRepMatrix, b::FqPolyRepMatrix) = ==(a, b)
 #
 ################################################################################
 
-function transpose(a::FqPolyRepMatrix)
-  z = similar(a, ncols(a), nrows(a))
-  return transpose!(z, a)
-end
-
-function transpose!(a::FqPolyRepMatrix)
-  check_square(a)
-  return transpose!(a, a)
-end
-
 function transpose!(z::FqPolyRepMatrix, a::FqPolyRepMatrix)
   @ccall libflint.fq_mat_transpose(z::Ref{FqPolyRepMatrix}, a::Ref{FqPolyRepMatrix}, base_ring(a)::Ref{FqPolyRepField})::Nothing
   return z

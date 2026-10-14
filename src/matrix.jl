@@ -200,6 +200,25 @@ end
 
 ################################################################################
 #
+#  Transpose
+#
+################################################################################
+
+# Each type implements `transpose!(z, a)`. AbstractAlgebra's
+# `transpose(::MatElem)` calls `similar(::Ring, ::Int, ::Int)`, which has no
+# method, and its `transpose!(::MatElem)` does not take a `Ref` or `Ptr`.
+function transpose(a::FlintMatElem)
+  z = similar(a, ncols(a), nrows(a))
+  return transpose!(z, a)
+end
+
+function transpose!(a::Union{Ref{T}, Ptr{T}}) where {T <: FlintMatElem}
+  is_square(a) || throw(DomainError(a, "Argument must be a square matrix"))
+  return transpose!(a, a)
+end
+
+################################################################################
+#
 #  (No) lazy transpose
 #
 ################################################################################

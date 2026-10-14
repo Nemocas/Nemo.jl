@@ -144,16 +144,6 @@ end
 #
 ################################################################################
 
-function transpose(a::ZZMatrix)
-  z = similar(a, ncols(a), nrows(a))
-  return transpose!(z, a)
-end
-
-function transpose!(a::ZZMatrixOrPtr)
-  @req is_square(a) "Matrix must be a square matrix"
-  return transpose!(a, a)
-end
-
 function transpose!(z::ZZMatrixOrPtr, a::ZZMatrixOrPtr)
   @ccall libflint.fmpz_mat_transpose(z::Ref{ZZMatrix}, a::Ref{ZZMatrix})::Nothing
   return z

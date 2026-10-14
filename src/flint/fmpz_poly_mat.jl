@@ -173,8 +173,7 @@ end
 #
 ###############################################################################
 
-function transpose(a::ZZPolyRingMatrix)
-  z = similar(a, ncols(a), nrows(a))
+function transpose!(z::ZZPolyRingMatrixOrPtr, a::ZZPolyRingMatrixOrPtr)
   @ccall libflint.fmpz_poly_mat_transpose(z::Ref{ZZPolyRingMatrix}, a::Ref{ZZPolyRingMatrix})::Nothing
   return z
 end

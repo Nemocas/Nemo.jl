@@ -114,16 +114,6 @@ isequal(a::FqMatrix, b::FqMatrix) = ==(a, b)
 #
 ################################################################################
 
-function transpose(a::FqMatrix)
-  z = similar(a, ncols(a), nrows(a))
-  return transpose!(z, a)
-end
-
-function transpose!(a::FqMatrix)
-  check_square(a)
-  return transpose!(a, a)
-end
-
 function transpose!(z::FqMatrix, a::FqMatrix)
   @ccall libflint.fq_default_mat_transpose(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
   return z

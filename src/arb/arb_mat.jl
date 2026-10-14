@@ -83,8 +83,7 @@ end
 #
 ################################################################################
 
-function transpose(x::ArbMatrix)
-  z = similar(x, ncols(x), nrows(x))
+function transpose!(z::ArbMatrixOrPtr, x::ArbMatrixOrPtr)
   @ccall libflint.arb_mat_transpose(z::Ref{ArbMatrix}, x::Ref{ArbMatrix})::Nothing
   return z
 end
