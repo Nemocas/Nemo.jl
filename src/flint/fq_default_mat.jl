@@ -99,7 +99,7 @@ end
 ################################################################################
 
 function ==(a::FqMatrix, b::FqMatrix)
-  if !(a.base_ring == b.base_ring)
+  if !(base_ring(a) == base_ring(b))
     return false
   end
   r = @ccall libflint.fq_default_mat_equal(a::Ref{FqMatrix}, b::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Cint

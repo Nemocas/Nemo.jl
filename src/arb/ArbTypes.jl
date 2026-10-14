@@ -793,13 +793,13 @@ mutable struct RealMatrix <: FlintMatElem{RealFieldElem}
   end
 
   function RealMatrix(a::ZZMatrix)
-    z = RealMatrix(a.r, a.c)
+    z = RealMatrix(nrows(a), ncols(a))
     @ccall libflint.arb_mat_set_fmpz_mat(z::Ref{RealMatrix}, a::Ref{ZZMatrix})::Nothing
     return z
   end
 
   function RealMatrix(a::ZZMatrix, prec::Int)
-    z = RealMatrix(a.r, a.c)
+    z = RealMatrix(nrows(a), ncols(a))
     @ccall libflint.arb_mat_set_round_fmpz_mat(z::Ref{RealMatrix}, a::Ref{ZZMatrix}, prec::Int)::Nothing
     return z
   end
@@ -849,7 +849,7 @@ mutable struct RealMatrix <: FlintMatElem{RealFieldElem}
   end
 
   function RealMatrix(a::QQMatrix, prec::Int)
-    z = RealMatrix(a.r, a.c)
+    z = RealMatrix(nrows(a), ncols(a))
     @ccall libflint.arb_mat_set_fmpq_mat(z::Ref{RealMatrix}, a::Ref{QQMatrix}, prec::Int)::Nothing
     return z
   end
@@ -885,13 +885,13 @@ mutable struct ArbMatrix <: FlintMatElem{ArbFieldElem}
   end
 
   function ArbMatrix(a::ZZMatrix)
-    z = ArbMatrix(a.r, a.c)
+    z = ArbMatrix(nrows(a), ncols(a))
     @ccall libflint.arb_mat_set_fmpz_mat(z::Ref{ArbMatrix}, a::Ref{ZZMatrix})::Nothing
     return z
   end
 
   function ArbMatrix(a::ZZMatrix, prec::Int)
-    z = ArbMatrix(a.r, a.c)
+    z = ArbMatrix(nrows(a), ncols(a))
     @ccall libflint.arb_mat_set_round_fmpz_mat(z::Ref{ArbMatrix}, a::Ref{ZZMatrix}, prec::Int)::Nothing
     return z
   end
@@ -941,7 +941,7 @@ mutable struct ArbMatrix <: FlintMatElem{ArbFieldElem}
   end
 
   function ArbMatrix(a::QQMatrix, prec::Int)
-    z = ArbMatrix(a.r, a.c)
+    z = ArbMatrix(nrows(a), ncols(a))
     @ccall libflint.arb_mat_set_fmpq_mat(z::Ref{ArbMatrix}, a::Ref{QQMatrix}, prec::Int)::Nothing
     return z
   end
@@ -977,25 +977,25 @@ mutable struct ComplexMatrix <: FlintMatElem{ComplexFieldElem}
   end
 
   function ComplexMatrix(a::ZZMatrix)
-    z = ComplexMatrix(a.r, a.c)
+    z = ComplexMatrix(nrows(a), ncols(a))
     @ccall libflint.acb_mat_set_fmpz_mat(z::Ref{ComplexMatrix}, a::Ref{ZZMatrix})::Nothing
     return z
   end
 
   function ComplexMatrix(a::ZZMatrix, prec::Int)
-    z = ComplexMatrix(a.r, a.c)
+    z = ComplexMatrix(nrows(a), ncols(a))
     @ccall libflint.acb_mat_set_round_fmpz_mat(z::Ref{ComplexMatrix}, a::Ref{ZZMatrix}, prec::Int)::Nothing
     return z
   end
 
   function ComplexMatrix(a::RealMatrix)
-    z = ComplexMatrix(a.r, a.c)
+    z = ComplexMatrix(nrows(a), ncols(a))
     @ccall libflint.acb_mat_set_arb_mat(z::Ref{ComplexMatrix}, a::Ref{RealMatrix})::Nothing
     return z
   end
 
   function ComplexMatrix(a::RealMatrix, prec::Int)
-    z = ComplexMatrix(a.r, a.c)
+    z = ComplexMatrix(nrows(a), ncols(a))
     @ccall libflint.acb_mat_set_round_arb_mat(z::Ref{ComplexMatrix}, a::Ref{RealMatrix}, prec::Int)::Nothing
     return z
   end
@@ -1133,7 +1133,7 @@ mutable struct ComplexMatrix <: FlintMatElem{ComplexFieldElem}
   end
 
   function ComplexMatrix(a::QQMatrix, prec::Int)
-    z = ComplexMatrix(a.r, a.c)
+    z = ComplexMatrix(nrows(a), ncols(a))
     @ccall libflint.acb_mat_set_fmpq_mat(z::Ref{ComplexMatrix}, a::Ref{QQMatrix}, prec::Int)::Nothing
     return z
   end
@@ -1169,25 +1169,25 @@ mutable struct AcbMatrix <: FlintMatElem{AcbFieldElem}
   end
 
   function AcbMatrix(a::ZZMatrix)
-    z = AcbMatrix(a.r, a.c)
+    z = AcbMatrix(nrows(a), ncols(a))
     @ccall libflint.acb_mat_set_fmpz_mat(z::Ref{AcbMatrix}, a::Ref{ZZMatrix})::Nothing
     return z
   end
 
   function AcbMatrix(a::ZZMatrix, prec::Int)
-    z = AcbMatrix(a.r, a.c)
+    z = AcbMatrix(nrows(a), ncols(a))
     @ccall libflint.acb_mat_set_round_fmpz_mat(z::Ref{AcbMatrix}, a::Ref{ZZMatrix}, prec::Int)::Nothing
     return z
   end
 
   function AcbMatrix(a::ArbMatrix)
-    z = AcbMatrix(a.r, a.c)
+    z = AcbMatrix(nrows(a), ncols(a))
     @ccall libflint.acb_mat_set_arb_mat(z::Ref{AcbMatrix}, a::Ref{ArbMatrix})::Nothing
     return z
   end
 
   function AcbMatrix(a::ArbMatrix, prec::Int)
-    z = AcbMatrix(a.r, a.c)
+    z = AcbMatrix(nrows(a), ncols(a))
     @ccall libflint.acb_mat_set_round_arb_mat(z::Ref{AcbMatrix}, a::Ref{ArbMatrix}, prec::Int)::Nothing
     return z
   end
@@ -1325,7 +1325,7 @@ mutable struct AcbMatrix <: FlintMatElem{AcbFieldElem}
   end
 
   function AcbMatrix(a::QQMatrix, prec::Int)
-    z = AcbMatrix(a.r, a.c)
+    z = AcbMatrix(nrows(a), ncols(a))
     @ccall libflint.acb_mat_set_fmpq_mat(z::Ref{AcbMatrix}, a::Ref{QQMatrix}, prec::Int)::Nothing
     return z
   end

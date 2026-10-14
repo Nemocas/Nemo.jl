@@ -94,7 +94,7 @@ end
 #
 ################################################################################
 
-==(a::T, b::T) where T <: Zmod_fmpz_mat = (a.base_ring == b.base_ring) &&
+==(a::T, b::T) where T <: Zmod_fmpz_mat = (base_ring(a) == base_ring(b)) &&
 Bool(@ccall libflint.fmpz_mod_mat_equal(a::Ref{T}, b::Ref{T}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Cint)
 
 isequal(a::T, b::T) where T <: Zmod_fmpz_mat = ==(a, b)
@@ -643,7 +643,7 @@ end
 
 function hcat(x::T, y::T) where T <: Zmod_fmpz_mat
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
-  (x.r != y.r) && error("Matrices must have same number of rows")
+  (nrows(x) != nrows(y)) && error("Matrices must have same number of rows")
   z = similar(x, nrows(x), ncols(x) + ncols(y))
   @ccall libflint.fmpz_mod_mat_concat_horizontal(z::Ref{T}, x::Ref{T}, y::Ref{T}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
@@ -651,7 +651,7 @@ end
 
 function vcat(x::T, y::T) where T <: Zmod_fmpz_mat
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
-  (x.c != y.c) && error("Matrices must have same number of columns")
+  (ncols(x) != ncols(y)) && error("Matrices must have same number of columns")
   z = similar(x, nrows(x) + nrows(y), ncols(x))
   @ccall libflint.fmpz_mod_mat_concat_vertical(z::Ref{T}, x::Ref{T}, y::Ref{T}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
@@ -744,8 +744,8 @@ function (a::ZZModMatrixSpace)(arr::AbstractVecOrMat{ZZModRingElem})
 end
 
 function (a::ZZModMatrixSpace)(b::ZZMatrix)
-  (ncols(a) != b.c || nrows(a) != b.r) && error("Dimensions do not fit")
-  z = ZZModMatrix(base_ring(a), undef, b.r, b.c)
+  (ncols(a) != ncols(b) || nrows(a) != nrows(b)) && error("Dimensions do not fit")
+  z = ZZModMatrix(base_ring(a), undef, nrows(b), ncols(b))
   @ccall libflint.fmpz_mod_mat_set_fmpz_mat(z::Ref{ZZModMatrix}, b::Ref{ZZMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
