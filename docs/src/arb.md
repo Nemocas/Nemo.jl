@@ -507,6 +507,10 @@ julia> d = const_glaisher(RR)
 ### Mathematical and special functions
 
 ```@docs
+log(::Int, ::ArbFieldElem)
+```
+
+```@docs
 rsqrt(::ArbFieldElem)
 ```
 

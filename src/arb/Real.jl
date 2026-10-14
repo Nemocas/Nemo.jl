@@ -1121,9 +1121,27 @@ function sqrtpos(x::RealFieldElem, prec::Int = precision(Balls))
   return z
 end
 
-function log(x::RealFieldElem, prec::Int = precision(Balls))
+@doc raw"""
+    log(x::RealFieldElem; precision::Int = precision(Balls))
+
+Return the natural logarithm of $x$ using the given precision.
+"""
+function log(x::RealFieldElem; precision::Int = precision(Balls))
   z = RealFieldElem()
-  @ccall libflint.arb_log(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, prec::Int)::Nothing
+  @ccall libflint.arb_log(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, precision::Int)::Nothing
+  return z
+end
+
+@doc raw"""
+    log(b::Int, x::RealFieldElem; precision::Int = precision(Balls))
+
+Return the base $b$ logarithm of $x$ using the given precision, computed
+exactly when possible. The base $b$ must be greater than $1$.
+"""
+function log(b::Int, x::RealFieldElem; precision::Int = precision(Balls))
+  @req b > 1 "Base must be greater than 1"
+  z = RealFieldElem()
+  @ccall libflint.arb_log_base_ui(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, b::UInt, precision::Int)::Nothing
   return z
 end
 
