@@ -193,14 +193,8 @@ end
 #
 ################################################################################
 
-for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (://, "acb_div"), (:-,"acb_sub"), (:^,"acb_pow"))
-  @eval begin
-    function ($s)(x::AcbFieldElem, y::AcbFieldElem)
-      z = parent(x)()
-      @ccall libflint.$f(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
-      return z
-    end
-  end
+for (f, s) in ((:+, :add!), (:-, :sub!), (:*, :mul!), (://, :div!), (:^, :pow!))
+  @eval ($f)(x::AcbFieldElem, y::AcbFieldElem) = $s(parent(x)(), x, y)
 end
 
 for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
@@ -1578,6 +1572,11 @@ end
 
 function div!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
   @ccall libflint.acb_div(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, parent(z).prec::Int)::Nothing
+  return z
+end
+
+function pow!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
+  @ccall libflint.acb_pow(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, parent(z).prec::Int)::Nothing
   return z
 end
 
