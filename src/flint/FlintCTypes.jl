@@ -715,13 +715,13 @@ const FQ_DEFAULT_NMOD = 4
 const FQ_DEFAULT_FMPZ_MOD = 5
 
 struct fq_default_struct
-  uniondata::NTuple{maximum(sizeof, (
+  uniondata::NTuple{cld(maximum(sizeof, (
     fq_t,
     fq_nmod_t,
     fq_zech_t,
     ulong,
     fmpz_t,
-  )), UInt8}
+  )), sizeof(UInt)), UInt}
 end
 const union_fq_default_struct = fq_default_struct
 
@@ -745,13 +745,13 @@ end
 # begin fq_default_mat.h
 
 struct fq_default_mat_struct
-  uniondata::NTuple{maximum(sizeof, (
+  uniondata::NTuple{cld(maximum(sizeof, (
     fq_mat_t,
     fq_nmod_mat_t,
     fq_zech_mat_t,
     nmod_mat_t,
     fmpz_mod_mat_t,
-  )), UInt8}
+  )), sizeof(UInt)), UInt}
 end
 const union_fq_default_mat_struct = fq_default_mat_struct
 
@@ -765,13 +765,13 @@ const fq_default_mat_t = Tuple{fq_default_mat_struct}
 # begin fq_default_poly.h
 
 struct fq_default_poly_struct
-  uniondata::NTuple{maximum(sizeof, (
+  uniondata::NTuple{cld(maximum(sizeof, (
     fq_poly_t,
     fq_nmod_poly_t,
     fq_zech_poly_t,
     nmod_poly_t,
     fmpz_mod_poly_t,
-  )), UInt8}
+  )), sizeof(UInt)), UInt}
 end
 const union_fq_default_poly_struct = fq_default_poly_struct
 
@@ -785,13 +785,13 @@ const fq_default_poly_t = Tuple{fq_default_poly_struct}
 # begin fq_default_poly_factor.h
 
 struct fq_default_poly_factor_struct
-  uniondata::NTuple{maximum(sizeof, (
+  uniondata::NTuple{cld(maximum(sizeof, (
     fq_poly_factor_t,
     fq_nmod_poly_factor_t,
     fq_zech_poly_factor_t,
     nmod_poly_factor_t,
     fmpz_mod_poly_factor_t,
-  )), UInt8}
+  )), sizeof(UInt)), UInt}
 end
 const union_fq_default_poly_factor_struct = fq_default_poly_factor_struct
 
