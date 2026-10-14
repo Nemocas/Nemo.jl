@@ -3922,10 +3922,7 @@ const ZZMatrixSpace = AbstractAlgebra.Generic.MatSpace{ZZRingElem}
 ZZMatrixSpace(r::Int, c::Int) = ZZMatrixSpace(ZZ, r, c)
 
 mutable struct ZZMatrix <: FlintMatElem{ZZRingElem}
-  entries::Ptr{ZZRingElem}
-  r::Int
-  c::Int
-  stride::Int
+  data::FlintC.fmpz_mat_struct
   view_parent
 
   # MatElem interface
@@ -3949,6 +3946,21 @@ mutable struct ZZMatrix <: FlintMatElem{ZZRingElem}
     finalizer(_fmpz_mat_clear_fn, z)
     return z
   end
+end
+
+# The C fields stay reachable as `x.r` etc. `entries` keeps Nemo's
+# `Ptr{ZZRingElem}` spelling of `fmpz*`.
+const _fmpz_mat_fields = fieldnames(FlintC.fmpz_mat_struct)
+
+@inline function Base.getproperty(x::ZZMatrix, s::Symbol)
+  s === :entries && return Ptr{ZZRingElem}(getfield(x, :data).entries)
+  s in _fmpz_mat_fields && return getproperty(getfield(x, :data), s)
+  return getfield(x, s)
+end
+
+@inline function Base.setproperty!(x::ZZMatrix, s::Symbol, v)
+  s in _fmpz_mat_fields && return setfield!(x, :data, _setfield(getfield(x, :data), s, v))
+  return setfield!(x, s, v)
 end
 
 ###############################################################################
