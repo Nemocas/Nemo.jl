@@ -186,6 +186,18 @@ function Base.round(::Type{ZZRingElem}, x::ArbFieldElem)
   end
 end
 
+function Base.round(::Type{ZZRingElem}, x::RealFieldElem)
+  if !isfinite(x) || radius(x) > 1e-1
+    throw(InexactError(:round, ZZRingElem, x))
+  end
+  # round the midpoint itself: it may carry more bits than precision(Balls)
+  z = ZZRingElem()
+  GC.@preserve x begin
+    @ccall libflint.arf_get_fmpz(z::Ref{ZZRingElem}, _mid_ptr(x)::Ptr{arf_struct}, ARB_RND_NEAR::Cint)::Cint
+  end
+  return z
+end
+
 function Base.round(::Type{ZZMatrix}, C::ArbMatrix)
   v = zero_matrix(ZZ, nrows(C), ncols(C))
 

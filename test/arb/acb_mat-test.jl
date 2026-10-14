@@ -146,6 +146,14 @@ end
 
   @test B[1, 1] == CC(3)
 
+  for y in [(1, 2), (big(1), big(2)), (1.0, 2.0), (big(1.0), big(2.0)),
+            (ZZ(1), ZZ(2)), (QQ(1), QQ(2)), (1//1, 2//1), (RR(1), RR(2)),
+            ("1", "2")]
+    B[1, 2] = y
+    @test B[1, 2] == CC(1, 2)
+    B[1, 2] = 0
+  end
+
   @test nrows(B) == 3
   @test ncols(B) == 3
 
