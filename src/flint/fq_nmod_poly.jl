@@ -37,7 +37,7 @@ end
 
 function coeff(x::fqPolyRepPolyRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
-  F = (x.parent).base_ring
+  F = base_ring(x)
   temp = F(1)
   @ccall libflint.fq_nmod_poly_get_coeff(temp::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepPolyRingElem}, n::Int, F::Ref{fqPolyRepField})::Nothing
   return temp
@@ -49,9 +49,9 @@ one(a::fqPolyRepPolyRing) = a(one(base_ring(a)))
 
 gen(a::fqPolyRepPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
-isone(x::fqPolyRepPolyRingElem) = @ccall libflint.fq_nmod_poly_is_one(x::Ref{fqPolyRepPolyRingElem}, base_ring(x.parent)::Ref{fqPolyRepField})::Bool
+isone(x::fqPolyRepPolyRingElem) = @ccall libflint.fq_nmod_poly_is_one(x::Ref{fqPolyRepPolyRingElem}, base_ring(x)::Ref{fqPolyRepField})::Bool
 
-is_gen(x::fqPolyRepPolyRingElem) = @ccall libflint.fq_nmod_poly_is_gen(x::Ref{fqPolyRepPolyRingElem}, base_ring(x.parent)::Ref{fqPolyRepField})::Bool
+is_gen(x::fqPolyRepPolyRingElem) = @ccall libflint.fq_nmod_poly_is_gen(x::Ref{fqPolyRepPolyRingElem}, base_ring(x)::Ref{fqPolyRepField})::Bool
 
 function deepcopy_internal(a::fqPolyRepPolyRingElem, dict::IdDict)
   z = fqPolyRepPolyRingElem(a)

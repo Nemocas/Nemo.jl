@@ -59,7 +59,7 @@ end
 
 function *(x::FpPolyRingElem, y::ZZRingElem)
   z = parent(x)()
-  @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{ZZRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
@@ -78,7 +78,7 @@ end
 
 function +(x::FpPolyRingElem, y::Int)
   z = parent(x)()
-  @ccall libflint.fmpz_mod_poly_add_si(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Int, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_add_si(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Int, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
@@ -86,7 +86,7 @@ end
 
 function +(x::FpPolyRingElem, y::ZZRingElem)
   z = parent(x)()
-  @ccall libflint.fmpz_mod_poly_add_fmpz(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_add_fmpz(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{ZZRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
@@ -105,25 +105,25 @@ end
 
 function -(x::FpPolyRingElem, y::Int)
   z = parent(x)()
-  @ccall libflint.fmpz_mod_poly_sub_si(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Int, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_sub_si(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Int, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
 function -(x::Int, y::FpPolyRingElem)
   z = parent(y)()
-  @ccall libflint.fmpz_mod_poly_si_sub(z::Ref{FpPolyRingElem}, x::Int, y::Ref{FpPolyRingElem}, y.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_si_sub(z::Ref{FpPolyRingElem}, x::Int, y::Ref{FpPolyRingElem}, base_ring(y).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
 function -(x::FpPolyRingElem, y::ZZRingElem)
   z = parent(x)()
-  @ccall libflint.fmpz_mod_poly_sub_fmpz(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_sub_fmpz(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{ZZRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
 function -(x::ZZRingElem, y::FpPolyRingElem)
   z = parent(y)()
-  @ccall libflint.fmpz_mod_poly_fmpz_sub(z::Ref{FpPolyRingElem}, x::Ref{ZZRingElem}, y::Ref{FpPolyRingElem}, y.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_fmpz_sub(z::Ref{FpPolyRingElem}, x::Ref{ZZRingElem}, y::Ref{FpPolyRingElem}, base_ring(y).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
@@ -153,7 +153,7 @@ function ==(x::FpPolyRingElem, y::FpFieldElem)
     return false
   elseif length(x) == 1 
     u = ZZRingElem()
-    @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(u::Ref{ZZRingElem}, x::Ref{FpPolyRingElem}, 0::Int, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+    @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(u::Ref{ZZRingElem}, x::Ref{FpPolyRingElem}, 0::Int, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
     return u == y
   else
     return iszero(y)
@@ -172,7 +172,7 @@ function divexact(x::FpPolyRingElem, y::FpFieldElem; check::Bool=true)
   base_ring(x) != parent(y) && error("Elements must have same parent")
   iszero(y) && throw(DivideError())
   q = parent(x)()
-  @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(q::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y.data::Ref{ZZRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(q::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y.data::Ref{ZZRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return q
 end
 
@@ -207,7 +207,7 @@ specifies the ring to lift into.
 """
 function lift(R::ZZPolyRing, y::FpPolyRingElem)
   z = ZZPolyRingElem()
-  @ccall libflint.fmpz_mod_poly_get_fmpz_poly(z::Ref{ZZPolyRingElem}, y::Ref{FpPolyRingElem}, y.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_get_fmpz_poly(z::Ref{ZZPolyRingElem}, y::Ref{FpPolyRingElem}, base_ring(y).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   z.parent = R
   return z
 end
@@ -222,7 +222,7 @@ function gcd(x::FpPolyRingElem, y::FpPolyRingElem)
   check_parent(x, y)
   z = parent(x)()
   f = ZZRingElem()
-  @ccall libflint.fmpz_mod_poly_gcd(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{FpPolyRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_gcd(z::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{FpPolyRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
@@ -231,7 +231,7 @@ function gcdx(x::FpPolyRingElem, y::FpPolyRingElem)
   g = parent(x)()
   s = parent(x)()
   t = parent(x)()
-  @ccall libflint.fmpz_mod_poly_xgcd(g::Ref{FpPolyRingElem}, s::Ref{FpPolyRingElem}, t::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{FpPolyRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_xgcd(g::Ref{FpPolyRingElem}, s::Ref{FpPolyRingElem}, t::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{FpPolyRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return g, s, t
 end
 
@@ -243,7 +243,7 @@ end
 
 function is_irreducible(x::FpPolyRingElem)
   is_constant(x) && return false
-  return Bool(@ccall libflint.fmpz_mod_poly_is_irreducible(x::Ref{FpPolyRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Cint)
+  return Bool(@ccall libflint.fmpz_mod_poly_is_irreducible(x::Ref{FpPolyRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Cint)
 end
 
 ################################################################################
@@ -253,7 +253,7 @@ end
 ################################################################################
 
 function is_squarefree(x::FpPolyRingElem)
-  return Bool(@ccall libflint.fmpz_mod_poly_is_squarefree(x::Ref{FpPolyRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Cint)
+  return Bool(@ccall libflint.fmpz_mod_poly_is_squarefree(x::Ref{FpPolyRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Cint)
 end
 
 ################################################################################
@@ -264,20 +264,20 @@ end
 
 function Base.sqrt(x::FpPolyRingElem; check::Bool=true)
   s = parent(x)()
-  flag = Bool(@ccall libflint.fmpz_mod_poly_sqrt(s::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Cint)
+  flag = Bool(@ccall libflint.fmpz_mod_poly_sqrt(s::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Cint)
   check && !flag && error("Not a square in sqrt")
   return s
 end
 
 function is_square(x::FpPolyRingElem)
   s = parent(x)()
-  flag = Bool(@ccall libflint.fmpz_mod_poly_sqrt(s::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Cint)
+  flag = Bool(@ccall libflint.fmpz_mod_poly_sqrt(s::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Cint)
   return flag
 end
 
 function is_square_with_sqrt(x::FpPolyRingElem)
   s = parent(x)()
-  flag = Bool(@ccall libflint.fmpz_mod_poly_sqrt(s::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Cint)
+  flag = Bool(@ccall libflint.fmpz_mod_poly_sqrt(s::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Cint)
   return flag, s
 end
 
@@ -294,7 +294,7 @@ function factor(x::FpPolyRingElem)
 end
 
 function _factor(x::FpPolyRingElem)
-  n = x.parent.base_ring.ninv
+  n = base_ring(x).ninv
   fac = gfp_fmpz_poly_factor(n)
   @ccall libflint.fmpz_mod_poly_factor(fac::Ref{gfp_fmpz_poly_factor}, x::Ref{FpPolyRingElem}, n::Ref{fmpz_mod_ctx_struct})::Nothing
   res = Dict{FpPolyRingElem, Int}()
@@ -314,7 +314,7 @@ function factor_squarefree(x::FpPolyRingElem)
 end
 
 function _factor_squarefree(x::FpPolyRingElem)
-  n = x.parent.base_ring.ninv
+  n = base_ring(x).ninv
   fac = gfp_fmpz_poly_factor(n)
   @ccall libflint.fmpz_mod_poly_factor_squarefree(fac::Ref{gfp_fmpz_poly_factor}, x::Ref{FpPolyRingElem}, n::Ref{fmpz_mod_ctx_struct})::UInt
   res = Dict{FpPolyRingElem, Int}()
@@ -336,7 +336,7 @@ function factor_distinct_deg(x::FpPolyRingElem)
   !is_squarefree(x) && error("Polynomial must be squarefree")
   degs = Vector{Int}(undef, degree(x))
   degss = [ pointer(degs) ]
-  n = x.parent.base_ring.ninv
+  n = base_ring(x).ninv
   fac = gfp_fmpz_poly_factor(n)
   @ccall libflint.fmpz_mod_poly_factor_distinct_deg(fac::Ref{gfp_fmpz_poly_factor}, x::Ref{FpPolyRingElem}, degss::Ptr{Ptr{Int}}, n::Ref{fmpz_mod_ctx_struct})::UInt
   res = Dict{Int, FpPolyRingElem}()
@@ -354,11 +354,11 @@ function factor_equal_deg(x::FpPolyRingElem, d::Int)
     return FpPolyRingElem[x]
   end
   fac = gfp_fmpz_poly_factor(base_ring(x))
-  @ccall libflint.fmpz_mod_poly_factor_equal_deg(fac::Ref{gfp_fmpz_poly_factor}, x::Ref{FpPolyRingElem}, d::Int, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::UInt
+  @ccall libflint.fmpz_mod_poly_factor_equal_deg(fac::Ref{gfp_fmpz_poly_factor}, x::Ref{FpPolyRingElem}, d::Int, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::UInt
   res = Vector{FpPolyRingElem}(undef, fac.num)
   for i in 1:fac.num
     f = parent(x)()
-    @ccall libflint.fmpz_mod_poly_factor_get_fmpz_mod_poly(f::Ref{FpPolyRingElem}, fac::Ref{gfp_fmpz_poly_factor}, (i - 1)::Int, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+    @ccall libflint.fmpz_mod_poly_factor_get_fmpz_mod_poly(f::Ref{FpPolyRingElem}, fac::Ref{gfp_fmpz_poly_factor}, (i - 1)::Int, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
     res[i] = f
   end
   return res
@@ -366,7 +366,7 @@ end
 
 function roots(a::FpPolyRingElem)
   R = parent(a)
-  n = R.base_ring.ninv
+  n = base_ring(R).ninv
   fac = fmpz_mod_poly_factor(n)
   @ccall libflint.fmpz_mod_poly_roots(fac::Ref{fmpz_mod_poly_factor}, a::Ref{FpPolyRingElem}, 0::Cint, n::Ref{fmpz_mod_ctx_struct})::UInt
   f = R()
