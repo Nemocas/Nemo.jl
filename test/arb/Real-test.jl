@@ -37,6 +37,20 @@ end
   @test real_field() == real_field()
 end
 
+@testset "RealFieldElem.rational_conversion" begin
+  setprecision(BigFloat, 64) do
+    for prec in (64, 256, 512), T in (Int8, Int, BigInt)
+      set_precision!(Balls, prec) do
+        for q in (Rational{T}(1, 3), Rational{T}(-2, 3))
+          for x in (RR(q), RR(q, prec), RR(q; precision=prec))
+            @test contains(x, QQ(q))
+          end
+        end
+      end
+    end
+  end
+end
+
 @testset "arf.hecke_semantics" begin
   x = Nemo.arf_struct(0, 0, 0, 0)
   y = ZZRingElem(3)^100
@@ -397,6 +411,43 @@ end
     @test contains(RR("1.0 +/- 1.76e-120"), x)
     @test contains(x, RR("1.0 +/- 1.76e-121"))
   end
+end
+
+@testset "RealFieldElem.log" begin
+  @test is_zero(log(RR(1); precision=128))
+
+  for prec in (64, 256)
+    z = log(RR(2); precision=prec)
+    set_precision!(Balls, prec) do
+      @test overlaps(log(RR(2)), z)
+    end
+  end
+end
+
+@testset "RealFieldElem.log_base" begin
+  @test log(2, RR(8)) == 3
+  @test log(4, RR(8)) == RR(3//2)
+  @test log(10, RR(1000)) == 3
+  @test log(3, RR(27)) == 3
+  @test log(2, RR(1//8)) == -3
+  @test is_zero(log(7, RR(1)))
+  @test overlaps(log(3, RR(2)), log(RR(2)) / log(RR(3)))
+  @test overlaps(log(3, RR("2 +/- 0.01")), log(RR("2 +/- 0.01")) / log(RR(3)))
+
+  for prec in (64, 256)
+    z = log(3, RR(2); precision=prec)
+    @test parent(z) === RR
+    @test accuracy_bits(z) > prec - 4
+    @test overlaps(z, log(RR(2); precision=prec) / log(RR(3); precision=prec))
+    set_precision!(Balls, prec) do
+      @test isequal(log(3, RR(2)), z)
+    end
+  end
+
+  for b in (-2, 0, 1)
+    @test_throws ArgumentError log(b, RR(2))
+  end
+  @test !isfinite(log(2, RR(-1)))
 end
 
 @testset "RealFieldElem.functions" begin

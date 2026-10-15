@@ -2139,7 +2139,6 @@ end
   lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}
   lut1::NTuple{Base.GMP.BITS_PER_LIMB, UInt8}
 
-  p :: Int
   n :: Int
   ninv :: Int
   norm :: Int

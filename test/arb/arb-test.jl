@@ -13,6 +13,17 @@ RR = ArbField(64)
   @test ArbField(11, cached = false) !== ArbField(11, cached = false)
 end
 
+@testset "ArbFieldElem.rational_conversion" begin
+  setprecision(BigFloat, 64) do
+    for prec in (64, 256, 512), T in (Int8, Int, BigInt)
+      R = ArbField(prec)
+      for q in (Rational{T}(1, 3), Rational{T}(-2, 3))
+        @test contains(R(q), QQ(q))
+      end
+    end
+  end
+end
+
 @testset "arf.hecke_semantics" begin
   x = Nemo.arf_struct(0, 0, 0, 0)
   y = ZZRingElem(3)^100
@@ -356,6 +367,29 @@ end
     @test contains(RR("1.0 +/- 1.76e-120"), x)
     @test contains(x, RR("1.0 +/- 1.76e-121"))
   end
+end
+
+@testset "ArbFieldElem.log_base" begin
+  @test log(2, RR(8)) == 3
+  @test log(4, RR(8)) == RR(3//2)
+  @test log(10, RR(1000)) == 3
+  @test log(3, RR(27)) == 3
+  @test log(2, RR(1//8)) == -3
+  @test is_zero(log(7, RR(1)))
+  @test overlaps(log(3, RR(2)), log(RR(2)) / log(RR(3)))
+  @test overlaps(log(3, RR("2 +/- 0.01")), log(RR("2 +/- 0.01")) / log(RR(3)))
+
+  for prec in (64, 256)
+    R = ArbField(prec)
+    z = log(3, R(2))
+    @test parent(z) === R
+    @test accuracy_bits(z) > prec - 4
+  end
+
+  for b in (-2, 0, 1)
+    @test_throws ArgumentError log(b, RR(2))
+  end
+  @test !isfinite(log(2, RR(-1)))
 end
 
 @testset "ArbFieldElem.functions" begin
