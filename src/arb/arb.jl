@@ -1110,6 +1110,19 @@ function log(x::ArbFieldElem)
   return z
 end
 
+@doc raw"""
+    log(b::Int, x::ArbFieldElem)
+
+Return the base $b$ logarithm of $x$, computed exactly when possible.
+The base $b$ must be greater than $1$.
+"""
+function log(b::Int, x::ArbFieldElem)
+  @req b > 1 "Base must be greater than 1"
+  z = parent(x)()
+  @ccall libflint.arb_log_base_ui(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, b::UInt, parent(x).prec::Int)::Nothing
+  return z
+end
+
 function log1p(x::ArbFieldElem)
   z = parent(x)()
   @ccall libflint.arb_log1p(z::Ref{ArbFieldElem}, x::Ref{ArbFieldElem}, parent(x).prec::Int)::Nothing
@@ -1963,6 +1976,10 @@ end
 
 function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::Integer, p::Int)
   _arb_set(x, ZZRingElem(y), p)
+end
+
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::Rational, p::Int)
+  _arb_set(x, flintify(y), p)
 end
 
 function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::Real)

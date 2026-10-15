@@ -1021,6 +1021,22 @@ end
   end
 end
 
+@testset "ZZMatrix.mul!_vector" begin
+  b = ZZRingElem[7, -8]
+  c = ZZRingElem[1, 0, -1]
+  # entries below and above the cutoff for fmpz_mat_mul_fmpz_vec_ptr
+  for A in (ZZ[1 2; 3 4; 5 6], ZZ(2)^70 * ZZ[1 2; 3 4; 5 6])
+    Ab = [A[i, 1] * b[1] + A[i, 2] * b[2] for i in 1:3]
+    cA = [A[1, j] * c[1] + A[2, j] * c[2] + A[3, j] * c[3] for j in 1:2]
+    GC.@preserve A begin
+      for a in (A, Ref(A), Ptr{ZZMatrix}(pointer_from_objref(A)))
+        @test mul!([ZZ(), ZZ(), ZZ()], a, b) == Ab
+        @test mul!([ZZ(), ZZ()], c, a) == cA
+      end
+    end
+  end
+end
+
 @testset "ZZMatrix.add_one!" begin
   A = ZZ[0 0; 0 0]
   Generic.add_one!(A, 1, 1)
@@ -1087,4 +1103,23 @@ end
 
   add_column!(A, -3, 2, 3, 1:1)
   @test A == ZZ[0 3 5; 0 6 21]
+end
+
+@testset "ZZMatrix.multiply_column!" begin
+  for s in (ZZ(3), 3)
+    A = ZZ[2 3 5; 4 6 3]
+
+    multiply_column!(A, s, 1)
+    @test A == ZZ[6 3 5; 12 6 3]
+
+    multiply_column!(A, s, 3, 2:2)
+    @test A == ZZ[6 3 5; 12 6 9]
+
+    # an Int in fourth position is a row, not a second column
+    multiply_column!(A, s, 3, 1)
+    @test A == ZZ[6 3 15; 12 6 9]
+
+    @test_throws AssertionError multiply_column!(A, s, 4)
+    @test_throws AssertionError multiply_column!(A, s, 1, 1:3)
+  end
 end

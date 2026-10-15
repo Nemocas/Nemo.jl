@@ -99,5 +99,8 @@ import Base: Array, view
 
 @deprecate view(x::FlintMatElem, r1::Int, c1::Int, r2::Int, c2::Int) _view_window(x, r1, c1, r2, c2) false
 
+# Deprecated in 0.57
+@deprecate log(x::RealFieldElem, prec::Int) log(x; precision=prec) false
+
 # to be deprecated in a future minor release
 fq_default_mat_entry_ptr(F::FqMatrix, i::Int, j::Int) = mat_entry_ptr(F, i, j)
