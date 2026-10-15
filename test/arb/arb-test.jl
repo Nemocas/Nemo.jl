@@ -13,6 +13,17 @@ RR = ArbField(64)
   @test ArbField(11, cached = false) !== ArbField(11, cached = false)
 end
 
+@testset "ArbFieldElem.rational_conversion" begin
+  setprecision(BigFloat, 64) do
+    for prec in (64, 256, 512), T in (Int8, Int, BigInt)
+      R = ArbField(prec)
+      for q in (Rational{T}(1, 3), Rational{T}(-2, 3))
+        @test contains(R(q), QQ(q))
+      end
+    end
+  end
+end
+
 @testset "arf.hecke_semantics" begin
   x = Nemo.arf_struct(0, 0, 0, 0)
   y = ZZRingElem(3)^100

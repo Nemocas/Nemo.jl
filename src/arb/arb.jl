@@ -1978,6 +1978,10 @@ function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::Integer, p::Int)
   _arb_set(x, ZZRingElem(y), p)
 end
 
+function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::Rational, p::Int)
+  _arb_set(x, flintify(y), p)
+end
+
 function _arb_set(x::TypeOrPtr{ArbFieldElem}, y::Real)
   _arb_set(x, BigFloat(y))
 end
