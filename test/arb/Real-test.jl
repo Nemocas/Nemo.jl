@@ -37,6 +37,20 @@ end
   @test real_field() == real_field()
 end
 
+@testset "RealFieldElem.rational_conversion" begin
+  setprecision(BigFloat, 64) do
+    for prec in (64, 256, 512), T in (Int8, Int, BigInt)
+      set_precision!(Balls, prec) do
+        for q in (Rational{T}(1, 3), Rational{T}(-2, 3))
+          for x in (RR(q), RR(q, prec), RR(q; precision=prec))
+            @test contains(x, QQ(q))
+          end
+        end
+      end
+    end
+  end
+end
+
 @testset "arf.hecke_semantics" begin
   x = Nemo.arf_struct(0, 0, 0, 0)
   y = ZZRingElem(3)^100
