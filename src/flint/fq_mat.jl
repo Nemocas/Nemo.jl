@@ -96,7 +96,7 @@ end
 ################################################################################
 
 function ==(a::FqPolyRepMatrix, b::FqPolyRepMatrix)
-  if !(a.base_ring == b.base_ring)
+  if !(base_ring(a) == base_ring(b))
     return false
   end
   r = @ccall libflint.fq_mat_equal(a::Ref{FqPolyRepMatrix}, b::Ref{FqPolyRepMatrix}, base_ring(a)::Ref{FqPolyRepField})::Cint
@@ -442,7 +442,7 @@ end
 
 function hcat(x::FqPolyRepMatrix, y::FqPolyRepMatrix)
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
-  (x.r != y.r) && error("Matrices must have same number of rows")
+  (nrows(x) != nrows(y)) && error("Matrices must have same number of rows")
   z = similar(x, nrows(x), ncols(x) + ncols(y))
   @ccall libflint.fq_mat_concat_horizontal(z::Ref{FqPolyRepMatrix}, x::Ref{FqPolyRepMatrix}, y::Ref{FqPolyRepMatrix}, base_ring(x)::Ref{FqPolyRepField})::Nothing
   return z
@@ -450,7 +450,7 @@ end
 
 function vcat(x::FqPolyRepMatrix, y::FqPolyRepMatrix)
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
-  (x.c != y.c) && error("Matrices must have same number of columns")
+  (ncols(x) != ncols(y)) && error("Matrices must have same number of columns")
   z = similar(x, nrows(x) + nrows(y), ncols(x))
   @ccall libflint.fq_mat_concat_vertical(z::Ref{FqPolyRepMatrix}, x::Ref{FqPolyRepMatrix}, y::Ref{FqPolyRepMatrix}, base_ring(x)::Ref{FqPolyRepField})::Nothing
   return z
@@ -545,7 +545,7 @@ function (a::FqPolyRepMatrixSpace)(arr::AbstractVector{FqPolyRepFieldElem})
 end
 
 function (a::FqPolyRepMatrixSpace)(b::ZZMatrix)
-  (ncols(a) != b.c || nrows(a) != b.r) && error("Dimensions do not fit")
+  (ncols(a) != ncols(b) || nrows(a) != nrows(b)) && error("Dimensions do not fit")
   return FqPolyRepMatrix(b, base_ring(a))
 end
 

@@ -30,13 +30,13 @@ var(a::FqPolyRing) = a.S
 ################################################################################
 
 function length(x::FqPolyRingElem)
-  F = (x.parent).base_ring
+  F = base_ring(x)
   @ccall libflint.fq_default_poly_length(x::Ref{FqPolyRingElem}, F::Ref{FqField})::Int
 end
 
 function coeff(x::FqPolyRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
-  F = (x.parent).base_ring
+  F = base_ring(x)
   temp = F(1)
   @ccall libflint.fq_default_poly_get_coeff(temp::Ref{FqFieldElem}, x::Ref{FqPolyRingElem}, n::Int, F::Ref{FqField})::Nothing
   return temp
@@ -54,9 +54,9 @@ one(a::FqPolyRing) = a(one(base_ring(a)))
 
 gen(a::FqPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
-is_gen(x::FqPolyRingElem) = @ccall libflint.fq_default_poly_is_gen(x::Ref{FqPolyRingElem}, base_ring(x.parent)::Ref{FqField})::Bool
+is_gen(x::FqPolyRingElem) = @ccall libflint.fq_default_poly_is_gen(x::Ref{FqPolyRingElem}, base_ring(x)::Ref{FqField})::Bool
 
-isone(x::FqPolyRingElem) = @ccall libflint.fq_default_poly_is_one(x::Ref{FqPolyRingElem}, base_ring(x.parent)::Ref{FqField})::Bool
+isone(x::FqPolyRingElem) = @ccall libflint.fq_default_poly_is_one(x::Ref{FqPolyRingElem}, base_ring(x)::Ref{FqField})::Bool
 
 function deepcopy_internal(a::FqPolyRingElem, dict::IdDict)
   z = FqPolyRingElem(a, base_ring(a))

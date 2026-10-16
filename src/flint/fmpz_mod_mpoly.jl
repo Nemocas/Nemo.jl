@@ -49,8 +49,8 @@ for (etype, rtype, ftype, ctype) in (
     end
 
     function gens(R::($rtype))
-      A = Vector{($etype)}(undef, R.nvars)
-      for i = 1:R.nvars
+      A = Vector{($etype)}(undef, nvars(R))
+      for i = 1:nvars(R)
         z = R()
         @ccall libflint.fmpz_mod_mpoly_gen(z::Ref{($etype)}, (i - 1)::Int, R::Ref{($rtype)})::Nothing
         A[i] = z
@@ -211,7 +211,7 @@ for (etype, rtype, ftype, ctype) in (
       if !total_degree_fits_int(a)
         throw(OverflowError("Total degree of polynomial does not fit into Int"))
       end
-      d = @ccall libflint.fmpz_mod_mpoly_total_degree_si(a::Ref{($etype)}, a.parent::Ref{($rtype)})::Int
+      d = @ccall libflint.fmpz_mod_mpoly_total_degree_si(a::Ref{($etype)}, parent(a)::Ref{($rtype)})::Int
       return d
     end
 
@@ -387,7 +387,7 @@ for (etype, rtype, ftype, ctype) in (
     function gcd(a::($etype), b::($etype))
       check_parent(a, b)
       z = parent(a)()
-      ok = @ccall libflint.fmpz_mod_mpoly_gcd(z::Ref{($etype)}, a::Ref{($etype)}, b::Ref{($etype)}, a.parent::Ref{($rtype)})::Cint
+      ok = @ccall libflint.fmpz_mod_mpoly_gcd(z::Ref{($etype)}, a::Ref{($etype)}, b::Ref{($etype)}, parent(a)::Ref{($rtype)})::Cint
       iszero(ok) && error("Unable to compute gcd")
       return z
     end
@@ -442,12 +442,12 @@ for (etype, rtype, ftype, ctype) in (
     end
 
     function is_square(a::($etype))
-      return Bool(@ccall libflint.fmpz_mod_mpoly_is_square(a::Ref{($etype)}, a.parent::Ref{($rtype)})::Cint)
+      return Bool(@ccall libflint.fmpz_mod_mpoly_is_square(a::Ref{($etype)}, parent(a)::Ref{($rtype)})::Cint)
     end
 
     function is_square_with_sqrt(a::($etype))
       q = parent(a)()
-      flag = @ccall libflint.fmpz_mod_mpoly_sqrt(q::Ref{($etype)}, a::Ref{($etype)}, a.parent::Ref{($rtype)})::Cint
+      flag = @ccall libflint.fmpz_mod_mpoly_sqrt(q::Ref{($etype)}, a::Ref{($etype)}, parent(a)::Ref{($rtype)})::Cint
       return (Bool(flag), q)
     end
 
@@ -459,12 +459,12 @@ for (etype, rtype, ftype, ctype) in (
 
     function ==(a::($etype), b::($etype))
       check_parent(a, b)
-      return Bool(@ccall libflint.fmpz_mod_mpoly_equal(a::Ref{($etype)}, b::Ref{($etype)}, a.parent::Ref{($rtype)})::Cint)
+      return Bool(@ccall libflint.fmpz_mod_mpoly_equal(a::Ref{($etype)}, b::Ref{($etype)}, parent(a)::Ref{($rtype)})::Cint)
     end
 
     function Base.isless(a::($etype), b::($etype))
       (!is_monomial(a) || !is_monomial(b)) && error("Not monomials in comparison")
-      return (@ccall libflint.fmpz_mod_mpoly_cmp(a::Ref{($etype)}, b::Ref{($etype)}, a.parent::Ref{($rtype)})::Cint) < 0
+      return (@ccall libflint.fmpz_mod_mpoly_cmp(a::Ref{($etype)}, b::Ref{($etype)}, parent(a)::Ref{($rtype)})::Cint) < 0
     end
 
     ###############################################################################
@@ -474,7 +474,7 @@ for (etype, rtype, ftype, ctype) in (
     ###############################################################################
 
     function ==(a::($etype), b::($ctype))
-      return Bool(@ccall libflint.fmpz_mod_mpoly_equal_fmpz(a::Ref{($etype)}, data(b)::Ref{ZZRingElem}, a.parent::Ref{($rtype)})::Cint)
+      return Bool(@ccall libflint.fmpz_mod_mpoly_equal_fmpz(a::Ref{($etype)}, data(b)::Ref{ZZRingElem}, parent(a)::Ref{($rtype)})::Cint)
     end
 
     ==(a::($ctype), b::($etype)) = b == a
@@ -676,9 +676,9 @@ for (etype, rtype, ftype, ctype) in (
     # must be removed with combine_like_terms!
     function setcoeff!(a::($etype), n::Int, c::($ctype))
       if n > length(a)
-        @ccall libflint.fmpz_mod_mpoly_resize(a::Ref{($etype)}, n::Int, a.parent::Ref{($rtype)})::Nothing
+        @ccall libflint.fmpz_mod_mpoly_resize(a::Ref{($etype)}, n::Int, parent(a)::Ref{($rtype)})::Nothing
       end
-      @ccall libflint.fmpz_mod_mpoly_set_term_coeff_fmpz(a::Ref{($etype)}, (n - 1)::Int, data(c)::Ref{ZZRingElem}, a.parent::Ref{($rtype)})::Nothing
+      @ccall libflint.fmpz_mod_mpoly_set_term_coeff_fmpz(a::Ref{($etype)}, (n - 1)::Int, data(c)::Ref{ZZRingElem}, parent(a)::Ref{($rtype)})::Nothing
       return a
     end
 
@@ -693,7 +693,7 @@ for (etype, rtype, ftype, ctype) in (
     # Remove zero terms and combine adjacent terms if they have the same monomial
     # no sorting is performed
     function combine_like_terms!(a::($etype))
-      @ccall libflint.fmpz_mod_mpoly_combine_like_terms(a::Ref{($etype)}, a.parent::Ref{($rtype)})::Nothing
+      @ccall libflint.fmpz_mod_mpoly_combine_like_terms(a::Ref{($etype)}, parent(a)::Ref{($rtype)})::Nothing
       return a
     end
 
@@ -750,7 +750,7 @@ for (etype, rtype, ftype, ctype) in (
     # No sort is performed, so this is unsafe.
     function set_exponent_vector!(a::($etype), n::Int, exps::Vector{UInt})
       if n > length(a)
-        @ccall libflint.fmpz_mod_mpoly_resize(a::Ref{($etype)}, n::Int, a.parent::Ref{($rtype)})::Nothing
+        @ccall libflint.fmpz_mod_mpoly_resize(a::Ref{($etype)}, n::Int, parent(a)::Ref{($rtype)})::Nothing
       end
       @ccall libflint.fmpz_mod_mpoly_set_term_exp_ui(a::Ref{($etype)}, (n - 1)::Int, exps::Ptr{UInt}, parent(a)::Ref{($rtype)})::Nothing
       return a
@@ -848,7 +848,7 @@ for (etype, rtype, ftype, ctype) in (
 
     # Sets the given polynomial m to the i-th monomial of the polynomial
     function monomial!(m::($etype), a::($etype), i::Int)
-      @ccall libflint.fmpz_mod_mpoly_get_term_monomial(m::Ref{($etype)}, a::Ref{($etype)}, (i - 1)::Int, a.parent::Ref{($rtype)})::Nothing
+      @ccall libflint.fmpz_mod_mpoly_get_term_monomial(m::Ref{($etype)}, a::Ref{($etype)}, (i - 1)::Int, parent(a)::Ref{($rtype)})::Nothing
       return m
     end
 

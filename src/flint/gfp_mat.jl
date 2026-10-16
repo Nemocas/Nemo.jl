@@ -253,7 +253,7 @@ function (a::fpMatrixSpace)(arr::AbstractVecOrMat{fpFieldElem})
 end
 
 function (a::fpMatrixSpace)(b::ZZMatrix)
-  (ncols(a) != b.c || nrows(a) != b.r) && error("Dimensions do not fit")
+  (ncols(a) != ncols(b) || nrows(a) != nrows(b)) && error("Dimensions do not fit")
   z = fpMatrix(modulus(base_ring(a)), b)
   z.base_ring = a.base_ring
   return z
