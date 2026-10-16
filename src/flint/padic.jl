@@ -737,7 +737,7 @@ end
 #
 ###############################################################################
 
-Base.precision(Q::PadicField) = Q.prec_max
+precision(R::PadicField) = R.prec_max
 
 function Base.setprecision(q::PadicFieldElem, N::Int)
   r = parent(q)()
@@ -752,9 +752,9 @@ function setprecision!(a::PadicFieldElem, n::Int)
   return a
 end
 
-function setprecision!(Q::PadicField, n::Int)
-  Q.prec_max = n
-  return Q
+function setprecision!(R::PadicField, n::Int)
+  R.prec_max = n
+  return R
 end
 
 function Base.setprecision(f::Generic.Poly{PadicFieldElem}, N::Int)
