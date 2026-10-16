@@ -166,7 +166,7 @@ function +(a::FqAbsPowerSeriesRingElem, b::FqAbsPowerSeriesRingElem)
   check_parent(a, b)
   lena = length(a)
   lenb = length(b)
-  prec = min(a.prec, b.prec)
+  prec = min(precision(a), precision(b))
   lena = min(lena, prec)
   lenb = min(lenb, prec)
   lenz = max(lena, lenb)
@@ -180,7 +180,7 @@ function -(a::FqAbsPowerSeriesRingElem, b::FqAbsPowerSeriesRingElem)
   check_parent(a, b)
   lena = length(a)
   lenb = length(b)
-  prec = min(a.prec, b.prec)
+  prec = min(precision(a), precision(b))
   lena = min(lena, prec)
   lenb = min(lenb, prec)
   lenz = max(lena, lenb)
@@ -196,7 +196,7 @@ function *(a::FqAbsPowerSeriesRingElem, b::FqAbsPowerSeriesRingElem)
   lenb = length(b)
   aval = valuation(a)
   bval = valuation(b)
-  prec = min(a.prec + bval, b.prec + aval)
+  prec = min(precision(a) + bval, precision(b) + aval)
   prec = min(prec, max_precision(parent(a)))
   lena = min(lena, prec)
   lenb = min(lenb, prec)
@@ -267,9 +267,9 @@ function shift_left(x::FqAbsPowerSeriesRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
   xlen = length(x)
   z = parent(x)()
-  z.prec = x.prec + len
-  z.prec = min(z.prec, max_precision(parent(x)))
-  zlen = min(z.prec, xlen + len)
+  z.prec = precision(x) + len
+  z.prec = min(precision(z), max_precision(parent(x)))
+  zlen = min(precision(z), xlen + len)
   @ccall libflint.fq_default_poly_shift_left(z::Ref{FqAbsPowerSeriesRingElem}, x::Ref{FqAbsPowerSeriesRingElem}, len::Int, base_ring(x)::Ref{FqField})::Nothing
   @ccall libflint.fq_default_poly_set_trunc(z::Ref{FqAbsPowerSeriesRingElem}, z::Ref{FqAbsPowerSeriesRingElem}, zlen::Int, base_ring(x)::Ref{FqField})::Nothing
   return z
@@ -280,9 +280,9 @@ function shift_right(x::FqAbsPowerSeriesRingElem, len::Int)
   xlen = length(x)
   z = parent(x)()
   if len >= xlen
-    z.prec = max(0, x.prec - len)
+    z.prec = max(0, precision(x) - len)
   else
-    z.prec = x.prec - len
+    z.prec = precision(x) - len
     @ccall libflint.fq_default_poly_shift_right(z::Ref{FqAbsPowerSeriesRingElem}, x::Ref{FqAbsPowerSeriesRingElem}, len::Int, base_ring(x)::Ref{FqField})::Nothing
   end
   return z
@@ -319,7 +319,7 @@ function ^(a::FqAbsPowerSeriesRingElem, b::Int)
   if precision(a) > 0 && is_gen(a) && b > 0
     return shift_left(a, b - 1)
   elseif length(a) == 1
-    return parent(a)([coeff(a, 0)^b], 1, a.prec)
+    return parent(a)([coeff(a, 0)^b], 1, precision(a))
   elseif b == 0
     z = one(parent(a))
     z = set_precision!(z, precision(a))
@@ -349,7 +349,7 @@ end
 
 function ==(x::FqAbsPowerSeriesRingElem, y::FqAbsPowerSeriesRingElem)
   check_parent(x, y)
-  prec = min(x.prec, y.prec)
+  prec = min(precision(x), precision(y))
   n = max(length(x), length(y))
   n = min(n, prec)
   return Bool(@ccall libflint.fq_default_poly_equal_trunc(x::Ref{FqAbsPowerSeriesRingElem}, y::Ref{FqAbsPowerSeriesRingElem}, n::Int, base_ring(x)::Ref{FqField})::Cint)
@@ -359,7 +359,7 @@ function isequal(x::FqAbsPowerSeriesRingElem, y::FqAbsPowerSeriesRingElem)
   if parent(x) != parent(y)
     return false
   end
-  if x.prec != y.prec || length(x) != length(y)
+  if precision(x) != precision(y) || length(x) != length(y)
     return false
   end
   return Bool(@ccall libflint.fq_default_poly_equal(x::Ref{FqAbsPowerSeriesRingElem}, y::Ref{FqAbsPowerSeriesRingElem}, base_ring(x)::Ref{FqField})::Cint)
@@ -421,7 +421,7 @@ function divexact(x::FqAbsPowerSeriesRingElem, y::FqAbsPowerSeriesRingElem; chec
     end
   end
   check && !is_unit(y) && error("Unable to invert power series")
-  prec = min(x.prec, y.prec - v2 + v1)
+  prec = min(precision(x), precision(y) - v2 + v1)
   z = parent(x)()
   z.prec = prec
   @ccall libflint.fq_default_poly_div_series(z::Ref{FqAbsPowerSeriesRingElem}, x::Ref{FqAbsPowerSeriesRingElem}, y::Ref{FqAbsPowerSeriesRingElem}, prec::Int, base_ring(x)::Ref{FqField})::Nothing
@@ -453,7 +453,7 @@ function inv(a::FqAbsPowerSeriesRingElem)
   !is_unit(a) && error("Unable to invert power series")
   ainv = parent(a)()
   ainv.prec = a.prec
-  @ccall libflint.fq_default_poly_inv_series(ainv::Ref{FqAbsPowerSeriesRingElem}, a::Ref{FqAbsPowerSeriesRingElem}, a.prec::Int, base_ring(a)::Ref{FqField})::Nothing
+  @ccall libflint.fq_default_poly_inv_series(ainv::Ref{FqAbsPowerSeriesRingElem}, a::Ref{FqAbsPowerSeriesRingElem}, precision(a)::Int, base_ring(a)::Ref{FqField})::Nothing
   return ainv
 end
 
@@ -496,7 +496,7 @@ function sqrt_classical(a::FqAbsPowerSeriesRingElem; check::Bool=true)
   end
   v = valuation(a)
   z = S()
-  z.prec = a.prec - div(v, 2)
+  z.prec = precision(a) - div(v, 2)
   if iszero(a)
     return true, z
   end
@@ -514,8 +514,8 @@ function sqrt_classical(a::FqAbsPowerSeriesRingElem; check::Bool=true)
     s = sqrt(c; check=check)
   end
   a = divexact(a, c)
-  z.prec = a.prec - div(v, 2)
-  @ccall libflint.fq_default_poly_sqrt_series(z::Ref{FqAbsPowerSeriesRingElem}, a::Ref{FqAbsPowerSeriesRingElem}, a.prec::Int, base_ring(a)::Ref{FqField})::Nothing
+  z.prec = precision(a) - div(v, 2)
+  @ccall libflint.fq_default_poly_sqrt_series(z::Ref{FqAbsPowerSeriesRingElem}, a::Ref{FqAbsPowerSeriesRingElem}, precision(a)::Int, base_ring(a)::Ref{FqField})::Nothing
   if !isone(s)
     z *= s
   end
@@ -579,7 +579,7 @@ function mul!(z::FqAbsPowerSeriesRingElem, a::FqAbsPowerSeriesRingElem, b::FqAbs
   lenb = length(b)
   aval = valuation(a)
   bval = valuation(b)
-  prec = min(a.prec + bval, b.prec + aval)
+  prec = min(precision(a) + bval, precision(b) + aval)
   prec = min(prec, max_precision(parent(z)))
   lena = min(lena, prec)
   lenb = min(lenb, prec)
@@ -595,7 +595,7 @@ end
 function add!(a::FqAbsPowerSeriesRingElem, b::FqAbsPowerSeriesRingElem)
   lena = length(a)
   lenb = length(b)
-  prec = min(a.prec, b.prec)
+  prec = min(precision(a), precision(b))
   lena = min(lena, prec)
   lenb = min(lenb, prec)
   lenz = max(lena, lenb)
@@ -612,7 +612,7 @@ function add!(c::FqAbsPowerSeriesRingElem, a::FqAbsPowerSeriesRingElem, b::FqAbs
   end
   lena = length(a)
   lenb = length(b)
-  prec = min(a.prec, b.prec)
+  prec = min(precision(a), precision(b))
   lena = min(lena, prec)
   lenb = min(lenb, prec)
   lenc = max(lena, lenb)

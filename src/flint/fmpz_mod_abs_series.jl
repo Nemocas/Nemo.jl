@@ -182,7 +182,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       lena = length(a)
       lenb = length(b)
 
-      prec = min(a.prec, b.prec)
+      prec = min(precision(a), precision(b))
 
       lena = min(lena, prec)
       lenb = min(lenb, prec)
@@ -199,7 +199,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       lena = length(a)
       lenb = length(b)
 
-      prec = min(a.prec, b.prec)
+      prec = min(precision(a), precision(b))
 
       lena = min(lena, prec)
       lenb = min(lenb, prec)
@@ -219,7 +219,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       aval = valuation(a)
       bval = valuation(b)
 
-      prec = min(a.prec + bval, b.prec + aval)
+      prec = min(precision(a) + bval, precision(b) + aval)
       prec = min(prec, max_precision(parent(a)))
 
       lena = min(lena, prec)
@@ -274,9 +274,9 @@ for (etype, rtype, ctype, mtype, brtype) in (
       len < 0 && throw(DomainError(len, "Shift must be non-negative"))
       xlen = length(x)
       z = parent(x)()
-      z.prec = x.prec + len
-      z.prec = min(z.prec, max_precision(parent(x)))
-      zlen = min(z.prec, xlen + len)
+      z.prec = precision(x) + len
+      z.prec = min(precision(z), max_precision(parent(x)))
+      zlen = min(precision(z), xlen + len)
       p = x.parent.base_ring.ninv
       @ccall libflint.fmpz_mod_poly_shift_left(z::Ref{($etype)}, x::Ref{($etype)}, len::Int, p::Ref{($ctype)})::Nothing
       @ccall libflint.fmpz_mod_poly_set_trunc(z::Ref{($etype)}, z::Ref{($etype)}, zlen::Int, p::Ref{($ctype)})::Nothing
@@ -288,9 +288,9 @@ for (etype, rtype, ctype, mtype, brtype) in (
       xlen = length(x)
       z = parent(x)()
       if len >= xlen
-        z.prec = max(0, x.prec - len)
+        z.prec = max(0, precision(x) - len)
       else
-        z.prec = x.prec - len
+        z.prec = precision(x) - len
         @ccall libflint.fmpz_mod_poly_shift_right(z::Ref{($etype)}, x::Ref{($etype)}, len::Int, x.parent.base_ring.ninv::Ref{($ctype)})::Nothing
       end
       return z
@@ -327,16 +327,16 @@ for (etype, rtype, ctype, mtype, brtype) in (
       if precision(a) > 0 && is_gen(a) && b > 0
         return shift_left(a, b - 1)
       elseif length(a) == 1
-        return parent(a)([coeff(a, 0)^b], 1, a.prec)
+        return parent(a)([coeff(a, 0)^b], 1, precision(a))
       elseif b == 0
         z = one(parent(a))
         z = set_precision!(z, precision(a))
         return z
       else
         z = parent(a)()
-        z.prec = a.prec + (b - 1)*valuation(a)
-        z.prec = min(z.prec, max_precision(parent(a)))
-        @ccall libflint.fmpz_mod_poly_pow_trunc(z::Ref{($etype)}, a::Ref{($etype)}, b::UInt, z.prec::Int, a.parent.base_ring.ninv::Ref{($ctype)})::Nothing
+        z.prec = precision(a) + (b - 1)*valuation(a)
+        z.prec = min(precision(z), max_precision(parent(a)))
+        @ccall libflint.fmpz_mod_poly_pow_trunc(z::Ref{($etype)}, a::Ref{($etype)}, b::UInt, precision(z)::Int, a.parent.base_ring.ninv::Ref{($ctype)})::Nothing
       end
       return z
     end
@@ -349,7 +349,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
 
     function ==(x::($etype), y::($etype))
       check_parent(x, y)
-      prec = min(x.prec, y.prec)
+      prec = min(precision(x), precision(y))
 
       n = max(length(x), length(y))
       n = min(n, prec)
@@ -361,7 +361,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       if parent(x) != parent(y)
         return false
       end
-      if x.prec != y.prec || length(x) != length(y)
+      if precision(x) != precision(y) || length(x) != length(y)
         return false
       end
       return Bool(@ccall libflint.fmpz_mod_poly_equal(x::Ref{($etype)}, y::Ref{($etype)}, x.parent.base_ring.ninv::Ref{($ctype)})::Cint)
@@ -425,7 +425,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
         end
       end
       check && !is_unit(y) && error("Unable to invert power series")
-      prec = min(x.prec, y.prec - v2 + v1)
+      prec = min(precision(x), precision(y) - v2 + v1)
       z = parent(x)()
       z.prec = prec
       @ccall libflint.fmpz_mod_poly_div_series(z::Ref{($etype)}, x::Ref{($etype)}, y::Ref{($etype)}, prec::Int, x.parent.base_ring.ninv::Ref{($ctype)})::Nothing
@@ -468,7 +468,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       !is_unit(a) && error("Unable to invert power series")
       ainv = parent(a)()
       ainv.prec = a.prec
-      @ccall libflint.fmpz_mod_poly_inv_series(ainv::Ref{($etype)}, a::Ref{($etype)}, a.prec::Int, a.parent.base_ring.ninv::Ref{($ctype)})::Nothing
+      @ccall libflint.fmpz_mod_poly_inv_series(ainv::Ref{($etype)}, a::Ref{($etype)}, precision(a)::Int, a.parent.base_ring.ninv::Ref{($ctype)})::Nothing
       return ainv
     end
 
@@ -511,7 +511,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       aval = valuation(a)
       bval = valuation(b)
 
-      prec = min(a.prec + bval, b.prec + aval)
+      prec = min(precision(a) + bval, precision(b) + aval)
       prec = min(prec, max_precision(parent(z)))
 
       lena = min(lena, prec)
@@ -531,7 +531,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       lena = length(a)
       lenb = length(b)
 
-      prec = min(a.prec, b.prec)
+      prec = min(precision(a), precision(b))
 
       lena = min(lena, prec)
       lenb = min(lenb, prec)
@@ -661,7 +661,7 @@ function sqrt_classical(a::FpAbsPowerSeriesRingElem; check::Bool=true)
   end
   v = valuation(a)
   z = S()
-  z.prec = a.prec - div(v, 2)
+  z.prec = precision(a) - div(v, 2)
   if iszero(a)
     return true, z
   end
@@ -679,8 +679,8 @@ function sqrt_classical(a::FpAbsPowerSeriesRingElem; check::Bool=true)
     s = sqrt(c; check=check)
   end
   a = divexact(a, c)
-  z.prec = a.prec - div(v, 2)
-  @ccall libflint.fmpz_mod_poly_sqrt_series(z::Ref{FpAbsPowerSeriesRingElem}, a::Ref{FpAbsPowerSeriesRingElem}, a.prec::Int, a.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  z.prec = precision(a) - div(v, 2)
+  @ccall libflint.fmpz_mod_poly_sqrt_series(z::Ref{FpAbsPowerSeriesRingElem}, a::Ref{FpAbsPowerSeriesRingElem}, precision(a)::Int, a.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   if !isone(s)
     z *= s
   end
