@@ -616,7 +616,9 @@ end
   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 2 2])
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(QQ) === AbstractAlgebra.Solve.RREFTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(QQ)) === AbstractAlgebra.Solve.RREFTrait()
   @test AbstractAlgebra.Solve.matrix_normal_form_type(A) === AbstractAlgebra.Solve.RREFTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(A)) === AbstractAlgebra.Solve.RREFTrait()
 
   T = matrix_space(QQ, 3, 1)
 
@@ -745,7 +747,9 @@ end
   A = matrix(QQ, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
   C = solve_init(A)
   @test C isa AbstractAlgebra.solve_context_type(QQ)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(QQ))
   @test C isa AbstractAlgebra.solve_context_type(A)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.FFLUTrait()
   @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), QQFieldElem)
