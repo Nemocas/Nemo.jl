@@ -217,7 +217,7 @@ function *(a::Generic.MPoly{T}, n::ZZRingElem) where T <: RingElem
     end
   end
   r.length = j - 1
-  resize!(r.coeffs, r.length)
+  resize!(r.coeffs, length(r))
   return r
 end
 
@@ -226,8 +226,8 @@ end
 function ==(a::Generic.MPoly{T}, n::ZZRingElem) where T <: RingElem
   N = size(a.exps, 1)
   if iszero(n)
-    return a.length == 0
-  elseif a.length == 1
+    return length(a) == 0
+  elseif length(a) == 1
     return a.coeffs[1] == n && monomial_iszero(a.exps, 1, N)
   end
   return false
@@ -245,19 +245,19 @@ function evaluate(a::Generic.MPoly{T}, A::Vector{ZZRingElem}) where {T <: RingEl
     start_var = N - 1
   end
   if ord == :degrevlex
-    while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
+    while length(a) > 1 || (length(a) == 1 && !monomial_iszero(a.exps, length(a), N))
       k = main_variable(a, start_var)
       p = main_variable_extract(a, k)
       a = evaluate(p, A[k])
     end
   else
-    while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
+    while length(a) > 1 || (length(a) == 1 && !monomial_iszero(a.exps, length(a), N))
       k = main_variable(a, start_var)
       p = main_variable_extract(a, k)
       a = evaluate(p, A[start_var - k + 1])
     end
   end
-  if a.length == 0
+  if length(a) == 0
     return base_ring(a)()
   else
     return a.coeffs[1]
@@ -289,7 +289,7 @@ end
 *(n::ZZRingElem, a::Generic.SparsePoly{T}) where T <: RingElem = a*n
 
 function ==(a::Generic.SparsePoly{T}, b::ZZRingElem) where T <: RingElem
-  return length(a) == 0 ? iszero(b) : a.length == 1 &
+  return length(a) == 0 ? iszero(b) : length(a) == 1 &
   a.exps[1] == 0 && a.coeffs[1] == b
 end
 

@@ -31,7 +31,7 @@ function evaluate(f::ZZPolyRingElem, r::fqPolyRepFieldElem)
     return parent(r)()
   end
 
-  l = f.length - 1
+  l = length(f) - 1
   s = parent(r)(coeff(f, l))
   for i = l-1:-1:0
     s = s * r + parent(r)(coeff(f, i))
@@ -48,7 +48,7 @@ function evaluate!(z::fqPolyRepFieldElem, f::ZZPolyRingElem, r::fqPolyRepFieldEl
     return z
   end
 
-  l = f.length - 1
+  l = length(f) - 1
   set!(z, parent(r)(coeff(f, l)))
   #s = parent(r)(coeff(f, l))
   for i = l-1:-1:0
