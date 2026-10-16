@@ -407,13 +407,13 @@ for (S, W) in ((:MatElem, ()),
 end
 
 function (a::Generic.MatSpace{T})(b::ZZMatrix) where {T <: RingElement}
-  if a.nrows != nrows(b) || a.ncols != ncols(b)
+  if nrows(a) != nrows(b) || ncols(a) != ncols(b)
     error("incompatible matrix dimensions")
   end
   A = a()
   R = base_ring(a)
-  for i=1:a.nrows
-    for j=1:a.ncols
+  for i=1:nrows(a)
+    for j=1:ncols(a)
       A[i,j] = R(b[i,j])
     end
   end
