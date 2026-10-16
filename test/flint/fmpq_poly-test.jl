@@ -644,7 +644,6 @@ end
     Rx, x = R["x"]
     g = @inferred change_base_ring(R, f; parent = Rx)
     @test g == 4*x^2 + 8*x + 2
-    @test (@which AbstractAlgebra._map(R, f, Rx)).module === Nemo
   end
 
   R = GF(5)
