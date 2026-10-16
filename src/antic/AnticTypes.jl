@@ -97,7 +97,7 @@ mutable struct AbsSimpleNumFieldElem <: SimpleNumFieldElem{QQFieldElem}
 end
 
 function _nf_elem_clear_fn(a::AbsSimpleNumFieldElem)
-  @ccall libflint.nf_elem_clear(a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_clear(a::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
 end
 
 

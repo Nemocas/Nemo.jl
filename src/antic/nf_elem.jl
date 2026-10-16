@@ -126,15 +126,15 @@ Return `true` if the given number field element is the generator of the
 number field, otherwise return `false`.
 """
 function is_gen(a::AbsSimpleNumFieldElem)
-  return @ccall libflint.nf_elem_is_gen(a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Bool
+  return @ccall libflint.nf_elem_is_gen(a::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Bool
 end
 
 function isone(a::AbsSimpleNumFieldElem)
-  return @ccall libflint.nf_elem_is_one(a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Bool
+  return @ccall libflint.nf_elem_is_one(a::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Bool
 end
 
 function iszero(a::AbsSimpleNumFieldElem)
-  return @ccall libflint.nf_elem_is_zero(a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Bool
+  return @ccall libflint.nf_elem_is_zero(a::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Bool
 end
 
 @doc raw"""
@@ -144,7 +144,7 @@ Return `true` if the given number field element is an integer, i.e., in ZZ, othe
 return `false`.
 """
 function isinteger(a::AbsSimpleNumFieldElem)
-  b = @ccall libflint.nf_elem_is_integer(a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Cint
+  b = @ccall libflint.nf_elem_is_integer(a::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Cint
   return Bool(b)
 end
 
@@ -155,7 +155,7 @@ Return `true` if the given number field element is a rational number, i.e., in Q
 otherwise `false`.
 """
 function is_rational(a::AbsSimpleNumFieldElem)
-  b = @ccall libflint.nf_elem_is_rational(a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Cint
+  b = @ccall libflint.nf_elem_is_rational(a::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Cint
   return Bool(b)
 end
 
@@ -167,7 +167,7 @@ field element.
 """
 function denominator(a::AbsSimpleNumFieldElem)
   z = ZZRingElem()
-  @ccall libflint.nf_elem_get_den(z::Ref{ZZRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_get_den(z::Ref{ZZRingElem}, a::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return z
 end
 
@@ -180,7 +180,7 @@ function elem_from_mat_row(a::AbsSimpleNumField, b::ZZMatrix, i::Int, d::ZZRingE
 end
 
 function elem_to_mat_row!(a::ZZMatrix, i::Int, d::ZZRingElem, b::AbsSimpleNumFieldElem)
-  @ccall libflint.nf_elem_get_fmpz_mat_row(a::Ref{ZZMatrix}, (i - 1)::Int, d::Ref{ZZRingElem}, b::Ref{AbsSimpleNumFieldElem}, b.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_get_fmpz_mat_row(a::Ref{ZZMatrix}, (i - 1)::Int, d::Ref{ZZRingElem}, b::Ref{AbsSimpleNumFieldElem}, parent(b)::Ref{AbsSimpleNumField})::Nothing
   nothing
 end
 
@@ -234,7 +234,7 @@ function Base.show(io::IO, a::AbsSimpleNumField)
 end
 
 function expressify(a::AbsSimpleNumFieldElem; context = nothing)
-  return expressify(parent(parent(a).pol)(a), var(parent(a)), context = context)
+  return expressify(parent(defining_polynomial(parent(a)))(a), var(parent(a)), context = context)
 end
 
 function Base.show(io::IO, a::AbsSimpleNumFieldElem)
@@ -242,7 +242,7 @@ function Base.show(io::IO, a::AbsSimpleNumFieldElem)
 end
 
 function pretty_lt(x::AbsSimpleNumFieldElem, y::AbsSimpleNumFieldElem)
-  return pretty_lt(parent(parent(x).pol)(x), parent(parent(y).pol)(y))
+  return pretty_lt(parent(defining_polynomial(parent(x)))(x), parent(defining_polynomial(parent(y)))(y))
 end
 pretty_eq(x::AbsSimpleNumFieldElem, y::AbsSimpleNumFieldElem) = (x == y)
 
@@ -252,7 +252,7 @@ pretty_eq(x::AbsSimpleNumFieldElem, y::AbsSimpleNumFieldElem) = (x == y)
 #
 ###############################################################################
 
--(a::AbsSimpleNumFieldElem) = neg!(a.parent(), a)
+-(a::AbsSimpleNumFieldElem) = neg!(parent(a)(), a)
 
 ###############################################################################
 #
@@ -263,21 +263,21 @@ pretty_eq(x::AbsSimpleNumFieldElem, y::AbsSimpleNumFieldElem) = (x == y)
 function +(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem)
   parent(a) == parent(b) || return force_op(+, a, b)::AbsSimpleNumFieldElem
   check_parent(a, b)
-  r = a.parent()
+  r = parent(a)()
   return add!(r, a, b)
 end
 
 function -(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem)
   parent(a) == parent(b) || return force_op(-, a, b)::AbsSimpleNumFieldElem
   check_parent(a, b)
-  r = a.parent()
+  r = parent(a)()
   return sub!(r, a, b)
 end
 
 function *(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem)
   parent(a) == parent(b) || return force_op(*, a, b)::AbsSimpleNumFieldElem
   check_parent(a, b)
-  r = a.parent()
+  r = parent(a)()
   return mul!(r, a, b)
 end
 
@@ -288,56 +288,56 @@ end
 ###############################################################################
 
 function +(a::AbsSimpleNumFieldElem, b::Int)
-  r = a.parent()
-  @ccall libflint.nf_elem_add_si(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Int, a.parent::Ref{AbsSimpleNumField})::Nothing
+  r = parent(a)()
+  @ccall libflint.nf_elem_add_si(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Int, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
 function +(a::AbsSimpleNumFieldElem, b::ZZRingElem)
-  r = a.parent()
-  @ccall libflint.nf_elem_add_fmpz(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  r = parent(a)()
+  @ccall libflint.nf_elem_add_fmpz(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
 function +(a::AbsSimpleNumFieldElem, b::QQFieldElem)
-  r = a.parent()
-  @ccall libflint.nf_elem_add_fmpq(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{QQFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  r = parent(a)()
+  @ccall libflint.nf_elem_add_fmpq(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{QQFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
 function -(a::AbsSimpleNumFieldElem, b::Int)
-  r = a.parent()
-  @ccall libflint.nf_elem_sub_si(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Int, a.parent::Ref{AbsSimpleNumField})::Nothing
+  r = parent(a)()
+  @ccall libflint.nf_elem_sub_si(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Int, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
 function -(a::AbsSimpleNumFieldElem, b::ZZRingElem)
-  r = a.parent()
-  @ccall libflint.nf_elem_sub_fmpz(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  r = parent(a)()
+  @ccall libflint.nf_elem_sub_fmpz(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
 function -(a::AbsSimpleNumFieldElem, b::QQFieldElem)
-  r = a.parent()
-  @ccall libflint.nf_elem_sub_fmpq(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{QQFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  r = parent(a)()
+  @ccall libflint.nf_elem_sub_fmpq(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{QQFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
 function -(a::Int, b::AbsSimpleNumFieldElem)
-  r = b.parent()
-  @ccall libflint.nf_elem_si_sub(r::Ref{AbsSimpleNumFieldElem}, a::Int, b::Ref{AbsSimpleNumFieldElem}, b.parent::Ref{AbsSimpleNumField})::Nothing
+  r = parent(b)()
+  @ccall libflint.nf_elem_si_sub(r::Ref{AbsSimpleNumFieldElem}, a::Int, b::Ref{AbsSimpleNumFieldElem}, parent(b)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
 function -(a::ZZRingElem, b::AbsSimpleNumFieldElem)
-  r = b.parent()
-  @ccall libflint.nf_elem_fmpz_sub(r::Ref{AbsSimpleNumFieldElem}, a::Ref{ZZRingElem}, b::Ref{AbsSimpleNumFieldElem}, b.parent::Ref{AbsSimpleNumField})::Nothing
+  r = parent(b)()
+  @ccall libflint.nf_elem_fmpz_sub(r::Ref{AbsSimpleNumFieldElem}, a::Ref{ZZRingElem}, b::Ref{AbsSimpleNumFieldElem}, parent(b)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
 function -(a::QQFieldElem, b::AbsSimpleNumFieldElem)
-  r = b.parent()
-  @ccall libflint.nf_elem_fmpq_sub(r::Ref{AbsSimpleNumFieldElem}, a::Ref{QQFieldElem}, b::Ref{AbsSimpleNumFieldElem}, b.parent::Ref{AbsSimpleNumField})::Nothing
+  r = parent(b)()
+  @ccall libflint.nf_elem_fmpq_sub(r::Ref{AbsSimpleNumFieldElem}, a::Ref{QQFieldElem}, b::Ref{AbsSimpleNumFieldElem}, parent(b)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
@@ -360,20 +360,20 @@ end
 -(a::AbsSimpleNumFieldElem, b::Rational) = a - QQFieldElem(b)
 
 function *(a::AbsSimpleNumFieldElem, b::Int)
-  r = a.parent()
-  @ccall libflint.nf_elem_scalar_mul_si(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Int, a.parent::Ref{AbsSimpleNumField})::Nothing
+  r = parent(a)()
+  @ccall libflint.nf_elem_scalar_mul_si(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Int, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
 function *(a::AbsSimpleNumFieldElem, b::ZZRingElem)
-  r = a.parent()
-  @ccall libflint.nf_elem_scalar_mul_fmpz(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  r = parent(a)()
+  @ccall libflint.nf_elem_scalar_mul_fmpz(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
 function *(a::AbsSimpleNumFieldElem, b::QQFieldElem)
-  r = a.parent()
-  @ccall libflint.nf_elem_scalar_mul_fmpq(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{QQFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  r = parent(a)()
+  @ccall libflint.nf_elem_scalar_mul_fmpq(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{QQFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
@@ -432,7 +432,7 @@ end
 function ==(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem)
   parent(a) == parent(b) || return force_op(==, a, b)::Bool
   check_parent(a, b)
-  return @ccall libflint.nf_elem_equal(a::Ref{AbsSimpleNumFieldElem}, b::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Bool
+  return @ccall libflint.nf_elem_equal(a::Ref{AbsSimpleNumFieldElem}, b::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Bool
 end
 
 ###############################################################################
@@ -442,22 +442,22 @@ end
 ###############################################################################
 
 function ==(a::AbsSimpleNumFieldElem, b::ZZRingElem)
-  b = @ccall libflint.nf_elem_equal_fmpz(a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Cint
+  b = @ccall libflint.nf_elem_equal_fmpz(a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, parent(a)::Ref{AbsSimpleNumField})::Cint
   return Bool(b)
 end
 
 function ==(a::AbsSimpleNumFieldElem, b::QQFieldElem)
-  b = @ccall libflint.nf_elem_equal_fmpq(a::Ref{AbsSimpleNumFieldElem}, b::Ref{QQFieldElem}, a.parent::Ref{AbsSimpleNumField})::Cint
+  b = @ccall libflint.nf_elem_equal_fmpq(a::Ref{AbsSimpleNumFieldElem}, b::Ref{QQFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Cint
   return Bool(b)
 end
 
 function ==(a::AbsSimpleNumFieldElem, b::Int)
-  b = @ccall libflint.nf_elem_equal_si(a::Ref{AbsSimpleNumFieldElem}, b::Int, a.parent::Ref{AbsSimpleNumField})::Cint
+  b = @ccall libflint.nf_elem_equal_si(a::Ref{AbsSimpleNumFieldElem}, b::Int, parent(a)::Ref{AbsSimpleNumField})::Cint
   return Bool(b)
 end
 
 function ==(a::AbsSimpleNumFieldElem, b::UInt)
-  b = @ccall libflint.nf_elem_equal_ui(a::Ref{AbsSimpleNumFieldElem}, b::UInt, a.parent::Ref{AbsSimpleNumField})::Cint
+  b = @ccall libflint.nf_elem_equal_ui(a::Ref{AbsSimpleNumFieldElem}, b::UInt, parent(a)::Ref{AbsSimpleNumField})::Cint
   return Bool(b)
 end
 
@@ -490,8 +490,8 @@ Return $a^{-1}$. Requires $a \neq 0$.
 """
 function inv(a::AbsSimpleNumFieldElem)
   iszero(a) && throw(DivideError())
-  r = a.parent()
-  @ccall libflint.nf_elem_inv(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  r = parent(a)()
+  @ccall libflint.nf_elem_inv(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
@@ -505,8 +505,8 @@ function divexact(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem; check::Boo
   iszero(b) && throw(DivideError())
   parent(a) == parent(b) || return force_op(divexact, a, b)::AbsSimpleNumFieldElem
   check_parent(a, b)
-  r = a.parent()
-  @ccall libflint.nf_elem_div(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  r = parent(a)()
+  @ccall libflint.nf_elem_div(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
@@ -518,15 +518,15 @@ end
 
 function divexact(a::AbsSimpleNumFieldElem, b::Int; check::Bool=true)
   b == 0 && throw(DivideError())
-  r = a.parent()
-  @ccall libflint.nf_elem_scalar_div_si(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Int, a.parent::Ref{AbsSimpleNumField})::Nothing
+  r = parent(a)()
+  @ccall libflint.nf_elem_scalar_div_si(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Int, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
 function divexact(a::AbsSimpleNumFieldElem, b::ZZRingElem; check::Bool=true)
   iszero(b) && throw(DivideError())
-  r = a.parent()
-  @ccall libflint.nf_elem_scalar_div_fmpz(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  r = parent(a)()
+  @ccall libflint.nf_elem_scalar_div_fmpz(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
@@ -534,8 +534,8 @@ divexact(a::AbsSimpleNumFieldElem, b::Integer; check::Bool=true) = divexact(a, f
 
 function divexact(a::AbsSimpleNumFieldElem, b::QQFieldElem; check::Bool=true)
   iszero(b) && throw(DivideError())
-  r = a.parent()
-  @ccall libflint.nf_elem_scalar_div_fmpq(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{QQFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  r = parent(a)()
+  @ccall libflint.nf_elem_scalar_div_fmpq(r::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{QQFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return r
 end
 
@@ -596,7 +596,7 @@ Return the absolute norm of $a$. The result will be a rational number.
 """
 function norm(a::AbsSimpleNumFieldElem)
   z = QQFieldElem()
-  @ccall libflint.nf_elem_norm(z::Ref{QQFieldElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_norm(z::Ref{QQFieldElem}, a::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return z
 end
 
@@ -607,7 +607,7 @@ Return the absolute trace of $a$. The result will be a rational number.
 """
 function tr(a::AbsSimpleNumFieldElem)
   z = QQFieldElem()
-  @ccall libflint.nf_elem_trace(z::Ref{QQFieldElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_trace(z::Ref{QQFieldElem}, a::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return z
 end
 
@@ -682,7 +682,7 @@ function mul_red!(z::AbsSimpleNumFieldElem, x::AbsSimpleNumFieldElem, y::AbsSimp
 end
 
 function add!(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem, c::AbsSimpleNumFieldElem)
-  @ccall libflint.nf_elem_add(a::Ref{AbsSimpleNumFieldElem}, b::Ref{AbsSimpleNumFieldElem}, c::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_add(a::Ref{AbsSimpleNumFieldElem}, b::Ref{AbsSimpleNumFieldElem}, c::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return a
 end
 
@@ -702,7 +702,7 @@ end
 #
 
 function pow!(z::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, n::Integer)
-  @ccall libflint.nf_elem_pow(z::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, n::UInt, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_pow(z::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, n::UInt, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return z
 end
 
@@ -713,39 +713,39 @@ end
 ###############################################################################
 
 function add!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::QQFieldElem)
-  @ccall libflint.nf_elem_add_fmpq(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{QQFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_add_fmpq(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{QQFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return c
 end
 
 function add!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::ZZRingElem)
-  @ccall libflint.nf_elem_add_fmpz(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_add_fmpz(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return c
 end
 
 function add!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Int)
-  @ccall libflint.nf_elem_add_si(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Int, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_add_si(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Int, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return c
 end
 
 add!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Integer) = add!(c, a, flintify(b))
 
 function sub!(a::AbsSimpleNumFieldElem, b::AbsSimpleNumFieldElem, c::AbsSimpleNumFieldElem)
-  @ccall libflint.nf_elem_sub(a::Ref{AbsSimpleNumFieldElem}, b::Ref{AbsSimpleNumFieldElem}, c::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_sub(a::Ref{AbsSimpleNumFieldElem}, b::Ref{AbsSimpleNumFieldElem}, c::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return a
 end
 
 function sub!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::QQFieldElem)
-  @ccall libflint.nf_elem_sub_fmpq(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{QQFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_sub_fmpq(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{QQFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return c
 end
 
 function sub!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::ZZRingElem)
-  @ccall libflint.nf_elem_sub_fmpz(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_sub_fmpz(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return c
 end
 
 function sub!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Int)
-  @ccall libflint.nf_elem_sub_si(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Int, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_sub_si(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Int, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return c
 end
 
@@ -762,24 +762,24 @@ function sub!(c::AbsSimpleNumFieldElem, a::ZZRingElem, b::AbsSimpleNumFieldElem)
 end
 
 function sub!(c::AbsSimpleNumFieldElem, a::Int, b::AbsSimpleNumFieldElem)
-  @ccall libflint.nf_elem_si_sub(c::Ref{AbsSimpleNumFieldElem}, a::Int, b::Ref{AbsSimpleNumFieldElem}, b.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_si_sub(c::Ref{AbsSimpleNumFieldElem}, a::Int, b::Ref{AbsSimpleNumFieldElem}, parent(b)::Ref{AbsSimpleNumField})::Nothing
   return c
 end
 
 sub!(c::AbsSimpleNumFieldElem, a::Integer, b::AbsSimpleNumFieldElem) = sub!(c, flintify(a), b)
 
 function mul!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::QQFieldElem)
-  @ccall libflint.nf_elem_scalar_mul_fmpq(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{QQFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_scalar_mul_fmpq(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{QQFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return c
 end
 
 function mul!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::ZZRingElem)
-  @ccall libflint.nf_elem_scalar_mul_fmpz(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_scalar_mul_fmpz(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Ref{ZZRingElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return c
 end
 
 function mul!(c::AbsSimpleNumFieldElem, a::AbsSimpleNumFieldElem, b::Int)
-  @ccall libflint.nf_elem_scalar_mul_si(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Int, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_scalar_mul_si(c::Ref{AbsSimpleNumFieldElem}, a::Ref{AbsSimpleNumFieldElem}, b::Int, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return c
 end
 
@@ -933,7 +933,7 @@ function *(a::Generic.Poly{AbsSimpleNumFieldElem}, b::Generic.Poly{AbsSimpleNumF
   if lena == 0 || lenb == 0
     return r
   end
-  pol = base_ring(a).pol
+  pol = defining_polynomial(base_ring(a))
   K = base_ring(a)
   R = parent(pol)
   T = elem_type(R)
@@ -1029,15 +1029,15 @@ end
 function (a::AbsSimpleNumField)(pol::QQPolyRingElem)
   check_parent(defining_polynomial(a), pol)
   z = AbsSimpleNumFieldElem(a)
-  if length(pol) >= length(a.pol)
-    pol = mod(pol, a.pol)
+  if length(pol) >= length(defining_polynomial(a))
+    pol = mod(pol, defining_polynomial(a))
   end
   @ccall libflint.nf_elem_set_fmpq_poly(z::Ref{AbsSimpleNumFieldElem}, pol::Ref{QQPolyRingElem}, a::Ref{AbsSimpleNumField})::Nothing
   return z
 end
 
 function (a::QQPolyRing)(b::AbsSimpleNumFieldElem)
-  parent(parent(b).pol) != a && error("Cannot coerce from number field to polynomial ring")
+  parent(defining_polynomial(parent(b))) != a && error("Cannot coerce from number field to polynomial ring")
   r = a()
   @ccall libflint.nf_elem_get_fmpq_poly(r::Ref{QQPolyRingElem}, b::Ref{AbsSimpleNumFieldElem}, parent(b)::Ref{AbsSimpleNumField})::Nothing
   return r
@@ -1066,7 +1066,7 @@ RandomExtensions.maketype(K::AbsSimpleNumField, ::AbstractUnitRange, ::AbstractU
 function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{AbsSimpleNumFieldElem, AbsSimpleNumField,
                                                            <:AbstractUnitRange{<:IntegerUnion}}})
   K, r = sp[][1:end]
-  R = parent(K.pol)
+  R = parent(defining_polynomial(K))
   return K(R([rand(rng, r) for _ in 1:degree(K)]))
 end
 
@@ -1228,7 +1228,7 @@ function charpoly(Qx::QQPolyRing, a::AbsSimpleNumFieldElem)
 end
 
 function charpoly(a::AbsSimpleNumFieldElem)
-  f = charpoly(parent(parent(a).pol), a)
+  f = charpoly(parent(defining_polynomial(parent(a))), a)
   return f
 end
 
@@ -1267,7 +1267,7 @@ function minpoly(Qx::QQPolyRing, a::AbsSimpleNumFieldElem)
 end
 
 function minpoly(a::AbsSimpleNumFieldElem)
-  f = minpoly(parent(parent(a).pol), a)
+  f = minpoly(parent(defining_polynomial(parent(a))), a)
   return f
 end
 
