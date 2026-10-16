@@ -477,13 +477,13 @@ end
 
 function zero!(z::ZZAbsPowerSeriesRingElem)
   @ccall libflint.fmpz_poly_zero(z::Ref{ZZAbsPowerSeriesRingElem})::Nothing
-  z.prec = parent(z).prec_max
+  z.prec = max_precision(parent(z))
   return z
 end
 
 function one!(z::ZZAbsPowerSeriesRingElem)
   @ccall libflint.fmpz_poly_one(z::Ref{ZZAbsPowerSeriesRingElem})::Nothing
-  z.prec = parent(z).prec_max
+  z.prec = max_precision(parent(z))
   return z
 end
 
@@ -558,7 +558,7 @@ promote_rule(::Type{ZZAbsPowerSeriesRingElem}, ::Type{ZZRingElem}) = ZZAbsPowerS
 
 function (a::ZZAbsPowerSeriesRing)()
   z = ZZAbsPowerSeriesRingElem()
-  z.prec = a.prec_max
+  z.prec = max_precision(a)
   z.parent = a
   return z
 end
@@ -566,9 +566,9 @@ end
 function (a::ZZAbsPowerSeriesRing)(b::Integer)
   if b == 0
     z = ZZAbsPowerSeriesRingElem()
-    z.prec = a.prec_max
+    z.prec = max_precision(a)
   else
-    z = ZZAbsPowerSeriesRingElem([ZZRingElem(b)], 1, a.prec_max)
+    z = ZZAbsPowerSeriesRingElem([ZZRingElem(b)], 1, max_precision(a))
   end
   z.parent = a
   return z
@@ -577,9 +577,9 @@ end
 function (a::ZZAbsPowerSeriesRing)(b::ZZRingElem)
   if iszero(b)
     z = ZZAbsPowerSeriesRingElem()
-    z.prec = a.prec_max
+    z.prec = max_precision(a)
   else
-    z = ZZAbsPowerSeriesRingElem([b], 1, a.prec_max)
+    z = ZZAbsPowerSeriesRingElem([b], 1, max_precision(a))
   end
   z.parent = a
   return z

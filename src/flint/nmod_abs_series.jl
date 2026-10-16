@@ -463,13 +463,13 @@ for (etype, rtype, mtype, brtype) in (
 
     function zero!(z::($etype))
       @ccall libflint.nmod_poly_zero(z::Ref{($etype)})::Nothing
-      z.prec = parent(z).prec_max
+      z.prec = max_precision(parent(z))
       return z
     end
 
     function one!(z::($etype))
       @ccall libflint.nmod_poly_one(z::Ref{($etype)})::Nothing
-      z.prec = parent(z).prec_max
+      z.prec = max_precision(parent(z))
       return z
     end
 
@@ -552,7 +552,7 @@ for (etype, rtype, mtype, brtype) in (
 
     function (a::($rtype))()
       z = ($etype)(a.n)
-      z.prec = a.prec_max
+      z.prec = max_precision(a)
       z.parent = a
       return z
     end
@@ -560,9 +560,9 @@ for (etype, rtype, mtype, brtype) in (
     function (a::($rtype))(b::$(mtype))
       if iszero(b)
         z = ($etype)(a.n)
-        z.prec = a.prec_max
+        z.prec = max_precision(a)
       else
-        z = ($etype)(a.n, [b], 1, a.prec_max)
+        z = ($etype)(a.n, [b], 1, max_precision(a))
       end
       z.parent = a
       return z

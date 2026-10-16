@@ -645,13 +645,13 @@ end
 
 function zero!(z::QQAbsPowerSeriesRingElem)
   @ccall libflint.fmpq_poly_zero(z::Ref{QQAbsPowerSeriesRingElem})::Nothing
-  z.prec = parent(z).prec_max
+  z.prec = max_precision(parent(z))
   return z
 end
 
 function one!(z::QQAbsPowerSeriesRingElem)
   @ccall libflint.fmpq_poly_one(z::Ref{QQAbsPowerSeriesRingElem})::Nothing
-  z.prec = parent(z).prec_max
+  z.prec = max_precision(parent(z))
   return z
 end
 
@@ -730,7 +730,7 @@ promote_rule(::Type{QQAbsPowerSeriesRingElem}, ::Type{QQFieldElem}) = QQAbsPower
 
 function (a::QQAbsPowerSeriesRing)()
   z = QQAbsPowerSeriesRingElem()
-  z.prec = a.prec_max
+  z.prec = max_precision(a)
   z.parent = a
   return z
 end
@@ -738,9 +738,9 @@ end
 function (a::QQAbsPowerSeriesRing)(b::Integer)
   if b == 0
     z = QQAbsPowerSeriesRingElem()
-    z.prec = a.prec_max
+    z.prec = max_precision(a)
   else
-    z = QQAbsPowerSeriesRingElem([QQFieldElem(b)], 1, a.prec_max)
+    z = QQAbsPowerSeriesRingElem([QQFieldElem(b)], 1, max_precision(a))
   end
   z.parent = a
   return z
@@ -749,9 +749,9 @@ end
 function (a::QQAbsPowerSeriesRing)(b::ZZRingElem)
   if iszero(b)
     z = QQAbsPowerSeriesRingElem()
-    z.prec = a.prec_max
+    z.prec = max_precision(a)
   else
-    z = QQAbsPowerSeriesRingElem([QQFieldElem(b)], 1, a.prec_max)
+    z = QQAbsPowerSeriesRingElem([QQFieldElem(b)], 1, max_precision(a))
   end
   z.parent = a
   return z
@@ -760,9 +760,9 @@ end
 function (a::QQAbsPowerSeriesRing)(b::QQFieldElem)
   if iszero(b)
     z = QQAbsPowerSeriesRingElem()
-    z.prec = a.prec_max
+    z.prec = max_precision(a)
   else
-    z = QQAbsPowerSeriesRingElem([b], 1, a.prec_max)
+    z = QQAbsPowerSeriesRingElem([b], 1, max_precision(a))
   end
   z.parent = a
   return z

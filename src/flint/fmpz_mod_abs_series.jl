@@ -480,13 +480,13 @@ for (etype, rtype, ctype, mtype, brtype) in (
 
     function zero!(z::($etype))
       @ccall libflint.fmpz_mod_poly_zero(z::Ref{($etype)}, z.parent.base_ring.ninv::Ref{($ctype)})::Nothing
-      z.prec = parent(z).prec_max
+      z.prec = max_precision(parent(z))
       return z
     end
 
     function one!(z::($etype))
       @ccall libflint.fmpz_mod_poly_one(z::Ref{($etype)}, z.parent.base_ring.ninv::Ref{($ctype)})::Nothing
-      z.prec = parent(z).prec_max
+      z.prec = max_precision(parent(z))
       return z
     end
 
@@ -568,7 +568,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
     function (a::($rtype))()
       m = base_ring(a)
       z = ($etype)(m)
-      z.prec = a.prec_max
+      z.prec = max_precision(a)
       z.parent = a
       return z
     end
@@ -585,9 +585,9 @@ for (etype, rtype, ctype, mtype, brtype) in (
       m = base_ring(a)
       if iszero(b)
         z = ($etype)(m)
-        z.prec = a.prec_max
+        z.prec = max_precision(a)
       else
-        z = ($etype)(m, [b], 1, a.prec_max)
+        z = ($etype)(m, [b], 1, max_precision(a))
       end
       z.parent = a
       return z
