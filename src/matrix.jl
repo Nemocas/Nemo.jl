@@ -1,6 +1,3 @@
-# The FlintMatElem types with windows, that is, with a `_view_window` method
-const _MatTypes = Union{ZZMatrix, QQMatrix, zzModMatrix, ZZModMatrix, fpMatrix, FpMatrix, FqMatrix, fqPolyRepMatrix, FqPolyRepMatrix}
-
 ################################################################################
 #
 #  Access through `Ref` and `Ptr`
@@ -43,15 +40,77 @@ end
 #
 ################################################################################
 
-function Base.view(x::_MatTypes, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
+function _checkrange_or_empty(l::Int, start::Int, stop::Int)
+  (stop < start) ||
+  (_checkbounds(l, start) &&
+   _checkbounds(l, stop))
+end
+
+# `_set_ring!(z, x)` gives the window `z` the ring of `x`: the base ring and,
+# where the FLINT struct has words after `stride` (nmod_mat keeps its modulus
+# there), those words.
+
+# These types store no ring: `base_ring` depends on the type alone.
+_set_ring!(z::T, x::T) where {T <: Union{ZZMatrix, QQMatrix, RealMatrix, ComplexMatrix}} = z
+
+_set_ring!(z::T, x::T) where {T <: FlintMatElem} = (z.base_ring = x.base_ring; z)
+
+for T in [zzModMatrix, fpMatrix]
+  @eval function _set_ring!(z::$T, x::$T)
+    z.n = x.n
+    z.ninv = x.ninv
+    z.norm = x.norm
+    z.base_ring = x.base_ring
+    return z
+  end
+end
+
+function _set_ring!(z::FqMatrix, x::FqMatrix)
+  z.opaque = x.opaque
+  z.base_ring = x.base_ring
+  return z
+end
+
+# A window of `x` is an object of the same Julia type as `x`. Its FLINT struct
+# consists of the pointer to its top left entry in `x`, its size and the stride
+# of `x`; it owns no memory. FLINT's `*_mat_window_clear` are left over from
+# FLINT < 3.3, where a window owned an array of row pointers, and are empty.
+# So a window needs no finalizer; `view_parent` keeps the entries alive.
+function _view_window(x::T, r1::Int, c1::Int, r2::Int, c2::Int) where {T <: FlintMatElem}
+  _checkrange_or_empty(nrows(x), r1, r2) ||
+  Base.throw_boundserror(x, (r1:r2, c1:c2))
+
+  _checkrange_or_empty(ncols(x), c1, c2) ||
+  Base.throw_boundserror(x, (r1:r2, c1:c2))
+
+  if r1 > r2
+    r1 = 1
+    r2 = 0
+  end
+  if c1 > c2
+    c1 = 1
+    c2 = 0
+  end
+
+  z = T()
+  z.entries = mat_entry_ptr(x, r1, c1)
+  z.r = r2 - r1 + 1
+  z.c = c2 - c1 + 1
+  z.stride = x.stride
+  _set_ring!(z, x)
+  z.view_parent = x
+  return z
+end
+
+function Base.view(x::FlintMatElem, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
   return _view_window(x, first(r), first(c), last(r), last(c))
 end
 
-function sub(x::_MatTypes, r1::Int, c1::Int, r2::Int, c2::Int)
+function sub(x::FlintMatElem, r1::Int, c1::Int, r2::Int, c2::Int)
   return deepcopy(view(x, r1:r2, c1:c2))
 end
 
-function sub(x::_MatTypes, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
+function sub(x::FlintMatElem, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
   return deepcopy(view(x, r, c))
 end
 
@@ -79,7 +138,7 @@ for T in [ZZMatrix, QQMatrix]
 end
 
 # make x[r, c] sugar for sub(x, r, c)
-getindex(x::_MatTypes, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) = sub(x, r, c)
+getindex(x::FlintMatElem, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) = sub(x, r, c)
 
 ################################################################################
 #
@@ -102,12 +161,12 @@ Base.setindex!(V::MatrixView, z, i::Int) = setindex!(V, ZZ(z), i)
 
 Base.size(V::MatrixView) = (length(V.A), )
 
-function Base.view(x::_MatTypes, r::Int, c::Union{Colon, AbstractUnitRange{Int}})
+function Base.view(x::FlintMatElem, r::Int, c::Union{Colon, AbstractUnitRange{Int}})
   A = view(x, r:r, c)
   return MatrixView{typeof(x), elem_type(base_ring(x))}(A)
 end
 
-function Base.view(x::_MatTypes, r::Union{Colon, AbstractUnitRange{Int}}, c::Int)
+function Base.view(x::FlintMatElem, r::Union{Colon, AbstractUnitRange{Int}}, c::Int)
   A = view(x, r, c:c)
   return MatrixView{typeof(x), elem_type(base_ring(x))}(A)
 end

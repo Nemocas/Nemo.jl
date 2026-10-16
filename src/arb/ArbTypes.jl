@@ -781,9 +781,15 @@ mutable struct RealMatrix <: FlintMatElem{RealFieldElem}
   c::Int
   stride::Int
   #base_ring::ArbField
+  view_parent
 
   # MatElem interface
   RealMatrix(::RealField, ::UndefInitializer, r::Int, c::Int) = RealMatrix(r, c)
+
+  # Used by view, not finalised!!
+  function RealMatrix()
+    return new()
+  end
 
   function RealMatrix(r::Int, c::Int)
     z = new()
@@ -869,12 +875,18 @@ mutable struct ArbMatrix <: FlintMatElem{ArbFieldElem}
   c::Int
   stride::Int
   base_ring::ArbField
+  view_parent
 
   # MatElem interface
   function ArbMatrix(R::ArbField, ::UndefInitializer, r::Int, c::Int)
     z = ArbMatrix(r, c)
     z.base_ring = R
     return z
+  end
+
+  # Used by view, not finalised!!
+  function ArbMatrix()
+    return new()
   end
 
   function ArbMatrix(r::Int, c::Int)
@@ -965,9 +977,15 @@ mutable struct ComplexMatrix <: FlintMatElem{ComplexFieldElem}
   c::Int
   stride::Int
   #base_ring::AcbField
+  view_parent
 
   # MatElem interface
   ComplexMatrix(::ComplexField, ::UndefInitializer, r::Int, c::Int) = ComplexMatrix(r, c)
+
+  # Used by view, not finalised!!
+  function ComplexMatrix()
+    return new()
+  end
 
   function ComplexMatrix(r::Int, c::Int)
     z = new()
@@ -1153,12 +1171,18 @@ mutable struct AcbMatrix <: FlintMatElem{AcbFieldElem}
   c::Int
   stride::Int
   base_ring::AcbField
+  view_parent
 
   # MatElem interface
   function AcbMatrix(R::AcbField, ::UndefInitializer, r::Int, c::Int)
     z = AcbMatrix(r, c)
     z.base_ring = R
     return z
+  end
+
+  # Used by view, not finalised!!
+  function AcbMatrix()
+    return new()
   end
 
   function AcbMatrix(r::Int, c::Int)

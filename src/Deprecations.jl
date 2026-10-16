@@ -97,7 +97,7 @@ import Base: Array, view
 
 @deprecate Array(a::ZZMatrix; S::Type{T} = ZZRingElem) where {T} Matrix{T}(a) false
 
-@deprecate view(x::_MatTypes, r1::Int, c1::Int, r2::Int, c2::Int) _view_window(x, r1, c1, r2, c2) false
+@deprecate view(x::FlintMatElem, r1::Int, c1::Int, r2::Int, c2::Int) _view_window(x, r1, c1, r2, c2) false
 
 # Deprecated in 0.57
 @deprecate log(x::RealFieldElem, prec::Int) log(x; precision=prec) false
