@@ -260,7 +260,7 @@ function -(x::QadicFieldElem)
     return x
   end
   ctx = parent(x)
-  z = QadicFieldElem(x.N)
+  z = QadicFieldElem(precision(x))
   @ccall libflint.qadic_neg(z::Ref{QadicFieldElem}, x::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
   z.parent = ctx
   return z
@@ -275,7 +275,7 @@ end
 function +(x::QadicFieldElem, y::QadicFieldElem)
   check_parent(x, y)
   ctx = parent(x)
-  z = QadicFieldElem(min(x.N, y.N))
+  z = QadicFieldElem(min(precision(x), precision(y)))
   z.parent = ctx
   @ccall libflint.qadic_add(z::Ref{QadicFieldElem}, x::Ref{QadicFieldElem}, y::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
   return z
@@ -284,7 +284,7 @@ end
 function -(x::QadicFieldElem, y::QadicFieldElem)
   check_parent(x, y)
   ctx = parent(x)
-  z = QadicFieldElem(min(x.N, y.N))
+  z = QadicFieldElem(min(precision(x), precision(y)))
   z.parent = ctx
   @ccall libflint.qadic_sub(z::Ref{QadicFieldElem}, x::Ref{QadicFieldElem}, y::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
   return z
@@ -293,7 +293,7 @@ end
 function *(x::QadicFieldElem, y::QadicFieldElem)
   check_parent(x, y)
   ctx = parent(x)
-  z = QadicFieldElem(min(x.N + valuation(y), y.N + valuation(x)))
+  z = QadicFieldElem(min(precision(x) + valuation(y), precision(y) + valuation(x)))
   z.parent = ctx
   @ccall libflint.qadic_mul(z::Ref{QadicFieldElem}, x::Ref{QadicFieldElem}, y::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
   return z
@@ -360,7 +360,7 @@ end
 function ==(a::QadicFieldElem, b::QadicFieldElem)
   check_parent(a, b)
   ctx = parent(a)
-  z = QadicFieldElem(min(a.N, b.N))
+  z = QadicFieldElem(min(precision(a), precision(b)))
   @ccall libflint.qadic_sub(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, b::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
   return Bool(@ccall libflint.qadic_is_zero(z::Ref{QadicFieldElem})::Cint)
 end
@@ -369,7 +369,7 @@ function isequal(a::QadicFieldElem, b::QadicFieldElem)
   if parent(a) != parent(b)
     return false
   end
-  return a.N == b.N && a == b
+  return precision(a) == precision(b) && a == b
 end
 
 ###############################################################################
@@ -404,9 +404,9 @@ function ^(a::QadicFieldElem, n::ZZRingElem)
     return inv(a)^(-n)
   end
   if valuation(a) == 0
-    z = QadicFieldElem(a.N) #if expo is ZZRingElem, Int(n) would throw an error
+    z = QadicFieldElem(precision(a)) #if expo is ZZRingElem, Int(n) would throw an error
   else             #for units (v==0) this is fine hower.
-    z = QadicFieldElem(a.N + (Int(n) - 1)*valuation(a))
+    z = QadicFieldElem(precision(a) + (Int(n) - 1)*valuation(a))
   end
   z.parent = ctx
   @ccall libflint.qadic_pow(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, n::Ref{ZZRingElem}, ctx::Ref{QadicField})::Nothing
@@ -451,7 +451,7 @@ divexact(a::QQFieldElem, b::QadicFieldElem; check::Bool=true) = inv(inv(a)*b)
 function inv(a::QadicFieldElem)
   iszero(a) && throw(DivideError())
   ctx = parent(a)
-  z = QadicFieldElem(a.N - 2*valuation(a))
+  z = QadicFieldElem(precision(a) - 2*valuation(a))
   z.parent = ctx
   @ccall libflint.qadic_inv(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Cint
   return z
@@ -507,7 +507,7 @@ function Base.sqrt(a::QadicFieldElem; check::Bool=true)
 
   av = valuation(a)
   check && (av % 2) != 0 && error("Unable to take qadic square root")
-  z = QadicFieldElem(a.N - div(av, 2))
+  z = QadicFieldElem(precision(a) - div(av, 2))
   z.parent = ctx
   res = Bool(@ccall libflint.qadic_sqrt(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Cint)
   check && !res && error("Square root of p-adic does not exist")
@@ -520,7 +520,7 @@ function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bo
   ctx === data.parent || throw(ArgumentError("precomputation belongs to a different qadic field"))
   av = valuation(a)
   check && (av % 2) != 0 && error("Unable to take qadic square root")
-  z = QadicFieldElem(a.N - div(av, 2))
+  z = QadicFieldElem(precision(a) - div(av, 2))
   z.parent = ctx
 
   GC.@preserve data begin
@@ -546,7 +546,7 @@ function converges at $a$.
 function Base.exp(a::QadicFieldElem)
   !iszero(a) && valuation(a) <= 0 && throw(DomainError(a, "Valuation must be positive"))
   ctx = parent(a)
-  z = QadicFieldElem(a.N)
+  z = QadicFieldElem(precision(a))
   z.parent = ctx
   res = Bool(@ccall libflint.qadic_exp(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Cint)
   !res && error("Unable to compute exponential")
@@ -570,7 +570,7 @@ function log(a::QadicFieldElem)
   end
 
   ctx = parent(a)
-  z = QadicFieldElem(a.N)
+  z = QadicFieldElem(precision(a))
   z.parent = ctx
   res = Bool(@ccall libflint.qadic_log(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Cint)
   !res && error("Unable to compute logarithm")
@@ -592,7 +592,7 @@ thrown.
 function teichmuller(a::QadicFieldElem)
   valuation(a) < 0 && throw(DomainError(a, "Valuation must be non-negative"))
   ctx = parent(a)
-  z = QadicFieldElem(a.N)
+  z = QadicFieldElem(precision(a))
   z.parent = ctx
   @ccall libflint.qadic_teichmuller(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
   return z
@@ -606,7 +606,7 @@ The precision of the output will be the same as the precision of the input.
 """
 function frobenius(a::QadicFieldElem, e::Int = 1)
   ctx = parent(a)
-  z = QadicFieldElem(a.N)
+  z = QadicFieldElem(precision(a))
   z.parent = ctx
   @ccall libflint.qadic_frobenius(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, e::Int, ctx::Ref{QadicField})::Nothing
   return z
@@ -626,7 +626,7 @@ function zero!(z::QadicFieldElem; precision::Int=precision(parent(z)))
 end
 
 function mul!(z::QadicFieldElem, x::QadicFieldElem, y::QadicFieldElem)
-  z.N = min(x.N + valuation(y), y.N + valuation(x))
+  z.N = min(precision(x) + valuation(y), precision(y) + valuation(x))
   ctx = parent(x)
   @ccall libflint.qadic_mul(z::Ref{QadicFieldElem}, x::Ref{QadicFieldElem}, y::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
   return z
@@ -635,7 +635,7 @@ end
 function add!(z::QadicFieldElem, x::QadicFieldElem, y::QadicFieldElem)
   ctx = parent(x)
   @ccall libflint.qadic_add(z::Ref{QadicFieldElem}, x::Ref{QadicFieldElem}, y::Ref{QadicFieldElem}, ctx::Ref{QadicField})::Nothing
-  setprecision!(z, min(x.N, y.N))
+  setprecision!(z, min(precision(x), precision(y)))
   return z
 end
 
