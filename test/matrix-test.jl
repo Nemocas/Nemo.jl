@@ -286,6 +286,14 @@ end
     @test A[3, 3] == R(43)
     @test V[2, 2] == R(43)
 
+    # so is a write through a row or a column; of a non-integer where the
+    # ring has one
+    z = R isa Field ? inv(R(2)) : R(44)
+    view(A, 2, :)[4] = z
+    @test A[2, 4] == z
+    view(A, :, 3)[1] = z + 1
+    @test A[1, 3] == z + 1
+
     # `sub` and indexing with ranges copy
     A1 = deepcopy(A)
     for S in (sub(A, 2:3, 2:4), sub(A, 2, 2, 3, 4), A[2:3, 2:4])

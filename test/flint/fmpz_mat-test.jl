@@ -247,6 +247,25 @@ end
   @test A == S([1 2 1; 4 5 6; 7 8 9])
 end
 
+@testset "ZZMatrix.reshape" begin
+  A = ZZ[1 2 3; 4 5 6; 7 8 9]
+
+  # the result shares its entries with the matrix
+  B = reshape(A, 1, 9)
+  @test B == ZZ[1 2 3 4 5 6 7 8 9]
+  B[1, 5] = 50
+  @test A[2, 2] == 50
+
+  # the rows of a view narrower than its parent are not consecutive in memory
+  @test_throws ErrorException reshape(view(A, 1:2, 1:2), 1, 4)
+  @test_throws ErrorException reshape(view(A, 2:3, 2:3), 1, 4)
+
+  # those of a view as wide as its parent, with one row or without entries are
+  @test reshape(view(A, 2:3, :), 1, 6) == ZZ[4 50 6 7 8 9]
+  @test reshape(view(A, 3:3, 2:3), 1, 2) == ZZ[8 9]
+  @test reshape(view(A, 1:3, 2:1), 1, 0) == zero_matrix(ZZ, 1, 0)
+end
+
 @testset "ZZMatrix.sub" begin
   S = matrix_space(ZZ, 3, 3)
 

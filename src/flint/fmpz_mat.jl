@@ -26,6 +26,10 @@ function Base.reshape(x::ZZMatrix, r::Int, c::Int)
   @assert nrows(x) * ncols(x) == r*c
   @assert r == 1
 
+  # the result shares the entries of `x`, which have to be consecutive in memory
+  nrows(x) <= 1 || c == 0 || x.stride == ncols(x) ||
+    error("cannot reshape a view with fewer columns than its parent")
+
   b = ZZMatrix()
   b.view_parent = x
   @ccall libflint.fmpz_mat_window_init(b::Ref{ZZMatrix}, x::Ref{ZZMatrix}, 0::Int, 0::Int, r::Int, c::Int)::Nothing
