@@ -772,14 +772,14 @@ end
 
 function zero!(z::QQRelPowerSeriesRingElem)
   @ccall libflint.fmpq_poly_zero(z::Ref{QQRelPowerSeriesRingElem})::Nothing
-  z.prec = parent(z).prec_max
-  z.val = parent(z).prec_max
+  z.prec = max_precision(parent(z))
+  z.val = max_precision(parent(z))
   return z
 end
 
 function one!(z::QQRelPowerSeriesRingElem)
   @ccall libflint.fmpq_poly_one(z::Ref{QQRelPowerSeriesRingElem})::Nothing
-  z.prec = parent(z).prec_max
+  z.prec = max_precision(parent(z))
   z.val = 0
   return z
 end
@@ -900,8 +900,8 @@ promote_rule(::Type{QQRelPowerSeriesRingElem}, ::Type{QQFieldElem}) = QQRelPower
 
 function (a::QQRelPowerSeriesRing)()
   z = QQRelPowerSeriesRingElem()
-  z.prec = a.prec_max
-  z.val = a.prec_max
+  z.prec = max_precision(a)
+  z.val = max_precision(a)
   z.parent = a
   return z
 end
@@ -909,10 +909,10 @@ end
 function (a::QQRelPowerSeriesRing)(b::Integer)
   if b == 0
     z = QQRelPowerSeriesRingElem()
-    z.prec = a.prec_max
-    z.val = a.prec_max
+    z.prec = max_precision(a)
+    z.val = max_precision(a)
   else
-    z = QQRelPowerSeriesRingElem([QQFieldElem(b)], 1, a.prec_max, 0)
+    z = QQRelPowerSeriesRingElem([QQFieldElem(b)], 1, max_precision(a), 0)
   end
   z.parent = a
   return z
@@ -921,10 +921,10 @@ end
 function (a::QQRelPowerSeriesRing)(b::ZZRingElem)
   if iszero(b)
     z = QQRelPowerSeriesRingElem()
-    z.prec = a.prec_max
-    z.val = a.prec_max
+    z.prec = max_precision(a)
+    z.val = max_precision(a)
   else
-    z = QQRelPowerSeriesRingElem([QQFieldElem(b)], 1, a.prec_max, 0)
+    z = QQRelPowerSeriesRingElem([QQFieldElem(b)], 1, max_precision(a), 0)
   end
   z.parent = a
   return z
@@ -933,10 +933,10 @@ end
 function (a::QQRelPowerSeriesRing)(b::QQFieldElem)
   if iszero(b)
     z = QQRelPowerSeriesRingElem()
-    z.prec = a.prec_max
-    z.val = a.prec_max
+    z.prec = max_precision(a)
+    z.val = max_precision(a)
   else
-    z = QQRelPowerSeriesRingElem([b], 1, a.prec_max, 0)
+    z = QQRelPowerSeriesRingElem([b], 1, max_precision(a), 0)
   end
   z.parent = a
   return z

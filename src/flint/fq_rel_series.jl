@@ -547,14 +547,14 @@ end
 
 function zero!(x::FqPolyRepRelPowerSeriesRingElem)
   @ccall libflint.fq_poly_zero(x::Ref{FqPolyRepRelPowerSeriesRingElem}, base_ring(x)::Ref{FqPolyRepField})::Nothing
-  x.prec = parent(x).prec_max
-  x.val = parent(x).prec_max
+  x.prec = max_precision(parent(x))
+  x.val = max_precision(parent(x))
   return x
 end
 
 function one!(x::FqPolyRepRelPowerSeriesRingElem)
   @ccall libflint.fq_poly_one(x::Ref{FqPolyRepRelPowerSeriesRingElem}, base_ring(x)::Ref{FqPolyRepField})::Nothing
-  x.prec = parent(x).prec_max
+  x.prec = max_precision(parent(x))
   x.val = 0
   return x
 end
@@ -688,8 +688,8 @@ promote_rule(::Type{FqPolyRepRelPowerSeriesRingElem}, ::Type{FqPolyRepFieldElem}
 function (a::FqPolyRepRelPowerSeriesRing)()
   ctx = base_ring(a)
   z = FqPolyRepRelPowerSeriesRingElem(ctx)
-  z.prec = a.prec_max
-  z.val = a.prec_max
+  z.prec = max_precision(a)
+  z.val = max_precision(a)
   z.parent = a
   return z
 end
@@ -706,10 +706,10 @@ function (a::FqPolyRepRelPowerSeriesRing)(b::FqPolyRepFieldElem)
   ctx = base_ring(a)
   if iszero(b)
     z = FqPolyRepRelPowerSeriesRingElem(ctx)
-    z.prec = a.prec_max
-    z.val = a.prec_max
+    z.prec = max_precision(a)
+    z.val = max_precision(a)
   else
-    z = FqPolyRepRelPowerSeriesRingElem(ctx, [b], 1, a.prec_max, 0)
+    z = FqPolyRepRelPowerSeriesRingElem(ctx, [b], 1, max_precision(a), 0)
   end
   z.parent = a
   return z
