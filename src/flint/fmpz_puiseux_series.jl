@@ -11,7 +11,7 @@
 ###############################################################################
 
 function *(x::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem}, y::ZZRingElem)
-  z = parent(x)(x.data*y, x.scale)
+  z = parent(x)(x.data*y, scale(x))
   z = rescale!(z)
   return z
 end
@@ -25,7 +25,7 @@ end
 ###############################################################################
 
 function divexact(x::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem}, y::ZZRingElem; check::Bool=true)
-  return parent(x)(divexact(x.data, y; check=check), x.scale)
+  return parent(x)(divexact(x.data, y; check=check), scale(x))
 end
 
 ###############################################################################
@@ -53,7 +53,7 @@ power of the generator of the Puiseux series ring.
 function eta_qexp(x::FlintPuiseuxSeriesElem{ZZLaurentSeriesRingElem})
   v = valuation(x)
   d = eta_qexp(x.data)
-  z = parent(x)(d, x.scale)
+  z = parent(x)(d, scale(x))
   return z*x^(1//24)
 end
 
