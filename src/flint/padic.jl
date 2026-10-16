@@ -136,7 +136,7 @@ Return the valuation of the given $p$-adic field element, i.e. if the given
 element is divisible by $p^n$ but not a higher power of $p$ then the function
 will return $n$.
 """
-valuation(a::PadicFieldElem) = iszero(a) ? a.N : a.v
+valuation(a::PadicFieldElem) = iszero(a) ? precision(a) : a.v
 
 @doc raw"""
     lift(R::QQField, a::PadicFieldElem)
@@ -252,7 +252,7 @@ function expressify(x::PadicFieldElem; context = nothing)
       push!(sum.args, Expr(:call, :*, d[i + 1], ppower))
     end
   end
-  push!(sum.args, Expr(:call, :O, Expr(:call, :^, p, x.N)))
+  push!(sum.args, Expr(:call, :O, Expr(:call, :^, p, precision(x))))
   return sum
 end
 
@@ -282,7 +282,7 @@ function -(x::PadicFieldElem)
     return x
   end
   ctx = parent(x)
-  z = PadicFieldElem(x.N)
+  z = PadicFieldElem(precision(x))
   @ccall libflint.padic_neg(z::Ref{PadicFieldElem}, x::Ref{PadicFieldElem}, ctx::Ref{PadicField})::Nothing
   z.parent = ctx
   return z
@@ -297,7 +297,7 @@ end
 function +(x::PadicFieldElem, y::PadicFieldElem)
   check_parent(x, y)
   ctx = parent(x)
-  z = PadicFieldElem(min(x.N, y.N))
+  z = PadicFieldElem(min(precision(x), precision(y)))
   z.parent = ctx
   @ccall libflint.padic_add(z::Ref{PadicFieldElem}, x::Ref{PadicFieldElem}, y::Ref{PadicFieldElem}, ctx::Ref{PadicField})::Nothing
   return z
@@ -306,7 +306,7 @@ end
 function -(x::PadicFieldElem, y::PadicFieldElem)
   check_parent(x, y)
   ctx = parent(x)
-  z = PadicFieldElem(min(x.N, y.N))
+  z = PadicFieldElem(min(precision(x), precision(y)))
   z.parent = ctx
   @ccall libflint.padic_sub(z::Ref{PadicFieldElem}, x::Ref{PadicFieldElem}, y::Ref{PadicFieldElem}, ctx::Ref{PadicField})::Nothing
   return z
@@ -315,7 +315,7 @@ end
 function *(x::PadicFieldElem, y::PadicFieldElem)
   check_parent(x, y)
   ctx = parent(x)
-  z = PadicFieldElem(min(x.N + y.v, y.N + x.v))
+  z = PadicFieldElem(min(precision(x) + y.v, precision(y) + x.v))
   z.parent = ctx
   @ccall libflint.padic_mul(z::Ref{PadicFieldElem}, x::Ref{PadicFieldElem}, y::Ref{PadicFieldElem}, ctx::Ref{PadicField})::Nothing
   return z
@@ -374,7 +374,7 @@ end
 function ==(a::PadicFieldElem, b::PadicFieldElem)
   check_parent(a, b)
   ctx = parent(a)
-  z = PadicFieldElem(min(a.N, b.N))
+  z = PadicFieldElem(min(precision(a), precision(b)))
   @ccall libflint.padic_sub(z::Ref{PadicFieldElem}, a::Ref{PadicFieldElem}, b::Ref{PadicFieldElem}, ctx::Ref{PadicField})::Nothing
   return Bool(@ccall libflint.padic_is_zero(z::Ref{PadicFieldElem})::Cint)
 end
@@ -383,7 +383,7 @@ function isequal(a::PadicFieldElem, b::PadicFieldElem)
   if parent(a) != parent(b)
     return false
   end
-  return a.N == b.N && a == b
+  return precision(a) == precision(b) && a == b
 end
 
 ###############################################################################
@@ -412,7 +412,7 @@ end
 
 function ^(a::PadicFieldElem, n::Int)
   ctx = parent(a)
-  z = PadicFieldElem(a.N + (n - 1)*a.v)
+  z = PadicFieldElem(precision(a) + (n - 1)*a.v)
   z.parent = ctx
   @ccall libflint.padic_pow_si(z::Ref{PadicFieldElem}, a::Ref{PadicFieldElem}, n::Int, ctx::Ref{PadicField})::Nothing
   return z
@@ -428,7 +428,7 @@ function divexact(a::PadicFieldElem, b::PadicFieldElem; check::Bool=true)
   iszero(b) && throw(DivideError())
   check_parent(a, b)
   ctx = parent(a)
-  z = PadicFieldElem(min(a.N - b.v, b.N - 2*b.v + a.v))
+  z = PadicFieldElem(min(precision(a) - b.v, precision(b) - 2*b.v + a.v))
   z.parent = ctx
   @ccall libflint.padic_div(z::Ref{PadicFieldElem}, a::Ref{PadicFieldElem}, b::Ref{PadicFieldElem}, ctx::Ref{PadicField})::Cint
   return z
@@ -461,7 +461,7 @@ divexact(a::QQFieldElem, b::PadicFieldElem; check::Bool=true) = inv(inv(a)*b)
 function inv(a::PadicFieldElem)
   iszero(a) && throw(DivideError())
   ctx = parent(a)
-  z = PadicFieldElem(a.N - 2*a.v)
+  z = PadicFieldElem(precision(a) - 2*a.v)
   z.parent = ctx
   @ccall libflint.padic_inv(z::Ref{PadicFieldElem}, a::Ref{PadicFieldElem}, ctx::Ref{PadicField})::Cint
   return z
@@ -508,7 +508,7 @@ end
 function Base.sqrt(a::PadicFieldElem; check::Bool=true)
   check && (a.v % 2) != 0 && error("Unable to take padic square root")
   ctx = parent(a)
-  z = PadicFieldElem(a.N - div(a.v, 2))
+  z = PadicFieldElem(precision(a) - div(a.v, 2))
   z.parent = ctx
   res = Bool(@ccall libflint.padic_sqrt(z::Ref{PadicFieldElem}, a::Ref{PadicFieldElem}, ctx::Ref{PadicField})::Cint)
   check && !res && error("Square root of p-adic does not exist")
@@ -542,7 +542,7 @@ function is_square_with_sqrt(a::PadicFieldElem)
     return false, zero(R)
   end
   ctx = parent(a)
-  z = PadicFieldElem(a.N - div(a.v, 2))
+  z = PadicFieldElem(precision(a) - div(a.v, 2))
   z.parent = ctx
   res = Bool(@ccall libflint.padic_sqrt(z::Ref{PadicFieldElem}, a::Ref{PadicFieldElem}, ctx::Ref{PadicField})::Cint)
   if !res
@@ -566,7 +566,7 @@ function converges at $a$.
 function Base.exp(a::PadicFieldElem)
   !iszero(a) && a.v <= 0 && throw(DomainError(a, "Valuation must be positive"))
   ctx = parent(a)
-  z = PadicFieldElem(a.N)
+  z = PadicFieldElem(precision(a))
   z.parent = ctx
   res = Bool(@ccall libflint.padic_exp(z::Ref{PadicFieldElem}, a::Ref{PadicFieldElem}, ctx::Ref{PadicField})::Cint)
   !res && error("Unable to compute exponential")
@@ -581,7 +581,7 @@ converges at $a$.
 """
 function log(a::PadicFieldElem)
   ctx = parent(a)
-  z = PadicFieldElem(a.N)
+  z = PadicFieldElem(precision(a))
   z.parent = ctx
   v = valuation(a)
   v == 0 || error("Unable to compute logarithm")
@@ -609,7 +609,7 @@ thrown.
 function teichmuller(a::PadicFieldElem)
   a.v < 0 && throw(DomainError(a.v, "Valuation must be non-negative"))
   ctx = parent(a)
-  z = PadicFieldElem(a.N)
+  z = PadicFieldElem(precision(a))
   z.parent = ctx
   @ccall libflint.padic_teichmuller(z::Ref{PadicFieldElem}, a::Ref{PadicFieldElem}, ctx::Ref{PadicField})::Nothing
   return z
@@ -629,14 +629,14 @@ function zero!(z::PadicFieldElem; precision::Int=precision(parent(z)))
 end
 
 function mul!(z::PadicFieldElem, x::PadicFieldElem, y::PadicFieldElem)
-  z.N = min(x.N + y.v, y.N + x.v)
+  z.N = min(precision(x) + y.v, precision(y) + x.v)
   ctx = parent(x)
   @ccall libflint.padic_mul(z::Ref{PadicFieldElem}, x::Ref{PadicFieldElem}, y::Ref{PadicFieldElem}, ctx::Ref{PadicField})::Nothing
   return z
 end
 
 function add!(z::PadicFieldElem, x::PadicFieldElem, y::PadicFieldElem)
-  z.N = min(x.N, y.N)
+  z.N = min(precision(x), precision(y))
   ctx = parent(x)
   @ccall libflint.padic_add(z::Ref{PadicFieldElem}, x::Ref{PadicFieldElem}, y::Ref{PadicFieldElem}, ctx::Ref{PadicField})::Nothing
   return z
@@ -737,7 +737,7 @@ end
 #
 ###############################################################################
 
-Base.precision(Q::PadicField) = Q.prec_max
+precision(R::PadicField) = R.prec_max
 
 function Base.setprecision(q::PadicFieldElem, N::Int)
   r = parent(q)()
@@ -752,9 +752,9 @@ function setprecision!(a::PadicFieldElem, n::Int)
   return a
 end
 
-function setprecision!(Q::PadicField, n::Int)
-  Q.prec_max = n
-  return Q
+function setprecision!(R::PadicField, n::Int)
+  R.prec_max = n
+  return R
 end
 
 function Base.setprecision(f::Generic.Poly{PadicFieldElem}, N::Int)
@@ -796,7 +796,7 @@ Base.setprecision(f::Function, K::PadicField, n::Int) = with_precision(f, K, n)
 
 function ConformanceTests.generate_element(R::PadicField)
   p = prime(R)
-  prec = rand(1:R.prec_max)
+  prec = rand(1:precision(R))
   r = ZZRingElem(0):p-1
   return R(sum(rand(r)*p^i for i in 0:prec))
 end

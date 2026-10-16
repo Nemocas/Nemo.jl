@@ -220,8 +220,8 @@ mutable struct CalciumFieldElem <: FieldElem
 end
 
 function _ca_clear_fn(a::CalciumFieldElem)
-  @ccall libflint.ca_clear(a::Ref{CalciumFieldElem}, a.parent::Ref{CalciumField})::Nothing
-  decrement_refcount(a.parent)
+  @ccall libflint.ca_clear(a::Ref{CalciumFieldElem}, parent(a)::Ref{CalciumField})::Nothing
+  decrement_refcount(parent(a))
 end
 
 
