@@ -588,7 +588,7 @@ parent(x::ArbPolyRingElem) = x.parent
 
 var(x::ArbPolyRing) = x.S
 
-precision(x::ArbPolyRing) = precision(x.base_ring)
+precision(x::ArbPolyRing) = precision(base_ring(x))
 
 base_ring(a::ArbPolyRing) = a.base_ring
 
@@ -761,7 +761,7 @@ parent(x::AcbPolyRingElem) = x.parent
 
 var(x::AcbPolyRing) = x.S
 
-precision(x::AcbPolyRing) = precision(x.base_ring)
+precision(x::AcbPolyRing) = precision(base_ring(x))
 
 base_ring(a::AcbPolyRing) = a.base_ring
 

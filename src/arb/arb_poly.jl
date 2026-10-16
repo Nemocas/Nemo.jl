@@ -25,7 +25,7 @@ end
 
 function coeff(a::ArbPolyRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
-  t = parent(a).base_ring()
+  t = base_ring(a)()
   @ccall libflint.arb_poly_get_coeff_arb(t::Ref{ArbFieldElem}, a::Ref{ArbPolyRingElem}, n::Int)::Nothing
   return t
 end
@@ -68,7 +68,7 @@ function show(io::IO, x::ArbPolyRing)
   print(io, "Univariate Polynomial Ring in ")
   print(io, var(x))
   print(io, " over ")
-  show(io, x.base_ring)
+  show(io, base_ring(x))
 end
 
 ###############################################################################
@@ -92,7 +92,7 @@ end
 function polynomial(R::ArbField, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
   coeffs = map(R, arr)
   coeffs = length(coeffs) == 0 ? ArbFieldElem[] : coeffs
-  z = ArbPolyRingElem(coeffs, R.prec)
+  z = ArbPolyRingElem(coeffs, precision(R))
   z.parent = ArbPolyRing(R, Symbol(var), cached)
   return z
 end
@@ -663,7 +663,7 @@ end
 for T in [Real, ZZRingElem, QQFieldElem, ArbFieldElem]
   @eval begin
     function (a::ArbPolyRing)(b::$T)
-      z = ArbPolyRingElem(base_ring(a)(b), a.base_ring.prec)
+      z = ArbPolyRingElem(base_ring(a)(b), precision(base_ring(a)))
       z.parent = a
       return z
     end
@@ -671,7 +671,7 @@ for T in [Real, ZZRingElem, QQFieldElem, ArbFieldElem]
 end
 
 function (a::ArbPolyRing)(b::Vector{ArbFieldElem})
-  z = ArbPolyRingElem(b, a.base_ring.prec)
+  z = ArbPolyRingElem(b, precision(base_ring(a)))
   z.parent = a
   return z
 end
@@ -683,19 +683,19 @@ for T in [Real, ZZRingElem, QQFieldElem, ArbFieldElem]
 end
 
 function (a::ArbPolyRing)(b::ZZPolyRingElem)
-  z = ArbPolyRingElem(b, a.base_ring.prec)
+  z = ArbPolyRingElem(b, precision(base_ring(a)))
   z.parent = a
   return z
 end
 
 function (a::ArbPolyRing)(b::QQPolyRingElem)
-  z = ArbPolyRingElem(b, a.base_ring.prec)
+  z = ArbPolyRingElem(b, precision(base_ring(a)))
   z.parent = a
   return z
 end
 
 function (a::ArbPolyRing)(b::ArbPolyRingElem)
-  z = ArbPolyRingElem(b, a.base_ring.prec)
+  z = ArbPolyRingElem(b, precision(base_ring(a)))
   z.parent = a
   return z
 end

@@ -25,7 +25,7 @@ end
 
 function coeff(a::AcbPolyRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
-  t = parent(a).base_ring()
+  t = base_ring(a)()
   @ccall libflint.acb_poly_get_coeff_acb(t::Ref{AcbFieldElem}, a::Ref{AcbPolyRingElem}, n::Int)::Nothing
   return t
 end
@@ -68,7 +68,7 @@ function show(io::IO, x::AcbPolyRing)
   print(io, "Univariate Polynomial Ring in ")
   print(io, var(x))
   print(io, " over ")
-  show(io, x.base_ring)
+  show(io, base_ring(x))
 end
 
 function Base.show(io::IO, a::AcbPolyRingElem)
@@ -96,7 +96,7 @@ end
 function polynomial(R::AcbField, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
   coeffs = map(R, arr)
   coeffs = length(coeffs) == 0 ? AcbFieldElem[] : coeffs
-  z = AcbPolyRingElem(coeffs, R.prec)
+  z = AcbPolyRingElem(coeffs, precision(R))
   z.parent = AcbPolyRing(R, Symbol(var), cached)
   return z
 end
@@ -754,7 +754,7 @@ end
 for T in [Real, Complex, ZZRingElem, QQFieldElem, ArbFieldElem, AcbFieldElem]
   @eval begin
     function (a::AcbPolyRing)(b::$T)
-      z = AcbPolyRingElem(base_ring(a)(b), a.base_ring.prec)
+      z = AcbPolyRingElem(base_ring(a)(b), precision(base_ring(a)))
       z.parent = a
       return z
     end
@@ -762,7 +762,7 @@ for T in [Real, Complex, ZZRingElem, QQFieldElem, ArbFieldElem, AcbFieldElem]
 end
 
 function (a::AcbPolyRing)(b::Vector{AcbFieldElem})
-  z = AcbPolyRingElem(b, a.base_ring.prec)
+  z = AcbPolyRingElem(b, precision(base_ring(a)))
   z.parent = a
   return z
 end
@@ -774,25 +774,25 @@ for T in [Real, Complex, ZZRingElem, QQFieldElem, ArbFieldElem, AcbFieldElem]
 end
 
 function (a::AcbPolyRing)(b::ZZPolyRingElem)
-  z = AcbPolyRingElem(b, a.base_ring.prec)
+  z = AcbPolyRingElem(b, precision(base_ring(a)))
   z.parent = a
   return z
 end
 
 function (a::AcbPolyRing)(b::QQPolyRingElem)
-  z = AcbPolyRingElem(b, a.base_ring.prec)
+  z = AcbPolyRingElem(b, precision(base_ring(a)))
   z.parent = a
   return z
 end
 
 function (a::AcbPolyRing)(b::ArbPolyRingElem)
-  z = AcbPolyRingElem(b, a.base_ring.prec)
+  z = AcbPolyRingElem(b, precision(base_ring(a)))
   z.parent = a
   return z
 end
 
 function (a::AcbPolyRing)(b::AcbPolyRingElem)
-  z = AcbPolyRingElem(b, a.base_ring.prec)
+  z = AcbPolyRingElem(b, precision(base_ring(a)))
   z.parent = a
   return z
 end
