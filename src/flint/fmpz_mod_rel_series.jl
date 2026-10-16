@@ -177,7 +177,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       check_parent(a, b)
       lena = pol_length(a)
       lenb = pol_length(b)
-      prec = min(a.prec, b.prec)
+      prec = min(precision(a), precision(b))
       val = min(valuation(a), valuation(b))
       lena = min(lena, prec - valuation(a))
       lenb = min(lenb, prec - valuation(b))
@@ -207,7 +207,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       check_parent(a, b)
       lena = pol_length(a)
       lenb = pol_length(b)
-      prec = min(a.prec, b.prec)
+      prec = min(precision(a), precision(b))
       val = min(valuation(a), valuation(b))
       lena = min(lena, prec - valuation(a))
       lenb = min(lenb, prec - valuation(b))
@@ -241,7 +241,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       lenb = pol_length(b)
       aval = valuation(a)
       bval = valuation(b)
-      prec = min(a.prec - aval, b.prec - bval)
+      prec = min(precision(a) - aval, precision(b) - bval)
       lena = min(lena, prec)
       lenb = min(lenb, prec)
       z = parent(a)()
@@ -298,7 +298,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       len < 0 && throw(DomainError(len, "Shift must be non-negative"))
       xlen = pol_length(x)
       z = ($etype)(x)
-      z.prec = x.prec + len
+      z.prec = precision(x) + len
       z.val = valuation(x) + len
       z.parent = parent(x)
       return z
@@ -310,10 +310,10 @@ for (etype, rtype, ctype, mtype, brtype) in (
       xval = valuation(x)
       z = parent(x)()
       if len >= xlen + xval
-        z.prec = max(0, x.prec - len)
-        z.val = max(0, x.prec - len)
+        z.prec = max(0, precision(x) - len)
+        z.val = max(0, precision(x) - len)
       else
-        z.prec = max(0, x.prec - len)
+        z.prec = max(0, precision(x) - len)
         z.val = max(0, xval - len)
         zlen = min(xlen + xval - len, xlen)
         @ccall libflint.fmpz_mod_poly_shift_right(z::Ref{($etype)}, x::Ref{($etype)}, (xlen - zlen)::Int, x.parent.base_ring.ninv::Ref{($ctype)})::Nothing
@@ -358,7 +358,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       if is_gen(a)
         z = parent(a)()
         z = setcoeff!(z, 0, ZZRingElem(1))
-        z.prec = a.prec + b - 1
+        z.prec = precision(a) + b - 1
         z.val = b
       elseif pol_length(a) == 0
         z = parent(a)()
@@ -373,9 +373,9 @@ for (etype, rtype, ctype, mtype, brtype) in (
         return one(parent(a))
       else
         z = parent(a)()
-        z.prec = a.prec + (b - 1)*valuation(a)
+        z.prec = precision(a) + (b - 1)*valuation(a)
         z.val = b*valuation(a)
-        @ccall libflint.fmpz_mod_poly_pow_trunc(z::Ref{($etype)}, a::Ref{($etype)}, b::UInt, (z.prec - valuation(z))::Int, a.parent.base_ring.ninv::Ref{($ctype)})::Nothing
+        @ccall libflint.fmpz_mod_poly_pow_trunc(z::Ref{($etype)}, a::Ref{($etype)}, b::UInt, (precision(z) - valuation(z))::Int, a.parent.base_ring.ninv::Ref{($ctype)})::Nothing
       end
       renormalize!(z)
       return z
@@ -389,7 +389,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
 
     function ==(x::($etype), y::($etype))
       check_parent(x, y)
-      prec = min(x.prec, y.prec)
+      prec = min(precision(x), precision(y))
       if prec <= valuation(x) && prec <= valuation(y)
         return true
       end
@@ -408,7 +408,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       if parent(x) != parent(y)
         return false
       end
-      if x.prec != y.prec || valuation(x) != valuation(y) || pol_length(x) != pol_length(y)
+      if precision(x) != precision(y) || valuation(x) != valuation(y) || pol_length(x) != pol_length(y)
         return false
       end
       return Bool(@ccall libflint.fmpz_mod_poly_equal(x::Ref{($etype)}, y::Ref{($etype)}, x.parent.base_ring.ninv::Ref{($ctype)})::Cint)
@@ -484,7 +484,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
         end
       end
       check && !is_unit(y) && error("Unable to invert power series")
-      prec = min(x.prec - valuation(x), y.prec - valuation(y))
+      prec = min(precision(x) - valuation(x), precision(y) - valuation(y))
       z = parent(x)()
       z.val = xval - yval
       z.prec = prec + valuation(z)
@@ -534,7 +534,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       ainv = parent(a)()
       ainv.prec = a.prec
       ainv.val = 0
-      @ccall libflint.fmpz_mod_poly_inv_series(ainv::Ref{($etype)}, a::Ref{($etype)}, a.prec::Int, a.parent.base_ring.ninv::Ref{($ctype)})::Nothing
+      @ccall libflint.fmpz_mod_poly_inv_series(ainv::Ref{($etype)}, a::Ref{($etype)}, precision(a)::Int, a.parent.base_ring.ninv::Ref{($ctype)})::Nothing
       return ainv
     end
 
@@ -614,7 +614,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       lenb = pol_length(b)
       aval = valuation(a)
       bval = valuation(b)
-      prec = min(a.prec - aval, b.prec - bval)
+      prec = min(precision(a) - aval, precision(b) - bval)
       lena = min(lena, prec)
       lenb = min(lenb, prec)
       z.val = valuation(a) + valuation(b)
@@ -631,7 +631,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
     function add!(a::($etype), b::($etype))
       lena = pol_length(a)
       lenb = pol_length(b)
-      prec = min(a.prec, b.prec)
+      prec = min(precision(a), precision(b))
       val = min(valuation(a), valuation(b))
       lena = min(lena, prec - valuation(a))
       lenb = min(lenb, prec - valuation(b))
@@ -666,7 +666,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       end
       lena = pol_length(a)
       lenb = pol_length(b)
-      prec = min(a.prec, b.prec)
+      prec = min(precision(a), precision(b))
       val = min(valuation(a), valuation(b))
       lena = min(lena, prec - valuation(a))
       lenb = min(lenb, prec - valuation(b))
@@ -816,7 +816,7 @@ function sqrt_classical(a::FpRelPowerSeriesRingElem; check::Bool=true)
   if characteristic(R) == 2
     return sqrt_classical_char2(a; check=check)
   end
-  z.prec = a.prec - v2
+  z.prec = precision(a) - v2
   z.val = v2
   c = coeff(a, v)
   if check
@@ -828,7 +828,7 @@ function sqrt_classical(a::FpRelPowerSeriesRingElem; check::Bool=true)
     s = sqrt(c; check=check)
   end
   a = divexact(a, c)
-  @ccall libflint.fmpz_mod_poly_sqrt_series(z::Ref{FpRelPowerSeriesRingElem}, a::Ref{FpRelPowerSeriesRingElem}, a.prec::Int, a.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_sqrt_series(z::Ref{FpRelPowerSeriesRingElem}, a::Ref{FpRelPowerSeriesRingElem}, precision(a)::Int, a.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   if !isone(s)
     z *= s
   end
