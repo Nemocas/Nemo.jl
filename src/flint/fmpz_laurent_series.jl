@@ -1065,7 +1065,7 @@ function mul!(c::ZZLaurentSeriesRingElem, a::ZZLaurentSeriesRingElem, b::ZZLaure
     @ccall libflint.fmpz_poly_mullow(c::Ref{ZZLaurentSeriesRingElem}, a::Ref{ZZLaurentSeriesRingElem}, b::Ref{ZZLaurentSeriesRingElem}, lenc::Int)::Nothing
   end
   c = set_valuation!(c, aval + bval)
-  c = set_precision!(c, prec + c.val)
+  c = set_precision!(c, prec + valuation(c))
   c = set_scale!(c, sz)
   renormalize!(c)
   c = rescale!(c)
