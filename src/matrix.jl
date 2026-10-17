@@ -8,10 +8,12 @@
 # loaded through it, not the Julia object. Asserting the type of `a[]` keeps
 # inference concrete for an abstract `Ref{T}`.
 
-# field `name` of the C struct at `p`, a pointer to a `T` or to its C part alone
+# field `name` of the C struct at `p`, a pointer to a `T` or to its C part
+# alone; the C struct is `T` itself or its `cstruct` field
 @inline function _unsafe_load_field(p::Ptr{T}, ::Val{name}) where {T, name}
-  i = Base.fieldindex(T, name)
-  return unsafe_load(Ptr{fieldtype(T, i)}(p + fieldoffset(T, i)))
+  S = hasfield(T, :cstruct) ? fieldtype(T, :cstruct) : T
+  i = Base.fieldindex(S, name)
+  return _unwrap(unsafe_load(Ptr{fieldtype(S, i)}(p + fieldoffset(S, i))))
 end
 
 number_of_rows(a::FlintMatElem) = a.r
@@ -26,7 +28,9 @@ is_square(a::Ref{<:FlintMatElem}) = nrows(a) == ncols(a)
 
 _entries(a::FlintMatElem) = a.entries
 _entries(a::Ref{T}) where {T <: FlintMatElem} = _entries(a[]::T)
-_entries(a::Ptr{<:FlintMatElem}) = _unsafe_load_field(a, Val(:entries))
+_entries(a::Ptr{T}) where {T <: FlintMatElem} = _entries_type(T)(_unsafe_load_field(a, Val(:entries)))
+
+_entries_type(::Type{T}) where {T <: FlintMatElem} = Base.promote_op(_entries, T)
 
 _stride(a::FlintMatElem) = a.stride
 _stride(a::Ref{T}) where {T <: FlintMatElem} = _stride(a[]::T)

@@ -2396,4 +2396,3 @@ end
 ################################################################################
 
 _entry_size(::Type{ZZMatrix}) = sizeof(ZZRingElem)
-_entries(a::Ptr{ZZMatrix}) = unsafe_load(Ptr{Ptr{ZZRingElem}}(a))
