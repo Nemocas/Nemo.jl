@@ -20,7 +20,9 @@ is_square(a::Ref{<:FlintMatElem}) = nrows(a) == ncols(a)
 
 _entries(a::FlintMatElem) = a.entries
 _entries(a::Ref{T}) where {T <: FlintMatElem} = _entries(a[]::T)
-_entries(a::Ptr{T}) where {T <: FlintMatElem} = unsafe_load(Ptr{fieldtype(T, :entries)}(a))
+_entries(a::Ptr{T}) where {T <: FlintMatElem} = unsafe_load(Ptr{_entries_type(T)}(a))
+
+_entries_type(::Type{T}) where {T <: FlintMatElem} = Base.promote_op(_entries, T)
 
 _stride(a::FlintMatElem) = a.stride
 _stride(a::Ref{T}) where {T <: FlintMatElem} = _stride(a[]::T)
