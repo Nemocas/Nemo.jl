@@ -26,11 +26,11 @@ function expand_templates(input, flintdir)
   return replace(input, substitutions...)
 end
 
-const regex_typedef_struct_fields_name = r"^typedef struct\s*\{([^{}]+)\}\s*([A-Za-z0-9_]+);"m
-const regex_typedef_struct_fields_refname = r"^typedef struct\s*\{([^{}]+)\}\s*([A-Za-z0-9_]+)\[1\];"m
-const regex_struct_structname_fields = r"^struct *([A-Za-z0-9_]+)\s*\{([^{}]+)\}\s*;"m
+const regex_typedef_struct_fields_name = r"^typedef struct\s*\{((?:[^{}]|\{[^{}]*\})+)\}\s*([A-Za-z0-9_]+);"m
+const regex_typedef_struct_fields_refname = r"^typedef struct\s*\{((?:[^{}]|\{[^{}]*\})+)\}\s*([A-Za-z0-9_]+)\[1\];"m
+const regex_struct_structname_fields = r"^struct *([A-Za-z0-9_]+)\s*\{((?:[^{}]|\{[^{}]*\})+)\}\s*;"m
 const regex_struct_structname = r"^struct *([A-Za-z0-9_]+);"m
-const regex_typedef_struct_structname_fields_name = r"^typedef struct *([A-Za-z0-9_]+)\s*\{([^{}]+)\}\s*([A-Za-z0-9_]+);"m
+const regex_typedef_struct_structname_fields_name = r"^typedef struct *([A-Za-z0-9_]+)\s*\{((?:[^{}]|\{[^{}]*\})+)\}\s*([A-Za-z0-9_]+);"m
 
 const regex_typedef_enum_values_name = r"^typedef enum\s*\{([^{}]+)\}\s*([A-Za-z0-9_]+);"m
 const regex_enum_enumname_values = r"^enum *([A-Za-z0-9_]+)\s*\{([^{}]+)\}\s*;"m
@@ -40,7 +40,15 @@ const regex_typedef_union_values_name = r"^typedef union\s*\{([^{}]+)\}\s*([A-Za
 const regex_union_unionname_values = r"^union *([A-Za-z0-9_]+)\s*\{([^{}]+)\}\s*;"m
 const regex_typedef_union_unionname_values_name = r"^typedef union *([A-Za-z0-9_]+)\s*\{([^{}]+)\}\s*([A-Za-z0-9_]+);"m
 
+# `union { T1 a; T2 b; } name;` inside a struct
+function convert_inline_union(str::AbstractString)
+  m = match(r"^ +union\s*\{([^{}]+)\}\s*([A-Za-z0-9_]+);"m, str)
+  types = [t.captures[1] for t in eachmatch(r"^ +([A-Za-z0-9_]+) +\**([A-Za-z0-9_]+);"m, m.captures[1])]
+  return "  $(m.captures[2])::NTuple{cld(maximum(sizeof, ($(join(types, ", ")),)), sizeof(UInt)), UInt}"
+end
+
 function convert_struct(str::AbstractString)
+  str = replace(str, r"^ +union\s*\{[^{}]+\}\s*[A-Za-z0-9_]+;"m => convert_inline_union)
   substitutions = Pair{Regex,Union{SubstitutionString,Function}}[
     regex_typedef_struct_fields_name => s"struct \2 <: FlintStruct\1end",                                       # whole typedef struct construct
     regex_struct_structname_fields => s"struct struct_\1 <: FlintStruct\2end",                                  # whole struct construct
@@ -58,7 +66,7 @@ function convert_struct(str::AbstractString)
     r"^ +([A-Za-z0-9_]+) *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+);"m => s"  \2::Ptr{\1}\n  \3::Ptr{\1}\n  \4::Ptr{\1}\n  \5::Ptr{\1}",
     r"^ +([A-Za-z0-9_]+) *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+) *, *\* *([A-Za-z0-9_]+);"m => s"  \2::Ptr{\1}\n  \3::Ptr{\1}\n  \4::Ptr{\1}\n  \5::Ptr{\1}\n  \6::Ptr{\1}",
     r"^ +([A-Za-z0-9_]+) *\* *\* *([A-Za-z0-9_]+);"m => s"  \2::Ptr{Ptr{\1}}",                    # double pointer field
-    r"^ +([A-Za-z0-9_]+) +([A-Za-z0-9_]+)\[([A-Za-z0-9_]+)\];"m => s"  \2::NTuple{\3, \1}",       # fixed len array field
+    r"^ +([A-Za-z0-9_]+) +([A-Za-z0-9_]+)\[([A-Za-z0-9_+*/ ()-]+)\];"m => s"  \2::NTuple{\3, \1}", # fixed len array field
     r"^ +[A-Za-z0-9_]+ *\( *\* *([A-Za-z0-9_]+) *\) *\([A-Za-z0-9_, *]+\);"m => s"  \1::Ptr{Cvoid}",  # function pointer field
     r"^ +struct *([A-Za-z0-9_]+) +([A-Za-z0-9_]+);"m => s"  \2::struct_\1",                       # struct field (without typedef)
     r"^ +enum *([A-Za-z0-9_]+) +([A-Za-z0-9_]+);"m => s"  \2::enum_\1",                           # enum field (without typedef)
@@ -84,9 +92,9 @@ end
 
 function convert_union(str::AbstractString)
   substitutions = Pair{Regex,Union{SubstitutionString,Function}}[
-    regex_typedef_union_values_name => s"struct \2\n  uniondata::NTuple{cld(maximum(sizeof, (\1  )), sizeof(UInt)), UInt}\nend",                                 # whole typedef union construct
-    regex_union_unionname_values => s"struct union_\1\n  uniondata::NTuple{cld(maximum(sizeof, (\2  )), sizeof(UInt)), UInt}\nend",                             # whole union construct
-    regex_typedef_union_unionname_values_name => s"struct \3\n  uniondata::NTuple{cld(maximum(sizeof, (\2  )), sizeof(UInt)), UInt}\nend\nconst union_\1 = \3", # whole typedef union construct with two names
+    regex_typedef_union_values_name => s"struct \2 <: FlintStruct\n  uniondata::NTuple{cld(maximum(sizeof, (\1  )), sizeof(UInt)), UInt}\nend",                                 # whole typedef union construct
+    regex_union_unionname_values => s"struct union_\1 <: FlintStruct\n  uniondata::NTuple{cld(maximum(sizeof, (\2  )), sizeof(UInt)), UInt}\nend",                             # whole union construct
+    regex_typedef_union_unionname_values_name => s"struct \3 <: FlintStruct\n  uniondata::NTuple{cld(maximum(sizeof, (\2  )), sizeof(UInt)), UInt}\nend\nconst union_\1 = \3", # whole typedef union construct with two names
     r"^ +([a-z_]+) +([A-Za-z0-9_]+);"m => s"    \1,",
   ]
   for substitution in substitutions
@@ -96,7 +104,7 @@ function convert_union(str::AbstractString)
 end
 
 # `ulong` and `slong` are platform dependent in flint.h and defined by hand in the template
-const ignored_constructs = r"^typedef .* (ulong|slong);$"
+const ignored_constructs = r"^typedef .* (ulong|slong);$|^struct [A-Za-z0-9_]+ ?\*[A-Za-z0-9_]+\("
 
 # Every type construct in the header must be covered by some match,
 # otherwise a FLINT change would silently drop a type.
@@ -153,6 +161,11 @@ function c2julia(str::String)
   check_all_constructs_matched(str, matches)
   output = join(map(m -> replace(m.match, substitutions...), matches), "\n\n")
   output = replace(output, r"\h*\n" => "\n") # remove trailing whitespace
+  output = replace(output, r"NTuple\{([^,}]*)/([^,}]*),"  => s"NTuple{\1÷\2,") # integer division in array lengths
+  # a C statement that survived translation would be a syntax error in Julia
+  for m in eachmatch(r"^.*;\h*$"m, output)
+    error("Untranslated line: $(m.match)")
+  end
   return output
 end
 
