@@ -21,20 +21,7 @@ Creation is usually by calling [`number_field`](@ref), but see also
 for some more specialized fields.
 """
 @attributes mutable struct AbsSimpleNumField <: SimpleNumField{QQFieldElem}
-  pol_coeffs::Ptr{Nothing}
-  pol_alloc::Int
-  pol_length::Int
-  pol_den::Int
-  pinv_dinv::Ptr{Nothing}
-  pinv_n::Int
-  pinv_norm::Int
-  powers::Ptr{Nothing}
-  powers_len::Int
-  traces_coeffs::Ptr{Nothing}
-  traces_den::Int
-  traces_alloc::Int
-  traces_length::Int
-  flag::UInt
+  data::FlintC.nf_struct
   pol::QQPolyRingElem
   S::Symbol
 
@@ -49,6 +36,22 @@ for some more specialized fields.
       return nf
     end
   end
+end
+@flint_fields AbsSimpleNumField
+@flint_legacy_fields AbsSimpleNumField begin
+  pol_coeffs = data.pol.coeffs
+  pol_alloc = data.pol.alloc
+  pol_length = data.pol.length
+  pol_den = data.pol.den
+  pinv_dinv = Ptr{Cvoid}(_union_word(data.pinv, 1))
+  pinv_n = _union_word(data.pinv, 2) % Int
+  pinv_norm = _union_word(data.pinv, 3) % Int
+  powers = Ptr{Cvoid}(_union_word(data.powers, 1))
+  powers_len = _union_word(data.powers, 2) % Int
+  traces_coeffs = data.traces.coeffs
+  traces_alloc = data.traces.alloc
+  traces_length = data.traces.length
+  traces_den = data.traces.den
 end
 
 const AnticNumberFieldID = CacheDictType{Tuple{QQPolyRing, QQPolyRingElem, Symbol}, AbsSimpleNumField}()
@@ -70,11 +73,7 @@ Essentially never called directly.
 See also [`number_field`](@ref).
 """
 mutable struct AbsSimpleNumFieldElem <: SimpleNumFieldElem{QQFieldElem}
-  elem_coeffs::Ptr{Nothing}
-  elem_alloc::Int
-  elem_length::Int
-  elem_den::Int
-  # end antic struct
+  data::FlintC.nf_elem_struct
 
   parent::AbsSimpleNumField
 
@@ -94,6 +93,17 @@ mutable struct AbsSimpleNumFieldElem <: SimpleNumFieldElem{QQFieldElem}
     finalizer(_nf_elem_clear_fn, r)
     return r
   end
+end
+@flint_fields AbsSimpleNumFieldElem
+@flint_extra_fields AbsSimpleNumFieldElem begin
+  elem_coeffs = Ptr{Cvoid}(_union_word(data, 1))
+  elem_coeffs! = _set_union_word(data, 1, v)
+  elem_alloc = _union_word(data, 2) % Int
+  elem_alloc! = _set_union_word(data, 2, v)
+  elem_length = _union_word(data, 3) % Int
+  elem_length! = _set_union_word(data, 3, v)
+  elem_den = _union_word(data, 4) % Int
+  elem_den! = _set_union_word(data, 4, v)
 end
 
 function _nf_elem_clear_fn(a::AbsSimpleNumFieldElem)

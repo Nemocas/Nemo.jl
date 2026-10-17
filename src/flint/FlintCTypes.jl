@@ -1275,4 +1275,112 @@ const fq_nmod_mpoly_pfrac_t = Tuple{fq_nmod_mpoly_pfrac_struct}
 ###############################################################################
 
 
+###############################################################################
+# begin fmpz_poly.h
+
+const FMPZ_POLY_INV_NEWTON_CUTOFF = 32
+
+const FMPZ_POLY_SQRT_DIVCONQUER_CUTOFF = 16
+
+const FMPZ_POLY_SQRTREM_DIVCONQUER_CUTOFF = 16
+
+struct fmpz_poly_powers_precomp_struct <: FlintStruct
+  powers::Ptr{Ptr{fmpz}}
+  len::slong
+end
+
+const fmpz_poly_powers_precomp_t = Tuple{fmpz_poly_powers_precomp_struct}
+
+struct fmpz_poly_mul_precache_struct <: FlintStruct
+  jj::Ptr{Ptr{ulong}}
+  n::slong
+  len2::slong
+  loglen::slong
+  bits2::slong
+  limbs::slong
+  poly2::fmpz_poly_t
+end
+
+const fmpz_poly_mul_precache_t = Tuple{fmpz_poly_mul_precache_struct}
+
+# end fmpz_poly.h
+###############################################################################
+
+
+###############################################################################
+# begin fmpq_poly.h
+
+struct fmpq_poly_powers_precomp_struct <: FlintStruct
+  powers::Ptr{fmpq_poly_struct}
+  len::slong
+end
+
+const fmpq_poly_powers_precomp_t = Tuple{fmpq_poly_powers_precomp_struct}
+
+const WEAK_CANONICALISE_CUTOFF = 25600
+
+# end fmpq_poly.h
+###############################################################################
+
+
+###############################################################################
+# begin nf.h
+
+struct nf_struct <: FlintStruct
+  pol::fmpq_poly_t
+  pinv::NTuple{cld(maximum(sizeof, (fmpz_preinvn_t,)), sizeof(UInt)), UInt}
+  powers::NTuple{cld(maximum(sizeof, (fmpq_poly_powers_precomp_t, fmpz_poly_powers_precomp_t,)), sizeof(UInt)), UInt}
+  traces::fmpq_poly_t
+  flag::ulong
+end
+
+const nf_t = Tuple{nf_struct}
+
+const NF_POWERS_CUTOFF = 30
+
+const NF_GENERIC = 0
+
+const NF_MONIC = 1
+
+const NF_LINEAR = 2
+
+const NF_QUADRATIC = 4
+
+const NF_GAUSSIAN = 8
+
+# end nf.h
+###############################################################################
+
+
+###############################################################################
+# begin nf_elem.h
+
+struct lnf_elem_struct <: FlintStruct
+  num::fmpz_t
+  den::fmpz_t
+end
+
+const lnf_elem_t = Tuple{lnf_elem_struct}
+
+struct qnf_elem_struct <: FlintStruct
+  num::NTuple{3, fmpz}
+  den::fmpz_t
+end
+
+const qnf_elem_t = Tuple{qnf_elem_struct}
+
+struct nf_elem_struct <: FlintStruct
+  uniondata::NTuple{cld(maximum(sizeof, (
+    fmpq_poly_t,
+    lnf_elem_t,
+    qnf_elem_t,
+  )), sizeof(UInt)), UInt}
+end
+
+const nf_elem_t = Tuple{nf_elem_struct}
+
+# end nf_elem.h
+###############################################################################
+
+
 end # module FlintC
