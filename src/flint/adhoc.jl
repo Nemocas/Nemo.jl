@@ -53,9 +53,9 @@ end
 for W in ((:(T <: RingElement),), (:(ZZRingElem <: T <: RingElem),))
   @eval function (a::Generic.AbsPowerSeriesRing{T})(b::ZZRingElem) where {$(W...)}
     if iszero(b)
-      z = Generic.AbsSeries{T}(T[], 0, a.prec_max)
+      z = Generic.AbsSeries{T}(T[], 0, max_precision(a))
     else
-      z = Generic.AbsSeries{T}([base_ring(a)(b)], 1, a.prec_max)
+      z = Generic.AbsSeries{T}([base_ring(a)(b)], 1, max_precision(a))
     end
     z.parent = a
     return z
@@ -113,9 +113,9 @@ end
 for W in ((:(T <: RingElement),), (:(ZZRingElem <: T <: RingElem),))
   @eval function (a::Generic.RelPowerSeriesRing{T})(b::ZZRingElem) where {$(W...)}
     if iszero(b)
-      z = Generic.RelSeries{T}(T[], 0, a.prec_max, a.prec_max)
+      z = Generic.RelSeries{T}(T[], 0, max_precision(a), max_precision(a))
     else
-      z = Generic.RelSeries{T}([base_ring(a)(b)], 1, a.prec_max, 0)
+      z = Generic.RelSeries{T}([base_ring(a)(b)], 1, max_precision(a), 0)
     end
     z.parent = a
     return z
@@ -238,7 +238,7 @@ function evaluate(a::Generic.MPoly{T}, A::Vector{ZZRingElem}) where {T <: RingEl
     return base_ring(a)()
   end
   N = size(a.exps, 1)
-  ord = parent(a).ord
+  ord = internal_ordering(parent(a))
   if ord == :lex
     start_var = N
   else
