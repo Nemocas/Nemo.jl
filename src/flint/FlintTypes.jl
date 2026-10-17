@@ -4111,7 +4111,7 @@ mutable struct zzModMatrix <: FlintMatElem{zzModRingElem}
   end
 
   function zzModMatrix(n::UInt, b::ZZMatrix)
-    z = zzModMatrix(b.r, b.c, n)
+    z = zzModMatrix(nrows(b), ncols(b), n)
     @ccall libflint.fmpz_mat_get_nmod_mat(z::Ref{zzModMatrix}, b::Ref{ZZMatrix})::Nothing
     return z
   end
@@ -4264,10 +4264,10 @@ mutable struct ZZModMatrix <: FlintMatElem{ZZModRingElem}
     (n < 2) && error("Modulus must be >= 2")
     z = new()
     R = ZZModRing(n)
-    @ccall libflint.fmpz_mod_mat_init(z::Ref{ZZModMatrix}, b.r::Int, b.c::Int, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+    @ccall libflint.fmpz_mod_mat_init(z::Ref{ZZModMatrix}, nrows(b)::Int, ncols(b)::Int, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
     finalizer(_fmpz_mod_mat_clear_fn, z)
-    for i = 1:b.r
-      for j = 1:b.c
+    for i = 1:nrows(b)
+      for j = 1:ncols(b)
         setindex_raw!(z, _reduce(b[i,j], R.ninv), i, j)
       end
     end
@@ -4495,7 +4495,7 @@ mutable struct fpMatrix <: FlintMatElem{fpFieldElem}
   end
 
   function fpMatrix(n::UInt, b::ZZMatrix)
-    z = fpMatrix(b.r, b.c, n)
+    z = fpMatrix(nrows(b), ncols(b), n)
     @ccall libflint.fmpz_mat_get_nmod_mat(z::Ref{fpMatrix}, b::Ref{ZZMatrix})::Nothing
     return z
   end
