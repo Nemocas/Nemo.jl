@@ -59,4 +59,12 @@ const FLINT_BITS = UInt == UInt64 ? 64 : 32
 
 @include_c_header("fq_nmod_mpoly_factor.h")
 
+@include_c_header("fmpz_poly.h")
+
+@include_c_header("fmpq_poly.h")
+
+@include_c_header("nf.h")
+
+@include_c_header("nf_elem.h")
+
 end # module FlintC

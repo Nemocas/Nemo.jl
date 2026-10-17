@@ -21,20 +21,7 @@ Creation is usually by calling [`number_field`](@ref), but see also
 for some more specialized fields.
 """
 @attributes mutable struct AbsSimpleNumField <: SimpleNumField{QQFieldElem}
-  pol_coeffs::Ptr{ZZRingElem} # array of fmpz
-  pol_alloc::Int
-  pol_length::Int
-  pol_den::Int
-  pinv_dinv::Ptr{UInt} # array of ulong
-  pinv_n::Int
-  pinv_norm::Int
-  powers::Ptr{Cvoid} # union of fmpq_poly_struct * and fmpz **
-  powers_len::Int
-  traces_coeffs::Ptr{ZZRingElem} # array of fmpz
-  traces_alloc::Int
-  traces_length::Int
-  traces_den::Int
-  flag::UInt
+  cstruct::FlintC.nf_struct
   pol::QQPolyRingElem
   S::Symbol
 
@@ -49,6 +36,22 @@ for some more specialized fields.
       return nf
     end
   end
+end
+@flint_fields AbsSimpleNumField
+@flint_legacy_fields AbsSimpleNumField begin
+  pol_coeffs = cstruct.pol.coeffs
+  pol_alloc = cstruct.pol.alloc
+  pol_length = cstruct.pol.length
+  pol_den = cstruct.pol.den
+  pinv_dinv = Ptr{Cvoid}(_union_word(cstruct.pinv, 1))
+  pinv_n = _union_word(cstruct.pinv, 2) % Int
+  pinv_norm = _union_word(cstruct.pinv, 3) % Int
+  powers = Ptr{Cvoid}(_union_word(cstruct.powers, 1))
+  powers_len = _union_word(cstruct.powers, 2) % Int
+  traces_coeffs = cstruct.traces.coeffs
+  traces_alloc = cstruct.traces.alloc
+  traces_length = cstruct.traces.length
+  traces_den = cstruct.traces.den
 end
 
 const AnticNumberFieldID = CacheDictType{Tuple{QQPolyRing, QQPolyRingElem, Symbol}, AbsSimpleNumField}()
@@ -70,11 +73,7 @@ Essentially never called directly.
 See also [`number_field`](@ref).
 """
 mutable struct AbsSimpleNumFieldElem <: SimpleNumFieldElem{QQFieldElem}
-  elem_coeffs::Ptr{ZZRingElem} # array of fmpz
-  elem_alloc::Int
-  elem_length::Int
-  elem_den::Int
-  # end antic struct
+  cstruct::FlintC.nf_elem_struct
 
   parent::AbsSimpleNumField
 
@@ -94,6 +93,17 @@ mutable struct AbsSimpleNumFieldElem <: SimpleNumFieldElem{QQFieldElem}
     finalizer(_nf_elem_clear_fn, r)
     return r
   end
+end
+@flint_fields AbsSimpleNumFieldElem
+@flint_extra_fields AbsSimpleNumFieldElem begin
+  elem_coeffs = Ptr{Cvoid}(_union_word(cstruct, 1))
+  elem_coeffs! = _set_union_word(cstruct, 1, v)
+  elem_alloc = _union_word(cstruct, 2) % Int
+  elem_alloc! = _set_union_word(cstruct, 2, v)
+  elem_length = _union_word(cstruct, 3) % Int
+  elem_length! = _set_union_word(cstruct, 3, v)
+  elem_den = _union_word(cstruct, 4) % Int
+  elem_den! = _set_union_word(cstruct, 4, v)
 end
 
 function _nf_elem_clear_fn(a::AbsSimpleNumFieldElem)
