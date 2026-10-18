@@ -1066,9 +1066,9 @@ end
 
 function cmp(a::BigFloat, b::ZZRingElem)
   if _fmpz_is_small(b)
-    return Int(@ccall :libmpfr.mpfr_cmp_si(a::Ref{BigFloat}, b.d::Int)::Cint)
+    return Int(@ccall Base.MPFR.libmpfr.mpfr_cmp_si(a::Ref{BigFloat}, b.d::Int)::Cint)
   end
-  return Int(@ccall :libmpfr.mpfr_cmp_z(a::Ref{BigFloat}, (unsigned(b.d) << 2)::UInt)::Cint)
+  return Int(@ccall Base.MPFR.libmpfr.mpfr_cmp_z(a::Ref{BigFloat}, (unsigned(b.d) << 2)::UInt)::Cint)
 end
 
 ==(x::ZZRingElem, y::BigFloat) = cmp(y, x) == 0
@@ -2032,7 +2032,7 @@ function remove(a::BigInt, b::BigInt)
   b <= 1 && error("Factor <= 1")
   a == 0 && error("Not yet implemented")
   q = BigInt()
-  v = @ccall :libgmp.__gmpz_remove(q::Ref{BigInt}, a::Ref{BigInt}, b::Ref{BigInt})::Culong
+  v = @ccall Base.GMP.libgmp.__gmpz_remove(q::Ref{BigInt}, a::Ref{BigInt}, b::Ref{BigInt})::Culong
   return (Int(v), q)
 end
 
