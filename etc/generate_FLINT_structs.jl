@@ -43,7 +43,7 @@ const regex_typedef_union_unionname_values_name = r"^typedef union *([A-Za-z0-9_
 # `union { T1 a; T2 b; } name;` inside a struct
 function convert_inline_union(str::AbstractString)
   m = match(r"^ +union\s*\{([^{}]+)\}\s*([A-Za-z0-9_]+);"m, str)
-  types = [t.captures[1] for t in eachmatch(r"^ +([A-Za-z0-9_]+) +\**([A-Za-z0-9_]+);"m, m.captures[1])]
+  types = [isempty(t.captures[2]) ? t.captures[1] : "Ptr{$(t.captures[1])}" for t in eachmatch(r"^ +([A-Za-z0-9_]+) *(\**) *([A-Za-z0-9_]+);"m, m.captures[1])]
   return "  $(m.captures[2])::NTuple{cld(maximum(sizeof, ($(join(types, ", ")),)), sizeof(UInt)), UInt}"
 end
 
@@ -95,7 +95,8 @@ function convert_union(str::AbstractString)
     regex_typedef_union_values_name => s"struct \2 <: FlintStruct\n  uniondata::NTuple{cld(maximum(sizeof, (\1  )), sizeof(UInt)), UInt}\nend",                                 # whole typedef union construct
     regex_union_unionname_values => s"struct union_\1 <: FlintStruct\n  uniondata::NTuple{cld(maximum(sizeof, (\2  )), sizeof(UInt)), UInt}\nend",                             # whole union construct
     regex_typedef_union_unionname_values_name => s"struct \3 <: FlintStruct\n  uniondata::NTuple{cld(maximum(sizeof, (\2  )), sizeof(UInt)), UInt}\nend\nconst union_\1 = \3", # whole typedef union construct with two names
-    r"^ +([a-z_]+) +([A-Za-z0-9_]+);"m => s"    \1,",
+    r"^ +([A-Za-z0-9_]+) *\* *([A-Za-z0-9_]+);"m => s"    Ptr{\1},",  # pointer member
+    r"^ +([A-Za-z0-9_]+) +([A-Za-z0-9_]+);"m => s"    \1,",
   ]
   for substitution in substitutions
     str = replace(str, substitution)
@@ -190,11 +191,11 @@ function expand_template_file(
   infile::String, outfile::String, flintpath::String, file_header::String
 )
   @info "Expanding file" infile outfile
+  # translate first, so a failure leaves the old file untouched
+  output = expand_templates(read(infile, String), joinpath(flintpath, "include", "flint"))
   open(outfile, "w") do io
     write(io, file_header)
-    write(
-      io, expand_templates(read(infile, String), joinpath(flintpath, "include", "flint"))
-    )
+    write(io, output)
   end
 end
 

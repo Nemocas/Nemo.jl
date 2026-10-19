@@ -67,4 +67,18 @@ const FLINT_BITS = UInt == UInt64 ? 64 : 32
 
 @include_c_header("nf_elem.h")
 
+@include_c_header("arf_types.h")
+
+@include_c_header("arb_types.h")
+
+@include_c_header("acb_types.h")
+
+@include_c_header("fexpr.h")
+
+@include_c_header("qqbar.h")
+
+@include_c_header("fmpz_mpoly.h")
+
+@include_c_header("ca_types.h")
+
 end # module FlintC
