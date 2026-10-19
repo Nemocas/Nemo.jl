@@ -415,6 +415,12 @@ end
   end
 end
 
+@testset "QQMPolyRingElem.divexact_by_zero" begin
+  R = QQ
+  S, = polynomial_ring(R, 2)
+  test_divexact_by_zero(S, 0, ZZ(0), QQ(0))
+end
+
 @testset "QQMPolyRingElem.euclidean_division" begin
   R = QQ
 
