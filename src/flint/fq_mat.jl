@@ -567,17 +567,3 @@ function nullspace(M::FqPolyRepMatrix)
   nullity = @ccall libflint.fq_mat_nullspace(N::Ref{FqPolyRepMatrix}, M::Ref{FqPolyRepMatrix}, base_ring(M)::Ref{FqPolyRepField})::Int
   return nullity, view(N, 1:nrows(N), 1:nullity)
 end
-
-################################################################################
-#
-#  Entry pointers
-#
-################################################################################
-
-# each matrix entry consists of 
-#   coeffs :: Ptr{Nothing}
-#   alloc :: Int
-#   length :: Int
-# The `parent` member of struct FqPolyRepFieldElem is not replicated in each
-# struct member, so we cannot use `sizeof(FqPolyRepFieldElem)`.
-_entry_size(::Type{FqPolyRepMatrix}) = sizeof(Ptr) + 2 * sizeof(Int)

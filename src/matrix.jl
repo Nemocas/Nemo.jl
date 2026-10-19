@@ -38,8 +38,10 @@ _stride(a::Ptr{<:FlintMatElem}) = _unsafe_load_field(a, Val(:stride))
 
 # `_entry_size(T)` is the size of the C struct of one entry, which is smaller
 # than the Julia element type if that has fields of its own, such as a parent.
-# For FqMatrix it depends on the base ring, so there is none: FqMatrix has a
-# method of its own and no entry pointers through a `Ref` or `Ptr`.
+# For FqMatrix it depends on the base ring: FqMatrix has a method of its own
+# and no entry pointers through a `Ref` or `Ptr`.
+_entry_size(::Type{T}) where {T <: FlintMatElem} = sizeof(eltype(fieldtype(fieldtype(T, :cstruct), :entries)))
+
 function mat_entry_ptr(A::TypeOrPtr{T}, i::Int, j::Int) where {T <: FlintMatElem}
   return _entries(A) + ((i - 1) * _stride(A) + (j - 1)) * _entry_size(T)
 end

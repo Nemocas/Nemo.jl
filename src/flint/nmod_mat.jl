@@ -723,11 +723,3 @@ function kernel(::Solve.RREFTrait, M::Union{zzModMatrix, ZZModMatrix}; side::Sym
 end
 
 # For kernel(::HowellFormTrait, ...) we use generic AbstractAlgebra code
-
-################################################################################
-#
-#  Entry pointers
-#
-################################################################################
-
-_entry_size(::Type{<:Zmodn_mat}) = sizeof(UInt)
