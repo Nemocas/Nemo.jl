@@ -587,6 +587,14 @@ end
 #
 ################################################################################
 
+# Every member of the `fq_default_mat_struct` union starts with the four
+# words `entries`, `r`, `c`, `stride`.
+_fq_default_mat_word(a::Ptr{FqMatrix}, i::Int) = unsafe_load(Ptr{UInt}(a), i)
+number_of_rows(a::Ptr{FqMatrix}) = _fq_default_mat_word(a, 2) % Int
+number_of_columns(a::Ptr{FqMatrix}) = _fq_default_mat_word(a, 3) % Int
+_stride(a::Ptr{FqMatrix}) = _fq_default_mat_word(a, 4) % Int
+_entries(a::Ptr{FqMatrix}) = Ptr{FqFieldElem}(_fq_default_mat_word(a, 1))
+
 function mat_entry_ptr(a::FqMatrix, i::Int, j::Int)
   t = _fq_default_ctx_type(base_ring(a))
   if t == _FQ_DEFAULT_FQ_ZECH

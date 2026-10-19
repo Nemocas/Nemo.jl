@@ -8,10 +8,9 @@
 # loaded through it, not the Julia object. Asserting the type of `a[]` keeps
 # inference concrete for an abstract `Ref{T}`.
 
-# field `name` of the C struct at `p`, a pointer to a `T` or to its C part
-# alone; the C struct is `T` itself or its `cstruct` field
+# field `name` of the C struct at `p`, a pointer to a `T` or to its C part alone
 @inline function _unsafe_load_field(p::Ptr{T}, ::Val{name}) where {T, name}
-  S = hasfield(T, :cstruct) ? fieldtype(T, :cstruct) : T
+  S = fieldtype(T, :cstruct)
   i = Base.fieldindex(S, name)
   return _unwrap(unsafe_load(Ptr{fieldtype(S, i)}(p + fieldoffset(S, i))))
 end
