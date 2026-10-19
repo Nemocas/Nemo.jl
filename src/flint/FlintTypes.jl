@@ -1922,7 +1922,7 @@ mutable struct FqFieldElem <: FinFieldElem
   function FqFieldElem(ctx::FqField)
     d = new()
     @ccall libflint.fq_default_init2(d::Ref{FqFieldElem}, ctx::Ref{FqField})::Nothing
-    if _fq_default_ctx_type(ctx) != _FQ_DEFAULT_NMOD
+    if _fq_default_ctx_type(ctx) != FlintC.FQ_DEFAULT_NMOD
       finalizer(_fq_default_clear_fn, d)
     end
     d.poly = nothing

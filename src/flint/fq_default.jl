@@ -192,12 +192,6 @@ end
 #
 ################################################################################
 
-const _FQ_DEFAULT_FQ_ZECH   = 1
-const _FQ_DEFAULT_FQ_NMOD   = 2
-const _FQ_DEFAULT_FQ        = 3
-const _FQ_DEFAULT_NMOD      = 4
-const _FQ_DEFAULT_FMPZ_NMOD = 5
-
 mutable struct CanonicalFqDefaultMap{T}# <: Map{FqField, T, SetMap, CanonicalFqDefaultMap}
   D::FqField
   C::T
@@ -221,14 +215,14 @@ function _fq_default_ctx_type(F::FqField)
 end
 
 function _get_raw_type(::Type{fqPolyRepField}, F::FqField)
-  @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FQ_NMOD
+  @assert _fq_default_ctx_type(F) == FlintC.FQ_DEFAULT_FQ_NMOD
   Rx, _ = polynomial_ring(Native.GF(UInt(characteristic(F))), :x, cached = false)
   m = map_coefficients(x -> _coeff(x, 0), defining_polynomial(F), parent = Rx)
   return fqPolyRepField(m, :$, false)
 end
 
 function _get_raw_type(::Type{FqPolyRepField}, F::FqField)
-  @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FQ
+  @assert _fq_default_ctx_type(F) == FlintC.FQ_DEFAULT_FQ
   Rx, _ = polynomial_ring(Native.GF(characteristic(F)), :x, cached = false)
   m = map_coefficients(x -> _coeff(x, 0), defining_polynomial(F), parent = Rx)
   return FqPolyRepField(m, :$, false)
@@ -240,12 +234,12 @@ function canonical_raw_type(::Type{T}, F::FqField) where {T}
 end
 
 function _get_raw_type(::Type{fpField}, F::FqField)
-  @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_NMOD
+  @assert _fq_default_ctx_type(F) == FlintC.FQ_DEFAULT_NMOD
   return Native.GF(UInt(order(F)), cached = false)
 end
 
 function _get_raw_type(::Type{FpField}, F::FqField)
-  @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_NMOD
+  @assert _fq_default_ctx_type(F) == FlintC.FQ_DEFAULT_FMPZ_MOD
   return Native.GF(order(F), cached = false)
 end
 

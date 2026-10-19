@@ -227,7 +227,7 @@ end
 
 function mul!(a::FqMatrix, b::FqMatrix, c::FqFieldElem)
   F = base_ring(a)
-  if _fq_default_ctx_type(F) == _FQ_DEFAULT_NMOD
+  if _fq_default_ctx_type(F) == FlintC.FQ_DEFAULT_NMOD
     @ccall libflint.nmod_mat_scalar_mul(a::Ref{FqMatrix}, b::Ref{FqMatrix}, UInt(lift(ZZ, c))::UInt)::Nothing
     return a
   end
@@ -609,10 +609,10 @@ _entries(a::Ptr{FqMatrix}) = Ptr{FqFieldElem}(_fq_default_mat_word(a, 1))
 # size of one entry of a matrix over `F`, which depends on the representation
 function _entry_size(F::FqField)
   t = _fq_default_ctx_type(F)
-  t == _FQ_DEFAULT_FQ_ZECH && return sizeof(FlintC.fq_zech_struct)
-  t == _FQ_DEFAULT_FQ_NMOD && return sizeof(FlintC.fq_nmod_struct)
-  t == _FQ_DEFAULT_FQ && return sizeof(FlintC.fq_struct)
-  t == _FQ_DEFAULT_NMOD && return sizeof(FlintC.ulong)
+  t == FlintC.FQ_DEFAULT_FQ_ZECH && return sizeof(FlintC.fq_zech_struct)
+  t == FlintC.FQ_DEFAULT_FQ_NMOD && return sizeof(FlintC.fq_nmod_struct)
+  t == FlintC.FQ_DEFAULT_FQ && return sizeof(FlintC.fq_struct)
+  t == FlintC.FQ_DEFAULT_NMOD && return sizeof(FlintC.ulong)
   return sizeof(FlintC.fmpz)
 end
 
