@@ -167,7 +167,7 @@ function AbstractAlgebra.multiply_row!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::In
     i_ptr = mat_entry_ptr(A, i, c)
     for k = cols
       @ccall libflint.fmpz_mod_mul(i_ptr::Ref{ZZRingElem}, i_ptr::Ref{ZZRingElem}, t::Ref{ZZRingElem}, ctx::Ref{fmpz_mod_ctx_struct})::Nothing
-      i_ptr += sizeof(ZZRingElem)
+      i_ptr += _entry_size(typeof(A))
     end
   end
   return A
@@ -207,8 +207,8 @@ function AbstractAlgebra.add_row!(A::Zmod_fmpz_mat, s::ZZModRingElem, i::Int, j:
       # we use the one for fmpz and reduce afterwards
       addmul!(j_ptr, t, i_ptr)
       @ccall libflint.fmpz_mod_set_fmpz(j_ptr::Ref{ZZRingElem}, j_ptr::Ref{ZZRingElem}, ctx::Ref{fmpz_mod_ctx_struct})::Nothing
-      i_ptr += sizeof(ZZRingElem)
-      j_ptr += sizeof(ZZRingElem)
+      i_ptr += _entry_size(typeof(A))
+      j_ptr += _entry_size(typeof(A))
     end
   end
   return A
