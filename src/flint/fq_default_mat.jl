@@ -595,20 +595,18 @@ number_of_columns(a::Ptr{FqMatrix}) = _fq_default_mat_word(a, 3) % Int
 _stride(a::Ptr{FqMatrix}) = _fq_default_mat_word(a, 4) % Int
 _entries(a::Ptr{FqMatrix}) = Ptr{FqFieldElem}(_fq_default_mat_word(a, 1))
 
+# size of one entry of a matrix over `F`, which depends on the representation
+function _entry_size(F::FqField)
+  t = _fq_default_ctx_type(F)
+  t == _FQ_DEFAULT_FQ_ZECH && return sizeof(FlintC.fq_zech_struct)
+  t == _FQ_DEFAULT_FQ_NMOD && return sizeof(FlintC.fq_nmod_struct)
+  t == _FQ_DEFAULT_FQ && return sizeof(FlintC.fq_struct)
+  t == _FQ_DEFAULT_NMOD && return sizeof(FlintC.ulong)
+  return sizeof(FlintC.fmpz)
+end
+
 function mat_entry_ptr(a::FqMatrix, i::Int, j::Int)
-  t = _fq_default_ctx_type(base_ring(a))
-  if t == _FQ_DEFAULT_FQ_ZECH
-    pptr = @ccall libflint.fq_zech_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
-  elseif t == _FQ_DEFAULT_FQ_NMOD
-    pptr = @ccall libflint.fq_nmod_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
-  elseif t == _FQ_DEFAULT_FQ
-    pptr = @ccall libflint.fq_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
-  elseif t == _FQ_DEFAULT_NMOD
-    pptr = @ccall libflint.nmod_mat_entry_ptr(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
-  else#if t == _FQ_DEFAULT_FMPZ_MOD
-    pptr = @ccall libflint.fmpz_mod_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
-  end
-  return pptr
+  return _entries(a) + ((i - 1) * _stride(a) + (j - 1)) * _entry_size(base_ring(a))
 end
 
 ################################################################################
