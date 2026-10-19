@@ -575,6 +575,26 @@ end
   end
 end
 
+@testset "FqPolyRingElem.roots_with_multiplicities" begin
+  R, x = finite_field(ZZRingElem(23), 5, "x")
+  S, y = polynomial_ring(R, "y")
+
+  @test_throws ArgumentError roots(S(0))
+  @test_throws ArgumentError roots_with_multiplicities(S(0))
+  @test isempty(roots_with_multiplicities(S(5)))
+
+  f = 5 * y * (y^2 + 1) * (y^2 + 2) * (y + 1) * (y - x)^10
+  rm = roots_with_multiplicities(f)
+  @test issetequal(first.(rm), roots(f))
+  # e is the largest exponent with (y - r)^e dividing f
+  @test all(((r, e),) -> iszero(rem(f, (y - r)^e)) && !iszero(rem(f, (y - r)^(e + 1))), rm)
+  # and the exponent of the linear factor y - r in the factorization of f
+  lin = [(-coeff(g, 0) // leading_coefficient(g), e)
+         for (g, e) in factor(f) if degree(g) == 1]
+  @test issetequal(rm, lin)
+  @test issetequal(rm, [(R(0), 1), (R(-1), 1), (x, 10)])
+end
+
 @testset "FqPolyRingElem.remove_valuation" begin
   R, x = finite_field(23, 5, "x")
   S, y = polynomial_ring(R, "y")

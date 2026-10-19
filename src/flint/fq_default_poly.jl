@@ -606,19 +606,30 @@ function factor_distinct_deg(x::FqPolyRingElem)
   return res
 end
 
-function roots(x::FqPolyRingElem)
-  R = parent(x)
+# The roots of `a` in its base ring, as FLINT's factorization of `a` into
+# linear factors `x - r`, and that factorization, whose exponents are the
+# multiplicities when `with_multiplicity` is set and 1 otherwise.
+function _roots_and_factor(a::FqPolyRingElem, with_multiplicity::Bool)
+  @req !iszero(a) "Argument must be non-zero"
+  R = parent(a)
   F = base_ring(R)
   fac = fq_default_poly_factor(F)
-  @ccall libflint.fq_default_poly_roots(fac::Ref{fq_default_poly_factor}, x::Ref{FqPolyRingElem}, 0::Cint, F::Ref{FqField})::Nothing
-  res = FqFieldElem[]
+  @ccall libflint.fq_default_poly_roots(fac::Ref{fq_default_poly_factor}, a::Ref{FqPolyRingElem}, with_multiplicity::Cint, F::Ref{FqField})::Nothing
+  f = R()
+  rts = Vector{FqFieldElem}(undef, length(fac))
   for i in 1:length(fac)
-    f = R()
-    @ccall libflint.fq_default_poly_factor_get_poly(f::Ref{FqPolyRingElem}, fac::Ref{fq_default_poly_factor}, (i-1)::Int, F::Ref{FqField})::Nothing
+    @ccall libflint.fq_default_poly_factor_get_poly(f::Ref{FqPolyRingElem}, fac::Ref{fq_default_poly_factor}, (i - 1)::Int, F::Ref{FqField})::Nothing
     @assert isone(coeff(f, 1))
-    push!(res, -coeff(f, 0))
+    rts[i] = -coeff(f, 0)
   end
-  return res
+  return rts, fac
+end
+
+roots(a::FqPolyRingElem) = first(_roots_and_factor(a, false))
+
+function roots_with_multiplicities(a::FqPolyRingElem)
+  rts, fac = _roots_and_factor(a, true)
+  return [(rts[i], exponent(fac, i - 1)) for i in eachindex(rts)]
 end
 
 ################################################################################

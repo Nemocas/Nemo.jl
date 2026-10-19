@@ -657,6 +657,61 @@ end
   @test length(roots(x^2+7)) == 2
 end
 
+@testset "zzModPolyRingElem.roots_with_multiplicities" begin
+  # e is the largest exponent with (y - r)^e dividing f
+  is_multiplicity(f, y, r, e) =
+    iszero(rem(f, (y - r)^e)) && !iszero(rem(f, (y - r)^(e + 1)))
+
+  S, y = polynomial_ring(residue_ring(ZZ, 1031)[1], "y")
+  @test_throws ArgumentError roots(S(0))
+  @test_throws ArgumentError roots_with_multiplicities(S(0))
+  @test isempty(roots_with_multiplicities(S(5)))
+  f = (y^2 + 7) * (y - 5)^3
+  rm = roots_with_multiplicities(f)
+  @test issetequal(first.(rm), roots(f))
+  @test all(((r, e),) -> is_multiplicity(f, y, r, e), rm)
+  @test (base_ring(S)(5), 3) in rm
+
+  # Composite modulus: 4y vanishes modulo 4, so each multiplicity is the one
+  # modulo 3, FLINT combining the prime powers by the minimum.
+  S, y = polynomial_ring(residue_ring(ZZ, 12)[1], "y")
+  f = 4 * y
+  rm = roots_with_multiplicities(f)
+  @test issetequal(first.(rm), roots(f))
+  @test length(rm) == 4
+  @test all(((r, e),) -> is_multiplicity(f, y, r, e), rm)
+  f = (y^2 + 7) * (y - 5)^3
+  @test all(((r, e),) -> is_multiplicity(f, y, r, e), roots_with_multiplicities(f))
+
+  # The top of the word-size range. typemax(UInt) is squarefree and odd, so
+  # y^2 - 1 has two simple roots modulo each of its prime factors.
+  n = typemax(UInt)
+  S, y = polynomial_ring(residue_ring(ZZ, n)[1], "y")
+  rm = roots_with_multiplicities(y^2 - 1)
+  @test length(rm) == 2^length(factor(ZZ(n)))
+  @test issetequal(first.(rm), roots(y^2 - 1))
+  @test all(((r, e),) -> is_multiplicity(y^2 - 1, y, r, e), rm)
+  # the largest prime below 2^Sys.WORD_SIZE
+  p = Sys.WORD_SIZE == 64 ? 0xffffffffffffffc5 : 0xfffffffb
+  S, y = polynomial_ring(residue_ring(ZZ, p)[1], "y")
+  f = (y^2 + 7) * (y - 5)^3
+  rm = roots_with_multiplicities(f)
+  @test (base_ring(S)(5), 3) in rm
+  @test all(((r, e),) -> is_multiplicity(f, y, r, e), rm)
+
+  # Modulus 1: every polynomial is zero, so this is the zero polynomial's error
+  S, y = polynomial_ring(residue_ring(ZZ, 1)[1], "y")
+  @test iszero(y + 1)
+  @test_throws ArgumentError roots(y + 1)
+  @test_throws ArgumentError roots_with_multiplicities(y + 1)
+
+  # Too many roots to list: p*y vanishes modulo p > 2^32, where FLINT gives up.
+  p = next_prime(2^32)
+  S, y = polynomial_ring(residue_ring(ZZ, 3 * p)[1], "y")
+  @test_throws ErrorException roots(p * y)
+  @test_throws ErrorException roots_with_multiplicities(p * y)
+end
+
 @testset "zzModPolyRingElem.canonicalization" begin
   R, = residue_ring(ZZ, 23)
   Rx, x = polynomial_ring(R, "x")
