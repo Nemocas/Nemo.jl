@@ -36,11 +36,7 @@ for (etype, rtype, ftype, ctype, utype) in (
     modulus(f::($etype)) = modulus(base_ring(parent(f)))
 
 
-    function internal_ordering(a::($rtype))
-      b = a.ord
-      #   b = @ccall libflint.nmod_mpoly_ctx_ord(a::Ref{zzModMPolyRing})::Cint
-      return flint_orderings[b + 1]
-    end
+    internal_ordering(a::($rtype)) = _ordering_symbol(a.minfo.ord)
 
     function gens(R::($rtype))
       A = Vector{($etype)}(undef, nvars(R))
