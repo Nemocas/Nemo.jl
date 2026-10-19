@@ -472,6 +472,7 @@ end
 
 function divexact(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem; check::Bool=true)
   check_parent(a, b)
+  iszero(b) && throw(DivideError())
   b, q = divides(a, b)
   check && !b && error("Division is not exact in divexact")
   return q

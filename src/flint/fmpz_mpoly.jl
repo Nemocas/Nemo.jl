@@ -272,6 +272,7 @@ for jT in (ZZRingElem, Integer)
     *(a::($jT), b::ZZMPolyRingElem) = mul!(parent(b)(), a, b)
 
     function divexact(a::ZZMPolyRingElem, b::($jT); check::Bool=true)
+      iszero(b) && throw(DivideError())
       z = parent(a)()
       if check
         d, z = divides!(z, a, b)
@@ -485,6 +486,7 @@ end
 
 function divexact(a::ZZMPolyRingElem, b::ZZMPolyRingElem; check::Bool=true)
   check_parent(a, b)
+  iszero(b) && throw(DivideError())
   b, q = divides(a, b)
   check && !b && error("Division is not exact in divexact")
   return q

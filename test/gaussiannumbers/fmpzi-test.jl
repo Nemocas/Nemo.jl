@@ -219,6 +219,12 @@ end
   @test b == A && a == B
 end
 
+@testset "ZZiRingElem.exact_division" begin
+  test_divexact_by_zero(ZZi, 0, ZZ(0))
+  @test_throws ErrorException divexact(ZZi(1), ZZi(2))
+  @test_throws ErrorException divexact(ZZi(1), 2)
+end
+
 @testset "ZZiRingElem.conformance_tests" begin
   ConformanceTests.test_Ring_interface(ZZi)
   ConformanceTests.test_EuclideanRing_interface(ZZi)

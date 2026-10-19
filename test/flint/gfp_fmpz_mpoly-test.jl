@@ -390,6 +390,12 @@ end
   end
 end
 
+@testset "FpMPolyRingElem.divexact_by_zero" begin
+  R = Native.GF(ZZ(23))
+  S, = polynomial_ring(R, 2)
+  test_divexact_by_zero(S, zero(R), 0, ZZ(0))
+end
+
 @testset "FpMPolyRingElem.euclidean_division" begin
   R = Native.GF(ZZRingElem(23))
 

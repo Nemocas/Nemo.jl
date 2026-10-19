@@ -323,6 +323,7 @@ end
 
 function divexact(x::zzModRingElem, y::zzModRingElem; check::Bool=true)
   check_parent(x, y)
+  iszero(y) && !is_trivial(parent(y)) && throw(DivideError())
   fl, q = divides(x, y)
   if !fl
     error("Impossible inverse in ", parent(x))

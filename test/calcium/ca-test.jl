@@ -4,6 +4,15 @@
   #ConformanceTests.test_Field_interface_recursive(R)  # polynomial ring tests too slow
 end
 
+@testset "CalciumFieldElem.divexact_by_zero" begin
+  for C in (CalciumField(), CalciumField(extended = true))
+    test_divexact_by_zero(C, 0, ZZ(0), QQ(0), QQBarField()(0))
+    for a in (0, 1, ZZ(1), QQ(1), QQBarField()(1))
+      @test_throws DivideError divexact(a, C(0))
+    end
+  end
+end
+
 @testset "CalciumFieldElem.constructors" begin
   C = CalciumField()
 

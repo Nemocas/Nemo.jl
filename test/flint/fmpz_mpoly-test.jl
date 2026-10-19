@@ -395,6 +395,12 @@ end
   end
 end
 
+@testset "ZZMPolyRingElem.divexact_by_zero" begin
+  R = ZZ
+  S, = polynomial_ring(R, 2)
+  test_divexact_by_zero(S, 0, ZZ(0))
+end
+
 @testset "ZZMPolyRingElem.euclidean_division" begin
   R = ZZ
 
