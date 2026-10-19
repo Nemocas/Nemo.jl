@@ -27,7 +27,7 @@ base_ring(a::QQMPolyRing) = QQ
 
 function internal_ordering(a::QQMPolyRing)
   b = @ccall libflint.fmpq_mpoly_ctx_ord(a::Ref{QQMPolyRing})::Cint
-  return flint_orderings[b + 1]
+  return _flint_ordering_symbol(b)
 end
 
 function gens(R::QQMPolyRing)

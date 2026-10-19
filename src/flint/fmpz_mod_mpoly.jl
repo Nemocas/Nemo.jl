@@ -45,7 +45,7 @@ for (etype, rtype, ftype, ctype) in (
     function internal_ordering(a::($rtype))
       b = a.ord
       #   b = @ccall libflint.fmpz_mod_mpoly_ctx_ord(a::Ref{($rtype)})::Cint
-      return flint_orderings[b + 1]
+      return _flint_ordering_symbol(b)
     end
 
     function gens(R::($rtype))

@@ -1058,6 +1058,7 @@ const _ORD_LEX       = Cint(0)
 const _ORD_DEGLEX    = Cint(1)
 const _ORD_DEGREVLEX = Cint(2)
 
+# used by the tests
 const flint_orderings = [:lex, :deglex, :degrevlex]
 
 function _flint_ordering(S::Symbol)
@@ -1069,6 +1070,18 @@ function _flint_ordering(S::Symbol)
     return _ORD_DEGREVLEX
   else
     throw(ArgumentError("$S is not a valid ordering"))
+  end
+end
+
+function _flint_ordering_symbol(b::Cint)
+  if b == _ORD_LEX
+    return :lex
+  elseif b == _ORD_DEGLEX
+    return :deglex
+  elseif b == _ORD_DEGREVLEX
+    return :degrevlex
+  else
+    throw(ArgumentError("$b is not a valid FLINT ordering"))
   end
 end
 
