@@ -2316,8 +2316,6 @@ const NALocalFieldElem = NonArchLocalFieldElem
 #
 ###############################################################################
 
-const flint_padic_printing_mode = [:terse, :series, :val_unit]
-
 @doc raw"""
     PadicField <: FlintLocalField <: NonArchLocalField <: Field
 
