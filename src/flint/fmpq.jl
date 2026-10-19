@@ -1022,7 +1022,7 @@ end
 _num_ptr(c::QQFieldElem) = Ptr{ZZRingElem}(pointer_from_objref(c))
 _num_ptr(c::Ptr{QQFieldElem}) = Ptr{ZZRingElem}(c)
 _num_ptr(c::Ref{QQFieldElem}) = _num_ptr(c[])
-_den_ptr(c::TypeOrPtr{QQFieldElem}) = _num_ptr(c) + sizeof(ZZRingElem)
+_den_ptr(c::TypeOrPtr{QQFieldElem}) = _num_ptr(c) + fieldoffset(QQFieldElem, Base.fieldindex(QQFieldElem, :den))
 
 function zero!(c::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_zero(c::Ref{QQFieldElem})::Nothing
