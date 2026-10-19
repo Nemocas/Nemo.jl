@@ -4836,10 +4836,6 @@ end
   stride = _union_word(data, 4) % Int
   stride! = _set_union_word(data, 4, v)
 end
-@flint_legacy_fields FqMatrix begin
-  opaque = data.uniondata[5:7]
-  opaque! = _setfield(data, :uniondata, (data.uniondata[1:4]..., v...))
-end
 
 ###############################################################################
 #

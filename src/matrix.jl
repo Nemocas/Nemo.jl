@@ -69,8 +69,10 @@ for T in [zzModMatrix, fpMatrix]
   end
 end
 
+# The words after the window header belong to the ring, e.g. the modulus
+# of an `nmod_mat`.
 function _set_ring!(z::FqMatrix, x::FqMatrix)
-  z.opaque = x.opaque
+  z.data = _setfield(z.data, :uniondata, (z.data.uniondata[1:4]..., x.data.uniondata[5:end]...))
   z.base_ring = x.base_ring
   return z
 end
