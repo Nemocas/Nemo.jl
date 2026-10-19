@@ -45,7 +45,7 @@ integer_ring() = ZZRing()
 
 @doc zz_ring_doc
 mutable struct ZZRingElem <: RingElem
-  d::FlintC.fmpz
+  cstruct::FlintC.fmpz
 
   function ZZRingElem()
     z = new()
@@ -98,6 +98,11 @@ mutable struct ZZRingElem <: RingElem
   end
 
   ZZRingElem(x::ZZRingElem) = x
+end
+@flint_fields ZZRingElem
+@flint_extra_fields ZZRingElem begin
+  d = cstruct
+  d! = v
 end
 
 mutable struct fmpz_factor
@@ -416,13 +421,8 @@ end
 #
 ###############################################################################
 
-# FLINT's `nmod_t`, passed by value; the leading fields of `zzModRing` and
-# `fpField`
-struct nmod_t
-  n::UInt
-  ninv::UInt
-  norm::UInt
-end
+# FLINT's `nmod_t`, passed by value; the C part of `zzModRing` and `fpField`
+const nmod_t = FlintC.nmod_t
 
 @doc raw"""
     zzModRing <: Ring
@@ -432,10 +432,7 @@ Implementation for the modulus being a machine integer [`Int`](@ref).
 For the modulus being a [`ZZRingElem`](@ref) see [`ZZModRing`](@ref).
 """
 @attributes mutable struct zzModRing <: ResidueRing{UInt}
-  n::UInt
-  ninv::UInt
-  norm::UInt
-  # end of flint struct
+  cstruct::FlintC.nmod_t
 
   function zzModRing(n::UInt, cached::Bool=true)
     return get_cached!(NmodRingID, n, cached) do
@@ -445,6 +442,7 @@ For the modulus being a [`ZZRingElem`](@ref) see [`ZZModRing`](@ref).
     end
   end
 end
+@flint_fields zzModRing
 
 const NmodRingID = CacheDictType{UInt, zzModRing}()
 
@@ -471,10 +469,7 @@ A Galois field $\mathbb F_p$ for some prime $p$. See [`GF`](@ref).
 Implementation for $p$ being a machine integer [`Int`](@ref).
 """
 @attributes mutable struct fpField <: FinField
-  n::UInt
-  ninv::UInt
-  norm::UInt
-  # end of flint struct
+  cstruct::FlintC.nmod_t
 
   function fpField(n::UInt, cached::Bool=true)
     return get_cached!(GaloisFieldID, n, cached) do
@@ -484,6 +479,7 @@ Implementation for $p$ being a machine integer [`Int`](@ref).
     end
   end
 end
+@flint_fields fpField
 
 const GaloisFieldID = CacheDictType{UInt, fpField}()
 

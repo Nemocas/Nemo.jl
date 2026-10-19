@@ -172,7 +172,7 @@ function -(x::zzModRingElem, y::zzModRingElem)
   end
 end
 
-nmod_t(R::Union{zzModRing, fpField}) = nmod_t(R.n, R.ninv, R.norm)
+nmod_t(R::Union{zzModRing, fpField}) = R.cstruct
 
 function nmod_t(n::UInt)
   m = Ref{nmod_t}()
