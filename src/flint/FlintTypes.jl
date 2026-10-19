@@ -1065,9 +1065,9 @@ end
 ###############################################################################
 
 # values of FLINT's `ordering_t`
-const _ORD_LEX       = Cint(0)
-const _ORD_DEGLEX    = Cint(1)
-const _ORD_DEGREVLEX = Cint(2)
+const _ORD_LEX       = FlintC.ORD_LEX
+const _ORD_DEGLEX    = FlintC.ORD_DEGLEX
+const _ORD_DEGREVLEX = FlintC.ORD_DEGREVLEX
 
 # used by the tests
 const flint_orderings = [:lex, :deglex, :degrevlex]
@@ -1084,7 +1084,7 @@ function _flint_ordering(S::Symbol)
   end
 end
 
-function _flint_ordering_symbol(b::Cint)
+function _flint_ordering_symbol(b::FlintC.ordering_t)
   if b == _ORD_LEX
     return :lex
   elseif b == _ORD_DEGLEX
@@ -1106,7 +1106,7 @@ end
       ord = _flint_ordering(S)
 
       z = new()
-      @ccall libflint.fmpz_mpoly_ctx_init(z::Ref{ZZMPolyRing}, length(s)::Int, ord::Cint)::Nothing
+      @ccall libflint.fmpz_mpoly_ctx_init(z::Ref{ZZMPolyRing}, length(s)::Int, ord::FlintC.ordering_t)::Nothing
       z.S = s
       finalizer(_fmpz_mpoly_ctx_clear_fn, z)
       return z
@@ -1223,7 +1223,7 @@ end
       ord = _flint_ordering(S)
 
       z = new()
-      @ccall libflint.fmpq_mpoly_ctx_init(z::Ref{QQMPolyRing}, length(s)::Int, ord::Cint)::Nothing
+      @ccall libflint.fmpq_mpoly_ctx_init(z::Ref{QQMPolyRing}, length(s)::Int, ord::FlintC.ordering_t)::Nothing
       z.S = s
       finalizer(_fmpq_mpoly_ctx_clear_fn, z)
       return z
@@ -1357,7 +1357,7 @@ end
       ord = _flint_ordering(S)
 
       z = new()
-      @ccall libflint.nmod_mpoly_ctx_init(z::Ref{zzModMPolyRing}, length(s)::Int, ord::Cint, R.n::UInt)::Nothing
+      @ccall libflint.nmod_mpoly_ctx_init(z::Ref{zzModMPolyRing}, length(s)::Int, ord::FlintC.ordering_t, R.n::UInt)::Nothing
       z.base_ring = R
       z.S = s
       finalizer(_nmod_mpoly_ctx_clear_fn, z)
@@ -1487,7 +1487,7 @@ end
       ord = _flint_ordering(S)
 
       z = new()
-      @ccall libflint.nmod_mpoly_ctx_init(z::Ref{fpMPolyRing}, length(s)::Int, ord::Cint, UInt(modulus(R))::UInt)::Nothing
+      @ccall libflint.nmod_mpoly_ctx_init(z::Ref{fpMPolyRing}, length(s)::Int, ord::FlintC.ordering_t, UInt(modulus(R))::UInt)::Nothing
       z.base_ring = R
       z.S = s
       finalizer(_nmod_mpoly_ctx_clear_fn, z)
@@ -1617,7 +1617,7 @@ end
       ord = _flint_ordering(S)
 
       z = new()
-      @ccall libflint.fmpz_mod_mpoly_ctx_init(z::Ref{FpMPolyRing}, length(s)::Int, ord::Cint, modulus(R)::Ref{ZZRingElem})::Nothing
+      @ccall libflint.fmpz_mod_mpoly_ctx_init(z::Ref{FpMPolyRing}, length(s)::Int, ord::FlintC.ordering_t, modulus(R)::Ref{ZZRingElem})::Nothing
       z.base_ring = R
       z.S = s
       finalizer(_fmpz_mod_mpoly_ctx_clear_fn, z)
@@ -2113,7 +2113,7 @@ end
       ord = _flint_ordering(S)
 
       z = new()
-      @ccall libflint.fq_nmod_mpoly_ctx_init(z::Ref{fqPolyRepMPolyRing}, length(s)::Int, ord::Cint, R::Ref{fqPolyRepField})::Nothing
+      @ccall libflint.fq_nmod_mpoly_ctx_init(z::Ref{fqPolyRepMPolyRing}, length(s)::Int, ord::FlintC.ordering_t, R::Ref{fqPolyRepField})::Nothing
       z.base_ring = R
       z.S = s
       finalizer(_fq_nmod_mpoly_ctx_clear_fn, z)

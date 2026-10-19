@@ -25,10 +25,7 @@ number_of_variables(a::QQMPolyRing) = @ccall libflint.fmpq_mpoly_ctx_nvars(a::Re
 
 base_ring(a::QQMPolyRing) = QQ
 
-function internal_ordering(a::QQMPolyRing)
-  b = @ccall libflint.fmpq_mpoly_ctx_ord(a::Ref{QQMPolyRing})::Cint
-  return _flint_ordering_symbol(b)
-end
+internal_ordering(a::QQMPolyRing) = _flint_ordering_symbol(a.zctx.minfo.ord)
 
 function gens(R::QQMPolyRing)
   A = Vector{QQMPolyRingElem}(undef, nvars(R))
