@@ -244,7 +244,7 @@ function ^(x::fpFieldElem, y::Int)
     x = inv(x)
     y = -y
   end
-  d = @ccall libflint.n_powmod2_preinv(UInt(x.data)::UInt, y::Int, R.n::UInt, R.ninv::UInt)::UInt
+  d = @ccall libflint.nmod_pow_ui(x.data::UInt, unsigned(y)::UInt, nmod_t(R)::nmod_t)::UInt
   return fpFieldElem(d, R)
 end
 

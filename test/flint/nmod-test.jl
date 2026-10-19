@@ -379,6 +379,10 @@ end
   @test a^ZZ(-2) == R(9)
   @test a^(ZZ(2)^64) == R(1)
   @test a^(-ZZ(2)^64) == R(1)
+
+  # -typemin(Int) overflows
+  x = residue_ring(ZZ, 9)[1](2)
+  @test x^typemin(Int) == (inv(x)^(2^62))^2
 end
 
 @testset "zzModRingElem.comparison" begin

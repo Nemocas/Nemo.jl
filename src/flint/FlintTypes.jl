@@ -422,6 +422,14 @@ end
 #
 ###############################################################################
 
+# FLINT's `nmod_t`, passed by value; the leading fields of `zzModRing` and
+# `fpField`
+struct nmod_t
+  n::UInt
+  ninv::UInt
+  norm::UInt
+end
+
 @doc raw"""
     zzModRing <: Ring
 
