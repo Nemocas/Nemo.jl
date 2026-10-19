@@ -786,16 +786,6 @@ function identity_matrix(R::ComplexField, n::Int)
   return one!(ComplexMatrix(n, n))
 end
 
-################################################################################
-#
-#  Entry pointers
-#
-################################################################################
-
-_entry_size(::Type{ComplexMatrix}) = sizeof(acb_struct)
-
-
-
 ###############################################################################
 #
 #   Promotions
