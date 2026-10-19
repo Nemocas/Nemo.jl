@@ -1383,4 +1383,483 @@ const nf_elem_t = Tuple{nf_elem_struct}
 ###############################################################################
 
 
+###############################################################################
+# begin arf_types.h
+
+const ARF_NOPTR_LIMBS = 2
+
+struct mantissa_noptr_struct <: FlintStruct
+  d::NTuple{ARF_NOPTR_LIMBS, ulong}
+end
+
+struct mantissa_ptr_struct <: FlintStruct
+  alloc::slong
+  d::nn_ptr
+end
+
+struct mantissa_struct <: FlintStruct
+  uniondata::NTuple{cld(maximum(sizeof, (
+    mantissa_noptr_struct,
+    mantissa_ptr_struct,
+  )), sizeof(UInt)), UInt}
+end
+
+struct arf_struct <: FlintStruct
+  exp::fmpz
+  size::slong
+  d::mantissa_struct
+end
+
+const arf_t = Tuple{arf_struct}
+
+const arf_ptr = Ptr{arf_struct}
+
+const arf_srcptr = Ptr{arf_struct}
+
+struct arf_interval_struct <: FlintStruct
+  a::arf_struct
+  b::arf_struct
+end
+
+const arf_interval_t = Tuple{arf_interval_struct}
+
+const arf_interval_ptr = Ptr{arf_interval_struct}
+
+const arf_interval_srcptr = Ptr{arf_interval_struct}
+
+# end arf_types.h
+###############################################################################
+
+
+###############################################################################
+# begin arb_types.h
+
+struct mag_struct <: FlintStruct
+  exp::fmpz
+  man::ulong
+end
+
+const mag_t = Tuple{mag_struct}
+
+const mag_ptr = Ptr{mag_struct}
+
+const mag_srcptr = Ptr{mag_struct}
+
+struct arb_struct <: FlintStruct
+  mid::arf_struct
+  rad::mag_struct
+end
+
+const arb_t = Tuple{arb_struct}
+
+const arb_ptr = Ptr{arb_struct}
+
+const arb_srcptr = Ptr{arb_struct}
+
+struct arb_mat_struct <: FlintStruct
+  entries::arb_ptr
+  r::slong
+  c::slong
+  stride::slong
+end
+
+const arb_mat_t = Tuple{arb_mat_struct}
+
+struct arb_poly_struct <: FlintStruct
+  coeffs::arb_ptr
+  alloc::slong
+  length::slong
+end
+
+const arb_poly_t = Tuple{arb_poly_struct}
+
+# end arb_types.h
+###############################################################################
+
+
+###############################################################################
+# begin acb_types.h
+
+struct acb_struct <: FlintStruct
+  real::arb_struct
+  imag::arb_struct
+end
+
+const acb_t = Tuple{acb_struct}
+
+const acb_ptr = Ptr{acb_struct}
+
+const acb_srcptr = Ptr{acb_struct}
+
+struct acb_mat_struct <: FlintStruct
+  entries::acb_ptr
+  r::slong
+  c::slong
+  stride::slong
+end
+
+const acb_mat_t = Tuple{acb_mat_struct}
+
+struct acb_poly_struct <: FlintStruct
+  coeffs::acb_ptr
+  alloc::slong
+  length::slong
+end
+
+const acb_poly_t = Tuple{acb_poly_struct}
+
+# end acb_types.h
+###############################################################################
+
+
+###############################################################################
+# begin fexpr.h
+
+const FEXPR_TYPE_BITS = 4
+
+struct fexpr_struct <: FlintStruct
+  data::Ptr{ulong}
+  alloc::slong
+end
+
+const fexpr_t = Tuple{fexpr_struct}
+
+const fexpr_ptr = Ptr{fexpr_struct}
+
+const fexpr_srcptr = Ptr{fexpr_struct}
+
+struct fexpr_vec_struct <: FlintStruct
+  entries::Ptr{fexpr_struct}
+  alloc::slong
+  length::slong
+end
+
+const fexpr_vec_t = Tuple{fexpr_vec_struct}
+
+const FEXPR_LATEX_SMALL = 1
+
+const FEXPR_LATEX_LOGIC = 2
+
+# end fexpr.h
+###############################################################################
+
+
+###############################################################################
+# begin qqbar.h
+
+struct qqbar_struct <: FlintStruct
+  poly::fmpz_poly_struct
+  enclosure::acb_struct
+end
+
+const qqbar_t = Tuple{qqbar_struct}
+
+const qqbar_ptr = Ptr{qqbar_struct}
+
+const qqbar_srcptr = Ptr{qqbar_struct}
+
+const QQBAR_DEFAULT_PREC = 128
+
+const QQBAR_ROOTS_IRREDUCIBLE = 1
+
+const QQBAR_ROOTS_UNSORTED = 2
+
+const QQBAR_FORMULA_GAUSSIANS = 1
+
+const QQBAR_FORMULA_QUADRATICS = 2
+
+const QQBAR_FORMULA_CYCLOTOMICS = 4
+
+const QQBAR_FORMULA_CUBICS = 8
+
+const QQBAR_FORMULA_QUARTICS = 16
+
+const QQBAR_FORMULA_QUINTICS = 32
+
+const QQBAR_FORMULA_DEPRESSION = 64
+
+const QQBAR_FORMULA_DEFLATION = 128
+
+const QQBAR_FORMULA_SEPARATION = 256
+
+const QQBAR_FORMULA_EXP_FORM = 2048
+
+const QQBAR_FORMULA_TRIG_FORM = 4096
+
+const QQBAR_FORMULA_RADICAL_FORM = 8192
+
+const QQBAR_FORMULA_AUTO_FORM = 0
+
+# end qqbar.h
+###############################################################################
+
+
+###############################################################################
+# begin fmpz_mpoly.h
+
+struct fmpz_mpoly_univar_struct <: FlintStruct
+  coeffs::Ptr{fmpz_mpoly_struct}
+  exps::Ptr{fmpz}
+  alloc::slong
+  length::slong
+end
+
+const fmpz_mpoly_univar_t = Tuple{fmpz_mpoly_univar_struct}
+
+struct fmpz_mpolyd_struct <: FlintStruct
+  nvars::slong
+  degb_alloc::slong
+  deg_bounds::Ptr{slong}
+  length::slong
+  coeff_alloc::slong
+  coeffs::Ptr{fmpz}
+end
+
+const fmpz_mpolyd_t = Tuple{fmpz_mpolyd_struct}
+
+struct fmpz_mpoly_vec_struct <: FlintStruct
+  p::Ptr{fmpz_mpoly_struct}
+  alloc::slong
+  length::slong
+end
+
+const fmpz_mpoly_vec_t = Tuple{fmpz_mpoly_vec_struct}
+
+struct fmpz_mpoly_stripe_struct <: FlintStruct
+  big_mem::Ptr{Cchar}
+  big_mem_alloc::slong
+  N::slong
+  bits::flint_bitcnt_t
+  cmpmask::Ptr{ulong}
+  startidx::Ptr{slong}
+  endidx::Ptr{slong}
+  emin::Ptr{ulong}
+  emax::Ptr{ulong}
+  coeff_bits::flint_bitcnt_t
+  upperclosed::Cint
+  flint_small::Cint
+end
+const struct__fmpz_mpoly_stripe_struct = fmpz_mpoly_stripe_struct
+
+const fmpz_mpoly_stripe_t = Tuple{fmpz_mpoly_stripe_struct}
+
+struct fmpz_mpolyd_ctx_struct <: FlintStruct
+  nvars::slong
+  perm::Ptr{slong}
+end
+
+const fmpz_mpolyd_ctx_t = Tuple{fmpz_mpolyd_ctx_struct}
+
+struct struct_fmpz_pow_cache_t <: FlintStruct
+  powers::Ptr{fmpz}
+  length::slong
+  alloc::slong
+  tmp::fmpz_t
+end
+const fmpz_pow_cache_t = Tuple{struct_fmpz_pow_cache_t}
+
+struct fmpz_mpoly_geobucket_struct <: FlintStruct
+  polys::NTuple{FLINT_BITS÷2, fmpz_mpoly_struct}
+  temps::NTuple{FLINT_BITS÷2, fmpz_mpoly_struct}
+  length::slong
+end
+const struct_fmpz_mpoly_geobucket = fmpz_mpoly_geobucket_struct
+
+const fmpz_mpoly_geobucket_t = Tuple{fmpz_mpoly_geobucket_struct}
+
+# end fmpz_mpoly.h
+###############################################################################
+
+
+###############################################################################
+# begin ca_types.h
+
+@enum calcium_func_code begin
+
+  CA_QQBar
+
+  CA_Neg
+  CA_Add
+  CA_Sub
+  CA_Mul
+  CA_Div
+
+  CA_Sqrt
+  CA_Cbrt
+  CA_Root
+
+  CA_Floor
+  CA_Ceil
+  CA_Abs
+  CA_Sign
+  CA_Re
+  CA_Im
+  CA_Arg
+  CA_Conjugate
+
+  CA_Pi
+
+  CA_Sin
+  CA_Cos
+  CA_Exp
+  CA_Log
+  CA_Pow
+  CA_Tan
+  CA_Cot
+  CA_Cosh
+  CA_Sinh
+  CA_Tanh
+  CA_Coth
+  CA_Atan
+  CA_Acos
+  CA_Asin
+  CA_Acot
+  CA_Atanh
+  CA_Acosh
+  CA_Asinh
+  CA_Acoth
+
+  CA_Euler
+
+  CA_Gamma
+  CA_LogGamma
+  CA_Psi
+  CA_Erf
+  CA_Erfc
+  CA_Erfi
+  CA_RiemannZeta
+  CA_HurwitzZeta
+  CA_FUNC_CODE_LENGTH
+end
+
+struct ca_elem_struct <: FlintStruct
+  uniondata::NTuple{cld(maximum(sizeof, (
+    fmpq,
+    nf_elem_struct,
+    Ptr{fmpz_mpoly_q_struct},
+  )), sizeof(UInt)), UInt}
+end
+
+struct ca_struct <: FlintStruct
+  field::ulong
+  elem::ca_elem_struct
+end
+
+const ca_t = Tuple{ca_struct}
+
+const ca_ptr = Ptr{ca_struct}
+
+const ca_srcptr = Ptr{ca_struct}
+
+struct ca_ext_qqbar <: FlintStruct
+  x::qqbar_struct
+  nf::Ptr{nf_struct}
+end
+
+struct ca_ext_func_data <: FlintStruct
+  args::Ptr{ca_struct}
+  nargs::slong
+  enclosure::acb_struct
+  prec::slong
+  qqbar::Ptr{qqbar_struct}
+end
+
+struct ca_ext_struct <: FlintStruct
+  head::calcium_func_code
+  hash::ulong
+  depth::slong
+  data::NTuple{cld(maximum(sizeof, (ca_ext_qqbar, ca_ext_func_data,)), sizeof(UInt)), UInt}
+end
+
+const ca_ext_t = Tuple{ca_ext_struct}
+
+const ca_ext_ptr = Ptr{ca_ext_struct}
+
+const ca_ext_srcptr = Ptr{ca_ext_struct}
+
+struct ca_ext_cache_struct <: FlintStruct
+  items::Ptr{Ptr{ca_ext_struct}}
+  length::slong
+  alloc::slong
+
+  hash_size::slong
+  hash_table::Ptr{slong}
+end
+
+const ca_ext_cache_t = Tuple{ca_ext_cache_struct}
+
+struct ca_field_struct <: FlintStruct
+  length::slong
+  ext::Ptr{Ptr{ca_ext_struct}}
+  ideal::fmpz_mpoly_vec_struct
+  hash::ulong
+end
+
+const ca_field_t = Tuple{ca_field_struct}
+
+const ca_field_ptr = Ptr{ca_field_struct}
+
+const ca_field_srcptr = Ptr{ca_field_struct}
+
+struct ca_field_cache_struct <: FlintStruct
+  items::Ptr{Ptr{ca_field_struct}}
+  length::slong
+  alloc::slong
+
+  hash_size::slong
+  hash_table::Ptr{slong}
+end
+
+const ca_field_cache_t = Tuple{ca_field_cache_struct}
+
+struct ca_ctx_struct <: FlintStruct
+  ext_cache::ca_ext_cache_struct
+  field_cache::ca_field_cache_struct
+  field_qq::Ptr{ca_field_struct}
+  field_qq_i::Ptr{ca_field_struct}
+  mctx::Ptr{Ptr{fmpz_mpoly_ctx_struct}}
+  mctx_len::slong
+  options::Ptr{slong}
+end
+
+const ca_ctx_t = Tuple{ca_ctx_struct}
+
+struct ca_factor_struct <: FlintStruct
+  base::ca_ptr
+  exp::ca_ptr
+  length::slong
+  alloc::slong
+end
+
+const ca_factor_t = Tuple{ca_factor_struct}
+
+struct ca_vec_struct <: FlintStruct
+  entries::ca_ptr
+  alloc::slong
+  length::slong
+end
+
+const ca_vec_t = Tuple{ca_vec_struct}
+
+struct ca_mat_struct <: FlintStruct
+  entries::ca_ptr
+  r::slong
+  c::slong
+  stride::slong
+end
+
+const ca_mat_t = Tuple{ca_mat_struct}
+
+struct ca_poly_struct <: FlintStruct
+  coeffs::Ptr{ca_struct}
+  alloc::slong
+  length::slong
+end
+
+const ca_poly_t = Tuple{ca_poly_struct}
+
+# end ca_types.h
+###############################################################################
+
+
 end # module FlintC
