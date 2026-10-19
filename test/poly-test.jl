@@ -44,6 +44,33 @@ end
   @test sum(p) == f//g
 end
 
+@testset "roots_with_multiplicities" begin
+  # the generic method, over rings without a FLINT root finder
+  for R in (ZZ, QQ)
+    S, y = polynomial_ring(R, "y")
+    f = 3 * (y - 1)^3 * (y + 2) * (y^2 + 1)
+    rm = @inferred roots_with_multiplicities(f)
+    # each root once
+    @test length(rm) == 2
+    @test issetequal(rm, [(R(1), 3), (R(-2), 1)])
+    @test issetequal(first.(rm), roots(f))
+    @test_throws ArgumentError roots_with_multiplicities(S(0))
+    @test isempty(roots_with_multiplicities(S(2)))
+  end
+
+  # an inexact ring has no well-defined multiplicities
+  _, y = polynomial_ring(complex_field(), "y")
+  @test_throws ArgumentError roots_with_multiplicities(y^2 + 1)
+
+  # eigenvalues read their multiplicities from the characteristic polynomial
+  M = ZZ[2 1 0; 0 2 0; 0 0 3]
+  for L in (QQ, GF(7))
+    @test issetequal(eigenvalues_with_multiplicities(L, M), [(L(2), 2), (L(3), 1)])
+    N = change_base_ring(L, M)
+    @test issetequal(eigenvalues_with_multiplicities(N), [(L(2), 2), (L(3), 1)])
+  end
+end
+
 @testset "convolution" begin
   @test convolution([3, 6, 1, 5, 3, 2], [4, 3, 6, 7, -1]) == [12, 33, 40, 80, 72, 48, 58, 28, 11, -2]
   @test_throws "InexactError" convolution([39876897139871313, 123984703947], [3579071, 937482163461])

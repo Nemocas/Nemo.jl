@@ -88,6 +88,16 @@ signature(::QQPolyRingElem)
 ### Root finding
 
 ```@docs
+roots_with_multiplicities(::PolyRingElem)
+```
+
+For `zzModPolyRingElem`, `fpPolyRingElem`, `ZZModPolyRingElem`, `FpPolyRingElem`,
+`FqPolyRingElem`, `FqPolyRepPolyRingElem` and `fqPolyRepPolyRingElem` the
+multiplicities are those FLINT computes while finding the roots. Over
+`Z/nZ` for composite `n`, `roots` and `roots_with_multiplicities` throw an
+error when the roots are too many to list.
+
+```@docs
 roots(::ComplexPolyRingElem)
 ```
 
