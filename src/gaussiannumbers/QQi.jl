@@ -385,6 +385,7 @@ function inv(a::QQiFieldElem)
 end
 
 function divexact!(z::QQiFieldElem, a::QQiFieldElem, b::QQiFieldElem)
+  iszero(b) && throw(DivideError())
   return mul!(z, a, inv(b))
 end
 
