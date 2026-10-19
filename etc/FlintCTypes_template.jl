@@ -73,6 +73,8 @@ const FLINT_BITS = UInt == UInt64 ? 64 : 32
 
 @include_c_header("acb_types.h")
 
+@include_c_header("acb_calc.h")
+
 @include_c_header("fexpr.h")
 
 @include_c_header("qqbar.h")

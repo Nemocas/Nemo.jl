@@ -1513,6 +1513,25 @@ const acb_poly_t = Tuple{acb_poly_struct}
 
 
 ###############################################################################
+# begin acb_calc.h
+
+const acb_calc_func_t = Ptr{Cvoid}
+
+struct acb_calc_integrate_opt_struct <: FlintStruct
+  deg_limit::slong
+  eval_limit::slong
+  depth_limit::slong
+  use_heap::Cint
+  verbose::Cint
+end
+
+const acb_calc_integrate_opt_t = Tuple{acb_calc_integrate_opt_struct}
+
+# end acb_calc.h
+###############################################################################
+
+
+###############################################################################
 # begin fexpr.h
 
 const FEXPR_TYPE_BITS = 4

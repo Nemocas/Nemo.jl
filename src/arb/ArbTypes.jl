@@ -24,14 +24,10 @@ const ARB_RND_NEAR = Cint(4)   # to nearest
 ################################################################################
 
 mutable struct arf_struct
-  exp::Int    # ZZRingElem
-  size::UInt  # mp_size_t
-  d1::UInt    # mantissa_struct
-  d2::UInt
+  cstruct::FlintC.arf_struct
 
-  function arf_struct(exp, size, d1, d2)
-    new(exp, size, d1, d2)
-  end
+  # keeps the positional constructor of the flattened fields
+  arf_struct(exp, size, d1, d2) = new(FlintC.arf_struct(exp, size, FlintC.mantissa_struct((UInt(d1), UInt(d2)))))
 
   function arf_struct()
     z = new()
@@ -40,38 +36,68 @@ mutable struct arf_struct
     return z
   end
 end
+@flint_fields arf_struct
+@flint_legacy_fields arf_struct begin
+  d1 = _union_word(cstruct.d, 1)
+  d1! = _setfield(cstruct, :d, _set_union_word(cstruct.d, 1, v))
+  d2 = _union_word(cstruct.d, 2)
+  d2! = _setfield(cstruct, :d, _set_union_word(cstruct.d, 2, v))
+end
 
 function _arf_clear_fn(x::arf_struct)
   @ccall libflint.arf_clear(x::Ref{arf_struct})::Nothing
 end
 
 mutable struct mag_struct
-  exp::Int  # ZZRingElem
-  man::UInt # mp_limb_t
+  cstruct::FlintC.mag_struct
+
+  # keeps the positional constructor of the flattened fields
+  mag_struct(exp, man) = new(FlintC.mag_struct(exp, man))
 end
+@flint_fields mag_struct
 
 mutable struct arb_struct
-  mid_exp::Int # ZZRingElem
-  mid_size::UInt # mp_size_t
-  mid_d1::UInt # mantissa_struct
-  mid_d2::UInt
-  rad_exp::Int # ZZRingElem
-  rad_man::UInt
+  cstruct::FlintC.arb_struct
+
+  # keeps the positional constructor of the flattened fields
+  arb_struct(mid_exp, mid_size, mid_d1, mid_d2, rad_exp, rad_man) = new(FlintC.arb_struct(arf_struct(mid_exp, mid_size, mid_d1, mid_d2).cstruct, FlintC.mag_struct(rad_exp, rad_man)))
+end
+@flint_fields arb_struct
+@flint_legacy_fields arb_struct begin
+  mid_exp = cstruct.mid.exp
+  mid_size = cstruct.mid.size
+  mid_d1 = _union_word(cstruct.mid.d, 1)
+  mid_d1! = _setpath(cstruct, (:mid, :d), _set_union_word(cstruct.mid.d, 1, v))
+  mid_d2 = _union_word(cstruct.mid.d, 2)
+  mid_d2! = _setpath(cstruct, (:mid, :d), _set_union_word(cstruct.mid.d, 2, v))
+  rad_exp = cstruct.rad.exp
+  rad_man = cstruct.rad.man
 end
 
 mutable struct acb_struct
-  real_mid_exp::Int # ZZRingElem
-  real_mid_size::UInt # mp_size_t
-  real_mid_d1::Int # mantissa_struct
-  real_mid_d2::Int
-  real_rad_exp::Int # ZZRingElem
-  real_rad_man::UInt
-  imag_mid_exp::Int # ZZRingElem
-  imag_mid_size::UInt # mp_size_t
-  imag_mid_d1::Int # mantissa_struct
-  imag_mid_d2::Int
-  imag_rad_exp::Int # ZZRingElem
-  imag_rad_man::UInt
+  cstruct::FlintC.acb_struct
+
+  # keeps the positional constructor of the flattened fields
+  acb_struct(r...) = new(FlintC.acb_struct(arb_struct(r[1:6]...).cstruct, arb_struct(r[7:12]...).cstruct))
+end
+@flint_fields acb_struct
+@flint_legacy_fields acb_struct begin
+  real_mid_exp = cstruct.real.mid.exp
+  real_mid_size = cstruct.real.mid.size
+  real_mid_d1 = _union_word(cstruct.real.mid.d, 1)
+  real_mid_d1! = _setpath(cstruct, (:real, :mid, :d), _set_union_word(cstruct.real.mid.d, 1, v))
+  real_mid_d2 = _union_word(cstruct.real.mid.d, 2)
+  real_mid_d2! = _setpath(cstruct, (:real, :mid, :d), _set_union_word(cstruct.real.mid.d, 2, v))
+  real_rad_exp = cstruct.real.rad.exp
+  real_rad_man = cstruct.real.rad.man
+  imag_mid_exp = cstruct.imag.mid.exp
+  imag_mid_size = cstruct.imag.mid.size
+  imag_mid_d1 = _union_word(cstruct.imag.mid.d, 1)
+  imag_mid_d1! = _setpath(cstruct, (:imag, :mid, :d), _set_union_word(cstruct.imag.mid.d, 1, v))
+  imag_mid_d2 = _union_word(cstruct.imag.mid.d, 2)
+  imag_mid_d2! = _setpath(cstruct, (:imag, :mid, :d), _set_union_word(cstruct.imag.mid.d, 2, v))
+  imag_rad_exp = cstruct.imag.rad.exp
+  imag_rad_man = cstruct.imag.rad.man
 end
 
 const arf_structOrPtr = TypeOrPtr{arf_struct}
@@ -95,12 +121,7 @@ struct RealField <: Field
 end
 
 mutable struct RealFieldElem <: FieldElem
-  mid_exp::Int    # ZZRingElem
-  mid_size::UInt  # mp_size_t
-  mid_d1::UInt    # mantissa_struct
-  mid_d2::UInt
-  rad_exp::Int    # ZZRingElem
-  rad_man::UInt
+  cstruct::FlintC.arb_struct
 
   function RealFieldElem()
     z = new()
@@ -129,6 +150,17 @@ mutable struct RealFieldElem <: FieldElem
   end
 
 end
+@flint_fields RealFieldElem
+@flint_legacy_fields RealFieldElem begin
+  mid_exp = cstruct.mid.exp
+  mid_size = cstruct.mid.size
+  mid_d1 = _union_word(cstruct.mid.d, 1)
+  mid_d1! = _setpath(cstruct, (:mid, :d), _set_union_word(cstruct.mid.d, 1, v))
+  mid_d2 = _union_word(cstruct.mid.d, 2)
+  mid_d2! = _setpath(cstruct, (:mid, :d), _set_union_word(cstruct.mid.d, 2, v))
+  rad_exp = cstruct.rad.exp
+  rad_man = cstruct.rad.man
+end
 
 function _arb_clear_fn(x::RealFieldElem)
   @ccall libflint.arb_clear(x::Ref{RealFieldElem})::Nothing
@@ -152,12 +184,7 @@ const ArbFieldID = CacheDictType{Int, ArbField}()
 precision(x::ArbField) = x.prec
 
 mutable struct ArbFieldElem <: FieldElem
-  mid_exp::Int # ZZRingElem
-  mid_size::UInt # mp_size_t
-  mid_d1::UInt # mantissa_struct
-  mid_d2::UInt
-  rad_exp::Int # ZZRingElem
-  rad_man::UInt
+  cstruct::FlintC.arb_struct
   parent::ArbField
 
   function ArbFieldElem()
@@ -192,6 +219,17 @@ mutable struct ArbFieldElem <: FieldElem
   #  return z
   #end
 end
+@flint_fields ArbFieldElem
+@flint_legacy_fields ArbFieldElem begin
+  mid_exp = cstruct.mid.exp
+  mid_size = cstruct.mid.size
+  mid_d1 = _union_word(cstruct.mid.d, 1)
+  mid_d1! = _setpath(cstruct, (:mid, :d), _set_union_word(cstruct.mid.d, 1, v))
+  mid_d2 = _union_word(cstruct.mid.d, 2)
+  mid_d2! = _setpath(cstruct, (:mid, :d), _set_union_word(cstruct.mid.d, 2, v))
+  rad_exp = cstruct.rad.exp
+  rad_man = cstruct.rad.man
+end
 
 function _arb_clear_fn(x::ArbFieldElem)
   @ccall libflint.arb_clear(x::Ref{ArbFieldElem})::Nothing
@@ -208,18 +246,7 @@ struct ComplexField <: Field
 end
 
 mutable struct ComplexFieldElem <: FieldElem
-  real_mid_exp::Int     # ZZRingElem
-  real_mid_size::UInt   # mp_size_t
-  real_mid_d1::UInt     # mantissa_struct
-  real_mid_d2::UInt
-  real_rad_exp::Int     # ZZRingElem
-  real_rad_man::UInt
-  imag_mid_exp::Int     # ZZRingElem
-  imag_mid_size::UInt   # mp_size_t
-  imag_mid_d1::UInt     # mantissa_struct
-  imag_mid_d2::UInt
-  imag_rad_exp::Int     # ZZRingElem
-  imag_rad_man::UInt
+  cstruct::FlintC.acb_struct
 
   function ComplexFieldElem()
     z = new()
@@ -245,6 +272,25 @@ mutable struct ComplexFieldElem <: FieldElem
     _acb_set(z, (x, y), p)
     return z
   end
+end
+@flint_fields ComplexFieldElem
+@flint_legacy_fields ComplexFieldElem begin
+  real_mid_exp = cstruct.real.mid.exp
+  real_mid_size = cstruct.real.mid.size
+  real_mid_d1 = _union_word(cstruct.real.mid.d, 1)
+  real_mid_d1! = _setpath(cstruct, (:real, :mid, :d), _set_union_word(cstruct.real.mid.d, 1, v))
+  real_mid_d2 = _union_word(cstruct.real.mid.d, 2)
+  real_mid_d2! = _setpath(cstruct, (:real, :mid, :d), _set_union_word(cstruct.real.mid.d, 2, v))
+  real_rad_exp = cstruct.real.rad.exp
+  real_rad_man = cstruct.real.rad.man
+  imag_mid_exp = cstruct.imag.mid.exp
+  imag_mid_size = cstruct.imag.mid.size
+  imag_mid_d1 = _union_word(cstruct.imag.mid.d, 1)
+  imag_mid_d1! = _setpath(cstruct, (:imag, :mid, :d), _set_union_word(cstruct.imag.mid.d, 1, v))
+  imag_mid_d2 = _union_word(cstruct.imag.mid.d, 2)
+  imag_mid_d2! = _setpath(cstruct, (:imag, :mid, :d), _set_union_word(cstruct.imag.mid.d, 2, v))
+  imag_rad_exp = cstruct.imag.rad.exp
+  imag_rad_man = cstruct.imag.rad.man
 end
 
 function _acb_clear_fn(x::ComplexFieldElem)
@@ -358,18 +404,7 @@ const AcbFieldID = CacheDictType{Int, AcbField}()
 precision(x::AcbField) = x.prec
 
 mutable struct AcbFieldElem <: FieldElem
-  real_mid_exp::Int     # ZZRingElem
-  real_mid_size::UInt # mp_size_t
-  real_mid_d1::UInt    # mantissa_struct
-  real_mid_d2::UInt
-  real_rad_exp::Int     # ZZRingElem
-  real_rad_man::UInt
-  imag_mid_exp::Int     # ZZRingElem
-  imag_mid_size::UInt # mp_size_t
-  imag_mid_d1::UInt    # mantissa_struct
-  imag_mid_d2::UInt
-  imag_rad_exp::Int     # ZZRingElem
-  imag_rad_man::UInt
+  cstruct::FlintC.acb_struct
   parent::AcbField
 
   function AcbFieldElem()
@@ -403,6 +438,25 @@ mutable struct AcbFieldElem <: FieldElem
     return z
   end
 end
+@flint_fields AcbFieldElem
+@flint_legacy_fields AcbFieldElem begin
+  real_mid_exp = cstruct.real.mid.exp
+  real_mid_size = cstruct.real.mid.size
+  real_mid_d1 = _union_word(cstruct.real.mid.d, 1)
+  real_mid_d1! = _setpath(cstruct, (:real, :mid, :d), _set_union_word(cstruct.real.mid.d, 1, v))
+  real_mid_d2 = _union_word(cstruct.real.mid.d, 2)
+  real_mid_d2! = _setpath(cstruct, (:real, :mid, :d), _set_union_word(cstruct.real.mid.d, 2, v))
+  real_rad_exp = cstruct.real.rad.exp
+  real_rad_man = cstruct.real.rad.man
+  imag_mid_exp = cstruct.imag.mid.exp
+  imag_mid_size = cstruct.imag.mid.size
+  imag_mid_d1 = _union_word(cstruct.imag.mid.d, 1)
+  imag_mid_d1! = _setpath(cstruct, (:imag, :mid, :d), _set_union_word(cstruct.imag.mid.d, 1, v))
+  imag_mid_d2 = _union_word(cstruct.imag.mid.d, 2)
+  imag_mid_d2! = _setpath(cstruct, (:imag, :mid, :d), _set_union_word(cstruct.imag.mid.d, 2, v))
+  imag_rad_exp = cstruct.imag.rad.exp
+  imag_rad_man = cstruct.imag.rad.man
+end
 
 function _acb_clear_fn(x::AcbFieldElem)
   @ccall libflint.acb_clear(x::Ref{AcbFieldElem})::Nothing
@@ -415,15 +469,11 @@ end
 ################################################################################
 
 mutable struct acb_calc_integrate_opts
-  deg_limit::Int   # <= 0: default of 0.5*min(prec, rel_goal) + 10
-  eval_limit::Int  # <= 0: default of 1000*prec*prec^2
-  depth_limit::Int # <= 0: default of 2*prec
-  use_heap::Int32  # 0 append to the top of a stack; 1 binary heap
-  verbose::Int32   # 1 less verbose; 2 more verbose
+  cstruct::FlintC.acb_calc_integrate_opt_struct
 
   function acb_calc_integrate_opts(deg_limit::Int, eval_limit::Int,
       depth_limit::Int, use_heap::Int32, verbose::Int32)
-    return new(deg_limit, eval_limit, depth_limit, use_heap, verbose)
+    return new(FlintC.acb_calc_integrate_opt_struct(deg_limit, eval_limit, depth_limit, use_heap, verbose))
   end
 
   function acb_calc_integrate_opts()
@@ -432,6 +482,7 @@ mutable struct acb_calc_integrate_opts
     return opts
   end
 end
+@flint_fields acb_calc_integrate_opts
 
 ################################################################################
 #
@@ -452,9 +503,7 @@ end
 const RealPolyRingID = CacheDictType{Tuple{Symbol}, RealPolyRing}()
 
 mutable struct RealPolyRingElem <: PolyRingElem{RealFieldElem}
-  coeffs::Ptr{arb_struct} # array of arb_struct
-  alloc::Int
-  length::Int
+  cstruct::FlintC.arb_poly_struct
   parent::RealPolyRing
 
   function RealPolyRingElem()
@@ -502,6 +551,7 @@ mutable struct RealPolyRingElem <: PolyRingElem{RealFieldElem}
     return z
   end
 end
+@flint_fields RealPolyRingElem
 
 function _RealPoly_clear_fn(x::RealPolyRingElem)
   @ccall libflint.arb_poly_clear(x::Ref{RealPolyRingElem})::Nothing
@@ -529,9 +579,7 @@ end
 const ArbPolyRingID = CacheDictType{Tuple{ArbField, Symbol}, ArbPolyRing}()
 
 mutable struct ArbPolyRingElem <: PolyRingElem{ArbFieldElem}
-  coeffs::Ptr{arb_struct} # array of arb_struct
-  alloc::Int
-  length::Int
+  cstruct::FlintC.arb_poly_struct
   parent::ArbPolyRing
 
   function ArbPolyRingElem()
@@ -579,6 +627,7 @@ mutable struct ArbPolyRingElem <: PolyRingElem{ArbFieldElem}
     return z
   end
 end
+@flint_fields ArbPolyRingElem
 
 function _arb_poly_clear_fn(x::ArbPolyRingElem)
   @ccall libflint.arb_poly_clear(x::Ref{ArbPolyRingElem})::Nothing
@@ -611,9 +660,7 @@ end
 const ComplexPolyRingID = CacheDictType{Tuple{Symbol}, ComplexPolyRing}()
 
 mutable struct ComplexPolyRingElem <: PolyRingElem{ComplexFieldElem}
-  coeffs::Ptr{acb_struct} # array of acb_struct
-  alloc::Int
-  length::Int
+  cstruct::FlintC.acb_poly_struct
   parent::ComplexPolyRing
 
   function ComplexPolyRingElem()
@@ -668,6 +715,7 @@ mutable struct ComplexPolyRingElem <: PolyRingElem{ComplexFieldElem}
     return z
   end
 end
+@flint_fields ComplexPolyRingElem
 
 function _acb_poly_clear_fn(x::ComplexPolyRingElem)
   @ccall libflint.acb_poly_clear(x::Ref{ComplexPolyRingElem})::Nothing
@@ -695,9 +743,7 @@ end
 const AcbPolyRingID = CacheDictType{Tuple{AcbField, Symbol}, AcbPolyRing}()
 
 mutable struct AcbPolyRingElem <: PolyRingElem{AcbFieldElem}
-  coeffs::Ptr{acb_struct} # array of acb_struct
-  alloc::Int
-  length::Int
+  cstruct::FlintC.acb_poly_struct
   parent::AcbPolyRing
 
   function AcbPolyRingElem()
@@ -752,6 +798,7 @@ mutable struct AcbPolyRingElem <: PolyRingElem{AcbFieldElem}
     return z
   end
 end
+@flint_fields AcbPolyRingElem
 
 function _acb_poly_clear_fn(x::AcbPolyRingElem)
   @ccall libflint.acb_poly_clear(x::Ref{AcbPolyRingElem})::Nothing
@@ -776,10 +823,7 @@ base_ring(a::AcbPolyRing) = a.base_ring
 const RealMatrixSpace = AbstractAlgebra.Generic.MatSpace{RealFieldElem}
 
 mutable struct RealMatrix <: FlintMatElem{RealFieldElem}
-  entries::Ptr{RealFieldElem}
-  r::Int
-  c::Int
-  stride::Int
+  cstruct::FlintC.arb_mat_struct
   #base_ring::ArbField
   view_parent
 
@@ -860,6 +904,7 @@ mutable struct RealMatrix <: FlintMatElem{RealFieldElem}
     return z
   end
 end
+@flint_fields RealMatrix entries = Ptr{RealFieldElem}
 
 function _arb_mat_clear_fn(x::RealMatrix)
   @ccall libflint.arb_mat_clear(x::Ref{RealMatrix})::Nothing
@@ -870,10 +915,7 @@ end
 const ArbMatrixSpace = AbstractAlgebra.Generic.MatSpace{ArbFieldElem}
 
 mutable struct ArbMatrix <: FlintMatElem{ArbFieldElem}
-  entries::Ptr{ArbFieldElem}
-  r::Int
-  c::Int
-  stride::Int
+  cstruct::FlintC.arb_mat_struct
   base_ring::ArbField
   view_parent
 
@@ -958,6 +1000,7 @@ mutable struct ArbMatrix <: FlintMatElem{ArbFieldElem}
     return z
   end
 end
+@flint_fields ArbMatrix entries = Ptr{ArbFieldElem}
 
 function _arb_mat_clear_fn(x::ArbMatrix)
   @ccall libflint.arb_mat_clear(x::Ref{ArbMatrix})::Nothing
@@ -972,10 +1015,7 @@ end
 const ComplexMatrixSpace = AbstractAlgebra.Generic.MatSpace{ComplexFieldElem}
 
 mutable struct ComplexMatrix <: FlintMatElem{ComplexFieldElem}
-  entries::Ptr{ComplexFieldElem}
-  r::Int
-  c::Int
-  stride::Int
+  cstruct::FlintC.acb_mat_struct
   #base_ring::AcbField
   view_parent
 
@@ -1156,6 +1196,7 @@ mutable struct ComplexMatrix <: FlintMatElem{ComplexFieldElem}
     return z
   end
 end
+@flint_fields ComplexMatrix entries = Ptr{ComplexFieldElem}
 
 function _acb_mat_clear_fn(x::ComplexMatrix)
   @ccall libflint.acb_mat_clear(x::Ref{ComplexMatrix})::Nothing
@@ -1166,10 +1207,7 @@ end
 const AcbMatrixSpace = AbstractAlgebra.Generic.MatSpace{AcbFieldElem}
 
 mutable struct AcbMatrix <: FlintMatElem{AcbFieldElem}
-  entries::Ptr{AcbFieldElem}
-  r::Int
-  c::Int
-  stride::Int
+  cstruct::FlintC.acb_mat_struct
   base_ring::AcbField
   view_parent
 
@@ -1354,6 +1392,7 @@ mutable struct AcbMatrix <: FlintMatElem{AcbFieldElem}
     return z
   end
 end
+@flint_fields AcbMatrix entries = Ptr{AcbFieldElem}
 
 function _acb_mat_clear_fn(x::AcbMatrix)
   @ccall libflint.acb_mat_clear(x::Ref{AcbMatrix})::Nothing
