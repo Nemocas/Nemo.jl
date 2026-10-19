@@ -601,6 +601,19 @@ end
 
 ################################################################################
 #
+#  Construction from roots
+#
+################################################################################
+
+function from_roots(R::ZZPolyRing, rs::Vector{ZZRingElem})
+  z = R()
+  xs = Int[r.d for r in rs]
+  GC.@preserve rs @ccall libflint.fmpz_poly_product_roots_fmpz_vec(z::Ref{ZZPolyRingElem}, xs::Ptr{Int}, length(xs)::Int)::Nothing
+  return z
+end
+
+################################################################################
+#
 #  Factorization
 #
 ################################################################################

@@ -501,6 +501,24 @@ end
   @test lift(T, f) == y^2 + 2y + 1
 end
 
+@testset "ZZModPolyRingElem.from_roots" begin
+  # a composite modulus of two words
+  R, = residue_ring(ZZ, ZZ(2)^64 * 3 * 5)
+  S, x = polynomial_ring(R, "x")
+
+  @test from_roots(S, ZZModRingElem[]) == one(S)
+  for n in 1:20
+    rs = [rand(R) for i in 1:n]
+    f = from_roots(S, rs)
+    @test parent(f) == S
+    @test f == prod(x - r for r in rs)
+  end
+  # a repeated root keeps its multiplicity
+  @test from_roots(S, [R(3), R(3), R(5)]) == (x - 3)^2 * (x - 5)
+
+  @test_throws ArgumentError from_roots(S, [residue_ring(ZZ, ZZ(2)^64 * 7)[1](1)])
+end
+
 @testset "ZZModPolyRingElem.is_irreducible" begin
   R, = residue_ring(ZZ, 123456789012345678949)
   S, x = polynomial_ring(R, "x")

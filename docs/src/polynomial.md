@@ -129,6 +129,7 @@ julia> sort(r; by=x->(real(x), imag(x))) # sort roots to make printing consisten
 ```@docs
 from_roots(::ArbPolyRing, ::Vector{ArbFieldElem})
 from_roots(::AcbPolyRing, ::Vector{AcbFieldElem})
+from_roots(::zzModPolyRing, ::Vector{zzModRingElem})
 ```
 
 **Examples**

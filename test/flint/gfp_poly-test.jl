@@ -512,6 +512,23 @@ end
   @test f == x^2
 end
 
+@testset "fpPolyRingElem.from_roots" begin
+  R = Native.GF(23)
+  S, x = polynomial_ring(R, "x")
+
+  @test from_roots(S, fpFieldElem[]) == one(S)
+  for n in 1:20
+    rs = [rand(R) for i in 1:n]
+    f = from_roots(S, rs)
+    @test parent(f) == S
+    @test f == prod(x - r for r in rs)
+  end
+  # a repeated root keeps its multiplicity
+  @test from_roots(S, [R(3), R(3), R(5)]) == (x - 3)^2 * (x - 5)
+
+  @test_throws ArgumentError from_roots(S, [Native.GF(29)(1)])
+end
+
 @testset "fpPolyRingElem.inflate" begin
   R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")

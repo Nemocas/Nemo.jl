@@ -194,6 +194,20 @@ end
 
 ################################################################################
 #
+#  Construction from roots
+#
+################################################################################
+
+function from_roots(R::FpPolyRing, rs::Vector{FpFieldElem})
+  @req all(r -> parent(r) == base_ring(R), rs) "parents do not match"
+  z = R()
+  xs = Int[r.data.d for r in rs]
+  GC.@preserve rs @ccall libflint.fmpz_mod_poly_product_roots_fmpz_vec(z::Ref{FpPolyRingElem}, xs::Ptr{Int}, length(xs)::Int, base_ring(R).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return z
+end
+
+################################################################################
+#
 #  Lifting
 #
 ################################################################################

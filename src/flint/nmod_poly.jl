@@ -591,6 +591,42 @@ end
 
 ################################################################################
 #
+#  Construction from roots
+#
+################################################################################
+
+@doc raw"""
+    from_roots(R::ZZPolyRing, rs::Vector{ZZRingElem})
+    from_roots(R::zzModPolyRing, rs::Vector{zzModRingElem})
+    from_roots(R::fpPolyRing, rs::Vector{fpFieldElem})
+    from_roots(R::ZZModPolyRing, rs::Vector{ZZModRingElem})
+    from_roots(R::FpPolyRing, rs::Vector{FpFieldElem})
+
+Return the monic polynomial $\prod_i (x - r_i)$ in `R`, where the $r_i$ are
+the entries of `rs`, a repeated root counted as often as it occurs; `one(R)`
+if `rs` is empty. The entries must lie in the base ring of `R`.
+
+# Examples
+
+```jldoctest
+julia> S, = residue_ring(ZZ, 12);
+
+julia> R, x = polynomial_ring(S, :x);
+
+julia> from_roots(R, S.([1, 5, 5]))
+x^3 + x^2 + 11*x + 11
+```
+"""
+function from_roots(R::zzModPolyRing, rs::Vector{zzModRingElem})
+  @req all(r -> parent(r) == base_ring(R), rs) "parents do not match"
+  z = R()
+  xs = UInt[r.data for r in rs]
+  @ccall libflint.nmod_poly_product_roots_nmod_vec(z::Ref{zzModPolyRingElem}, xs::Ptr{UInt}, length(xs)::Int)::Nothing
+  return z
+end
+
+################################################################################
+#
 #  Inflation and Deflation
 #
 ################################################################################
