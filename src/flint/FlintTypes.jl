@@ -432,11 +432,14 @@ For the modulus being a [`ZZRingElem`](@ref) see [`ZZModRing`](@ref).
 @attributes mutable struct zzModRing <: ResidueRing{UInt}
   n::UInt
   ninv::UInt
+  norm::UInt
+  # end of flint struct
 
   function zzModRing(n::UInt, cached::Bool=true)
     return get_cached!(NmodRingID, n, cached) do
-      ninv = @ccall libflint.n_preinvert_limb(n::UInt)::UInt
-      return new(n, ninv)
+      z = new()
+      @ccall libflint.nmod_init(z::Ref{zzModRing}, n::UInt)::Nothing
+      return z
     end
   end
 end
@@ -468,11 +471,14 @@ Implementation for $p$ being a machine integer [`Int`](@ref).
 @attributes mutable struct fpField <: FinField
   n::UInt
   ninv::UInt
+  norm::UInt
+  # end of flint struct
 
   function fpField(n::UInt, cached::Bool=true)
     return get_cached!(GaloisFieldID, n, cached) do
-      ninv = @ccall libflint.n_preinvert_limb(n::UInt)::UInt
-      return new(n, ninv)
+      z = new()
+      @ccall libflint.nmod_init(z::Ref{fpField}, n::UInt)::Nothing
+      return z
     end
   end
 end
