@@ -5,6 +5,14 @@ abstract type FlintStruct end
 @inline _unwrap(v::Tuple{T}) where {T} = only(v)
 @inline _unwrap(v) = v
 
+# field `name` of the C struct at `p`, which is a pointer to a `T` or to
+# its C part alone
+@inline function _unsafe_load_field(p::Ptr{T}, ::Val{name}) where {T, name}
+  S = fieldtype(T, :data)
+  i = Base.fieldindex(S, name)
+  return _unwrap(unsafe_load(Ptr{fieldtype(S, i)}(p + fieldoffset(S, i))))
+end
+
 # copy of `d` with field `name` replaced by `v`
 function _setfield(d::T, name::Symbol, v) where {T<:FlintStruct}
   return T(ntuple(i -> fieldname(T, i) === name ? _wrap(fieldtype(T, i), v) : getfield(d, i), Val(fieldcount(T)))...)
