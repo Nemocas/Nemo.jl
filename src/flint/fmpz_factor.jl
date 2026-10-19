@@ -45,7 +45,7 @@ function _factor(::Type{T}, a::UInt)  where T <: Integer
   @req  (T != Bool)  "Cannot have a factorization into booleans"
   @req  !iszero(a)  "Argument must be non-zero"
   F = n_factor()
-  @ccall libflint.n_factor(F::Ref{n_factor}, a::UInt)::Nothing
+  @ccall libflint.n_factor(F::Ref{n_factor}, a::UInt, 1::Cint)::Nothing
   res = Dict{T, Int}()  # factor-multiplicity pairs
   for i in 1:F.num
     z = T(F.p[i])

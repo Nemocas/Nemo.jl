@@ -991,6 +991,31 @@ end
 
   @test_throws ErrorException sqrtmod(ZZRingElem(-7), ZZRingElem(1024))
 
+  # sqrtmod_all: every root, against a scan of the residues
+  for n in 1:200, a in 0:n-1
+    @test sqrtmod_all(a, n) == [ZZ(x) for x in 0:n-1 if mod(x^2 - a, n) == 0]
+  end
+  # the composite modulus sqrtmod does not take, from any integer type
+  r = sqrtmod_all(-7, 1024)
+  @test length(r) == 4 && all(x -> mod(x^2 + 7, 1024) == 0, r)
+  @test sqrtmod_all(ZZ(-7), ZZ(1024)) == sqrtmod_all(big(-7), UInt(1024)) == r
+  # non-units: x^2 = 0 mod 2^k exactly when 2^ceil(k/2) divides x
+  @test all(k -> length(sqrtmod_all(0, 2^k)) == 2^div(k, 2), 1:30)
+  # units modulo a product of distinct odd primes: prod (1 + (a/q)) roots
+  qs = [next_prime(ZZ(2)^20 + i) for i in (0, 100, 200)]
+  for a in (2, 3, 5, 7, 11)
+    @test length(sqrtmod_all(a, prod(qs))) == prod(1 + jacobi_symbol(ZZ(a), q) for q in qs)
+  end
+  # the ends of the word-size range
+  n = ZZ(2)^64 - 59
+  @test is_prime(n) && sqrtmod_all(4, n) == [ZZ(2), n - 2]
+  n = ZZ(2)^64 - 1
+  r = sqrtmod_all(1, n)
+  @test length(r) == 2^length(factor(n)) && all(x -> mod(x^2 - 1, n) == 0, r)
+  @test_throws ArgumentError sqrtmod_all(1, 0)
+  @test_throws ArgumentError sqrtmod_all(1, -5)
+  @test_throws ArgumentError sqrtmod_all(1, ZZ(2)^64)
+
   @test mod_sym(ZZ(0), ZZ(5)) == ZZ(0)
   @test mod_sym(ZZ(0), ZZ(-5)) == ZZ(0)
   @test mod_sym(ZZ(1), ZZ(5)) == ZZ(1)
