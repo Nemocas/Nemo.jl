@@ -104,6 +104,25 @@ end
   end
 end
 
+@testset "Nemo._mulmod" begin
+  for n in UInt[1, 2, 3, 7, 0x00000000ffffffff, 0x0000000100000001,
+                0x7fffffffffffffff, 0x8000000000000000, 0xffffffffffffffff]
+    R = zzModRing(n, false)
+    vals = filter(<(n), UInt[0, 1, 2, n >> 1, n - 2, n - 1])
+    for a in vals, b in vals
+      @test Nemo._mulmod(a, b, R) == widemul(a, b) % n
+    end
+  end
+
+  for _ in 1:10_000
+    n = rand(UInt(1):typemax(UInt))
+    R = zzModRing(n, false)
+    a = rand(UInt(0):n - 1)
+    b = rand(UInt(0):n - 1)
+    @test Nemo._mulmod(a, b, R) == widemul(a, b) % n
+  end
+end
+
 @testset "zzModRingElem.rand" begin
   R, = residue_ring(ZZ, 13)
 
