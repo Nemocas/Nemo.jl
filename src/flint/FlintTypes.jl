@@ -2320,7 +2320,7 @@ A $p$-adic field for some prime $p$.
 @attributes mutable struct PadicField <: FlintLocalField
   p::Int
   pinv::Float64
-  pow::Ptr{Nothing}
+  pow::Ptr{ZZRingElem} # array of fmpz
   minpre::Int
   maxpre::Int
   mode::Cint
@@ -2375,12 +2375,12 @@ A $p^n$-adic field for some prime power $p^n$.
 @attributes mutable struct QadicField <: FlintLocalField
   p::Int
   pinv::Float64
-  pow::Ptr{Nothing}
+  pow::Ptr{ZZRingElem} # array of fmpz
   minpre::Int
   maxpre::Int
   mode::Cint
   a::Int         # ZZRingElem
-  j::Ptr{Nothing}   # slong*
+  j::Ptr{Int} # array of slong
   len::Int
   var::Cstring   # char*
   prec_max::Int
@@ -2454,7 +2454,7 @@ end
 An element of a $q$-adic field. See [`QadicField`](@ref).
 """
 mutable struct QadicFieldElem <: FlintLocalFieldElem
-  coeffs::Int
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   val::Int
@@ -2476,12 +2476,12 @@ Opaque precomputation used to speed up square roots in a $q$-adic field of
 characteristic 2. Wraps a FLINT `struct qadic2_sqrt_precomp *`.
 """
 mutable struct Qadic2SqrtPrecomp
-  ptr::Ptr{Nothing}
+  ptr::Ptr{Cvoid}
   parent::QadicField
 
   function Qadic2SqrtPrecomp(R::QadicField)
     prime(R) == 2 || throw(DomainError(prime(R), "characteristic must be 2"))
-    ptr = @ccall libflint._qadic_char2_sqrt_precomp_init(R::Ref{QadicField})::Ptr{Nothing}
+    ptr = @ccall libflint._qadic_char2_sqrt_precomp_init(R::Ref{QadicField})::Ptr{Cvoid}
     z = new(ptr, R)
     finalizer(_qadic_char2_sqrt_precomp_clear_fn, z)
     return z
@@ -5421,7 +5421,7 @@ function _qadic_ctx_clear_fn(a::QadicField)
 end
 
 function _qadic_char2_sqrt_precomp_clear_fn(a::Qadic2SqrtPrecomp)
-  @ccall libflint._qadic_char2_sqrt_precomp_clear(a.ptr::Ptr{Nothing})::Nothing
+  @ccall libflint._qadic_char2_sqrt_precomp_clear(a.ptr::Ptr{Cvoid})::Nothing
 end
 
 function _rand_ctx_clear_fn(a::rand_ctx)
