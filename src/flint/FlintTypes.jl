@@ -1061,8 +1061,8 @@ const flint_orderings = [:lex, :deglex, :degrevlex]
   ord::Cint
   deg::Cint
   rev::Cint
-  lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}
-  lut1::NTuple{Base.GMP.BITS_PER_LIMB, UInt8}
+  lut::NTuple{Sys.WORD_SIZE, Int}
+  lut1::NTuple{Sys.WORD_SIZE, UInt8}
 
   S::Vector{Symbol}
 
@@ -1191,8 +1191,8 @@ end
   ord::Cint
   deg::Cint
   rev::Cint
-  lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}
-  lut1::NTuple{Base.GMP.BITS_PER_LIMB, UInt8}
+  lut::NTuple{Sys.WORD_SIZE, Int}
+  lut1::NTuple{Sys.WORD_SIZE, UInt8}
 
   S::Vector{Symbol}
 
@@ -1325,8 +1325,8 @@ end
   ord::Cint
   deg::Cint
   rev::Cint
-  lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}
-  lut1::NTuple{Base.GMP.BITS_PER_LIMB, UInt8}
+  lut::NTuple{Sys.WORD_SIZE, Int}
+  lut1::NTuple{Sys.WORD_SIZE, UInt8}
 
   n::UInt
   ninv::UInt
@@ -1470,8 +1470,8 @@ end
   ord::Cint
   deg::Cint
   rev::Cint
-  lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}
-  lut1::NTuple{Base.GMP.BITS_PER_LIMB, UInt8}
+  lut::NTuple{Sys.WORD_SIZE, Int}
+  lut1::NTuple{Sys.WORD_SIZE, UInt8}
 
   n::UInt
   ninv::UInt
@@ -1615,8 +1615,8 @@ end
   ord::Cint
   deg::Cint
   rev::Cint
-  lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}
-  lut1::NTuple{Base.GMP.BITS_PER_LIMB, UInt8}
+  lut::NTuple{Sys.WORD_SIZE, Int}
+  lut1::NTuple{Sys.WORD_SIZE, UInt8}
 
   n::Int # fmpz_t
   add_fxn::Ptr{Nothing}
@@ -2136,8 +2136,8 @@ end
   ord::Cint
   deg::Cint
   rev::Cint
-  lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}
-  lut1::NTuple{Base.GMP.BITS_PER_LIMB, UInt8}
+  lut::NTuple{Sys.WORD_SIZE, Int}
+  lut1::NTuple{Sys.WORD_SIZE, UInt8}
 
   n :: Int
   ninv :: Int
