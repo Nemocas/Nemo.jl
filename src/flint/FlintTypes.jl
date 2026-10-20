@@ -1053,7 +1053,37 @@ end
 #
 ###############################################################################
 
+# values of FLINT's `ordering_t`
+const _ORD_LEX       = Cint(0)
+const _ORD_DEGLEX    = Cint(1)
+const _ORD_DEGREVLEX = Cint(2)
+
+# used by the tests
 const flint_orderings = [:lex, :deglex, :degrevlex]
+
+function _flint_ordering(S::Symbol)
+  if S == :lex
+    return _ORD_LEX
+  elseif S == :deglex
+    return _ORD_DEGLEX
+  elseif S == :degrevlex
+    return _ORD_DEGREVLEX
+  else
+    throw(ArgumentError("$S is not a valid ordering"))
+  end
+end
+
+function _flint_ordering_symbol(b::Cint)
+  if b == _ORD_LEX
+    return :lex
+  elseif b == _ORD_DEGLEX
+    return :deglex
+  elseif b == _ORD_DEGREVLEX
+    return :degrevlex
+  else
+    throw(ArgumentError("$b is not a valid FLINT ordering"))
+  end
+end
 
 @attributes mutable struct ZZMPolyRing <: MPolyRing{ZZRingElem}
   nvars::Int
@@ -1068,18 +1098,10 @@ const flint_orderings = [:lex, :deglex, :degrevlex]
 
   function ZZMPolyRing(s::Vector{Symbol}, S::Symbol, cached::Bool = true)
     return get_cached!(FmpzMPolyID, (s, S), cached) do
-      if S == :lex
-        ord = 0
-      elseif S == :deglex
-        ord = 1
-      elseif S == :degrevlex
-        ord = 2
-      else
-        error("$S is not a valid ordering")
-      end
+      ord = _flint_ordering(S)
 
       z = new()
-      @ccall libflint.fmpz_mpoly_ctx_init(z::Ref{ZZMPolyRing}, length(s)::Int, ord::Int)::Nothing
+      @ccall libflint.fmpz_mpoly_ctx_init(z::Ref{ZZMPolyRing}, length(s)::Int, ord::Cint)::Nothing
       z.S = s
       finalizer(_fmpz_mpoly_ctx_clear_fn, z)
       return z
@@ -1198,18 +1220,10 @@ end
 
   function QQMPolyRing(s::Vector{Symbol}, S::Symbol, cached::Bool = true)
     return get_cached!(FmpqMPolyID, (s, S), cached) do
-      if S == :lex
-        ord = 0
-      elseif S == :deglex
-        ord = 1
-      elseif S == :degrevlex
-        ord = 2
-      else
-        error("$S is not a valid ordering")
-      end
+      ord = _flint_ordering(S)
 
       z = new()
-      @ccall libflint.fmpq_mpoly_ctx_init(z::Ref{QQMPolyRing}, length(s)::Int, ord::Int)::Nothing
+      @ccall libflint.fmpq_mpoly_ctx_init(z::Ref{QQMPolyRing}, length(s)::Int, ord::Cint)::Nothing
       z.S = s
       finalizer(_fmpq_mpoly_ctx_clear_fn, z)
       return z
@@ -1338,15 +1352,7 @@ end
 
   function zzModMPolyRing(R::zzModRing, s::Vector{Symbol}, S::Symbol, cached::Bool = true)
     return get_cached!(NmodMPolyID, (R, s, S), cached) do
-      if S == :lex
-        ord = 0
-      elseif S == :deglex
-        ord = 1
-      elseif S == :degrevlex
-        ord = 2
-      else
-        error("$S is not a valid ordering")
-      end
+      ord = _flint_ordering(S)
 
       z = new()
       @ccall libflint.nmod_mpoly_ctx_init(z::Ref{zzModMPolyRing}, length(s)::Int, ord::Cint, R.n::UInt)::Nothing
@@ -1483,15 +1489,7 @@ end
 
   function fpMPolyRing(R::fpField, s::Vector{Symbol}, S::Symbol, cached::Bool = true)
     return get_cached!(GFPMPolyID, (R, s, S), cached) do
-      if S == :lex
-        ord = 0
-      elseif S == :deglex
-        ord = 1
-      elseif S == :degrevlex
-        ord = 2
-      else
-        error("$S is not a valid ordering")
-      end
+      ord = _flint_ordering(S)
 
       z = new()
       @ccall libflint.nmod_mpoly_ctx_init(z::Ref{fpMPolyRing}, length(s)::Int, ord::Cint, UInt(modulus(R))::UInt)::Nothing
@@ -1635,15 +1633,7 @@ end
 
   function FpMPolyRing(R::FpField, s::Vector{Symbol}, S::Symbol, cached::Bool = true)
     return get_cached!(GFPFmpzMPolyID, (R, s, S), cached) do
-      if S == :lex
-        ord = 0
-      elseif S == :deglex
-        ord = 1
-      elseif S == :degrevlex
-        ord = 2
-      else
-        error("$S is not a valid ordering")
-      end
+      ord = _flint_ordering(S)
 
       z = new()
       @ccall libflint.fmpz_mod_mpoly_ctx_init(z::Ref{FpMPolyRing}, length(s)::Int, ord::Cint, modulus(R)::Ref{ZZRingElem})::Nothing
@@ -2167,15 +2157,7 @@ end
 
   function fqPolyRepMPolyRing(R::fqPolyRepField, s::Vector{Symbol}, S::Symbol, cached::Bool = true)
     return get_cached!(FqNmodMPolyID, (R, s, S), cached) do
-      if S == :lex
-        ord = 0
-      elseif S == :deglex
-        ord = 1
-      elseif S == :degrevlex
-        ord = 2
-      else
-        error("$S is not a valid ordering")
-      end
+      ord = _flint_ordering(S)
 
       z = new()
       @ccall libflint.fq_nmod_mpoly_ctx_init(z::Ref{fqPolyRepMPolyRing}, length(s)::Int, ord::Cint, R::Ref{fqPolyRepField})::Nothing

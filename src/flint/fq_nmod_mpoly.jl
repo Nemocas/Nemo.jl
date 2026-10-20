@@ -27,7 +27,7 @@ base_ring(a::fqPolyRepMPolyRing) = a.base_ring
 function internal_ordering(a::fqPolyRepMPolyRing)
   b = a.ord
   #   b = @ccall libflint.fq_nmod_mpoly_ctx_ord(a::Ref{fqPolyRepMPolyRing})::Cint
-  return flint_orderings[b + 1]
+  return _flint_ordering_symbol(b)
 end
 
 function gens(R::fqPolyRepMPolyRing)
