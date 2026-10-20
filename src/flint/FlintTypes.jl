@@ -1127,8 +1127,8 @@ ZZMPolyRing(::ZZRing, s::Vector{Symbol}, S::Symbol, cached::Bool=true) = ZZMPoly
 const FmpzMPolyID = CacheDictType{Tuple{Vector{Symbol}, Symbol}, ZZMPolyRing}()
 
 mutable struct ZZMPolyRingElem <: MPolyRingElem{ZZRingElem}
-  coeffs::Ptr{Nothing}
-  exps::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
+  exps::Ptr{UInt} # array of ulong
   alloc::Int
   length::Int
   bits::Int
@@ -1198,8 +1198,8 @@ end
 mutable struct fmpz_mpoly_factor
   constant::Int
   constant_den::Int
-  poly::Ptr{Nothing}
-  exp::Ptr{Nothing}
+  poly::Ptr{Cvoid} # array of fmpz_mpoly_struct
+  exp::Ptr{ZZRingElem} # array of fmpz
   num::Int
   alloc::Int
   # end flint struct
@@ -1251,8 +1251,8 @@ const FmpqMPolyID = CacheDictType{Tuple{Vector{Symbol}, Symbol}, QQMPolyRing}()
 mutable struct QQMPolyRingElem <: MPolyRingElem{QQFieldElem}
   content_num::Int
   content_den::Int
-  coeffs::Ptr{Nothing}
-  exps::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
+  exps::Ptr{UInt} # array of ulong
   alloc::Int
   length::Int
   bits::Int
@@ -1324,8 +1324,8 @@ end
 mutable struct fmpq_mpoly_factor
   constant_num::Int
   constant_den::Int
-  poly::Ptr{Nothing}
-  exp::Ptr{Nothing}
+  poly::Ptr{Cvoid} # array of fmpq_mpoly_struct
+  exp::Ptr{ZZRingElem} # array of fmpz
   num::Int
   alloc::Int
   # end flint struct
@@ -1381,8 +1381,8 @@ end
 const NmodMPolyID = CacheDictType{Tuple{zzModRing, Vector{Symbol}, Symbol}, zzModMPolyRing}()
 
 mutable struct zzModMPolyRingElem <: MPolyRingElem{zzModRingElem}
-  coeffs::Ptr{Nothing}
-  exps::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
+  exps::Ptr{UInt} # array of ulong
   length::Int
   bits::Int
   coeffs_alloc::Int
@@ -1461,8 +1461,8 @@ end
 
 mutable struct nmod_mpoly_factor
   constant::UInt
-  poly::Ptr{Nothing}
-  exp::Ptr{Nothing}
+  poly::Ptr{Cvoid} # array of nmod_mpoly_struct
+  exp::Ptr{ZZRingElem} # array of fmpz
   num::Int
   alloc::Int
   # end flint struct
@@ -1518,8 +1518,8 @@ end
 const GFPMPolyID = CacheDictType{Tuple{fpField, Vector{Symbol}, Symbol}, fpMPolyRing}()
 
 mutable struct fpMPolyRingElem <: MPolyRingElem{fpFieldElem}
-  coeffs::Ptr{Nothing}
-  exps::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
+  exps::Ptr{UInt} # array of ulong
   length::Int
   bits::Int
   coeffs_alloc::Int
@@ -1598,8 +1598,8 @@ end
 
 mutable struct gfp_mpoly_factor
   constant::UInt
-  poly::Ptr{Nothing}
-  exp::Ptr{Nothing}
+  poly::Ptr{Cvoid} # array of nmod_mpoly_struct
+  exp::Ptr{ZZRingElem} # array of fmpz
   num::Int
   alloc::Int
   # end flint struct
@@ -1631,15 +1631,15 @@ end
   lut1::NTuple{Sys.WORD_SIZE, UInt8}
 
   n::Int # fmpz_t
-  add_fxn::Ptr{Nothing}
-  sub_fxn::Ptr{Nothing}
-  mul_fxn::Ptr{Nothing}
+  add_fxn::Ptr{Cvoid}
+  sub_fxn::Ptr{Cvoid}
+  mul_fxn::Ptr{Cvoid}
   n2::UInt
   ninv::UInt
   norm::UInt
   n_limbs::Tuple{UInt, UInt, UInt}
   ninv_limbs::Tuple{UInt, UInt, UInt}
-  ninv_huge::Ptr{Nothing} # fmpz_preinvn_struct
+  ninv_huge::Ptr{Cvoid} # fmpz_preinvn_struct *
   # end of flint struct
 
   base_ring::FpField
@@ -1662,8 +1662,8 @@ end
 const GFPFmpzMPolyID = CacheDictType{Tuple{FpField, Vector{Symbol}, Symbol}, FpMPolyRing}()
 
 mutable struct FpMPolyRingElem <: MPolyRingElem{FpFieldElem}
-  coeffs::Ptr{Nothing}
-  exps::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
+  exps::Ptr{UInt} # array of ulong
   length::Int
   bits::Int
   coeffs_alloc::Int
@@ -1709,8 +1709,8 @@ end
 
 mutable struct gfp_fmpz_mpoly_factor
   constant::Int
-  poly::Ptr{Nothing}
-  exp::Ptr{Nothing}
+  poly::Ptr{Cvoid} # array of fmpz_mod_mpoly_struct
+  exp::Ptr{ZZRingElem} # array of fmpz
   num::Int
   alloc::Int
   # end flint struct
@@ -2186,8 +2186,8 @@ end
 const FqNmodMPolyID = CacheDictType{Tuple{fqPolyRepField, Vector{Symbol}, Symbol}, fqPolyRepMPolyRing}()
 
 mutable struct fqPolyRepMPolyRingElem <: MPolyRingElem{fqPolyRepFieldElem}
-  coeffs::Ptr{Nothing}
-  exps::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
+  exps::Ptr{UInt} # array of ulong
   length::Int
   bits::Int
   coeffs_alloc::Int
@@ -2263,15 +2263,15 @@ mutable struct fqPolyRepMPolyRingElem <: MPolyRingElem{fqPolyRepFieldElem}
 end
 
 mutable struct fq_nmod_mpoly_factor
-  constant_coeffs::Ptr{Nothing}
+  constant_coeffs::Ptr{UInt} # array of ulong
   constant_alloc::Int
   constant_length::Int
   constant_n::UInt
   constant_ninv::UInt
   constant_norm::Int
 
-  poly::Ptr{Nothing}
-  exp::Ptr{Nothing}
+  poly::Ptr{Cvoid} # array of fq_nmod_mpoly_struct
+  exp::Ptr{ZZRingElem} # array of fmpz
   num::Int
   alloc::Int
   # end flint struct
