@@ -214,6 +214,14 @@ function _fq_default_ctx_type(F::FqField)
   return @ccall libflint.fq_default_ctx_type(F::Ref{FqField})::Cint
 end
 
+# Old names of the `FQ_DEFAULT_*` constants; Hecke and Oscar compare against
+# them. To be dropped together with `@flint_legacy_fields`.
+const _FQ_DEFAULT_FQ_ZECH = FlintC.FQ_DEFAULT_FQ_ZECH
+const _FQ_DEFAULT_FQ_NMOD = FlintC.FQ_DEFAULT_FQ_NMOD
+const _FQ_DEFAULT_FQ = FlintC.FQ_DEFAULT_FQ
+const _FQ_DEFAULT_NMOD = FlintC.FQ_DEFAULT_NMOD
+const _FQ_DEFAULT_FMPZ_NMOD = FlintC.FQ_DEFAULT_FMPZ_MOD
+
 # `FQ_DEFAULT_CTX_FMPZ_MOD`: the first data word of the gr context points to
 # the `fmpz_mod_ctx_struct`. Only valid while `F` is kept alive.
 function _fmpz_mod_ctx_ptr(F::FqField)
