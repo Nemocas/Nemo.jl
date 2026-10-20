@@ -31,7 +31,7 @@ end
 ################################################################################
 
 mutable struct qqbar_struct
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   real_mid_exp::Int     # ZZRingElem
@@ -49,7 +49,7 @@ mutable struct qqbar_struct
 end
 
 mutable struct fexpr_struct
-  data::Ptr{Nothing}
+  data::Ptr{UInt} # array of ulong
   alloc::Int
 end
 
@@ -88,7 +88,7 @@ end
 
 @doc qqbar_field_doc
 mutable struct QQBarFieldElem <: FieldElem
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   real_mid_exp::Int     # ZZRingElem
@@ -141,19 +141,19 @@ const ca_ctx_options = [
                   :trig_form]
 
 @attributes mutable struct CalciumField <: Field
-  ext_cache_items::Ptr{Nothing}
+  ext_cache_items::Ptr{Ptr{Cvoid}} # array of ca_ext_struct *
   ext_cache_length::Int
   ext_cache_alloc::Int
   ext_cache_hash_size::Int
-  ext_cache_hash_table::Ptr{Nothing}
-  field_cache_items::Ptr{Nothing}
+  ext_cache_hash_table::Ptr{Int} # array of slong
+  field_cache_items::Ptr{Ptr{Cvoid}} # array of ca_field_struct *
   field_cache_length::Int
   field_cache_alloc::Int
   field_cache_hash_size::Int
-  field_cache_hash_table::Ptr{Nothing}
-  field_qq::Ptr{Nothing}
-  field_qq_i::Ptr{Nothing}
-  mctx::Ptr{Nothing}
+  field_cache_hash_table::Ptr{Int} # array of slong
+  field_qq::Ptr{Cvoid} # ca_field_struct *
+  field_qq_i::Ptr{Cvoid} # ca_field_struct *
+  mctx::Ptr{Ptr{Cvoid}} # array of fmpz_mpoly_ctx_struct *
   mctx_len::Int
   options::Ptr{Int}
   # end C struct
