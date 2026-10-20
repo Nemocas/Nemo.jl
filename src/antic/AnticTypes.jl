@@ -21,16 +21,16 @@ Creation is usually by calling [`number_field`](@ref), but see also
 for some more specialized fields.
 """
 @attributes mutable struct AbsSimpleNumField <: SimpleNumField{QQFieldElem}
-  pol_coeffs::Ptr{Nothing}
+  pol_coeffs::Ptr{ZZRingElem} # array of fmpz
   pol_alloc::Int
   pol_length::Int
   pol_den::Int
-  pinv_dinv::Ptr{Nothing}
+  pinv_dinv::Ptr{UInt} # array of ulong
   pinv_n::Int
   pinv_norm::Int
-  powers::Ptr{Nothing}
+  powers::Ptr{Cvoid} # union of fmpq_poly_struct * and fmpz **
   powers_len::Int
-  traces_coeffs::Ptr{Nothing}
+  traces_coeffs::Ptr{ZZRingElem} # array of fmpz
   traces_alloc::Int
   traces_length::Int
   traces_den::Int
@@ -70,7 +70,7 @@ Essentially never called directly.
 See also [`number_field`](@ref).
 """
 mutable struct AbsSimpleNumFieldElem <: SimpleNumFieldElem{QQFieldElem}
-  elem_coeffs::Ptr{Nothing}
+  elem_coeffs::Ptr{ZZRingElem} # array of fmpz
   elem_alloc::Int
   elem_length::Int
   elem_den::Int
