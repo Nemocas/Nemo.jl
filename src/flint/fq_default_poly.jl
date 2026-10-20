@@ -785,7 +785,9 @@ function lift(R::ZZPolyRing, f::FqPolyRingElem)
   else
     @assert _fq_default_ctx_type(F) == FlintC.FQ_DEFAULT_FMPZ_MOD
     z = R()
-    @ccall libflint.fmpz_mod_poly_get_fmpz_poly(z::Ref{ZZPolyRingElem}, f::Ref{FqPolyRingElem}, (pointer_from_objref(F) + 2 * sizeof(Cint))::Ptr{Nothing})::Nothing
+    GC.@preserve F begin
+      @ccall libflint.fmpz_mod_poly_get_fmpz_poly(z::Ref{ZZPolyRingElem}, f::Ref{FqPolyRingElem}, _fmpz_mod_ctx_ptr(F)::Ptr{FlintC.fmpz_mod_ctx_struct})::Nothing
+    end
     return z
   end
 end
