@@ -254,14 +254,14 @@ function raw_field_type(F::FqField)
 end
 
 function _get_raw_type(::Type{fqPolyRepField}, F::FqField)
-  @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FQ_NMOD
+  @assert raw_field_type(F) === fqPolyRepField
   Rx, _ = polynomial_ring(Native.GF(UInt(characteristic(F))), :x, cached = false)
   m = map_coefficients(x -> _coeff(x, 0), defining_polynomial(F), parent = Rx)
   return fqPolyRepField(m, :$, false)
 end
 
 function _get_raw_type(::Type{FqPolyRepField}, F::FqField)
-  @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FQ
+  @assert raw_field_type(F) === FqPolyRepField
   Rx, _ = polynomial_ring(Native.GF(characteristic(F)), :x, cached = false)
   m = map_coefficients(x -> _coeff(x, 0), defining_polynomial(F), parent = Rx)
   return FqPolyRepField(m, :$, false)
@@ -273,12 +273,12 @@ function canonical_raw_type(::Type{T}, F::FqField) where {T}
 end
 
 function _get_raw_type(::Type{fpField}, F::FqField)
-  @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_NMOD
+  @assert raw_field_type(F) === fpField
   return Native.GF(UInt(order(F)), cached = false)
 end
 
 function _get_raw_type(::Type{FpField}, F::FqField)
-  @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_MOD
+  @assert raw_field_type(F) === FpField
   return Native.GF(order(F), cached = false)
 end
 

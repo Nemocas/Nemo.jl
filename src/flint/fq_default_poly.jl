@@ -803,9 +803,9 @@ function QadicField(f::FqPolyRingElem, prec::Int = 64, var::String = "a"; cached
   absolute_degree(K) == 1 || throw(ArgumentError("base ring of polynomial must be a prime field"))
 
   z = get_cached!(QadicBaseFqPol, (base_field, f), cached) do
-    ctx_type = _fq_default_ctx_type(K)
-    @assert ctx_type in (_FQ_DEFAULT_NMOD, _FQ_DEFAULT_FMPZ_MOD)
-    _K = ctx_type == _FQ_DEFAULT_NMOD ? _get_raw_type(fpField, K) : _get_raw_type(FpField, K)
+    T = raw_field_type(K)
+    @assert T in (fpField, FpField)
+    _K = _get_raw_type(T, K)
     ff = map_coefficients(c -> _K(lift(ZZ, c)), f; cached = false)
     return QadicField(ff, prec, var; cached = false, check = check, base_field = base_field)[1]
   end
