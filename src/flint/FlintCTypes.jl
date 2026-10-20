@@ -859,6 +859,31 @@ const padic_poly_t = Tuple{padic_poly_struct}
 
 
 ###############################################################################
+# begin qadic.h
+
+const qadic_t = padic_poly_t
+
+const qadic_struct = padic_poly_struct
+
+struct qadic_ctx_struct <: FlintStruct
+  pctx::padic_ctx_struct
+
+  a::Ptr{fmpz}
+  j::Ptr{slong}
+  len::slong
+
+  var::Ptr{Cchar}
+end
+
+const qadic_ctx_t = Tuple{qadic_ctx_struct}
+
+struct struct_qadic2_sqrt_precomp <: FlintStruct end
+
+# end qadic.h
+###############################################################################
+
+
+###############################################################################
 # begin n_poly_types.h
 
 struct n_poly_struct <: FlintStruct

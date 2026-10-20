@@ -2400,12 +2400,12 @@ Opaque precomputation used to speed up square roots in a $q$-adic field of
 characteristic 2. Wraps a FLINT `struct qadic2_sqrt_precomp *`.
 """
 mutable struct Qadic2SqrtPrecomp
-  ptr::Ptr{Nothing}
+  ptr::Ptr{FlintC.struct_qadic2_sqrt_precomp}
   parent::QadicField
 
   function Qadic2SqrtPrecomp(R::QadicField)
     prime(R) == 2 || throw(DomainError(prime(R), "characteristic must be 2"))
-    ptr = @ccall libflint._qadic_char2_sqrt_precomp_init(R::Ref{QadicField})::Ptr{Nothing}
+    ptr = @ccall libflint._qadic_char2_sqrt_precomp_init(R::Ref{QadicField})::Ptr{FlintC.struct_qadic2_sqrt_precomp}
     z = new(ptr, R)
     finalizer(_qadic_char2_sqrt_precomp_clear_fn, z)
     return z
@@ -5300,7 +5300,7 @@ function _qadic_ctx_clear_fn(a::QadicField)
 end
 
 function _qadic_char2_sqrt_precomp_clear_fn(a::Qadic2SqrtPrecomp)
-  @ccall libflint._qadic_char2_sqrt_precomp_clear(a.ptr::Ptr{Nothing})::Nothing
+  @ccall libflint._qadic_char2_sqrt_precomp_clear(a.ptr::Ptr{FlintC.struct_qadic2_sqrt_precomp})::Nothing
 end
 
 function _rand_ctx_clear_fn(a::rand_ctx)

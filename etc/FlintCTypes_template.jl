@@ -51,6 +51,8 @@ const FLINT_BITS = UInt == UInt64 ? 64 : 32
 
 @include_c_header("padic_types.h")
 
+@include_c_header("qadic.h")
+
 @include_c_header("n_poly_types.h")
 
 @include_c_header("mpoly_types.h")
