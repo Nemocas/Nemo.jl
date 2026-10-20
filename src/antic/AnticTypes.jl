@@ -31,9 +31,9 @@ for some more specialized fields.
   powers::Ptr{Nothing}
   powers_len::Int
   traces_coeffs::Ptr{Nothing}
-  traces_den::Int
   traces_alloc::Int
   traces_length::Int
+  traces_den::Int
   flag::UInt
   pol::QQPolyRingElem
   S::Symbol
