@@ -112,7 +112,7 @@ end
 ###############################################################################
 
 function expressify(a::FqPolyRepFieldElem; context = nothing)
-  x = unsafe_string(reinterpret(Cstring, parent(a).var))
+  x = unsafe_string(parent(a).var)
   d = degree(parent(a))
 
   sum = Expr(:call, :+)
