@@ -4026,7 +4026,7 @@ mutable struct zzModMatrix <: FlintMatElem{zzModRingElem}
 
   # MatElem interface
   function zzModMatrix(R::zzModRing, ::UndefInitializer, r::Int, c::Int)
-    z = zzModMatrix(r, c, R.n)
+    z = zzModMatrix(r, c, R)
     z.base_ring = R
     return z
   end
@@ -4036,7 +4036,7 @@ mutable struct zzModMatrix <: FlintMatElem{zzModRingElem}
     return new()
   end
 
-  function zzModMatrix(r::Int, c::Int, n::UInt)
+  function zzModMatrix(r::Int, c::Int, n::Union{UInt, zzModRing})
     z = new()
     # The entry buffer is Julia-owned; `view_parent` keeps it alive, so no
     # finalizer is needed and FLINT must never be asked to clear this matrix.
@@ -4046,7 +4046,7 @@ mutable struct zzModMatrix <: FlintMatElem{zzModRingElem}
     z.r = r
     z.c = c
     z.stride = c
-    @ccall libflint.nmod_mat_set_mod(z::Ref{zzModMatrix}, n::UInt)::Nothing
+    _set_mod!(z, n)
     return z
   end
 
@@ -4410,7 +4410,7 @@ mutable struct fpMatrix <: FlintMatElem{fpFieldElem}
 
   # MatElem interface
   function fpMatrix(R::fpField, ::UndefInitializer, r::Int, c::Int)
-    z = fpMatrix(r, c, R.n)
+    z = fpMatrix(r, c, R)
     z.base_ring = R
     return z
   end
@@ -4420,7 +4420,7 @@ mutable struct fpMatrix <: FlintMatElem{fpFieldElem}
     return new()
   end
 
-  function fpMatrix(r::Int, c::Int, n::UInt)
+  function fpMatrix(r::Int, c::Int, n::Union{UInt, fpField})
     z = new()
     # The entry buffer is Julia-owned; `view_parent` keeps it alive, so no
     # finalizer is needed and FLINT must never be asked to clear this matrix.
@@ -4430,7 +4430,7 @@ mutable struct fpMatrix <: FlintMatElem{fpFieldElem}
     z.r = r
     z.c = c
     z.stride = c
-    @ccall libflint.nmod_mat_set_mod(z::Ref{fpMatrix}, n::UInt)::Nothing
+    _set_mod!(z, n)
     return z
   end
 
@@ -4525,6 +4525,19 @@ mutable struct fpMatrix <: FlintMatElem{fpFieldElem}
     error("Modulus must be smaller than ", ZZRingElem(typemax(UInt)))
     return fpMatrix(UInt(n), b)
   end
+end
+
+# Copying the ring's `nmod_t` avoids recomputing `ninv` in `nmod_mat_set_mod`.
+function _set_mod!(z::Union{zzModMatrix, fpMatrix}, R::Union{zzModRing, fpField})
+  z.n = R.n
+  z.ninv = R.ninv
+  z.norm = R.norm
+  return z
+end
+
+function _set_mod!(z::T, n::UInt) where {T <: Union{zzModMatrix, fpMatrix}}
+  @ccall libflint.nmod_mat_set_mod(z::Ref{T}, n::UInt)::Nothing
+  return z
 end
 
 ###############################################################################
