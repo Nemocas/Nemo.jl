@@ -227,6 +227,32 @@ function _fmpz_mod_ctx_ptr(F::FqField)
   return unsafe_load(Ptr{Ptr{fmpz_mod_ctx_struct}}(pointer_from_objref(F)))
 end
 
+@doc raw"""
+    raw_field_type(F::FqField)
+
+Return the native Nemo type of the field FLINT uses to represent `F`:
+`fpField`, `FpField`, `fqPolyRepField` or `FqPolyRepField`. Return `nothing`
+for FLINT's Zech logarithm representation, which has no Nemo type.
+
+# Examples
+
+```jldoctest
+julia> Nemo.raw_field_type(GF(7))
+fpField
+
+julia> Nemo.raw_field_type(GF(ZZ(2)^127 - 1, 2))
+FqPolyRepField
+```
+"""
+function raw_field_type(F::FqField)
+  t = _fq_default_ctx_type(F)
+  t == _FQ_DEFAULT_FQ_NMOD && return fqPolyRepField
+  t == _FQ_DEFAULT_FQ && return FqPolyRepField
+  t == _FQ_DEFAULT_NMOD && return fpField
+  t == _FQ_DEFAULT_FMPZ_MOD && return FpField
+  return nothing
+end
+
 function _get_raw_type(::Type{fqPolyRepField}, F::FqField)
   @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FQ_NMOD
   Rx, _ = polynomial_ring(Native.GF(UInt(characteristic(F))), :x, cached = false)
