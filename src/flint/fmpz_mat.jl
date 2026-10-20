@@ -2153,9 +2153,10 @@ function _very_unsafe_convert(::Type{ZZMatrix}, a::Vector{ZZRingElem}, row = tru
   # a must be GC.@preserved
   # row = true -> make it a row
   # row = false -> make it a column
+  # the matrix owns nothing; the returned vector holds its entries
   M = Nemo.@new_struct(ZZMatrix)
-  Me = zeros(Int, length(a))
-  M.entries = reinterpret(Ptr{ZZRingElem}, pointer(Me))
+  Me = [x.d for x in a]
+  M.entries = pointer(Me)
   if row
     M.r = 1
     M.c = length(a)
@@ -2164,9 +2165,6 @@ function _very_unsafe_convert(::Type{ZZMatrix}, a::Vector{ZZRingElem}, row = tru
     M.r = length(a)
     M.c = 1
     M.stride = M.c
-  end
-  for i in 1:length(a)
-    Me[i] = a[i].d
   end
   return M, Me
 end
@@ -2193,7 +2191,7 @@ function mul!(z::Vector{ZZRingElem}, a::ZZMatrixOrPtr, b::Vector{ZZRingElem})
     GC.@preserve dk1 dk3 begin
       mul!(zz, a, bb)
       for i in 1:length(z)
-        z[i].d = unsafe_load(zz.entries, i).d
+        z[i].d = dk3[i]
       end
     end
   end
@@ -2211,7 +2209,7 @@ function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::ZZMatrixOrPtr)
     GC.@preserve dk1 dk3 begin
       mul!(zz, aa, b)
       for i in 1:length(z)
-        z[i].d = unsafe_load(zz.entries, i).d
+        z[i].d = dk3[i]
       end
     end
   end
