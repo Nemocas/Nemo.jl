@@ -527,23 +527,6 @@ function _fq_field_from_fmpz_mod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   # f is an fmpz_mod_poly in disguise
   # I cannot use the FqField constructor, since f has the wrong type
   # on the julia side
-  #
-  # The following trick of picking the fmpz_mod_ctx_struct from the fq_default_ctx
-  # does not work anymore:
-  #
-  # It is in K but the first 4 bytes are the type
-  # z = @new_struct(FqField) # this is just new() usable outside the type definition
-  # z.var = string(s)
-  # Temporary hack
-  #_K = _get_raw_type(FpField, K)
-  # ss = string(s)
-  # GC.@preserve K ss begin
-  #   ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
-  #         (Ref{FqField}, Ref{FqPolyRingElem}, Ptr{Nothing}, Ptr{UInt8}),
-  #         #z, f, _K.ninv, string(s))
-  #         z, f, pointer_from_objref(K) + 2 * sizeof(Cint), ss)
-  #   finalizer(_fq_default_ctx_clear_fn, z)
-  # end
   _K = _get_raw_type(FpField, K)
   ff = map_coefficients(c -> _K(lift(ZZ, c)), f; cached = false)
   z = FqField(ff, s, false; check = false)
