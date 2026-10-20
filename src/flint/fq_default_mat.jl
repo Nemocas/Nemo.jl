@@ -608,7 +608,7 @@ function mat_entry_ptr(a::FqMatrix, i::Int, j::Int)
     pptr = @ccall libflint.fq_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   elseif t == _FQ_DEFAULT_NMOD
     pptr = @ccall libflint.nmod_mat_entry_ptr(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
-  else#if t == _FQ_DEFAULT_FMPZ_NMOD
+  else#if t == _FQ_DEFAULT_FMPZ_MOD
     pptr = @ccall libflint.fmpz_mod_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   end
   return pptr

@@ -196,7 +196,7 @@ const _FQ_DEFAULT_FQ_ZECH   = 1
 const _FQ_DEFAULT_FQ_NMOD   = 2
 const _FQ_DEFAULT_FQ        = 3
 const _FQ_DEFAULT_NMOD      = 4
-const _FQ_DEFAULT_FMPZ_NMOD = 5
+const _FQ_DEFAULT_FMPZ_MOD  = 5
 
 mutable struct CanonicalFqDefaultMap{T}# <: Map{FqField, T, SetMap, CanonicalFqDefaultMap}
   D::FqField
@@ -245,7 +245,7 @@ function _get_raw_type(::Type{fpField}, F::FqField)
 end
 
 function _get_raw_type(::Type{FpField}, F::FqField)
-  @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_NMOD
+  @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_MOD
   return Native.GF(order(F), cached = false)
 end
 

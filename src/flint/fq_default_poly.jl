@@ -783,7 +783,7 @@ function lift(R::ZZPolyRing, f::FqPolyRingElem)
     @ccall libflint.fmpz_poly_set_nmod_poly_unsigned(z::Ref{ZZPolyRingElem}, f::Ref{FqPolyRingElem})::Nothing
     return z
   else
-    @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_NMOD
+    @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_MOD
     z = R()
     @ccall libflint.fmpz_mod_poly_get_fmpz_poly(z::Ref{ZZPolyRingElem}, f::Ref{FqPolyRingElem}, (pointer_from_objref(F) + 2 * sizeof(Cint))::Ptr{Nothing})::Nothing
     return z
@@ -802,7 +802,7 @@ function QadicField(f::FqPolyRingElem, prec::Int = 64, var::String = "a"; cached
 
   z = get_cached!(QadicBaseFqPol, (base_field, f), cached) do
     ctx_type = _fq_default_ctx_type(K)
-    @assert ctx_type in (_FQ_DEFAULT_NMOD, _FQ_DEFAULT_FMPZ_NMOD)
+    @assert ctx_type in (_FQ_DEFAULT_NMOD, _FQ_DEFAULT_FMPZ_MOD)
     _K = ctx_type == _FQ_DEFAULT_NMOD ? _get_raw_type(fpField, K) : _get_raw_type(FpField, K)
     ff = map_coefficients(c -> _K(lift(ZZ, c)), f; cached = false)
     return QadicField(ff, prec, var; cached = false, check = check, base_field = base_field)[1]
