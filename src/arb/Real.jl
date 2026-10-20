@@ -1816,24 +1816,25 @@ function neg!(z::TypeOrPtr{RealFieldElem}, a::TypeOrPtr{RealFieldElem})
   return z
 end
 
-for (f, s) in ((:add!, :arb_add), (:sub!, :arb_sub), (:mul!, :arb_mul), (:div!, :arb_div))
-  for (suffix, T, R) in (("", TypeOrPtr{RealFieldElem}, Ref{RealFieldElem}),
-                         ("_ui", UInt, UInt),
-                         ("_si", Int, Int),
-                         ("_fmpz", ZZRingElemOrPtr, Ref{ZZRingElem}))
+for (T, R, add, sub, mul, div) in (
+    (TypeOrPtr{RealFieldElem}, Ref{RealFieldElem}, :arb_add, :arb_sub, :arb_mul, :arb_div),
+    (UInt, UInt, :arb_add_ui, :arb_sub_ui, :arb_mul_ui, :arb_div_ui),
+    (Int, Int, :arb_add_si, :arb_sub_si, :arb_mul_si, :arb_div_si),
+    (ZZRingElemOrPtr, Ref{ZZRingElem}, :arb_add_fmpz, :arb_sub_fmpz, :arb_mul_fmpz, :arb_div_fmpz))
+  for (f, c) in ((:add!, add), (:sub!, sub), (:mul!, mul), (:div!, div))
     @eval function $f(z::TypeOrPtr{RealFieldElem}, x::TypeOrPtr{RealFieldElem}, y::$T, prec::Int = precision(Balls))
-      @ccall libflint.$(Symbol(s, suffix))(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::$R, prec::Int)::Nothing
+      @ccall libflint.$c(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::$R, prec::Int)::Nothing
       return z
     end
   end
 end
 
-for (suffix, T, R) in (("", TypeOrPtr{RealFieldElem}, Ref{RealFieldElem}),
-                       ("_ui", UInt, UInt),
-                       ("_fmpz", ZZRingElemOrPtr, Ref{ZZRingElem}),
-                       ("_fmpq", QQFieldElemOrPtr, Ref{QQFieldElem}))
+for (T, R, c) in ((TypeOrPtr{RealFieldElem}, Ref{RealFieldElem}, :arb_pow),
+                  (UInt, UInt, :arb_pow_ui),
+                  (ZZRingElemOrPtr, Ref{ZZRingElem}, :arb_pow_fmpz),
+                  (QQFieldElemOrPtr, Ref{QQFieldElem}, :arb_pow_fmpq))
   @eval function pow!(z::TypeOrPtr{RealFieldElem}, x::TypeOrPtr{RealFieldElem}, y::$T, prec::Int = precision(Balls))
-    @ccall libflint.$(Symbol(:arb_pow, suffix))(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::$R, prec::Int)::Nothing
+    @ccall libflint.$c(z::Ref{RealFieldElem}, x::Ref{RealFieldElem}, y::$R, prec::Int)::Nothing
     return z
   end
 end

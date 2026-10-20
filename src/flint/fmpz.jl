@@ -434,11 +434,11 @@ end
 
 # Metaprogram to define functions &, |, $ (xor)
 
-for (fJ, fC) in ((:&, :and), (:|, :or), (:xor, :xor))
+for (fJ, fC) in ((:&, :fmpz_and), (:|, :fmpz_or), (:xor, :fmpz_xor))
   @eval begin
     function ($fJ)(x::ZZRingElem, y::ZZRingElem)
       z = ZZRingElem()
-      @ccall libflint.$("fmpz_$fC")(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
+      @ccall libflint.$fC(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
       return z
     end
   end

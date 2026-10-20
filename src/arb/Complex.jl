@@ -1524,14 +1524,15 @@ function neg!(z::TypeOrPtr{ComplexFieldElem}, a::TypeOrPtr{ComplexFieldElem})
   return z
 end
 
-for (f, s) in ((:add!, :acb_add), (:sub!, :acb_sub), (:mul!, :acb_mul), (:div!, :acb_div), (:pow!, :acb_pow))
-  for (suffix, T, R) in (("", TypeOrPtr{ComplexFieldElem}, Ref{ComplexFieldElem}),
-                         ("_ui", UInt, UInt),
-                         ("_si", Int, Int),
-                         ("_fmpz", ZZRingElemOrPtr, Ref{ZZRingElem}),
-                         ("_arb", TypeOrPtr{RealFieldElem}, Ref{RealFieldElem}))
+for (T, R, add, sub, mul, div, pow) in (
+    (TypeOrPtr{ComplexFieldElem}, Ref{ComplexFieldElem}, :acb_add, :acb_sub, :acb_mul, :acb_div, :acb_pow),
+    (UInt, UInt, :acb_add_ui, :acb_sub_ui, :acb_mul_ui, :acb_div_ui, :acb_pow_ui),
+    (Int, Int, :acb_add_si, :acb_sub_si, :acb_mul_si, :acb_div_si, :acb_pow_si),
+    (ZZRingElemOrPtr, Ref{ZZRingElem}, :acb_add_fmpz, :acb_sub_fmpz, :acb_mul_fmpz, :acb_div_fmpz, :acb_pow_fmpz),
+    (TypeOrPtr{RealFieldElem}, Ref{RealFieldElem}, :acb_add_arb, :acb_sub_arb, :acb_mul_arb, :acb_div_arb, :acb_pow_arb))
+  for (f, c) in ((:add!, add), (:sub!, sub), (:mul!, mul), (:div!, div), (:pow!, pow))
     @eval function $f(z::TypeOrPtr{ComplexFieldElem}, x::TypeOrPtr{ComplexFieldElem}, y::$T, prec::Int = precision(Balls))
-      @ccall libflint.$(Symbol(s, suffix))(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::$R, prec::Int)::Nothing
+      @ccall libflint.$c(z::Ref{ComplexFieldElem}, x::Ref{ComplexFieldElem}, y::$R, prec::Int)::Nothing
       return z
     end
   end
