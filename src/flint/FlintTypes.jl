@@ -99,7 +99,7 @@ end
 
 mutable struct fmpz_factor
   sign::Cint
-  p::Ptr{Nothing} # Array of fmpz_struct's
+  p::Ptr{ZZRingElem} # array of fmpz
   exp::Ptr{UInt}
   alloc::Int
   num::Int
@@ -311,7 +311,7 @@ end
 const FmpzPolyID = CacheDictType{Symbol, ZZPolyRing}()
 
 mutable struct ZZPolyRingElem <: PolyRingElem{ZZRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   # end flint struct
@@ -379,7 +379,7 @@ end
 const FmpqPolyID = CacheDictType{Symbol, QQPolyRing}()
 
 mutable struct QQPolyRingElem <: PolyRingElem{QQFieldElem}
-  coeffs::Ptr{Int}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   den::Int
@@ -511,15 +511,15 @@ end
 
 mutable struct fmpz_mod_ctx_struct
   n::Int # fmpz_t
-  add_fxn::Ptr{Nothing}
-  sub_fxn::Ptr{Nothing}
-  mul_fxn::Ptr{Nothing}
+  add_fxn::Ptr{Cvoid}
+  sub_fxn::Ptr{Cvoid}
+  mul_fxn::Ptr{Cvoid}
   n2::UInt
   ninv::UInt
   norm::UInt
   n_limbs::Tuple{UInt, UInt, UInt}
   ninv_limbs::Tuple{UInt, UInt, UInt}
-  ninv_huge::Ptr{Nothing} # fmpz_preinvn_struct
+  ninv_huge::Ptr{Cvoid} # fmpz_preinvn_struct *
 
   function fmpz_mod_ctx_struct()
     z = new()
@@ -621,7 +621,7 @@ end
 const NmodPolyRingID = CacheDictType{Tuple{zzModRing, Symbol}, zzModPolyRing}()
 
 mutable struct zzModPolyRingElem <: PolyRingElem{zzModRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
   alloc::Int
   length::Int
   mod_n::UInt
@@ -735,7 +735,7 @@ end
 const GFPPolyRingID = CacheDictType{Tuple{fpField, Symbol}, fpPolyRing}()
 
 mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
   alloc::Int
   length::Int
   mod_n::UInt
@@ -849,7 +849,7 @@ end
 const FmpzModPolyRingID = CacheDictType{Tuple{ZZModRing, Symbol}, ZZModPolyRing}()
 
 mutable struct ZZModPolyRingElem <: PolyRingElem{ZZModRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   # end of flint struct
@@ -965,7 +965,7 @@ end
 const GFPFmpzPolyRingID = CacheDictType{Tuple{FpField, Symbol}, FpPolyRing}()
 
 mutable struct FpPolyRingElem <: PolyRingElem{FpFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   # end flint struct
@@ -2508,7 +2508,7 @@ end
 const FmpzRelSeriesID = CacheDictType{Tuple{Int, Symbol}, ZZRelPowerSeriesRing}()
 
 mutable struct ZZRelPowerSeriesRingElem <: RelPowerSeriesRingElem{ZZRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   # end flint struct
@@ -2563,7 +2563,7 @@ end
 const FmpzAbsSeriesID = CacheDictType{Tuple{Int, Symbol}, ZZAbsPowerSeriesRing}()
 
 mutable struct ZZAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{ZZRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   prec :: Int
@@ -2668,7 +2668,7 @@ end
 const FmpzLaurentSeriesID = CacheDictType{Tuple{Int, Symbol}, ZZLaurentSeriesRing}()
 
 mutable struct ZZLaurentSeriesRingElem <: RingElem
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   prec::Int
@@ -2723,7 +2723,7 @@ end
 const FmpqRelSeriesID = CacheDictType{Tuple{Int, Symbol}, QQRelPowerSeriesRing}()
 
 mutable struct QQRelPowerSeriesRingElem <: RelPowerSeriesRingElem{QQFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   den::Int
@@ -2779,7 +2779,7 @@ end
 const FmpqAbsSeriesID = CacheDictType{Tuple{Int, Symbol}, QQAbsPowerSeriesRing}()
 
 mutable struct QQAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{QQFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   den::Int
@@ -2836,7 +2836,7 @@ const GFPRelSeriesID = CacheDictType{Tuple{fpField, Int, Symbol},
                                      fpRelPowerSeriesRing}()
 
 mutable struct fpRelPowerSeriesRingElem <: RelPowerSeriesRingElem{fpFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
   alloc::Int
   length::Int
   mod_n::UInt
@@ -2924,7 +2924,7 @@ const NmodRelSeriesID = CacheDictType{Tuple{zzModRing, Int, Symbol},
                                       zzModRelPowerSeriesRing}()
 
 mutable struct zzModRelPowerSeriesRingElem <: RelPowerSeriesRingElem{zzModRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
   alloc::Int
   length::Int
   mod_n::UInt
@@ -3012,7 +3012,7 @@ const GFPFmpzRelSeriesID = CacheDictType{Tuple{FpField, Int, Symbol},
                                          FpRelPowerSeriesRing}()
 
 mutable struct FpRelPowerSeriesRingElem <: RelPowerSeriesRingElem{FpFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   # end flint struct
@@ -3104,7 +3104,7 @@ const FmpzModRelSeriesID = CacheDictType{Tuple{ZZModRing, Int, Symbol},
                                          ZZModRelPowerSeriesRing}()
 
 mutable struct ZZModRelPowerSeriesRingElem <: RelPowerSeriesRingElem{ZZModRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   # end flint struct
@@ -3196,7 +3196,7 @@ const GFPFmpzAbsSeriesID = CacheDictType{Tuple{FpField, Int, Symbol},
                                          FpAbsPowerSeriesRing}()
 
 mutable struct FpAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{FpFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   # end flint struct
@@ -3284,7 +3284,7 @@ const NmodAbsSeriesID = CacheDictType{Tuple{zzModRing, Int, Symbol},
                                       zzModAbsPowerSeriesRing}()
 
 mutable struct zzModAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{zzModRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
   alloc::Int
   length::Int
   mod_n::UInt
@@ -3372,7 +3372,7 @@ const GFPAbsSeriesID = CacheDictType{Tuple{fpField, Int, Symbol},
                                      fpAbsPowerSeriesRing}()
 
 mutable struct fpAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{fpFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
   alloc::Int
   length::Int
   mod_n::UInt
@@ -3458,7 +3458,7 @@ const FmpzModAbsSeriesID = CacheDictType{Tuple{ZZModRing, Int, Symbol},
                                          ZZModAbsPowerSeriesRing}()
 
 mutable struct ZZModAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{ZZModRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   # end flint struct
