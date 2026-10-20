@@ -1984,8 +1984,8 @@ function next_prime(x::ZZRingElem, proved::Bool = true)
 end
 
 function next_prime(x::UInt, proved::Bool = true)
-  if (Base.GMP.BITS_PER_LIMB == 64 && x >= 0xffffffffffffffc5) ||
-    (Base.GMP.BITS_PER_LIMB == 32 && x >= 0xfffffffb)
+  if (FlintC.FLINT_BITS == 64 && x >= 0xffffffffffffffc5) ||
+    (FlintC.FLINT_BITS == 32 && x >= 0xfffffffb)
     error("No larger single-limb prime exists")
   end
   return @ccall libflint.n_nextprime(x::UInt, proved::Cint)::UInt

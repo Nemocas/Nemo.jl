@@ -31,27 +31,35 @@ end
 ################################################################################
 
 mutable struct qqbar_struct
-  coeffs::Ptr{Nothing}
-  alloc::Int
-  length::Int
-  real_mid_exp::Int     # ZZRingElem
-  real_mid_size::UInt # mp_size_t
-  real_mid_d1::UInt    # mantissa_struct
-  real_mid_d2::UInt
-  real_rad_exp::Int     # ZZRingElem
-  real_rad_man::UInt
-  imag_mid_exp::Int     # ZZRingElem
-  imag_mid_size::UInt # mp_size_t
-  imag_mid_d1::UInt    # mantissa_struct
-  imag_mid_d2::UInt
-  imag_rad_exp::Int     # ZZRingElem
-  imag_rad_man::UInt
+  data::FlintC.qqbar_struct
+end
+@flint_fields qqbar_struct
+@flint_legacy_fields qqbar_struct begin
+  coeffs = data.poly.coeffs
+  alloc = data.poly.alloc
+  length = data.poly.length
+  real_mid_exp = data.enclosure.real.mid.exp
+  real_mid_size = data.enclosure.real.mid.size
+  real_mid_d1 = _union_word(data.enclosure.real.mid.d, 1)
+  real_mid_d1! = _setpath(data, (:enclosure, :real, :mid, :d), _set_union_word(data.enclosure.real.mid.d, 1, v))
+  real_mid_d2 = _union_word(data.enclosure.real.mid.d, 2)
+  real_mid_d2! = _setpath(data, (:enclosure, :real, :mid, :d), _set_union_word(data.enclosure.real.mid.d, 2, v))
+  real_rad_exp = data.enclosure.real.rad.exp
+  real_rad_man = data.enclosure.real.rad.man
+  imag_mid_exp = data.enclosure.imag.mid.exp
+  imag_mid_size = data.enclosure.imag.mid.size
+  imag_mid_d1 = _union_word(data.enclosure.imag.mid.d, 1)
+  imag_mid_d1! = _setpath(data, (:enclosure, :imag, :mid, :d), _set_union_word(data.enclosure.imag.mid.d, 1, v))
+  imag_mid_d2 = _union_word(data.enclosure.imag.mid.d, 2)
+  imag_mid_d2! = _setpath(data, (:enclosure, :imag, :mid, :d), _set_union_word(data.enclosure.imag.mid.d, 2, v))
+  imag_rad_exp = data.enclosure.imag.rad.exp
+  imag_rad_man = data.enclosure.imag.rad.man
 end
 
 mutable struct fexpr_struct
-  data::Ptr{Nothing}
-  alloc::Int
+  data::FlintC.fexpr_struct
 end
+@flint_fields fexpr_struct
 
 ################################################################################
 #
@@ -88,21 +96,7 @@ end
 
 @doc qqbar_field_doc
 mutable struct QQBarFieldElem <: FieldElem
-  coeffs::Ptr{Nothing}
-  alloc::Int
-  length::Int
-  real_mid_exp::Int     # ZZRingElem
-  real_mid_size::UInt # mp_size_t
-  real_mid_d1::UInt    # mantissa_struct
-  real_mid_d2::UInt
-  real_rad_exp::Int     # ZZRingElem
-  real_rad_man::UInt
-  imag_mid_exp::Int     # ZZRingElem
-  imag_mid_size::UInt # mp_size_t
-  imag_mid_d1::UInt    # mantissa_struct
-  imag_mid_d2::UInt
-  imag_rad_exp::Int     # ZZRingElem
-  imag_rad_man::UInt
+  data::FlintC.qqbar_struct
 
   function QQBarFieldElem()
     z = new()
@@ -111,6 +105,28 @@ mutable struct QQBarFieldElem <: FieldElem
     return z
   end
 
+end
+@flint_fields QQBarFieldElem
+@flint_legacy_fields QQBarFieldElem begin
+  coeffs = data.poly.coeffs
+  alloc = data.poly.alloc
+  length = data.poly.length
+  real_mid_exp = data.enclosure.real.mid.exp
+  real_mid_size = data.enclosure.real.mid.size
+  real_mid_d1 = _union_word(data.enclosure.real.mid.d, 1)
+  real_mid_d1! = _setpath(data, (:enclosure, :real, :mid, :d), _set_union_word(data.enclosure.real.mid.d, 1, v))
+  real_mid_d2 = _union_word(data.enclosure.real.mid.d, 2)
+  real_mid_d2! = _setpath(data, (:enclosure, :real, :mid, :d), _set_union_word(data.enclosure.real.mid.d, 2, v))
+  real_rad_exp = data.enclosure.real.rad.exp
+  real_rad_man = data.enclosure.real.rad.man
+  imag_mid_exp = data.enclosure.imag.mid.exp
+  imag_mid_size = data.enclosure.imag.mid.size
+  imag_mid_d1 = _union_word(data.enclosure.imag.mid.d, 1)
+  imag_mid_d1! = _setpath(data, (:enclosure, :imag, :mid, :d), _set_union_word(data.enclosure.imag.mid.d, 1, v))
+  imag_mid_d2 = _union_word(data.enclosure.imag.mid.d, 2)
+  imag_mid_d2! = _setpath(data, (:enclosure, :imag, :mid, :d), _set_union_word(data.enclosure.imag.mid.d, 2, v))
+  imag_rad_exp = data.enclosure.imag.rad.exp
+  imag_rad_man = data.enclosure.imag.rad.man
 end
 
 function _qqbar_clear_fn(a::QQBarFieldElem)
@@ -141,22 +157,7 @@ const ca_ctx_options = [
                   :trig_form]
 
 @attributes mutable struct CalciumField <: Field
-  ext_cache_items::Ptr{Nothing}
-  ext_cache_length::Int
-  ext_cache_alloc::Int
-  ext_cache_hash_size::Int
-  ext_cache_hash_table::Ptr{Nothing}
-  field_cache_items::Ptr{Nothing}
-  field_cache_length::Int
-  field_cache_alloc::Int
-  field_cache_hash_size::Int
-  field_cache_hash_table::Ptr{Nothing}
-  field_qq::Ptr{Nothing}
-  field_qq_i::Ptr{Nothing}
-  mctx::Ptr{Nothing}
-  mctx_len::Int
-  options::Ptr{Int}
-  # end C struct
+  data::FlintC.ca_ctx_struct
 
   extended::Bool
   refcount::Int
@@ -177,6 +178,19 @@ const ca_ctx_options = [
     C.refcount = 1
     return C
   end
+end
+@flint_fields CalciumField
+@flint_legacy_fields CalciumField begin
+  ext_cache_items = data.ext_cache.items
+  ext_cache_length = data.ext_cache.length
+  ext_cache_alloc = data.ext_cache.alloc
+  ext_cache_hash_size = data.ext_cache.hash_size
+  ext_cache_hash_table = data.ext_cache.hash_table
+  field_cache_items = data.field_cache.items
+  field_cache_length = data.field_cache.length
+  field_cache_alloc = data.field_cache.alloc
+  field_cache_hash_size = data.field_cache.hash_size
+  field_cache_hash_table = data.field_cache.hash_table
 end
 
 function options(C::CalciumField)
@@ -199,12 +213,7 @@ function _CalciumField_clear_fn(C::CalciumField)
 end
 
 mutable struct CalciumFieldElem <: FieldElem
-  field::Int
-  data0::UInt
-  data1::UInt
-  data2::UInt
-  data3::UInt
-  # end C struct
+  data::FlintC.ca_struct
 
   parent::CalciumField
 
@@ -217,6 +226,17 @@ mutable struct CalciumFieldElem <: FieldElem
     return z
   end
 
+end
+@flint_fields CalciumFieldElem
+@flint_legacy_fields CalciumFieldElem begin
+  data0 = _union_word(data.elem, 1)
+  data0! = _setfield(data, :elem, _set_union_word(data.elem, 1, v))
+  data1 = _union_word(data.elem, 2)
+  data1! = _setfield(data, :elem, _set_union_word(data.elem, 2, v))
+  data2 = _union_word(data.elem, 3)
+  data2! = _setfield(data, :elem, _set_union_word(data.elem, 3, v))
+  data3 = _union_word(data.elem, 4)
+  data3! = _setfield(data, :elem, _set_union_word(data.elem, 4, v))
 end
 
 function _ca_clear_fn(a::CalciumFieldElem)

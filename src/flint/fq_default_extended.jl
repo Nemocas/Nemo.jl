@@ -523,27 +523,10 @@ println(io, AbstractAlgebra.obj_to_string(_fq_default_dummy(a), context = io))
 
 function _fq_field_from_fmpz_mod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   K = base_ring(f)
-  @assert _fq_default_ctx_type(K) == _FQ_DEFAULT_FMPZ_NMOD
+  @assert _fq_default_ctx_type(K) == FlintC.FQ_DEFAULT_FMPZ_MOD
   # f is an fmpz_mod_poly in disguise
   # I cannot use the FqField constructor, since f has the wrong type
   # on the julia side
-  #
-  # The following trick of picking the fmpz_mod_ctx_struct from the fq_default_ctx
-  # does not work anymore:
-  #
-  # It is in K but the first 4 bytes are the type
-  # z = @new_struct(FqField) # this is just new() usable outside the type definition
-  # z.var = string(s)
-  # Temporary hack
-  #_K = _get_raw_type(FpField, K)
-  # ss = string(s)
-  # GC.@preserve K ss begin
-  #   ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
-  #         (Ref{FqField}, Ref{FqPolyRingElem}, Ptr{Nothing}, Ptr{UInt8}),
-  #         #z, f, _K.ninv, string(s))
-  #         z, f, pointer_from_objref(K) + 2 * sizeof(Cint), ss)
-  #   finalizer(_fq_default_ctx_clear_fn, z)
-  # end
   _K = _get_raw_type(FpField, K)
   ff = map_coefficients(c -> _K(lift(ZZ, c)), f; cached = false)
   z = FqField(ff, s, false; check = false)
@@ -568,7 +551,7 @@ end
 
 function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   K = base_ring(f)
-  @assert _fq_default_ctx_type(K) == _FQ_DEFAULT_NMOD
+  @assert _fq_default_ctx_type(K) == FlintC.FQ_DEFAULT_NMOD
   # f is an nmod_poly in disguise
   # I cannot use the FqField constructor, since f has the wrong type
   # on the julia side
@@ -606,10 +589,10 @@ function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::B
       # f is either nmod_poly or fmpz_mod_poly
       # we can define K[t]/(f) directly on the C side with the right modulus
       _fq_ctx_type = _fq_default_ctx_type(K)
-      if _fq_ctx_type == _FQ_DEFAULT_NMOD
+      if _fq_ctx_type == FlintC.FQ_DEFAULT_NMOD
         z = _fq_field_from_nmod_poly_in_disguise(f, s)
       else
-        @assert _fq_ctx_type == _FQ_DEFAULT_FMPZ_NMOD
+        @assert _fq_ctx_type == FlintC.FQ_DEFAULT_FMPZ_MOD
         z = _fq_field_from_fmpz_mod_poly_in_disguise(f, s)
       end
     else
@@ -797,12 +780,12 @@ function (F::FqField)(p::FqPolyRingElem)
     K = base_field(F)
     characteristic(base_ring(p)) != characteristic(F) && error("Polynomial has wrong coefficient ring")
     _fq_ctx_type = _fq_default_ctx_type(K)
-    if _fq_ctx_type == _FQ_DEFAULT_NMOD
+    if _fq_ctx_type == FlintC.FQ_DEFAULT_NMOD
       y = FqFieldElem(F)
       @ccall libflint.fq_default_set_nmod_poly(y::Ref{FqFieldElem}, p::Ref{FqPolyRingElem}, F::Ref{FqField})::Nothing
       return y
     else
-      @assert _fq_ctx_type == _FQ_DEFAULT_FMPZ_NMOD
+      @assert _fq_ctx_type == FlintC.FQ_DEFAULT_FMPZ_MOD
       y = FqFieldElem(F)
       @ccall libflint.fq_default_set_fmpz_mod_poly(y::Ref{FqFieldElem}, p::Ref{FqPolyRingElem}, F::Ref{FqField})::Nothing
       return y
@@ -822,11 +805,11 @@ function _lift_standard(R::FqPolyRing, a::FqFieldElem)
   p = R()
   @assert F === base_field(parent(a))
   _fq_ctx_type = _fq_default_ctx_type(F)
-  if _fq_ctx_type == _FQ_DEFAULT_NMOD
+  if _fq_ctx_type == FlintC.FQ_DEFAULT_NMOD
     @ccall libflint.fq_default_get_nmod_poly(p::Ref{FqPolyRingElem}, a::Ref{FqFieldElem}, K::Ref{FqField})::Nothing
     return p
   else
-    @assert _fq_ctx_type == _FQ_DEFAULT_FMPZ_NMOD
+    @assert _fq_ctx_type == FlintC.FQ_DEFAULT_FMPZ_MOD
     @ccall libflint.fq_default_get_fmpz_mod_poly(p::Ref{FqPolyRingElem}, a::Ref{FqFieldElem}, K::Ref{FqField})::Nothing
     return p
   end
