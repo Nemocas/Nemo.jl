@@ -191,7 +191,7 @@ characteristic(R::PadicField) = 0
 #
 ###############################################################################
 
-const PADIC_PRINTING_MODE = Ref(Cint(1))
+const PADIC_PRINTING_MODE = Ref(:series)
 
 @doc raw"""
     get_printing_mode(::Type{PadicField})
@@ -199,7 +199,7 @@ const PADIC_PRINTING_MODE = Ref(Cint(1))
 Get the printing mode for the elements of the p-adic field `R`.
 """
 function get_printing_mode(::Type{PadicField})
-  return flint_padic_printing_mode[PADIC_PRINTING_MODE[] + 1]
+  return PADIC_PRINTING_MODE[]
 end
 
 @doc raw"""
@@ -209,15 +209,8 @@ Set the printing mode for the elements of the p-adic field `R`. Possible values
 are `:terse`, `:series` and `:val_unit`.
 """
 function set_printing_mode(::Type{PadicField}, printing::Symbol)
-  if printing == :terse
-    PADIC_PRINTING_MODE[] = 0
-  elseif printing == :series
-    PADIC_PRINTING_MODE[] = 1
-  elseif printing == :val_unit
-    PADIC_PRINTING_MODE[] = 2
-  else
-    error("Invalid printing mode: $printing")
-  end
+  @req printing in (:terse, :series, :val_unit) "Invalid printing mode: $printing"
+  PADIC_PRINTING_MODE[] = printing
   return printing
 end
 
@@ -227,7 +220,7 @@ function expressify(x::PadicFieldElem; context = nothing)
   sum = Expr(:call, :+)
   if iszero(x)
     push!(sum.args, 0)
-  elseif pmode == 0  # terse
+  elseif pmode == :terse
     push!(sum.args, expressify(lift(QQ, x), context = context))
   else
     pp = prime(parent(x))
@@ -242,7 +235,7 @@ function expressify(x::PadicFieldElem; context = nothing)
       u = lift(ZZ, x*p^-v)
     end
 
-    if pmode == 1  # series
+    if pmode == :series
       d = digits(u, base=p)
     else  # val_unit
       d = [u]
