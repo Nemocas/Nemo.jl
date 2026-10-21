@@ -183,11 +183,11 @@ end
 #
 ################################################################################
 
-# For some types, FLINT's matrix-vector functions are slower than its matrix
-# multiplication with the vector as a one-row or one-column matrix. That
-# matrix borrows the entries: `_pack_entries(a)` copies their C structs into a
-# word vector, `_unpack_entries!(z, Me)` copies the result back into `z`. The
-# entries of `z` must not share objects.
+# For some types, FLINT's matrix-vector functions, or the generic method, are
+# slower than FLINT's matrix multiplication with the vector as a one-row or
+# one-column matrix. That matrix borrows the entries: `_pack_entries(a)` copies
+# their C structs into a word vector, `_unpack_entries!(z, Me)` copies the
+# result back into `z`. The entries of `z` must not share objects.
 
 function _very_unsafe_convert(::Type{T}, a::Vector, m::TypeOrPtr{T}; row::Bool) where {T <: FlintMatElem}
   # a must be GC.@preserved
