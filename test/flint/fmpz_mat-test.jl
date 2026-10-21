@@ -1048,8 +1048,12 @@ end
     cA = [A[1, j] * c[1] + A[2, j] * c[2] + A[3, j] * c[3] for j in 1:2]
     GC.@preserve A begin
       for a in (A, Ref(A), Ptr{ZZMatrix}(pointer_from_objref(A)))
-        @test mul!([ZZ(), ZZ(), ZZ()], a, b) == Ab
-        @test mul!([ZZ(), ZZ()], c, a) == cA
+        for f in (mul!, Nemo.mul!_flint, Nemo.mul!_through_matrix)
+          z = [ZZ(), ZZ(), ZZ()]
+          @test f(z, a, b) == z == Ab
+          z = [ZZ(), ZZ()]
+          @test f(z, c, a) == z == cA
+        end
       end
     end
   end
