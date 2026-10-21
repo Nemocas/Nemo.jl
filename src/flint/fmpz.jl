@@ -1301,8 +1301,9 @@ end
     sqrtmod_all(a::IntegerUnion, n::IntegerUnion) -> Vector{ZZRingElem}
 
 Return every $x$ with $0 \le x < n$ and $x^2 \equiv a \pmod n$, in increasing
-order, and none if $a$ is not a square modulo $n$. The modulus must satisfy
-$0 < n < 2^{64}$; $a$ is any integer, not necessarily a unit modulo $n$.
+order, and none if $a$ is not a square modulo $n$. The modulus must be
+positive and fit in a `UInt`; $a$ is any integer, not necessarily a unit
+modulo $n$.
 
 There can be many roots: $2^k$ for $a = 0$ and $n = 4^k$. For one square root
 modulo a prime, see [`sqrtmod`](@ref).
@@ -1329,8 +1330,8 @@ ZZRingElem[]
 ```
 """
 function sqrtmod_all(a::IntegerUnion, n::IntegerUnion)
-  @req 0 < n < ZZ(2)^64 "Modulus must satisfy 0 < n < 2^64"
   N = ZZ(n)
+  @req N > 0 && fits(UInt, N) "Modulus must be positive and fit in UInt"
   return sort!(ZZRingElem[ZZ(x) for x in _sqrtmod_all(UInt(mod(ZZ(a), N)), UInt(N))])
 end
 

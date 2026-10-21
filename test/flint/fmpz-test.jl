@@ -1001,20 +1001,24 @@ end
   @test sqrtmod_all(ZZ(-7), ZZ(1024)) == sqrtmod_all(big(-7), UInt(1024)) == r
   # non-units: x^2 = 0 mod 2^k exactly when 2^ceil(k/2) divides x
   @test all(k -> length(sqrtmod_all(0, 2^k)) == 2^div(k, 2), 1:30)
-  # units modulo a product of distinct odd primes: prod (1 + (a/q)) roots
-  qs = [next_prime(ZZ(2)^20 + i) for i in (0, 100, 200)]
+  # units modulo a product of distinct odd primes: prod (1 + (a/q)) roots,
+  # the product within the word size
+  qs = [next_prime(ZZ(2)^(div(Sys.WORD_SIZE, 3) - 1) + i) for i in (0, 100, 200)]
   for a in (2, 3, 5, 7, 11)
     @test length(sqrtmod_all(a, prod(qs))) == prod(1 + jacobi_symbol(ZZ(a), q) for q in qs)
   end
-  # the ends of the word-size range
-  n = ZZ(2)^64 - 59
+  # the ends of the word-size range: the largest prime below 2^Sys.WORD_SIZE,
+  # and typemax(UInt), squarefree and odd, from each integer type
+  n = ZZ(Sys.WORD_SIZE == 64 ? 0xffffffffffffffc5 : 0xfffffffb)
   @test is_prime(n) && sqrtmod_all(4, n) == [ZZ(2), n - 2]
-  n = ZZ(2)^64 - 1
+  n = typemax(UInt)
   r = sqrtmod_all(1, n)
-  @test length(r) == 2^length(factor(n)) && all(x -> mod(x^2 - 1, n) == 0, r)
+  @test length(r) == 2^length(factor(ZZ(n))) && all(x -> mod(x^2 - 1, n) == 0, r)
+  @test sqrtmod_all(1, ZZ(n)) == sqrtmod_all(1, BigInt(n)) == r
   @test_throws ArgumentError sqrtmod_all(1, 0)
   @test_throws ArgumentError sqrtmod_all(1, -5)
-  @test_throws ArgumentError sqrtmod_all(1, ZZ(2)^64)
+  @test_throws ArgumentError sqrtmod_all(1, ZZ(n) + 1)
+  @test_throws ArgumentError sqrtmod_all(1, BigInt(n) + 1)
 
   @test mod_sym(ZZ(0), ZZ(5)) == ZZ(0)
   @test mod_sym(ZZ(0), ZZ(-5)) == ZZ(0)
