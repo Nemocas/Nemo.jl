@@ -516,6 +516,16 @@ end
   # a repeated root keeps its multiplicity
   @test from_roots(S, [R(3), R(3), R(5)]) == (x - 3)^2 * (x - 5)
 
+  # modulus 1: every polynomial is zero, though FLINT's product is not
+  R1, = residue_ring(ZZ, ZZ(1))
+  S1, = polynomial_ring(R1, "x")
+  for rs in (elem_type(R1)[], [R1(0)], [R1(0), R1(0), R1(5)])
+    f = from_roots(S1, rs)
+    @test iszero(f)
+    @test f == one(S1)
+    @test degree(f) == -1
+  end
+
   @test_throws ArgumentError from_roots(S, [residue_ring(ZZ, ZZ(2)^64 * 7)[1](1)])
 end
 

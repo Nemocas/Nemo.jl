@@ -607,8 +607,11 @@ end
 
 function from_roots(R::ZZPolyRing, rs::Vector{ZZRingElem})
   z = R()
-  xs = Int[r.d for r in rs]
-  GC.@preserve rs @ccall libflint.fmpz_poly_product_roots_fmpz_vec(z::Ref{ZZPolyRingElem}, xs::Ptr{Int}, length(xs)::Int)::Nothing
+  GC.@preserve rs begin
+    # the entries of xs point into the integers of rs
+    xs = Int[r.d for r in rs]
+    @ccall libflint.fmpz_poly_product_roots_fmpz_vec(z::Ref{ZZPolyRingElem}, xs::Ptr{Int}, length(xs)::Int)::Nothing
+  end
   return z
 end
 

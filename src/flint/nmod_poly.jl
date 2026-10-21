@@ -619,6 +619,8 @@ x^3 + x^2 + 11*x + 11
 """
 function from_roots(R::zzModPolyRing, rs::Vector{zzModRingElem})
   @req all(r -> parent(r) == base_ring(R), rs) "parents do not match"
+  # FLINT returns a non-zero polynomial of degree length(rs) here
+  isone(modulus(base_ring(R))) && return zero(R)
   z = R()
   xs = UInt[r.data for r in rs]
   @ccall libflint.nmod_poly_product_roots_nmod_vec(z::Ref{zzModPolyRingElem}, xs::Ptr{UInt}, length(xs)::Int)::Nothing
