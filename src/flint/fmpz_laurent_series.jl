@@ -1017,8 +1017,8 @@ end
 
 function zero!(a::ZZLaurentSeriesRingElem)
   @ccall libflint.fmpz_poly_zero(a::Ref{ZZLaurentSeriesRingElem})::Nothing
-  a = set_precision!(a, parent(a).prec_max)
-  a = set_valuation!(a, parent(a).prec_max)
+  a = set_precision!(a, max_precision(parent(a)))
+  a = set_valuation!(a, max_precision(parent(a)))
   a = set_scale!(a, 1)
   return a
 end
@@ -1065,7 +1065,7 @@ function mul!(c::ZZLaurentSeriesRingElem, a::ZZLaurentSeriesRingElem, b::ZZLaure
     @ccall libflint.fmpz_poly_mullow(c::Ref{ZZLaurentSeriesRingElem}, a::Ref{ZZLaurentSeriesRingElem}, b::Ref{ZZLaurentSeriesRingElem}, lenc::Int)::Nothing
   end
   c = set_valuation!(c, aval + bval)
-  c = set_precision!(c, prec + c.val)
+  c = set_precision!(c, prec + valuation(c))
   c = set_scale!(c, sz)
   renormalize!(c)
   c = rescale!(c)
@@ -1188,7 +1188,7 @@ function rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make3{ZZLaurentSeriesRingEl
   R = base_ring(S)
   f = S()
   x = gen(S)
-  for i = 0:S.prec_max - 1
+  for i = 0:max_precision(S) - 1
     f += rand(rng, v)*x^i
   end
   return shift_left(f, rand(rng, val_range))
@@ -1219,16 +1219,16 @@ promote_rule(::Type{ZZLaurentSeriesRingElem}, ::Type{ZZRingElem}) = ZZLaurentSer
 ###############################################################################
 
 function (R::ZZLaurentSeriesRing)()
-  z = ZZLaurentSeriesRingElem(Vector{ZZRingElem}(undef, 0), 0, R.prec_max, R.prec_max, 1)
+  z = ZZLaurentSeriesRingElem(Vector{ZZRingElem}(undef, 0), 0, max_precision(R), max_precision(R), 1)
   z.parent = R
   return z
 end
 
 function (R::ZZLaurentSeriesRing)(b::Integer)
   if b == 0
-    z = ZZLaurentSeriesRingElem(Vector{ZZRingElem}(undef, 0), 0, R.prec_max, R.prec_max, 1)
+    z = ZZLaurentSeriesRingElem(Vector{ZZRingElem}(undef, 0), 0, max_precision(R), max_precision(R), 1)
   else
-    z = ZZLaurentSeriesRingElem([ZZRingElem(b)], 1, R.prec_max, 0, 1)
+    z = ZZLaurentSeriesRingElem([ZZRingElem(b)], 1, max_precision(R), 0, 1)
   end
   z.parent = R
   return z
@@ -1236,9 +1236,9 @@ end
 
 function (R::ZZLaurentSeriesRing)(b::ZZRingElem)
   if iszero(b)
-    z = ZZLaurentSeriesRingElem(Vector{ZZRingElem}(undef, 0), 0, R.prec_max, R.prec_max, 1)
+    z = ZZLaurentSeriesRingElem(Vector{ZZRingElem}(undef, 0), 0, max_precision(R), max_precision(R), 1)
   else
-    z = ZZLaurentSeriesRingElem([b], 1, R.prec_max, 0, 1)
+    z = ZZLaurentSeriesRingElem([b], 1, max_precision(R), 0, 1)
   end
   z.parent = R
   return z
