@@ -224,14 +224,51 @@ function sub!(a::FqPolyRepMatrix, b::FqPolyRepMatrix, c::FqPolyRepMatrix)
   return a
 end
 
-function mul!(z::Vector{FqPolyRepFieldElem}, a::FqPolyRepMatrix, b::Vector{FqPolyRepFieldElem})
+function mul!_flint(z::Vector{FqPolyRepFieldElem}, a::FqPolyRepMatrix, b::Vector{FqPolyRepFieldElem})
   @ccall libflint.fq_mat_mul_vec_ptr(z::Ptr{Ref{FqPolyRepFieldElem}}, a::Ref{FqPolyRepMatrix}, b::Ptr{Ref{FqPolyRepFieldElem}}, length(b)::Int, base_ring(a)::Ref{FqPolyRepField})::Nothing
   return z
 end
 
-function mul!(z::Vector{FqPolyRepFieldElem}, a::Vector{FqPolyRepFieldElem}, b::FqPolyRepMatrix)
+function mul!_flint(z::Vector{FqPolyRepFieldElem}, a::Vector{FqPolyRepFieldElem}, b::FqPolyRepMatrix)
   @ccall libflint.fq_mat_vec_mul_ptr(z::Ptr{Ref{FqPolyRepFieldElem}}, a::Ptr{Ref{FqPolyRepFieldElem}}, length(a)::Int, b::Ref{FqPolyRepMatrix}, base_ring(b)::Ref{FqPolyRepField})::Nothing
   return z
+end
+
+# a must be GC.@preserved
+function _pack_entries(a::Vector{FqPolyRepFieldElem})
+  w = _entry_size(FqPolyRepMatrix) ÷ sizeof(Int)
+  Me = Vector{Int}(undef, w * length(a))
+  for i in 1:length(a)
+    unsafe_copyto!(pointer(Me, w * (i - 1) + 1), Ptr{Int}(pointer_from_objref(a[i])), w)
+  end
+  return Me
+end
+
+# z must be GC.@preserved
+function _unpack_entries!(z::Vector{FqPolyRepFieldElem}, Me::Vector{Int})
+  w = _entry_size(FqPolyRepMatrix) ÷ sizeof(Int)
+  for i in 1:length(z)
+    unsafe_copyto!(Ptr{Int}(pointer_from_objref(z[i])), pointer(Me, w * (i - 1) + 1), w)
+  end
+  return z
+end
+
+function mul!(z::Vector{FqPolyRepFieldElem}, a::FqPolyRepMatrix, b::Vector{FqPolyRepFieldElem})
+  # cutoff for the flint method
+  if nrows(a) < 2
+    return mul!_flint(z, a, b)
+  end
+
+  return mul!_through_matrix(z, a, b)
+end
+
+function mul!(z::Vector{FqPolyRepFieldElem}, a::Vector{FqPolyRepFieldElem}, b::FqPolyRepMatrix)
+  # cutoff for the flint method
+  if nrows(b) < 2
+    return mul!_flint(z, a, b)
+  end
+
+  return mul!_through_matrix(z, a, b)
 end
 
 function Generic.add_one!(a::FqPolyRepMatrix, i::Int, j::Int)
