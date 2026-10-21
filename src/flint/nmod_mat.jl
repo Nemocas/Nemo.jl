@@ -231,16 +231,86 @@ function sub!(a::T, b::T, c::T) where T <: Zmodn_mat
   return a
 end
 
-# entries of b required to be in [0,n)
-function mul!(z::Vector{UInt}, a::T, b::Vector{UInt}) where T <: Zmodn_mat
+function mul!_flint(z::Vector{UInt}, a::T, b::Vector{UInt}) where T <: Zmodn_mat
   @ccall libflint.nmod_mat_mul_nmod_vec(z::Ptr{UInt}, a::Ref{T}, b::Ptr{UInt}, length(b)::Int)::Nothing
   return z
 end
 
-# entries of a required to be in [0,n)
-function mul!(z::Vector{UInt}, a::Vector{UInt}, b::T) where T <: Zmodn_mat
+function mul!_flint(z::Vector{UInt}, a::Vector{UInt}, b::T) where T <: Zmodn_mat
   @ccall libflint.nmod_mat_nmod_vec_mul(z::Ptr{UInt}, a::Ptr{UInt}, length(a)::Int, b::Ref{T})::Nothing
   return z
+end
+
+# the matrix borrows the entries of a
+_pack_entries(a::Vector{UInt}) = a
+
+function _unpack_entries!(z::Vector{UInt}, Me::Vector{UInt})
+  z === Me || copyto!(z, Me)
+  return z
+end
+
+# entries of b required to be in [0,n)
+function mul!(z::Vector{UInt}, a::T, b::Vector{UInt}) where T <: Zmodn_mat
+  # cutoff for the flint method
+  if nrows(a) < 8
+    return mul!_flint(z, a, b)
+  end
+
+  return mul!_through_matrix(z, a, b)
+end
+
+# entries of a required to be in [0,n)
+function mul!(z::Vector{UInt}, a::Vector{UInt}, b::T) where T <: Zmodn_mat
+  # cutoff for the flint method
+  if nrows(b) < 8
+    return mul!_flint(z, a, b)
+  end
+
+  return mul!_through_matrix(z, a, b)
+end
+
+for (T, E) in ((zzModMatrix, zzModRingElem), (fpMatrix, fpFieldElem))
+  @eval begin
+    _pack_entries(a::Vector{$E}) = [x.data for x in a]
+
+    # the elements are immutable, so they are replaced, keeping their parents
+    function _unpack_entries!(z::Vector{$E}, Me::Vector{UInt})
+      for i in 1:length(z)
+        z[i] = $E(Me[i], parent(z[i]))
+      end
+      return z
+    end
+
+    function mul!_flint(z::Vector{$E}, a::$T, b::Vector{$E})
+      zz = Vector{UInt}(undef, length(z))
+      mul!_flint(zz, a, [x.data for x in b])
+      return _unpack_entries!(z, zz)
+    end
+
+    function mul!_flint(z::Vector{$E}, a::Vector{$E}, b::$T)
+      zz = Vector{UInt}(undef, length(z))
+      mul!_flint(zz, [x.data for x in a], b)
+      return _unpack_entries!(z, zz)
+    end
+
+    function mul!(z::Vector{$E}, a::$T, b::Vector{$E})
+      # cutoff for the flint method
+      if nrows(a) < 8
+        return mul!_flint(z, a, b)
+      end
+
+      return mul!_through_matrix(z, a, b)
+    end
+
+    function mul!(z::Vector{$E}, a::Vector{$E}, b::$T)
+      # cutoff for the flint method
+      if nrows(b) < 8
+        return mul!_flint(z, a, b)
+      end
+
+      return mul!_through_matrix(z, a, b)
+    end
+  end
 end
 
 # c required to be in [0,n)

@@ -361,6 +361,32 @@ end
   @test mul!(Vector{UInt}(undef, 2), UInt[1, 2], a) == [Z17(7), Z17(10)]
 end
 
+@testset "fpMatrix.vector_mul" begin
+  R = Native.GF(next_prime(2^62))
+
+  data(x) = [y.data for y in x]
+
+  for (r, c) in ((1, 2), (3, 5), (5, 3), (9, 9))
+    a = matrix(R, [rand(R) for i in 1:r, j in 1:c])
+    v = [rand(R) for j in 1:c]
+    w = [rand(R) for i in 1:r]
+    Av = a * matrix(R, c, 1, v)
+    Av = [Av[i, 1] for i in 1:r]
+    wA = matrix(R, 1, r, w) * a
+    wA = [wA[1, j] for j in 1:c]
+    for f in (mul!, Nemo.mul!_flint, Nemo.mul!_through_matrix)
+      z = [rand(R) for i in 1:r]
+      @test f(z, a, v) == z == Av
+      z = [rand(R) for j in 1:c]
+      @test f(z, w, a) == z == wA
+      z = zeros(UInt, r)
+      @test f(z, a, data(v)) == z == data(Av)
+      z = zeros(UInt, c)
+      @test f(z, data(w), a) == z == data(wA)
+    end
+  end
+end
+
 @testset "fpMatrix.row_col_swapping" begin
   R, = residue_field(ZZ, 17)
 
