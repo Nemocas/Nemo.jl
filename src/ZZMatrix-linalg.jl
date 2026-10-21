@@ -26,7 +26,7 @@ end
 
 # Use this function with great care!
 function _unsafe_change_base_ring!(k::Nemo.fpField, a::fpMatrix)
-  @ccall libflint.nmod_mat_set_mod(a::Ref{fpMatrix}, k.n::UInt)::Cvoid
+  _set_mod!(a, k)
   a.base_ring = k  # exploiting that the internal repr is the indep of char
   return a
 end

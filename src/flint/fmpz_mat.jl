@@ -2279,7 +2279,7 @@ function map_entries(R::zzModRing, A::ZZMatrix)
 end
 
 function map_entries!(R::zzModRing, N::zzModMatrix, A::ZZMatrix)
-  @ccall libflint.nmod_mat_set_mod(N::Ref{zzModMatrix}, R.n::UInt)::Cvoid
+  _set_mod!(N, R)
   @ccall libflint.fmpz_mat_get_nmod_mat(N::Ref{zzModMatrix}, A::Ref{ZZMatrix})::Cvoid
   N.base_ring = R  # exploiting that the internal repr is the indep of char
   return N
@@ -2292,7 +2292,7 @@ function map_entries(R::fpField, A::ZZMatrix)
 end
 
 function map_entries!(R::fpField, N::fpMatrix, A::ZZMatrix)
-  @ccall libflint.nmod_mat_set_mod(N::Ref{fpMatrix}, R.n::UInt)::Cvoid
+  _set_mod!(N, R)
   @ccall libflint.fmpz_mat_get_nmod_mat(N::Ref{fpMatrix}, A::Ref{ZZMatrix})::Cvoid
   N.base_ring = R  # exploiting that the internal repr is the indep of char
   return N
