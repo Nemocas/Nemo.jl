@@ -523,7 +523,7 @@ println(io, AbstractAlgebra.obj_to_string(_fq_default_dummy(a), context = io))
 
 function _fq_field_from_fmpz_mod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   K = base_ring(f)
-  @assert _fq_default_ctx_type(K) == _FQ_DEFAULT_FMPZ_MOD
+  @assert raw_field_type(K) === FpField
   # f is an fmpz_mod_poly in disguise
   # I cannot use the FqField constructor, since f has the wrong type
   # on the julia side
@@ -551,7 +551,7 @@ end
 
 function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   K = base_ring(f)
-  @assert _fq_default_ctx_type(K) == _FQ_DEFAULT_NMOD
+  @assert raw_field_type(K) === fpField
   # f is an nmod_poly in disguise
   # I cannot use the FqField constructor, since f has the wrong type
   # on the julia side
@@ -588,11 +588,11 @@ function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::B
       # K is F_p
       # f is either nmod_poly or fmpz_mod_poly
       # we can define K[t]/(f) directly on the C side with the right modulus
-      _fq_ctx_type = _fq_default_ctx_type(K)
-      if _fq_ctx_type == _FQ_DEFAULT_NMOD
+      T = raw_field_type(K)
+      if T === fpField
         z = _fq_field_from_nmod_poly_in_disguise(f, s)
       else
-        @assert _fq_ctx_type == _FQ_DEFAULT_FMPZ_MOD
+        @assert T === FpField
         z = _fq_field_from_fmpz_mod_poly_in_disguise(f, s)
       end
     else
