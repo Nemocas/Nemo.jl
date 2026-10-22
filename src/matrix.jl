@@ -57,7 +57,7 @@ end
 # there), those words.
 
 # These types store no ring: `base_ring` depends on the type alone.
-_set_ring!(z::ZZMatrix, x::ZZMatrixOrPtr) = z
+_set_ring!(z::ZZMatrix, x::Union{ZZMatrixOrPtr, QQMatrixOrPtr}) = z
 _set_ring!(z::QQMatrix, x::QQMatrixOrPtr) = z
 _set_ring!(z::T, x::T) where {T <: Union{RealMatrix, ComplexMatrix}} = z
 
@@ -189,13 +189,13 @@ end
 # their C structs into a word vector, `_unpack_entries!(z, Me)` copies the
 # result back into `z`. The entries of `z` must not share objects.
 
-function _very_unsafe_convert(::Type{T}, a::Vector, m::TypeOrPtr{T}; row::Bool) where {T <: FlintMatElem}
+function _very_unsafe_convert(::Type{S}, a::Vector, m::TypeOrPtr{T}; row::Bool) where {S <: FlintMatElem, T <: FlintMatElem}
   # a must be GC.@preserved
   # m provides the ring
   # the matrix owns nothing, the returned vector holds its entries
-  M = Nemo.@new_struct(T)
+  M = Nemo.@new_struct(S)
   Me = @inline _pack_entries(a)
-  M.entries = reinterpret(fieldtype(T, :entries), pointer(Me))
+  M.entries = reinterpret(fieldtype(S, :entries), pointer(Me))
   if row
     M.r = 1
     M.c = length(a)
@@ -208,9 +208,10 @@ function _very_unsafe_convert(::Type{T}, a::Vector, m::TypeOrPtr{T}; row::Bool) 
   return M, Me
 end
 
-function mul!_through_matrix(z::Vector, a::TypeOrPtr{T}, b::Vector) where {T <: FlintMatElem}
+# `vector_as` is the matrix type the input vector becomes
+function mul!_through_matrix(z::Vector, a::TypeOrPtr{T}, b::Vector; vector_as::Type{S} = T) where {T <: FlintMatElem, S <: FlintMatElem}
   GC.@preserve z b begin
-    bb, dk1 = _very_unsafe_convert(T, b, a; row = false)
+    bb, dk1 = _very_unsafe_convert(S, b, a; row = false)
     zz, dk3 = _very_unsafe_convert(T, z, a; row = false)
     GC.@preserve dk1 dk3 begin
       mul!(zz, a, bb)
@@ -220,9 +221,9 @@ function mul!_through_matrix(z::Vector, a::TypeOrPtr{T}, b::Vector) where {T <: 
   return z
 end
 
-function mul!_through_matrix(z::Vector, a::Vector, b::TypeOrPtr{T}) where {T <: FlintMatElem}
+function mul!_through_matrix(z::Vector, a::Vector, b::TypeOrPtr{T}; vector_as::Type{S} = T) where {T <: FlintMatElem, S <: FlintMatElem}
   GC.@preserve z a begin
-    aa, dk1 = _very_unsafe_convert(T, a, b; row = true)
+    aa, dk1 = _very_unsafe_convert(S, a, b; row = true)
     zz, dk3 = _very_unsafe_convert(T, z, b; row = true)
     GC.@preserve dk1 dk3 begin
       mul!(zz, aa, b)
