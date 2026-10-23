@@ -249,7 +249,8 @@ function _unpack_entries!(z::Vector{UInt}, Me::Vector{UInt})
   return z
 end
 
-_use_mul!_flint(a::Zmodn_mat, len::Int, out::Int; vec_times_mat::Bool) = nrows(a) < 8
+# nmod_mat_mul is not faster for a matrix times vector product
+_use_mul!_flint(a::Zmodn_mat, len::Int, out::Int; vec_times_mat::Bool) = !vec_times_mat || len < 8
 
 # entries of b required to be in [0,n)
 function mul!(z::Vector{UInt}, a::T, b::Vector{UInt}) where T <: Zmodn_mat

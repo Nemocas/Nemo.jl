@@ -2159,7 +2159,11 @@ function mul!_flint(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::ZZMatrixOrP
   return z
 end
 
-_use_mul!_flint(a::ZZMatrixOrPtr, len::Int, out::Int; vec_times_mat::Bool) = nrows(a) < 50 && maximum(nbits, a) < 10
+function _use_mul!_flint(a::ZZMatrixOrPtr, len::Int, out::Int; vec_times_mat::Bool)
+  len * out < 16 && return true
+  # FLINT has a fast path below 31 bits
+  return (len < 8 || out < 2) && maximum(nbits, a) < 31
+end
 
 function mul!(z::Vector{ZZRingElem}, a::ZZMatrixOrPtr, b::Vector{ZZRingElem})
   if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)

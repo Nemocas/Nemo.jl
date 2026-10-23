@@ -880,7 +880,29 @@ function _unpack_entries!(z::Vector{QQFieldElem}, Me::Vector{Int})
   return z
 end
 
-_use_mul!_flint(a::QQMatrixOrPtr, len::Int, out::Int; vec_times_mat::Bool) = nrows(a) < 8
+# the matrix product loses with denominators above 8 bits and with integral
+# entries that are not stored in the word itself
+function _use_mul!_flint(a::QQMatrixOrPtr, len::Int, out::Int; vec_times_mat::Bool)
+  len < 8 && return true
+  integral = true
+  large = false
+  GC.@preserve a begin
+    for i in 1:nrows(a)
+      num = Ptr{ZZRingElem}(mat_entry_ptr(a, i, 1))
+      for j in 1:ncols(a)
+        den = num + sizeof(ZZRingElem)
+        (_fmpz_is_small(den) && data(den) <= 255) || return true
+        if data(den) > 1
+          integral = false
+        elseif integral
+          large |= !_fmpz_is_small(num)
+        end
+        num += sizeof(QQFieldElem)
+      end
+    end
+  end
+  return integral && large
+end
 
 function mul!(z::Vector{QQFieldElem}, a::Vector{QQFieldElem}, b::QQMatrixOrPtr)
   if _use_mul!_flint(b, nrows(b), ncols(b); vec_times_mat = true)

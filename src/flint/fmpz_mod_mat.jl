@@ -321,7 +321,12 @@ function mul!_flint(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::T) where T 
   return z
 end
 
-_use_mul!_flint(a::Zmod_fmpz_mat, len::Int, out::Int; vec_times_mat::Bool) = nrows(a) < 8
+function _use_mul!_flint(a::Zmod_fmpz_mat, len::Int, out::Int; vec_times_mat::Bool)
+  if nbits(modulus(base_ring(a))) <= 32
+    return len * out < 64 || min(len, out) < 2
+  end
+  return len * out < 16
+end
 
 function mul!(z::Vector{ZZRingElem}, a::T, b::Vector{ZZRingElem}) where T <: Zmod_fmpz_mat
   if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)

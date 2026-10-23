@@ -293,7 +293,14 @@ function mul!_flint(z::Vector{FqFieldElem}, a::Vector{FqFieldElem}, b::FqMatrix)
   return z
 end
 
-_use_mul!_flint(a::FqMatrix, len::Int, out::Int; vec_times_mat::Bool) = nrows(a) < 2
+function _use_mul!_flint(a::FqMatrix, len::Int, out::Int; vec_times_mat::Bool)
+  t = _fq_default_ctx_type(base_ring(a))
+  # the fq_zech and nmod matrix products are not faster for a single column
+  t == _FQ_DEFAULT_FQ_ZECH && return true
+  t == _FQ_DEFAULT_NMOD && return !vec_times_mat || len < 32 || out < 2
+  t == _FQ_DEFAULT_FMPZ_MOD && return len < 8
+  return len < (t == _FQ_DEFAULT_FQ_NMOD ? 3 : 2)
+end
 
 function mul!(z::Vector{FqFieldElem}, a::FqMatrix, b::Vector{FqFieldElem})
   if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)

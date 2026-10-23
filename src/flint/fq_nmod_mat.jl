@@ -254,7 +254,7 @@ function _unpack_entries!(z::Vector{fqPolyRepFieldElem}, Me::Vector{Int})
   return z
 end
 
-_use_mul!_flint(a::fqPolyRepMatrix, len::Int, out::Int; vec_times_mat::Bool) = nrows(a) < 2
+_use_mul!_flint(a::fqPolyRepMatrix, len::Int, out::Int; vec_times_mat::Bool) = len < 2
 
 function mul!(z::Vector{fqPolyRepFieldElem}, a::fqPolyRepMatrix, b::Vector{fqPolyRepFieldElem})
   if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)
