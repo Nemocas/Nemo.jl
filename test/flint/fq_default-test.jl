@@ -335,6 +335,22 @@ end
   @test_throws AssertionError f(rand(F4))
 end
 
+@testset "raw_field_type" begin
+  p = next_prime(ZZ(2)^70)
+  types = Dict(Nemo._FQ_DEFAULT_FQ_ZECH => nothing,
+               Nemo._FQ_DEFAULT_FQ_NMOD => fqPolyRepField,
+               Nemo._FQ_DEFAULT_FQ => FqPolyRepField,
+               Nemo._FQ_DEFAULT_NMOD => Nemo.fpField,
+               Nemo._FQ_DEFAULT_FMPZ_MOD => Nemo.FpField)
+  for F in [GF(7), GF(7, 2), GF(p), GF(p, 2)]
+    T = Nemo.raw_field_type(F)
+    @test T === types[Nemo._fq_default_ctx_type(F)]
+    if T !== nothing
+      @test Nemo._get_raw_type(T, F) isa T
+    end
+  end
+end
+
 @testset "residue field" begin
   R, f = residue_field(ZZ, 2)
   @test R isa FqField

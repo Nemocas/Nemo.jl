@@ -491,8 +491,7 @@ function _solve_cholesky_precomp(cho::ArbMatrix, y::ArbMatrix)
   return z
 end
 
-Solve.matrix_normal_form_type(::ArbField) = Solve.LUTrait()
-Solve.matrix_normal_form_type(::ArbMatrix) = Solve.LUTrait()
+Solve.matrix_normal_form_type(::Type{ArbField}) = Solve.LUTrait()
 
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::ArbMatrix, b::ArbMatrix, task::Symbol; side::Symbol = :left)
   nrows(A) != ncols(A) && error("Only implemented for square matrices")

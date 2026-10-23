@@ -170,7 +170,7 @@ function +(a::FqPolyRepAbsPowerSeriesRingElem, b::FqPolyRepAbsPowerSeriesRingEle
   check_parent(a, b)
   lena = length(a)
   lenb = length(b)
-  prec = min(a.prec, b.prec)
+  prec = min(precision(a), precision(b))
   lena = min(lena, prec)
   lenb = min(lenb, prec)
   lenz = max(lena, lenb)
@@ -184,7 +184,7 @@ function -(a::FqPolyRepAbsPowerSeriesRingElem, b::FqPolyRepAbsPowerSeriesRingEle
   check_parent(a, b)
   lena = length(a)
   lenb = length(b)
-  prec = min(a.prec, b.prec)
+  prec = min(precision(a), precision(b))
   lena = min(lena, prec)
   lenb = min(lenb, prec)
   lenz = max(lena, lenb)
@@ -200,7 +200,7 @@ function *(a::FqPolyRepAbsPowerSeriesRingElem, b::FqPolyRepAbsPowerSeriesRingEle
   lenb = length(b)
   aval = valuation(a)
   bval = valuation(b)
-  prec = min(a.prec + bval, b.prec + aval)
+  prec = min(precision(a) + bval, precision(b) + aval)
   prec = min(prec, max_precision(parent(a)))
   lena = min(lena, prec)
   lenb = min(lenb, prec)
@@ -239,9 +239,9 @@ function shift_left(x::FqPolyRepAbsPowerSeriesRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
   xlen = length(x)
   z = parent(x)()
-  z.prec = x.prec + len
-  z.prec = min(z.prec, max_precision(parent(x)))
-  zlen = min(z.prec, xlen + len)
+  z.prec = precision(x) + len
+  z.prec = min(precision(z), max_precision(parent(x)))
+  zlen = min(precision(z), xlen + len)
   @ccall libflint.fq_poly_shift_left(z::Ref{FqPolyRepAbsPowerSeriesRingElem}, x::Ref{FqPolyRepAbsPowerSeriesRingElem}, len::Int, base_ring(x)::Ref{FqPolyRepField})::Nothing
   @ccall libflint.fq_poly_set_trunc(z::Ref{FqPolyRepAbsPowerSeriesRingElem}, z::Ref{FqPolyRepAbsPowerSeriesRingElem}, zlen::Int, base_ring(x)::Ref{FqPolyRepField})::Nothing
   return z
@@ -252,9 +252,9 @@ function shift_right(x::FqPolyRepAbsPowerSeriesRingElem, len::Int)
   xlen = length(x)
   z = parent(x)()
   if len >= xlen
-    z.prec = max(0, x.prec - len)
+    z.prec = max(0, precision(x) - len)
   else
-    z.prec = x.prec - len
+    z.prec = precision(x) - len
     @ccall libflint.fq_poly_shift_right(z::Ref{FqPolyRepAbsPowerSeriesRingElem}, x::Ref{FqPolyRepAbsPowerSeriesRingElem}, len::Int, base_ring(x)::Ref{FqPolyRepField})::Nothing
   end
   return z
@@ -291,7 +291,7 @@ function ^(a::FqPolyRepAbsPowerSeriesRingElem, b::Int)
   if precision(a) > 0 && is_gen(a) && b > 0
     return shift_left(a, b - 1)
   elseif length(a) == 1
-    return parent(a)([coeff(a, 0)^b], 1, a.prec)
+    return parent(a)([coeff(a, 0)^b], 1, precision(a))
   elseif b == 0
     z = one(parent(a))
     z = set_precision!(z, precision(a))
@@ -321,7 +321,7 @@ end
 
 function ==(x::FqPolyRepAbsPowerSeriesRingElem, y::FqPolyRepAbsPowerSeriesRingElem)
   check_parent(x, y)
-  prec = min(x.prec, y.prec)
+  prec = min(precision(x), precision(y))
   n = max(length(x), length(y))
   n = min(n, prec)
   return Bool(@ccall libflint.fq_poly_equal_trunc(x::Ref{FqPolyRepAbsPowerSeriesRingElem}, y::Ref{FqPolyRepAbsPowerSeriesRingElem}, n::Int, base_ring(x)::Ref{FqPolyRepField})::Cint)
@@ -331,7 +331,7 @@ function isequal(x::FqPolyRepAbsPowerSeriesRingElem, y::FqPolyRepAbsPowerSeriesR
   if parent(x) != parent(y)
     return false
   end
-  if x.prec != y.prec || length(x) != length(y)
+  if precision(x) != precision(y) || length(x) != length(y)
     return false
   end
   return Bool(@ccall libflint.fq_poly_equal(x::Ref{FqPolyRepAbsPowerSeriesRingElem}, y::Ref{FqPolyRepAbsPowerSeriesRingElem}, base_ring(x)::Ref{FqPolyRepField})::Cint)
@@ -393,7 +393,7 @@ function divexact(x::FqPolyRepAbsPowerSeriesRingElem, y::FqPolyRepAbsPowerSeries
     end
   end
   check && !is_unit(y) && error("Unable to invert power series")
-  prec = min(x.prec, y.prec - v2 + v1)
+  prec = min(precision(x), precision(y) - v2 + v1)
   z = parent(x)()
   z.prec = prec
   @ccall libflint.fq_poly_div_series(z::Ref{FqPolyRepAbsPowerSeriesRingElem}, x::Ref{FqPolyRepAbsPowerSeriesRingElem}, y::Ref{FqPolyRepAbsPowerSeriesRingElem}, prec::Int, base_ring(x)::Ref{FqPolyRepField})::Nothing
@@ -425,7 +425,7 @@ function inv(a::FqPolyRepAbsPowerSeriesRingElem)
   !is_unit(a) && error("Unable to invert power series")
   ainv = parent(a)()
   ainv.prec = a.prec
-  @ccall libflint.fq_poly_inv_series(ainv::Ref{FqPolyRepAbsPowerSeriesRingElem}, a::Ref{FqPolyRepAbsPowerSeriesRingElem}, a.prec::Int, base_ring(a)::Ref{FqPolyRepField})::Nothing
+  @ccall libflint.fq_poly_inv_series(ainv::Ref{FqPolyRepAbsPowerSeriesRingElem}, a::Ref{FqPolyRepAbsPowerSeriesRingElem}, precision(a)::Int, base_ring(a)::Ref{FqPolyRepField})::Nothing
   return ainv
 end
 
@@ -468,7 +468,7 @@ function sqrt_classical(a::FqPolyRepAbsPowerSeriesRingElem; check::Bool=true)
   end
   v = valuation(a)
   z = S()
-  z.prec = a.prec - div(v, 2)
+  z.prec = precision(a) - div(v, 2)
   if iszero(a)
     return true, z
   end
@@ -486,8 +486,8 @@ function sqrt_classical(a::FqPolyRepAbsPowerSeriesRingElem; check::Bool=true)
     s = sqrt(c; check=check)
   end
   a = divexact(a, c)
-  z.prec = a.prec - div(v, 2)
-  @ccall libflint.fq_poly_sqrt_series(z::Ref{FqPolyRepAbsPowerSeriesRingElem}, a::Ref{FqPolyRepAbsPowerSeriesRingElem}, a.prec::Int, base_ring(a)::Ref{FqPolyRepField})::Nothing
+  z.prec = precision(a) - div(v, 2)
+  @ccall libflint.fq_poly_sqrt_series(z::Ref{FqPolyRepAbsPowerSeriesRingElem}, a::Ref{FqPolyRepAbsPowerSeriesRingElem}, precision(a)::Int, base_ring(a)::Ref{FqPolyRepField})::Nothing
   if !isone(s)
     z *= s
   end
@@ -520,13 +520,13 @@ end
 
 function zero!(z::FqPolyRepAbsPowerSeriesRingElem)
   @ccall libflint.fq_poly_zero(z::Ref{FqPolyRepAbsPowerSeriesRingElem}, base_ring(z)::Ref{FqPolyRepField})::Nothing
-  z.prec = parent(z).prec_max
+  z.prec = max_precision(parent(z))
   return z
 end
 
 function one!(z::FqPolyRepAbsPowerSeriesRingElem)
   @ccall libflint.fq_poly_one(z::Ref{FqPolyRepAbsPowerSeriesRingElem}, base_ring(z)::Ref{FqPolyRepField})::Nothing
-  z.prec = parent(z).prec_max
+  z.prec = max_precision(parent(z))
   return z
 end
 
@@ -545,7 +545,7 @@ function mul!(z::FqPolyRepAbsPowerSeriesRingElem, a::FqPolyRepAbsPowerSeriesRing
   lenb = length(b)
   aval = valuation(a)
   bval = valuation(b)
-  prec = min(a.prec + bval, b.prec + aval)
+  prec = min(precision(a) + bval, precision(b) + aval)
   prec = min(prec, max_precision(parent(z)))
   lena = min(lena, prec)
   lenb = min(lenb, prec)
@@ -561,7 +561,7 @@ end
 function add!(c::FqPolyRepAbsPowerSeriesRingElem, a::FqPolyRepAbsPowerSeriesRingElem, b::FqPolyRepAbsPowerSeriesRingElem)
   lena = length(a)
   lenb = length(b)
-  prec = min(a.prec, b.prec)
+  prec = min(precision(a), precision(b))
   lena = min(lena, prec)
   lenb = min(lenb, prec)
   lenc = max(lena, lenb)
@@ -596,7 +596,7 @@ promote_rule(::Type{FqPolyRepAbsPowerSeriesRingElem}, ::Type{ZZRingElem}) = FqPo
 function (a::FqPolyRepAbsPowerSeriesRing)()
   ctx = base_ring(a)
   z = FqPolyRepAbsPowerSeriesRingElem(ctx)
-  z.prec = a.prec_max
+  z.prec = max_precision(a)
   z.parent = a
   return z
 end
@@ -613,9 +613,9 @@ function (a::FqPolyRepAbsPowerSeriesRing)(b::FqPolyRepFieldElem)
   ctx = base_ring(a)
   if iszero(b)
     z = FqPolyRepAbsPowerSeriesRingElem(ctx)
-    z.prec = a.prec_max
+    z.prec = max_precision(a)
   else
-    z = FqPolyRepAbsPowerSeriesRingElem(ctx, [b], 1, a.prec_max)
+    z = FqPolyRepAbsPowerSeriesRingElem(ctx, [b], 1, max_precision(a))
   end
   z.parent = a
   return z

@@ -783,9 +783,11 @@ function lift(R::ZZPolyRing, f::FqPolyRingElem)
     @ccall libflint.fmpz_poly_set_nmod_poly_unsigned(z::Ref{ZZPolyRingElem}, f::Ref{FqPolyRingElem})::Nothing
     return z
   else
-    @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_NMOD
+    @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_MOD
     z = R()
-    @ccall libflint.fmpz_mod_poly_get_fmpz_poly(z::Ref{ZZPolyRingElem}, f::Ref{FqPolyRingElem}, (pointer_from_objref(F) + 2 * sizeof(Cint))::Ptr{Nothing})::Nothing
+    GC.@preserve F begin
+      @ccall libflint.fmpz_mod_poly_get_fmpz_poly(z::Ref{ZZPolyRingElem}, f::Ref{FqPolyRingElem}, _fmpz_mod_ctx_ptr(F)::Ptr{fmpz_mod_ctx_struct})::Nothing
+    end
     return z
   end
 end
@@ -801,9 +803,9 @@ function QadicField(f::FqPolyRingElem, prec::Int = 64, var::String = "a"; cached
   absolute_degree(K) == 1 || throw(ArgumentError("base ring of polynomial must be a prime field"))
 
   z = get_cached!(QadicBaseFqPol, (base_field, f), cached) do
-    ctx_type = _fq_default_ctx_type(K)
-    @assert ctx_type in (_FQ_DEFAULT_NMOD, _FQ_DEFAULT_FMPZ_NMOD)
-    _K = ctx_type == _FQ_DEFAULT_NMOD ? _get_raw_type(fpField, K) : _get_raw_type(FpField, K)
+    T = raw_field_type(K)
+    @assert T in (fpField, FpField)
+    _K = _get_raw_type(T, K)
     ff = map_coefficients(c -> _K(lift(ZZ, c)), f; cached = false)
     return QadicField(ff, prec, var; cached = false, check = check, base_field = base_field)[1]
   end

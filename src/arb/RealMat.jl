@@ -468,8 +468,7 @@ function _solve_lu_precomp(P::Perm, LU::RealMatrix, y::RealMatrix)
   return z
 end
 
-Solve.matrix_normal_form_type(::RealField) = Solve.LUTrait()
-Solve.matrix_normal_form_type(::RealMatrix) = Solve.LUTrait()
+Solve.matrix_normal_form_type(::Type{RealField}) = Solve.LUTrait()
 
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::RealMatrix, b::RealMatrix, task::Symbol; side::Symbol = :left)
   nrows(A) != ncols(A) && error("Only implemented for square matrices")

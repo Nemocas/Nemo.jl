@@ -509,8 +509,7 @@ function _solve_lu_precomp(P::Perm, LU::AcbMatrix, y::AcbMatrix)
   return z
 end
 
-Solve.matrix_normal_form_type(::AcbField) = Solve.LUTrait()
-Solve.matrix_normal_form_type(::AcbMatrix) = Solve.LUTrait()
+Solve.matrix_normal_form_type(::Type{AcbField}) = Solve.LUTrait()
 
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::AcbMatrix, b::AcbMatrix, task::Symbol; side::Symbol = :left)
   nrows(A) != ncols(A) && error("Only implemented for square matrices")

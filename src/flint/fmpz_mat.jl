@@ -718,7 +718,7 @@ function hadamard_bound2(M::ZZMatrix)
       M_ptr = mat_entry_ptr(M, i, 1)
       for j in 1:n
         addmul!(r, M_ptr, M_ptr)
-        M_ptr += sizeof(ZZRingElem)
+        M_ptr += _entry_size(M)
       end
       if iszero(r)
         return r
@@ -744,7 +744,7 @@ function maximum(::typeof(nbits), M::ZZMatrixOrPtr)
         if !iszero(unsafe_load(reinterpret(Ptr{Int}, M_ptr)))
           mx = max(mx, nbits(M_ptr))
         end
-        M_ptr += sizeof(ZZRingElem)
+        M_ptr += _entry_size(M)
       end
     end
   end
@@ -1522,7 +1522,7 @@ function AbstractAlgebra.multiply_row!(A::ZZMatrix, s::Union{Int, TypeOrPtr{ZZRi
     i_ptr = mat_entry_ptr(A, i, c)
     for k = cols
       mul!(i_ptr, s, i_ptr)
-      i_ptr += sizeof(ZZRingElem)
+      i_ptr += _entry_size(A)
     end
   end
   return A
@@ -1552,8 +1552,8 @@ function AbstractAlgebra.add_row!(A::ZZMatrix, s::Union{TypeOrPtr{ZZRingElem}, I
     j_ptr = mat_entry_ptr(A, j, c)
     for k = cols
       addmul!(j_ptr, s, i_ptr)
-      i_ptr += sizeof(ZZRingElem)
-      j_ptr += sizeof(ZZRingElem)
+      i_ptr += _entry_size(A)
+      j_ptr += _entry_size(A)
     end
   end
   return A
@@ -1580,8 +1580,7 @@ end
 #
 ###############################################################################
 
-Solve.matrix_normal_form_type(::ZZRing) = Solve.HermiteFormTrait()
-Solve.matrix_normal_form_type(::ZZMatrix) = Solve.HermiteFormTrait()
+Solve.matrix_normal_form_type(::Type{ZZRing}) = Solve.HermiteFormTrait()
 
 function Solve._can_solve_internal_no_check(::Solve.HermiteFormTrait, A::ZZMatrix, b::ZZMatrix, task::Symbol; side::Symbol = :left)
   if side === :left
@@ -1616,7 +1615,7 @@ function Solve._can_solve_internal_no_check(::Solve.HermiteFormTrait, A::ZZMatri
             b_ptr = mat_entry_ptr(b, h, i)
             mul!(t, q, H_ptr)
             sub!(b_ptr, b_ptr, t)
-            H_ptr += sizeof(ZZRingElem)
+            H_ptr += _entry_size(H)
           end
         end
       end
@@ -1667,8 +1666,8 @@ function Base.cat(A::ZZMatrix...;dims)
         X_ptr = mat_entry_ptr(X, start_row + k, start_col+1)
         for l = 1:ncols(Ai)
           set!(X_ptr, A_ptr)
-          X_ptr += sizeof(ZZRingElem)
-          A_ptr += sizeof(ZZRingElem)
+          X_ptr += _entry_size(X)
+          A_ptr += _entry_size(Ai)
         end
       end
     end
@@ -1696,8 +1695,8 @@ function AbstractAlgebra._vcat(A::AbstractVector{ZZMatrix})
         N_ptr = mat_entry_ptr(N, j, 1)
         for k in 1:ncols(N)
           set!(M_ptr, N_ptr)
-          M_ptr += sizeof(ZZRingElem)
-          N_ptr += sizeof(ZZRingElem)
+          M_ptr += _entry_size(M)
+          N_ptr += _entry_size(N)
         end
       end
     end
@@ -1725,8 +1724,8 @@ function AbstractAlgebra._hcat(A::AbstractVector{ZZMatrix})
         N_ptr = mat_entry_ptr(N, j, 1)
         for k in 1:ncols(N)
           set!(M_ptr, N_ptr)
-          M_ptr += sizeof(ZZRingElem)
-          N_ptr += sizeof(ZZRingElem)
+          M_ptr += _entry_size(M)
+          N_ptr += _entry_size(N)
         end
       end
     end
@@ -1790,8 +1789,8 @@ function AbstractAlgebra._solve_triu_left(U::ZZMatrix, b::ZZMatrix; unipotent::B
       X_p = mat_entry_ptr(X, i, 1)
       for j = 1:n
         set!(tmp_p, X_p)
-        X_p += sizeof(ZZRingElem)
-        tmp_p += sizeof(ZZRingElem)
+        X_p += _entry_size(X)
+        tmp_p += _entry_size(tmp)
       end
       for j = 1:n
         zero!(s)
@@ -1800,7 +1799,7 @@ function AbstractAlgebra._solve_triu_left(U::ZZMatrix, b::ZZMatrix; unipotent::B
         for k = 1:j-1
           U_p = mat_entry_ptr(U, k, j)
           addmul!(s, U_p, tmp_p)
-          tmp_p += sizeof(ZZRingElem)
+          tmp_p += _entry_size(tmp)
         end
         sub!(s, mat_entry_ptr(b, i, j), s)
         if unipotent
@@ -1813,8 +1812,8 @@ function AbstractAlgebra._solve_triu_left(U::ZZMatrix, b::ZZMatrix; unipotent::B
       X_p = mat_entry_ptr(X, i, 1)
       for j = 1:n
         set!(X_p, tmp_p)
-        X_p += sizeof(ZZRingElem)
-        tmp_p += sizeof(ZZRingElem)
+        X_p += _entry_size(X)
+        tmp_p += _entry_size(tmp)
       end
     end
   end
@@ -1841,7 +1840,7 @@ function AbstractAlgebra._solve_triu(U::ZZMatrix, b::ZZMatrix; side::Symbol=:lef
       for j = 1:n
         X_ptr = mat_entry_ptr(X, j, i)
         set!(tmp_ptr, X_ptr)
-        tmp_ptr += sizeof(ZZRingElem)
+        tmp_ptr += _entry_size(tmp)
       end
       # At this point tmp is full of zeroes
       for j = n:-1:1 # j indexes the rows (in i-th column)
@@ -1850,7 +1849,7 @@ function AbstractAlgebra._solve_triu(U::ZZMatrix, b::ZZMatrix; side::Symbol=:lef
         for k = j + 1:n
           U_ptr = mat_entry_ptr(U, j, k)
           addmul!(s, U_ptr, tmp_ptr)
-          tmp_ptr += sizeof(ZZRingElem)
+          tmp_ptr += _entry_size(tmp)
           #           s = addmul!(s, U[j, k], tmp[k])
         end
         b_ptr = mat_entry_ptr(b, j, i)
@@ -1869,7 +1868,7 @@ function AbstractAlgebra._solve_triu(U::ZZMatrix, b::ZZMatrix; side::Symbol=:lef
       for j = 1:n
         X_ptr = mat_entry_ptr(X, j, i)
         set!(X_ptr, tmp_ptr)
-        tmp_ptr += sizeof(ZZRingElem)
+        tmp_ptr += _entry_size(tmp)
       end
     end
   end
@@ -1898,7 +1897,7 @@ function AbstractAlgebra._solve_tril!(X::ZZMatrix, L::ZZMatrix, B::ZZMatrix; uni
         for k = 1:j-1
           X_ptr = mat_entry_ptr(X, k, i)
           mul!(s, X_ptr, L_ptr)
-          L_ptr += sizeof(ZZRingElem)
+          L_ptr += _entry_size(L)
           sub!(t, t, s)
         end
         if unipotent
@@ -2143,8 +2142,9 @@ function _very_unsafe_convert(::Type{ZZMatrix}, a::Vector{ZZRingElem}, row = tru
   # a must be GC.@preserved
   # row = true -> make it a row
   # row = false -> make it a column
+  # the matrix owns nothing, the returned vector holds its entries
   M = Nemo.@new_struct(ZZMatrix)
-  Me = zeros(Int, length(a))
+  Me = [x.d for x in a]
   M.entries = reinterpret(Ptr{ZZRingElem}, pointer(Me))
   if row
     M.r = 1
@@ -2154,9 +2154,6 @@ function _very_unsafe_convert(::Type{ZZMatrix}, a::Vector{ZZRingElem}, row = tru
     M.r = length(a)
     M.c = 1
     M.stride = M.c
-  end
-  for i in 1:length(a)
-    Me[i] = a[i].d
   end
   return M, Me
 end
@@ -2183,7 +2180,7 @@ function mul!(z::Vector{ZZRingElem}, a::ZZMatrixOrPtr, b::Vector{ZZRingElem})
     GC.@preserve dk1 dk3 begin
       mul!(zz, a, bb)
       for i in 1:length(z)
-        z[i].d = unsafe_load(zz.entries, i).d
+        z[i].d = dk3[i]
       end
     end
   end
@@ -2201,7 +2198,7 @@ function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::ZZMatrixOrPtr)
     GC.@preserve dk1 dk3 begin
       mul!(zz, aa, b)
       for i in 1:length(z)
-        z[i].d = unsafe_load(zz.entries, i).d
+        z[i].d = dk3[i]
       end
     end
   end
@@ -2271,7 +2268,7 @@ function map_entries(R::zzModRing, A::ZZMatrix)
 end
 
 function map_entries!(R::zzModRing, N::zzModMatrix, A::ZZMatrix)
-  @ccall libflint.nmod_mat_set_mod(N::Ref{zzModMatrix}, R.n::UInt)::Cvoid
+  _set_mod!(N, R)
   @ccall libflint.fmpz_mat_get_nmod_mat(N::Ref{zzModMatrix}, A::Ref{ZZMatrix})::Cvoid
   N.base_ring = R  # exploiting that the internal repr is the indep of char
   return N
@@ -2284,7 +2281,7 @@ function map_entries(R::fpField, A::ZZMatrix)
 end
 
 function map_entries!(R::fpField, N::fpMatrix, A::ZZMatrix)
-  @ccall libflint.nmod_mat_set_mod(N::Ref{fpMatrix}, R.n::UInt)::Cvoid
+  _set_mod!(N, R)
   @ccall libflint.fmpz_mat_get_nmod_mat(N::Ref{fpMatrix}, A::Ref{ZZMatrix})::Cvoid
   N.base_ring = R  # exploiting that the internal repr is the indep of char
   return N

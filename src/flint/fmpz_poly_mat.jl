@@ -54,8 +54,7 @@ end
   GC.@preserve A begin
     x = mat_entry_ptr(A, i, j)
     # fmpz_poly_is_zero is an inline C function that checks length == 0
-    # length is the 3rd field of fmpz_poly_struct (at offset 2*sizeof(Int))
-    return unsafe_load(Ptr{Int}(x), 3) == 0
+    return _unsafe_load_field(x, Val(:length)) == 0
   end
 end
 

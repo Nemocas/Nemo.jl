@@ -196,7 +196,7 @@ const _FQ_DEFAULT_FQ_ZECH   = 1
 const _FQ_DEFAULT_FQ_NMOD   = 2
 const _FQ_DEFAULT_FQ        = 3
 const _FQ_DEFAULT_NMOD      = 4
-const _FQ_DEFAULT_FMPZ_NMOD = 5
+const _FQ_DEFAULT_FMPZ_MOD  = 5
 
 mutable struct CanonicalFqDefaultMap{T}# <: Map{FqField, T, SetMap, CanonicalFqDefaultMap}
   D::FqField
@@ -220,15 +220,48 @@ function _fq_default_ctx_type(F::FqField)
   return @ccall libflint.fq_default_ctx_type(F::Ref{FqField})::Cint
 end
 
+# `FQ_DEFAULT_CTX_FMPZ_MOD`: the first data word of the gr context points to
+# the `fmpz_mod_ctx_struct`. Only valid while `F` is kept alive.
+function _fmpz_mod_ctx_ptr(F::FqField)
+  @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_MOD
+  return unsafe_load(Ptr{Ptr{fmpz_mod_ctx_struct}}(pointer_from_objref(F)))
+end
+
+@doc raw"""
+    raw_field_type(F::FqField)
+
+Return the native Nemo type of the field FLINT uses to represent `F`:
+`fpField`, `FpField`, `fqPolyRepField` or `FqPolyRepField`. Return `nothing`
+for FLINT's Zech logarithm representation, which has no Nemo type.
+
+# Examples
+
+```jldoctest
+julia> Nemo.raw_field_type(GF(7))
+fpField
+
+julia> Nemo.raw_field_type(GF(ZZ(2)^127 - 1, 2))
+FqPolyRepField
+```
+"""
+function raw_field_type(F::FqField)
+  t = _fq_default_ctx_type(F)
+  t == _FQ_DEFAULT_FQ_NMOD && return fqPolyRepField
+  t == _FQ_DEFAULT_FQ && return FqPolyRepField
+  t == _FQ_DEFAULT_NMOD && return fpField
+  t == _FQ_DEFAULT_FMPZ_MOD && return FpField
+  return nothing
+end
+
 function _get_raw_type(::Type{fqPolyRepField}, F::FqField)
-  @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FQ_NMOD
+  @assert raw_field_type(F) === fqPolyRepField
   Rx, _ = polynomial_ring(Native.GF(UInt(characteristic(F))), :x, cached = false)
   m = map_coefficients(x -> _coeff(x, 0), defining_polynomial(F), parent = Rx)
   return fqPolyRepField(m, :$, false)
 end
 
 function _get_raw_type(::Type{FqPolyRepField}, F::FqField)
-  @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FQ
+  @assert raw_field_type(F) === FqPolyRepField
   Rx, _ = polynomial_ring(Native.GF(characteristic(F)), :x, cached = false)
   m = map_coefficients(x -> _coeff(x, 0), defining_polynomial(F), parent = Rx)
   return FqPolyRepField(m, :$, false)
@@ -240,12 +273,12 @@ function canonical_raw_type(::Type{T}, F::FqField) where {T}
 end
 
 function _get_raw_type(::Type{fpField}, F::FqField)
-  @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_NMOD
+  @assert raw_field_type(F) === fpField
   return Native.GF(UInt(order(F)), cached = false)
 end
 
 function _get_raw_type(::Type{FpField}, F::FqField)
-  @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_NMOD
+  @assert raw_field_type(F) === FpField
   return Native.GF(order(F), cached = false)
 end
 

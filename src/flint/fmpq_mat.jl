@@ -546,10 +546,9 @@ function _solve_dixon(a::QQMatrix, b::QQMatrix)
 end
 
 # Actually we use a modular algorithm in flint...
-Solve.matrix_normal_form_type(::QQField) = Solve.RREFTrait()
-Solve.matrix_normal_form_type(::QQMatrix) = Solve.RREFTrait()
+Solve.matrix_normal_form_type(::Type{QQField}) = Solve.RREFTrait()
 
-function Solve.solve_context_type(::QQField)
+function Solve.solve_context_type(::Type{QQField})
   return Solve.solve_context_type(Solve.FFLUTrait(), QQFieldElem)
 end
 

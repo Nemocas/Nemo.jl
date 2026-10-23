@@ -26,7 +26,7 @@ base_ring(a::ZZMPolyRing) = ZZ
 
 function internal_ordering(a::ZZMPolyRing)
   b = @ccall libflint.fmpz_mpoly_ctx_ord(a::Ref{ZZMPolyRing})::Cint
-  return flint_orderings[b + 1]
+  return _flint_ordering_symbol(b)
 end
 
 function gens(R::ZZMPolyRing)

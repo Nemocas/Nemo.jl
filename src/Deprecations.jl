@@ -7,6 +7,8 @@
 # ALL aliases here are only a temporary measure to allow for a smooth transition downstream.
 # they will be replaced by deprecations eventually
 
+const _FQ_DEFAULT_FMPZ_NMOD = _FQ_DEFAULT_FMPZ_MOD # used by Hecke
+
 ###############################################################################
 #
 #   Deprecated bindings

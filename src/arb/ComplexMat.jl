@@ -507,8 +507,7 @@ function _solve_lu_precomp(P::Perm, LU::ComplexMatrix, y::ComplexMatrix)
   return z
 end
 
-Solve.matrix_normal_form_type(::ComplexField) = Solve.LUTrait()
-Solve.matrix_normal_form_type(::ComplexMatrix) = Solve.LUTrait()
+Solve.matrix_normal_form_type(::Type{ComplexField}) = Solve.LUTrait()
 
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::ComplexMatrix, b::ComplexMatrix, task::Symbol; side::Symbol = :left)
   nrows(A) != ncols(A) && error("Only implemented for square matrices")
