@@ -139,24 +139,18 @@ end
 ################################################################################
 
 function +(x::T, y::T) where T <: Zmodn_poly
-  check_parent(x,y)
-  z = parent(x)()
-  @ccall libflint.nmod_poly_add(z::Ref{T}, x::Ref{T}, y::Ref{T})::Nothing
-  return z
+  check_parent(x, y)
+  return add!(parent(x)(), x, y)
 end
 
 function -(x::T, y::T) where T <: Zmodn_poly
-  check_parent(x,y)
-  z = parent(x)()
-  @ccall libflint.nmod_poly_sub(z::Ref{T}, x::Ref{T}, y::Ref{T})::Nothing
-  return z
+  check_parent(x, y)
+  return sub!(parent(x)(), x, y)
 end
 
 function *(x::T, y::T) where T <: Zmodn_poly
-  check_parent(x,y)
-  z = parent(x)()
-  @ccall libflint.nmod_poly_mul(z::Ref{T}, x::Ref{T}, y::Ref{T})::Nothing
-  return z
+  check_parent(x, y)
+  return mul!(parent(x)(), x, y)
 end
 
 ###############################################################################

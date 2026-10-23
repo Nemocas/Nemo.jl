@@ -243,22 +243,19 @@ for (etype, rtype, ftype, ctype, utype) in (
     function +(a::($etype), b::($etype))
       check_parent(a, b)
       z = parent(a)()
-      @ccall libflint.nmod_mpoly_add(z::Ref{($etype)}, a::Ref{($etype)}, b::Ref{($etype)}, parent(a)::Ref{($rtype)})::Nothing
-      return z
+      return add!(z, a, b)
     end
 
     function -(a::($etype), b::($etype))
       check_parent(a, b)
       z = parent(a)()
-      @ccall libflint.nmod_mpoly_sub(z::Ref{($etype)}, a::Ref{($etype)}, b::Ref{($etype)}, parent(a)::Ref{($rtype)})::Nothing
-      return z
+      return sub!(z, a, b)
     end
 
     function *(a::($etype), b::($etype))
       check_parent(a, b)
       z = parent(a)()
-      @ccall libflint.nmod_mpoly_mul(z::Ref{($etype)}, a::Ref{($etype)}, b::Ref{($etype)}, parent(a)::Ref{($rtype)})::Nothing
-      return z
+      return mul!(z, a, b)
     end
 
     ###############################################################################
@@ -608,6 +605,11 @@ for (etype, rtype, ftype, ctype, utype) in (
 
     function mul!(a::($etype), b::($etype), c::($etype))
       @ccall libflint.nmod_mpoly_mul(a::Ref{($etype)}, b::Ref{($etype)}, c::Ref{($etype)}, parent(a)::Ref{($rtype)})::Nothing
+      return a
+    end
+
+    function sub!(a::($etype), b::($etype), c::($etype))
+      @ccall libflint.nmod_mpoly_sub(a::Ref{($etype)}, b::Ref{($etype)}, c::Ref{($etype)}, parent(a)::Ref{($rtype)})::Nothing
       return a
     end
 

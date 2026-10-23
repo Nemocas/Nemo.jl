@@ -251,25 +251,19 @@ end
 ################################################################################
 
 function +(x::T, y::T) where T <: Zmod_fmpz_mat
-  check_parent(x,y)
-  z = similar(x)
-  @ccall libflint.fmpz_mod_mat_add(z::Ref{T}, x::Ref{T}, y::Ref{T}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
+  check_parent(x, y)
+  return add!(similar(x), x, y)
 end
 
 function -(x::T, y::T) where T <: Zmod_fmpz_mat
-  check_parent(x,y)
-  z = similar(x)
-  @ccall libflint.fmpz_mod_mat_sub(z::Ref{T}, x::Ref{T}, y::Ref{T}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
+  check_parent(x, y)
+  return sub!(similar(x), x, y)
 end
 
 function *(x::T, y::T) where T <: Zmod_fmpz_mat
   (base_ring(x) != base_ring(y)) && error("Base ring must be equal")
   (ncols(x) != nrows(y)) && error("Dimensions are wrong")
-  z = similar(x, nrows(x), ncols(y))
-  @ccall libflint.fmpz_mod_mat_mul(z::Ref{T}, x::Ref{T}, y::Ref{T}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
+  return mul!(similar(x, nrows(x), ncols(y)), x, y)
 end
 
 
@@ -358,19 +352,11 @@ end
 #
 ################################################################################
 
-function *(x::T, y::Int) where T <: Zmod_fmpz_mat
-  z = similar(x)
-  @ccall libflint.fmpz_mod_mat_scalar_mul_si(z::Ref{T}, x::Ref{T}, y::Int, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
-end
+*(x::T, y::Int) where T <: Zmod_fmpz_mat = mul!(similar(x), x, y)
 
 *(x::Int, y::T) where T <: Zmod_fmpz_mat = y*x
 
-function *(x::T, y::ZZRingElem) where T <: Zmod_fmpz_mat
-  z = similar(x)
-  @ccall libflint.fmpz_mod_mat_scalar_mul_fmpz(z::Ref{T}, x::Ref{T}, y::Ref{ZZRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return z
-end
+*(x::T, y::ZZRingElem) where T <: Zmod_fmpz_mat = mul!(similar(x), x, y)
 
 *(x::ZZRingElem, y::T) where T <: Zmod_fmpz_mat = y*x
 

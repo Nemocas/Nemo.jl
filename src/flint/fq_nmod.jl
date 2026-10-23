@@ -182,23 +182,17 @@ pretty_eq(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem) = (x == y)
 
 function +(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
   check_parent(x, y)
-  z = parent(y)()
-  @ccall libflint.fq_nmod_add(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, parent(y)::Ref{fqPolyRepField})::Nothing
-  return z
+  return add!(parent(y)(), x, y)
 end
 
 function -(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
   check_parent(x, y)
-  z = parent(y)()
-  @ccall libflint.fq_nmod_sub(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, parent(y)::Ref{fqPolyRepField})::Nothing
-  return z
+  return sub!(parent(y)(), x, y)
 end
 
 function *(x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
   check_parent(x, y)
-  z = parent(y)()
-  @ccall libflint.fq_nmod_mul(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, parent(y)::Ref{fqPolyRepField})::Nothing
-  return z
+  return mul!(parent(y)(), x, y)
 end
 
 ###############################################################################
@@ -475,6 +469,11 @@ end
 
 function add!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
   @ccall libflint.fq_nmod_add(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, parent(x)::Ref{fqPolyRepField})::Nothing
+  return z
+end
+
+function sub!(z::fqPolyRepFieldElem, x::fqPolyRepFieldElem, y::fqPolyRepFieldElem)
+  @ccall libflint.fq_nmod_sub(z::Ref{fqPolyRepFieldElem}, x::Ref{fqPolyRepFieldElem}, y::Ref{fqPolyRepFieldElem}, parent(x)::Ref{fqPolyRepField})::Nothing
   return z
 end
 

@@ -230,11 +230,7 @@ end
 #
 ###############################################################################
 
-function -(a::ZZMPolyRingElem)
-  z = parent(a)()
-  @ccall libflint.fmpz_mpoly_neg(z::Ref{ZZMPolyRingElem}, a::Ref{ZZMPolyRingElem}, parent(a)::Ref{ZZMPolyRing})::Nothing
-  return z
-end
+-(a::ZZMPolyRingElem) = neg!(parent(a)(), a)
 
 function +(a::ZZMPolyRingElem, b::ZZMPolyRingElem)
   check_parent(a, b)

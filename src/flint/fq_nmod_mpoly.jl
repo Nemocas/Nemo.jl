@@ -231,22 +231,19 @@ end
 function +(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
   check_parent(a, b)
   z = parent(a)()
-  @ccall libflint.fq_nmod_mpoly_add(z::Ref{fqPolyRepMPolyRingElem}, a::Ref{fqPolyRepMPolyRingElem}, b::Ref{fqPolyRepMPolyRingElem}, parent(a)::Ref{fqPolyRepMPolyRing})::Nothing
-  return z
+  return add!(z, a, b)
 end
 
 function -(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
   check_parent(a, b)
   z = parent(a)()
-  @ccall libflint.fq_nmod_mpoly_sub(z::Ref{fqPolyRepMPolyRingElem}, a::Ref{fqPolyRepMPolyRingElem}, b::Ref{fqPolyRepMPolyRingElem}, parent(a)::Ref{fqPolyRepMPolyRing})::Nothing
-  return z
+  return sub!(z, a, b)
 end
 
 function *(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem)
   check_parent(a, b)
   z = parent(a)()
-  @ccall libflint.fq_nmod_mpoly_mul(z::Ref{fqPolyRepMPolyRingElem}, a::Ref{fqPolyRepMPolyRingElem}, b::Ref{fqPolyRepMPolyRingElem}, parent(a)::Ref{fqPolyRepMPolyRing})::Nothing
-  return z
+  return mul!(z, a, b)
 end
 
 ###############################################################################
@@ -561,6 +558,11 @@ end
 
 function mul!(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem, c::fqPolyRepMPolyRingElem)
   @ccall libflint.fq_nmod_mpoly_mul(a::Ref{fqPolyRepMPolyRingElem}, b::Ref{fqPolyRepMPolyRingElem}, c::Ref{fqPolyRepMPolyRingElem}, parent(a)::Ref{fqPolyRepMPolyRing})::Nothing
+  return a
+end
+
+function sub!(a::fqPolyRepMPolyRingElem, b::fqPolyRepMPolyRingElem, c::fqPolyRepMPolyRingElem)
+  @ccall libflint.fq_nmod_mpoly_sub(a::Ref{fqPolyRepMPolyRingElem}, b::Ref{fqPolyRepMPolyRingElem}, c::Ref{fqPolyRepMPolyRingElem}, parent(a)::Ref{fqPolyRepMPolyRing})::Nothing
   return a
 end
 
