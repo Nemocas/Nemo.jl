@@ -174,6 +174,12 @@ end
 
 nmod_t(R::Union{zzModRing, fpField}) = nmod_t(R.n, R.ninv, R.norm)
 
+function nmod_t(n::UInt)
+  m = Ref{nmod_t}()
+  @ccall libflint.nmod_init(m::Ref{nmod_t}, n::UInt)::Nothing
+  return m[]
+end
+
 # ni needs to be an 'inverse' of n computing using :n_preinvert_limb in flint
 function mulmod(a::UInt, b::UInt, n::UInt, ni::UInt)
   return @ccall libflint.n_mulmod2_preinv(a::UInt, b::UInt, n::UInt, ni::UInt)::UInt

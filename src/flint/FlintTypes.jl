@@ -813,6 +813,22 @@ mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
   end
 end
 
+function _set_mod!(z::T, m::nmod_t) where {T <: Union{zzModPolyRingElem, fpPolyRingElem}}
+  @ccall libflint.nmod_poly_set_mod(z::Ref{T}, m::nmod_t)::Nothing
+  return z
+end
+
+_set_mod!(z::Union{zzModPolyRingElem, fpPolyRingElem}, R::Union{zzModRing, fpField}) = _set_mod!(z, nmod_t(R))
+
+_set_mod!(z::Union{zzModPolyRingElem, fpPolyRingElem}, n::UInt) = _set_mod!(z, nmod_t(n))
+
+# Moves `z` to the polynomial ring `P`, keeping the coefficients.
+function _set_mod!(z::Union{zzModPolyRingElem, fpPolyRingElem}, P::Union{zzModPolyRing, fpPolyRing})
+  _set_mod!(z, base_ring(P))
+  z.parent = P
+  return z
+end
+
 mutable struct gfp_poly_factor
   poly::Ptr{fpPolyRingElem}  # array of flint nmod_poly_struct's
   exp::Ptr{Int}
