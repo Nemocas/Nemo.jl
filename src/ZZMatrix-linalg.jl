@@ -320,8 +320,8 @@ function _induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; error_toler
         end
         Nemo.set!(A_ptr, n)
 
-        a_ptr += sizeof(ZZRingElem)
-        A_ptr += sizeof(ZZRingElem)
+        a_ptr += _entry_size(a)
+        A_ptr += _entry_size(A)
       end
     end
   end
@@ -566,17 +566,18 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
     # A*y: either direct as ZZMatrix or using CRT approach.
     # CHALLENGE: make the criterion for choosing the stategy smarter!!
     if ncols(_B) == 1
-      n = nrows(D.A)
+      A = D.A
+      n = nrows(A)
       GC.@preserve D d begin
         for i=1:n
           Ay_ptr = mat_entry_ptr(D.Ay, i, 1)
-          A_ptr = mat_entry_ptr(D.A, i, 1)
+          A_ptr = mat_entry_ptr(A, i, 1)
           d_ptr = mat_entry_ptr(d, i, 1)
           zero!(Ay_ptr)
           for j=1:n
             y_ptr = Nemo.mat_entry_ptr(D.y_mod, j, 1)
             addmul!(Ay_ptr, A_ptr, unsafe_load(y_ptr))
-            A_ptr += sizeof(ZZRingElem)
+            A_ptr += _entry_size(A)
           end
           sub!(d_ptr, d_ptr, Ay_ptr)
         end
@@ -807,7 +808,7 @@ end
 #saves essentially the allocation of A.rows
 #Edit: A.rows no longer exists, not sure if this is still useful
 function view!(A::ZZMatrix, B::ZZMatrix, r::UnitRange{Int}, ::Colon)
-  A.entries = B.entries + B.stride * sizeof(ZZRingElem) * (r.start - 1)
+  A.entries = B.entries + B.stride * _entry_size(B) * (r.start - 1)
   A.r = length(r)
   A.c = B.c
   A.stride = B.stride

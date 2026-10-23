@@ -40,6 +40,8 @@ function mat_entry_ptr(A::TypeOrPtr{T}, i::Int, j::Int) where {T <: FlintMatElem
   return _entries(A) + ((i - 1) * _stride(A) + (j - 1)) * _entry_size(T)
 end
 
+_entry_size(::TypeOrPtr{T}) where {T <: FlintMatElem} = _entry_size(T)
+
 ################################################################################
 #
 #  common functionality for views
