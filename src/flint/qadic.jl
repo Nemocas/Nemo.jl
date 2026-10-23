@@ -564,8 +564,8 @@ function log(a::QadicFieldElem)
   (av > 0 || av < 0 || iszero(a)) && throw(DomainError(a, "Valuation must be zero"))
   av = valuation(a-1)
   ctx = parent(a)
+  qm1 = _prime(ctx, degree(ctx)) - 1
   if av == 0
-    qm1 = _prime(ctx, degree(ctx)) - 1
     a = a^qm1
   end
 
