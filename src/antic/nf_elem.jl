@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-AbstractAlgebra.Solve.matrix_normal_form_type(::AbsSimpleNumField) = AbstractAlgebra.Solve.FFLUTrait()
+AbstractAlgebra.Solve.matrix_normal_form_type(::Type{AbsSimpleNumField}) = AbstractAlgebra.Solve.FFLUTrait()
 function AbstractAlgebra.Solve._common_denominator(A::MatElem{AbsSimpleNumFieldElem}) 
   return base_ring(A)(mapreduce(denominator, lcm, A; init = ZZ(1)))
 end
