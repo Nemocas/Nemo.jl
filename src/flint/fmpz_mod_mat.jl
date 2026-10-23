@@ -321,9 +321,10 @@ function mul!_flint(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::T) where T 
   return z
 end
 
+_use_mul!_flint(a::Zmod_fmpz_mat, len::Int, out::Int; vec_times_mat::Bool) = nrows(a) < 8
+
 function mul!(z::Vector{ZZRingElem}, a::T, b::Vector{ZZRingElem}) where T <: Zmod_fmpz_mat
-  # cutoff for the flint method
-  if nrows(a) < 8
+  if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)
     return mul!_flint(z, a, b)
   end
 
@@ -331,8 +332,7 @@ function mul!(z::Vector{ZZRingElem}, a::T, b::Vector{ZZRingElem}) where T <: Zmo
 end
 
 function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::T) where T <: Zmod_fmpz_mat
-  # cutoff for the flint method
-  if nrows(b) < 8
+  if _use_mul!_flint(b, nrows(b), ncols(b); vec_times_mat = true)
     return mul!_flint(z, a, b)
   end
 
@@ -361,8 +361,7 @@ for (T, E) in ((ZZModMatrix, ZZModRingElem), (FpMatrix, FpFieldElem))
     end
 
     function mul!(z::Vector{$E}, a::$T, b::Vector{$E})
-      # cutoff for the flint method
-      if nrows(a) < 8
+      if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)
         return mul!_flint(z, a, b)
       end
 
@@ -370,8 +369,7 @@ for (T, E) in ((ZZModMatrix, ZZModRingElem), (FpMatrix, FpFieldElem))
     end
 
     function mul!(z::Vector{$E}, a::Vector{$E}, b::$T)
-      # cutoff for the flint method
-      if nrows(b) < 8
+      if _use_mul!_flint(b, nrows(b), ncols(b); vec_times_mat = true)
         return mul!_flint(z, a, b)
       end
 

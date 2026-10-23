@@ -188,6 +188,9 @@ end
 # one-column matrix. That matrix borrows the entries: `_pack_entries(a)` copies
 # their C structs into a word vector, `_unpack_entries!(z, Me)` copies the
 # result back into `z`. The entries of `z` must not share objects.
+#
+# `_use_mul!_flint(a, len, out; vec_times_mat)` tells whether `mul!_flint` is
+# faster, for a vector of length `len` and a result of length `out`.
 
 function _very_unsafe_convert(::Type{S}, a::Vector, m::TypeOrPtr{T}; row::Bool) where {S <: FlintMatElem, T <: FlintMatElem}
   # a must be GC.@preserved

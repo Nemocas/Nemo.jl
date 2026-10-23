@@ -2159,9 +2159,10 @@ function mul!_flint(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::ZZMatrixOrP
   return z
 end
 
+_use_mul!_flint(a::ZZMatrixOrPtr, len::Int, out::Int; vec_times_mat::Bool) = nrows(a) < 50 && maximum(nbits, a) < 10
+
 function mul!(z::Vector{ZZRingElem}, a::ZZMatrixOrPtr, b::Vector{ZZRingElem})
-  # cutoff for the flint method
-  if nrows(a) < 50 && maximum(nbits, a) < 10
+  if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)
     return mul!_flint(z, a, b)
   end
 
@@ -2169,8 +2170,7 @@ function mul!(z::Vector{ZZRingElem}, a::ZZMatrixOrPtr, b::Vector{ZZRingElem})
 end
 
 function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::ZZMatrixOrPtr)
-  # cutoff for the flint method
-  if nrows(b) < 50 && maximum(nbits, b) < 10
+  if _use_mul!_flint(b, nrows(b), ncols(b); vec_times_mat = true)
     return mul!_flint(z, a, b)
   end
   return mul!_through_matrix(z, a, b)

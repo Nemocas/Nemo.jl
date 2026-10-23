@@ -880,9 +880,10 @@ function _unpack_entries!(z::Vector{QQFieldElem}, Me::Vector{Int})
   return z
 end
 
+_use_mul!_flint(a::QQMatrixOrPtr, len::Int, out::Int; vec_times_mat::Bool) = nrows(a) < 8
+
 function mul!(z::Vector{QQFieldElem}, a::Vector{QQFieldElem}, b::QQMatrixOrPtr)
-  # cutoff for the flint method
-  if nrows(b) < 8
+  if _use_mul!_flint(b, nrows(b), ncols(b); vec_times_mat = true)
     return mul!_flint(z, a, b)
   end
 
@@ -890,8 +891,7 @@ function mul!(z::Vector{QQFieldElem}, a::Vector{QQFieldElem}, b::QQMatrixOrPtr)
 end
 
 function mul!(z::Vector{QQFieldElem}, a::QQMatrixOrPtr, b::Vector{QQFieldElem})
-  # cutoff for the flint method
-  if nrows(a) < 8
+  if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)
     return mul!_flint(z, a, b)
   end
 
@@ -899,8 +899,7 @@ function mul!(z::Vector{QQFieldElem}, a::QQMatrixOrPtr, b::Vector{QQFieldElem})
 end
 
 function mul!(z::Vector{QQFieldElem}, a::Vector{ZZRingElem}, b::QQMatrixOrPtr)
-  # cutoff for the flint method
-  if nrows(b) < 8
+  if _use_mul!_flint(b, nrows(b), ncols(b); vec_times_mat = true)
     return mul!_flint(z, a, b)
   end
 
@@ -908,8 +907,7 @@ function mul!(z::Vector{QQFieldElem}, a::Vector{ZZRingElem}, b::QQMatrixOrPtr)
 end
 
 function mul!(z::Vector{QQFieldElem}, a::QQMatrixOrPtr, b::Vector{ZZRingElem})
-  # cutoff for the flint method
-  if nrows(a) < 8
+  if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)
     return mul!_flint(z, a, b)
   end
 

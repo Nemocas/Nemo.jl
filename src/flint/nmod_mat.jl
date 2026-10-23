@@ -249,10 +249,11 @@ function _unpack_entries!(z::Vector{UInt}, Me::Vector{UInt})
   return z
 end
 
+_use_mul!_flint(a::Zmodn_mat, len::Int, out::Int; vec_times_mat::Bool) = nrows(a) < 8
+
 # entries of b required to be in [0,n)
 function mul!(z::Vector{UInt}, a::T, b::Vector{UInt}) where T <: Zmodn_mat
-  # cutoff for the flint method
-  if nrows(a) < 8
+  if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)
     return mul!_flint(z, a, b)
   end
 
@@ -261,8 +262,7 @@ end
 
 # entries of a required to be in [0,n)
 function mul!(z::Vector{UInt}, a::Vector{UInt}, b::T) where T <: Zmodn_mat
-  # cutoff for the flint method
-  if nrows(b) < 8
+  if _use_mul!_flint(b, nrows(b), ncols(b); vec_times_mat = true)
     return mul!_flint(z, a, b)
   end
 
@@ -294,8 +294,7 @@ for (T, E) in ((zzModMatrix, zzModRingElem), (fpMatrix, fpFieldElem))
     end
 
     function mul!(z::Vector{$E}, a::$T, b::Vector{$E})
-      # cutoff for the flint method
-      if nrows(a) < 8
+      if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)
         return mul!_flint(z, a, b)
       end
 
@@ -303,8 +302,7 @@ for (T, E) in ((zzModMatrix, zzModRingElem), (fpMatrix, fpFieldElem))
     end
 
     function mul!(z::Vector{$E}, a::Vector{$E}, b::$T)
-      # cutoff for the flint method
-      if nrows(b) < 8
+      if _use_mul!_flint(b, nrows(b), ncols(b); vec_times_mat = true)
         return mul!_flint(z, a, b)
       end
 

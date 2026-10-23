@@ -293,9 +293,10 @@ function mul!_flint(z::Vector{FqFieldElem}, a::Vector{FqFieldElem}, b::FqMatrix)
   return z
 end
 
+_use_mul!_flint(a::FqMatrix, len::Int, out::Int; vec_times_mat::Bool) = nrows(a) < 2
+
 function mul!(z::Vector{FqFieldElem}, a::FqMatrix, b::Vector{FqFieldElem})
-  # cutoff for the flint method
-  if nrows(a) < 2
+  if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)
     return mul!_flint(z, a, b)
   end
 
@@ -303,8 +304,7 @@ function mul!(z::Vector{FqFieldElem}, a::FqMatrix, b::Vector{FqFieldElem})
 end
 
 function mul!(z::Vector{FqFieldElem}, a::Vector{FqFieldElem}, b::FqMatrix)
-  # cutoff for the flint method
-  if nrows(b) < 2
+  if _use_mul!_flint(b, nrows(b), ncols(b); vec_times_mat = true)
     return mul!_flint(z, a, b)
   end
 
