@@ -526,28 +526,22 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
         else
           xp = next_prime(D.p)
 #          @show ceil(Int, (sz - nbits(ppow))/60)
-          local Ap::fpMatrix
-          local Bp::fpMatrix
-          local nump::fpMatrix
-          local lhs::fpMatrix
-          local rhs::fpMatrix
+          # the modulus of these is reset for each prime
+          k = Nemo.fpField(xp, false)
+          Ap = zero_matrix(k, nrows(D.A), ncols(D.A))
+          Bp = zero_matrix(k, nrows(_B), ncols(_B))
+          nump = zero_matrix(k, nrows(num), ncols(num))
+          lhs = zero_matrix(k, nrows(D.A), ncols(num))
+          rhs = zero_matrix(k, nrows(_B), ncols(_B))
           for i=1:ceil(Int, (sz - nbits(ppow))/60)
             k = Nemo.fpField(xp, false)
-            if i == 1
-              Ap = map_entries(k, D.A)
-              Bp = map_entries(k, _B)
-              nump = map_entries(k, num)
-              lhs = Ap*nump
-              rhs = Bp*k(den)
-            else
-              map_entries!(k, Ap, D.A)
-              map_entries!(k, Bp, _B)
-              map_entries!(k, nump, num)
-              _unsafe_change_base_ring!(k, lhs)
-              mul!(lhs, Ap, nump)
-              _unsafe_change_base_ring!(k, rhs)
-              mul!(rhs, Bp, k(den))
-            end
+            map_entries!(k, Ap, D.A)
+            map_entries!(k, Bp, _B)
+            map_entries!(k, nump, num)
+            _unsafe_change_base_ring!(k, lhs)
+            mul!(lhs, Ap, nump)
+            _unsafe_change_base_ring!(k, rhs)
+            mul!(rhs, Bp, k(den))
             fl = lhs == rhs
             fl || break
             xp = next_prime(xp)

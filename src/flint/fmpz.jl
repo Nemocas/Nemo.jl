@@ -3258,9 +3258,7 @@ function rand(rng::AbstractRNG, a::ZZRingElemUnitRange)
   m < 0 && error("range empty")
   nd = ndigits(m, 2)
   nl, high = Base.divrem(nd, 8 * sizeof(Base.GMP.Limb))
-  if high > 0
-    mask = m >> (nl * 8 * sizeof(Base.GMP.Limb))
-  end
+  mask = m >> (nl * 8 * sizeof(Base.GMP.Limb))
   s = ZZRingElem(0)
   c = (8 * sizeof(Base.GMP.Limb))
   while true
