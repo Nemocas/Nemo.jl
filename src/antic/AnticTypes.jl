@@ -31,9 +31,9 @@ for some more specialized fields.
   powers::Ptr{Nothing}
   powers_len::Int
   traces_coeffs::Ptr{Nothing}
-  traces_den::Int
   traces_alloc::Int
   traces_length::Int
+  traces_den::Int
   flag::UInt
   pol::QQPolyRingElem
   S::Symbol
@@ -97,7 +97,7 @@ mutable struct AbsSimpleNumFieldElem <: SimpleNumFieldElem{QQFieldElem}
 end
 
 function _nf_elem_clear_fn(a::AbsSimpleNumFieldElem)
-  @ccall libflint.nf_elem_clear(a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_clear(a::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
 end
 
 

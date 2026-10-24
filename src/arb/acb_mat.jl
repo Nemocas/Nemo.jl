@@ -75,10 +75,6 @@ function one(x::AcbMatrixSpace)
   return one!(x())
 end
 
-number_of_rows(a::AcbMatrix) = a.r
-
-number_of_columns(a::AcbMatrix) = a.c
-
 function deepcopy_internal(x::AcbMatrix, dict::IdDict)
   z = similar(x)
   @ccall libflint.acb_mat_set(z::Ref{AcbMatrix}, x::Ref{AcbMatrix})::Nothing
@@ -99,8 +95,7 @@ end
 #
 ################################################################################
 
-function transpose(x::AcbMatrix)
-  z = similar(x, ncols(x), nrows(x))
+function transpose!(z::AcbMatrixOrPtr, x::AcbMatrixOrPtr)
   @ccall libflint.acb_mat_transpose(z::Ref{AcbMatrix}, x::Ref{AcbMatrix})::Nothing
   return z
 end
@@ -139,7 +134,7 @@ end
 ################################################################################
 
 function ^(x::AcbMatrix, y::UInt)
-  nrows(x) != ncols(x) && error("Matrix must be square")
+  check_square(x)
   z = similar(x)
   @ccall libflint.acb_mat_pow_ui(z::Ref{AcbMatrix}, x::Ref{AcbMatrix}, y::UInt, precision(base_ring(x))::Int)::Nothing
   return z
@@ -514,8 +509,7 @@ function _solve_lu_precomp(P::Perm, LU::AcbMatrix, y::AcbMatrix)
   return z
 end
 
-Solve.matrix_normal_form_type(::AcbField) = Solve.LUTrait()
-Solve.matrix_normal_form_type(::AcbMatrix) = Solve.LUTrait()
+Solve.matrix_normal_form_type(::Type{AcbField}) = Solve.LUTrait()
 
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::AcbMatrix, b::AcbMatrix, task::Symbol; side::Symbol = :left)
   nrows(A) != ncols(A) && error("Only implemented for square matrices")
@@ -804,8 +798,7 @@ end
 #
 ################################################################################
 
-@inline mat_entry_ptr(A::AcbMatrix, i::Int, j::Int) = 
-@ccall libflint.acb_mat_entry_ptr(A::Ref{AcbMatrix}, (i-1)::Int, (j-1)::Int)::Ptr{AcbFieldElem}
+_entry_size(::Type{AcbMatrix}) = sizeof(acb_struct)
 
 ###############################################################################
 #

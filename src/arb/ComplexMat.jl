@@ -73,10 +73,6 @@ function one(x::ComplexMatrixSpace)
   return one!(x())
 end
 
-number_of_rows(a::ComplexMatrix) = a.r
-
-number_of_columns(a::ComplexMatrix) = a.c
-
 function deepcopy_internal(x::ComplexMatrix, dict::IdDict)
   z = similar(x)
   @ccall libflint.acb_mat_set(z::Ref{ComplexMatrix}, x::Ref{ComplexMatrix})::Nothing
@@ -97,8 +93,7 @@ end
 #
 ################################################################################
 
-function transpose(x::ComplexMatrix)
-  z = similar(x, ncols(x), nrows(x))
+function transpose!(z::ComplexMatrixOrPtr, x::ComplexMatrixOrPtr)
   @ccall libflint.acb_mat_transpose(z::Ref{ComplexMatrix}, x::Ref{ComplexMatrix})::Nothing
   return z
 end
@@ -137,7 +132,7 @@ end
 ################################################################################
 
 function ^(x::ComplexMatrix, y::UInt)
-  nrows(x) != ncols(x) && error("Matrix must be square")
+  check_square(x)
   z = similar(x)
   @ccall libflint.acb_mat_pow_ui(z::Ref{ComplexMatrix}, x::Ref{ComplexMatrix}, y::UInt, precision(Balls)::Int)::Nothing
   return z
@@ -512,8 +507,7 @@ function _solve_lu_precomp(P::Perm, LU::ComplexMatrix, y::ComplexMatrix)
   return z
 end
 
-Solve.matrix_normal_form_type(::ComplexField) = Solve.LUTrait()
-Solve.matrix_normal_form_type(::ComplexMatrix) = Solve.LUTrait()
+Solve.matrix_normal_form_type(::Type{ComplexField}) = Solve.LUTrait()
 
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::ComplexMatrix, b::ComplexMatrix, task::Symbol; side::Symbol = :left)
   nrows(A) != ncols(A) && error("Only implemented for square matrices")
@@ -796,8 +790,7 @@ end
 #
 ################################################################################
 
-@inline mat_entry_ptr(A::ComplexMatrix, i::Int, j::Int) = 
-@ccall libflint.acb_mat_entry_ptr(A::Ref{ComplexMatrix}, (i-1)::Int, (j-1)::Int)::Ptr{ComplexFieldElem}
+_entry_size(::Type{ComplexMatrix}) = sizeof(acb_struct)
 
 
 

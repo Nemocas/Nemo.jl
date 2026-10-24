@@ -174,7 +174,7 @@ end
 function *(x::fpFieldElem, y::fpFieldElem)
   check_parent(x, y)
   R = parent(x)
-  d = mulmod(x.data, y.data, R.n, R.ninv)
+  d = _mulmod(x.data, y.data, R)
   return fpFieldElem(d, R)
 end
 
@@ -244,7 +244,7 @@ function ^(x::fpFieldElem, y::Int)
     x = inv(x)
     y = -y
   end
-  d = @ccall libflint.n_powmod2_preinv(UInt(x.data)::UInt, y::Int, R.n::UInt, R.ninv::UInt)::UInt
+  d = @ccall libflint.nmod_pow_ui(x.data::UInt, unsigned(y)::UInt, nmod_t(R)::nmod_t)::UInt
   return fpFieldElem(d, R)
 end
 
@@ -297,7 +297,7 @@ function divexact(x::fpFieldElem, y::fpFieldElem; check::Bool=true)
   y == 0 && throw(DivideError())
   R = parent(x)
   yinv = @ccall libflint.n_invmod(y.data::UInt, R.n::UInt)::UInt
-  d = mulmod(x.data, yinv, R.n, R.ninv)
+  d = _mulmod(x.data, yinv, R)
   return fpFieldElem(d, R)
 end
 
@@ -425,7 +425,7 @@ function (R::fpField)(a::Int)
     d += n
   end
   if d >= n
-    d = @ccall libflint.n_mod2_preinv(d::UInt, n::UInt, ninv::UInt)::UInt
+    d = mod2_preinv(d, n, ninv)
   end
   return fpFieldElem(d, R)
 end
@@ -433,7 +433,7 @@ end
 function (R::fpField)(a::UInt)
   n = R.n
   ninv = R.ninv
-  a = @ccall libflint.n_mod2_preinv(a::UInt, n::UInt, ninv::UInt)::UInt
+  a = mod2_preinv(a, n, ninv)
   return fpFieldElem(a, R)
 end
 

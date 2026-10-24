@@ -61,6 +61,12 @@ end
   A[2, 2] = x^3
   @test A[2, 2] == x^3
 
+  B = ZZPolyRingMatrix(matrix(R, [1 2 x; 3 4 x^2; 5 6 x^3]))
+  B[2:3, 1:2] = A
+  @test B == ZZPolyRingMatrix(matrix(R, [1 2 x; x+1 x x^2; x^2 x^3 x^3]))
+  @test_throws DimensionMismatch B[1:2, 1:3] = A
+  @test_throws BoundsError B[3:4, 1:2] = A
+
   # iszero / isone
   Z = ZZPolyRingMatrix(zero_matrix(R, 2, 2))
   @test iszero(Z)
@@ -166,6 +172,21 @@ end
   for i in 1:2, j in 1:3
     @test Bt[j, i] == B[i, j]
   end
+
+  Z = similar(B, 3, 2)
+  @test transpose!(Z, B) === Z
+  @test Z == Bt
+
+  D = ZZPolyRingMatrix(matrix(R, [1 x; 3 4]))
+  GC.@preserve D B begin
+    for (d, e) in ((D, B), (Ref(D), Ref(B)),
+                   (Ptr{ZZPolyRingMatrix}(pointer_from_objref(D)), Ptr{ZZPolyRingMatrix}(pointer_from_objref(B))))
+      @test transpose!(d) === d
+      @test D == ZZPolyRingMatrix(matrix(R, [1 3; x 4]))
+      transpose!(D)
+      @test_throws DomainError transpose!(e)
+    end
+  end
 end
 
 @testset "ZZPolyRingMatrix.det" begin
@@ -190,7 +211,7 @@ end
 
   # non-square throws
   C = ZZPolyRingMatrix(matrix(R, [x 1; x^2+1 x-1; R(1) x]))
-  @test_throws ArgumentError det(C)
+  @test_throws DomainError det(C)
 end
 
 @testset "ZZPolyRingMatrix.tr" begin
@@ -204,7 +225,7 @@ end
 
   # non-square throws
   C = ZZPolyRingMatrix(matrix(R, [x 1 x+2; x^2+1 x-1 3]))
-  @test_throws ArgumentError tr(C)
+  @test_throws DomainError tr(C)
 end
 
 @testset "ZZPolyRingMatrix.rank" begin

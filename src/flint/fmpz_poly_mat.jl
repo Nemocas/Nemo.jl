@@ -22,10 +22,6 @@ is_zero_initialized(::Type{ZZPolyRingMatrix}) = true
 #
 ###############################################################################
 
-@inline number_of_rows(a::ZZPolyRingMatrix) = a.r
-
-@inline number_of_columns(a::ZZPolyRingMatrix) = a.c
-
 function getindex!(v::ZZPolyRingElem, a::ZZPolyRingMatrix, r::Int, c::Int)
   @boundscheck _checkbounds(a, r, c)
   GC.@preserve a begin
@@ -58,16 +54,8 @@ end
   GC.@preserve A begin
     x = mat_entry_ptr(A, i, j)
     # fmpz_poly_is_zero is an inline C function that checks length == 0
-    # length is the 3rd field of fmpz_poly_struct (at offset 2*sizeof(Int))
-    return unsafe_load(Ptr{Int}(x), 3) == 0
+    return _unsafe_load_field(x, Val(:length)) == 0
   end
-end
-
-function setindex!(a::ZZPolyRingMatrix, b::ZZPolyRingMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
-  _checkbounds(a, r, c)
-  size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
-  A = view(a, r, c)
-  @ccall libflint.fmpz_poly_mat_set(A::Ref{ZZPolyRingMatrix}, b::Ref{ZZPolyRingMatrix})::Nothing
 end
 
 function deepcopy_internal(d::ZZPolyRingMatrix, dict::IdDict)
@@ -184,8 +172,7 @@ end
 #
 ###############################################################################
 
-function transpose(a::ZZPolyRingMatrix)
-  z = similar(a, ncols(a), nrows(a))
+function transpose!(z::ZZPolyRingMatrixOrPtr, a::ZZPolyRingMatrixOrPtr)
   @ccall libflint.fmpz_poly_mat_transpose(z::Ref{ZZPolyRingMatrix}, a::Ref{ZZPolyRingMatrix})::Nothing
   return z
 end
@@ -197,7 +184,7 @@ end
 ###############################################################################
 
 function det(a::ZZPolyRingMatrix)
-  @req is_square(a) "Matrix must be a square matrix"
+  check_square(a)
   z = base_ring(a)()
   @ccall libflint.fmpz_poly_mat_det(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingMatrix})::Nothing
   return z
@@ -220,7 +207,7 @@ end
 ###############################################################################
 
 function tr(a::ZZPolyRingMatrix)
-  @req is_square(a) "Matrix must be a square matrix"
+  check_square(a)
   z = base_ring(a)()
   @ccall libflint.fmpz_poly_mat_trace(z::Ref{ZZPolyRingElem}, a::Ref{ZZPolyRingMatrix})::Nothing
   return z
@@ -234,11 +221,7 @@ end
 
 # Size of the C fmpz_poly_struct (coeffs pointer + alloc + length), without
 # the Julia-only parent field.
-const SIZEOF_FMPZ_POLY_STRUCT = 3 * sizeof(Int)
-
-function mat_entry_ptr(A::ZZPolyRingMatrix, i::Int, j::Int)
-  return Ptr{ZZPolyRingElem}(UInt(A.entries) + UInt(((i - 1) * A.stride + (j - 1)) * SIZEOF_FMPZ_POLY_STRUCT))
-end
+_entry_size(::Type{ZZPolyRingMatrix}) = 3 * sizeof(Int)
 
 ###############################################################################
 #

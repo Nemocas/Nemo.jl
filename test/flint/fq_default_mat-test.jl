@@ -171,10 +171,11 @@
   R, x = finite_field(ZZRingElem(23), 5, "x")
   S = matrix_space(R, 2, 2)
 
-  for R in [ZZ, residue_ring(ZZ, 23)[1], residue_ring(ZZ, ZZ(23))[1], Native.GF(23)]
+  for R in [ZZ, residue_ring(ZZ, 23)[1], residue_ring(ZZ, ZZ(23))[1], Native.GF(23), Native.GF(ZZ(23))]
     M = matrix(R, 2, 2, [1, 2, 3, 4])
 
     @test isa(S(M), MatElem)
+    @test S(M) == S([1 2; 3 4])
   end
 
   F, a = finite_field(5, 2)
@@ -198,12 +199,16 @@ end
   @test t isa FqMatrix
   @test size(t) == (2, 3)
 
-  for (R, M) in ring_to_mat
+  for R in example_rings
     t = similar(s, R)
     @test size(t) == size(s)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
 
     t = similar(s, R, 2, 3)
     @test size(t) == (2, 3)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
   end
 end
 
@@ -251,6 +256,17 @@ end
 
   @test a[2,2] == F4(4)
   @test_throws BoundsError a[-2,2] = F4(4)
+
+  u = F4(3)
+  GC.@preserve u b begin
+    @test b[1,1] == u
+    for uu in (Ref(u), Ptr{FqFieldElem}(pointer_from_objref(u)), Nemo.mat_entry_ptr(b, 1, 1))
+      a[2,2] = F4(4)
+      a[2,2] = uu
+      @test a[2,2] == u
+      @test_throws BoundsError a[-2,2] = uu
+    end
+  end
 
   a[1,2] = 5
 
@@ -524,13 +540,13 @@ end
 
   @test c == F17(13)
 
-  @test_throws ErrorException tr(b)
+  @test_throws DomainError tr(b)
 
   c = det(a)
 
   @test c == zero(F17)
 
-  @test_throws ErrorException det(b)
+  @test_throws DomainError det(b)
 
   c = det(aa)
 
@@ -580,7 +596,7 @@ end
 
   @test c == parent(aa)([12 13 1; 14 13 15; 4 4 1])
 
-  @test_throws ErrorException inv(a)
+  @test_throws DomainError inv(a)
 
   @test_throws ErrorException inv(transpose(a)*a)
 end
@@ -593,7 +609,9 @@ end
   a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(F17) === AbstractAlgebra.Solve.LUTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(F17)) === AbstractAlgebra.Solve.LUTrait()
   @test AbstractAlgebra.Solve.matrix_normal_form_type(a) === AbstractAlgebra.Solve.LUTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(a)) === AbstractAlgebra.Solve.LUTrait()
 
   b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
 
@@ -684,7 +702,9 @@ end
   A = matrix(F, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
   C = solve_init(A)
   @test C isa AbstractAlgebra.solve_context_type(F)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(F))
   @test C isa AbstractAlgebra.solve_context_type(A)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.LUTrait()
   @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), FqFieldElem)

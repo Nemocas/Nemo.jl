@@ -31,7 +31,7 @@ function evaluate(f::ZZPolyRingElem, r::fqPolyRepFieldElem)
     return parent(r)()
   end
 
-  l = f.length - 1
+  l = length(f) - 1
   s = parent(r)(coeff(f, l))
   for i = l-1:-1:0
     s = s * r + parent(r)(coeff(f, i))
@@ -48,7 +48,7 @@ function evaluate!(z::fqPolyRepFieldElem, f::ZZPolyRingElem, r::fqPolyRepFieldEl
     return z
   end
 
-  l = f.length - 1
+  l = length(f) - 1
   set!(z, parent(r)(coeff(f, l)))
   #s = parent(r)(coeff(f, l))
   for i = l-1:-1:0
@@ -91,7 +91,7 @@ function _acb_mat(A::ArbMatrix)
 end
 
 function mul!(z::AcbFieldElem, x::AcbFieldElem, y::ArbFieldElem)
-  @ccall libflint.acb_mul_arb(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{ArbFieldElem}, parent(z).prec::Int)::Nothing
+  @ccall libflint.acb_mul_arb(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{ArbFieldElem}, precision(parent(z))::Int)::Nothing
   return z
 end
 
@@ -186,6 +186,18 @@ function Base.round(::Type{ZZRingElem}, x::ArbFieldElem)
   end
 end
 
+function Base.round(::Type{ZZRingElem}, x::RealFieldElem)
+  if !isfinite(x) || radius(x) > 1e-1
+    throw(InexactError(:round, ZZRingElem, x))
+  end
+  # round the midpoint itself: it may carry more bits than precision(Balls)
+  z = ZZRingElem()
+  GC.@preserve x begin
+    @ccall libflint.arf_get_fmpz(z::Ref{ZZRingElem}, _mid_ptr(x)::Ptr{arf_struct}, ARB_RND_NEAR::Cint)::Cint
+  end
+  return z
+end
+
 function Base.round(::Type{ZZMatrix}, C::ArbMatrix)
   v = zero_matrix(ZZ, nrows(C), ncols(C))
 
@@ -267,7 +279,7 @@ end
 function Base.setprecision(x::BigFloat, p::Int)
   setprecision(BigFloat, p) do
     y = BigFloat()
-    @ccall :libmpfr.mpfr_set(y::Ref{BigFloat}, x::Ref{BigFloat}, Base.MPFR.ROUNDING_MODE[]::Int32)::Nothing
+    @ccall Base.MPFR.libmpfr.mpfr_set(y::Ref{BigFloat}, x::Ref{BigFloat}, Base.MPFR.ROUNDING_MODE[]::Int32)::Nothing
     return y
   end
 end
@@ -295,7 +307,7 @@ This function returns $b$.
 function numerator(a::AbsSimpleNumFieldElem)
   _one = one(ZZ)
   z = deepcopy(a)
-  @ccall libflint.nf_elem_set_den(z::Ref{AbsSimpleNumFieldElem}, _one::Ref{ZZRingElem}, a.parent::Ref{AbsSimpleNumField})::Nothing
+  @ccall libflint.nf_elem_set_den(z::Ref{AbsSimpleNumFieldElem}, _one::Ref{ZZRingElem}, parent(a)::Ref{AbsSimpleNumField})::Nothing
   return z
 end
 
@@ -447,10 +459,6 @@ function rand(R::Union{EuclideanRingResidueRing{ZZRingElem},EuclideanRingResidue
   return R(rand(ZZRingElem(0):(size(R)-1)))
 end
 
-function rand(R::EuclideanRingResidueField{ZZRingElem})
-  return R(rand(ZZRingElem(0):(order(R)-1)))
-end
-
 function rand(R::Union{EuclideanRingResidueRing{fqPolyRepPolyRingElem},EuclideanRingResidueField{fqPolyRepPolyRingElem}})
   r = rand(base_ring(base_ring(R)))
   g = gen(R)
@@ -600,16 +608,7 @@ end
 ################################################################################
 
 # mainly for testing
-function rand(L::LocalizedEuclideanRing{T}, num_scale=(1:1000), den_scale=(1:1000)) where {T<:ZZRingElem}
-  num = rand(num_scale)
-  den = rand(den_scale)
-  while gcd(den, prime(L)) != 1
-    den = rand(den_scale)
-  end
-  return L(num // den)
-end
-
-function rand(L::LocalizedEuclideanRing{T}, num_scale::Vector, den_scale::Integer) where {T<:ZZRingElem}
+function rand(L::LocalizedEuclideanRing{T}, num_scale::AbstractVector=(1:1000), den_scale::AbstractVector=(1:1000)) where {T<:ZZRingElem}
   num = rand(num_scale)
   den = rand(den_scale)
   while gcd(den, prime(L)) != 1
@@ -642,7 +641,7 @@ function evaluate(f::QQPolyRingElem, a::AbsSimpleNumFieldElem)
   if iszero(f)
     return zero(R)
   end
-  if a == gen(R) && parent(f) == parent(parent(a).pol)
+  if a == gen(R) && parent(f) == parent(defining_polynomial(parent(a)))
     return R(f)
   end
   l = length(f) - 1
@@ -858,7 +857,7 @@ Base.log2(a::ZZRingElem) = log2(BigInt(a)) # stupid: there has to be faster way
 
 
 function nf_elem_to_fmpz_mod_poly!(r::ZZModPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
-  @ccall libflint.nf_elem_get_fmpz_mod_poly_den(r::Ref{ZZModPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint, r.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.nf_elem_get_fmpz_mod_poly_den(r::Ref{ZZModPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField}, Cint(useden)::Cint, base_ring(r).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return r
 end
 
@@ -869,7 +868,7 @@ function (R::ZZModPolyRing)(a::AbsSimpleNumFieldElem)
 end
 
 function nf_elem_to_gfp_poly!(r::fpPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
-  @ccall libflint.nf_elem_get_nmod_poly_den(r::Ref{fpPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint)::Nothing
+  @ccall libflint.nf_elem_get_nmod_poly_den(r::Ref{fpPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField}, Cint(useden)::Cint)::Nothing
   return r
 end
 
@@ -880,7 +879,7 @@ function (R::fpPolyRing)(a::AbsSimpleNumFieldElem)
 end
 
 function nf_elem_to_nmod_poly!(r::zzModPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
-  @ccall libflint.nf_elem_get_nmod_poly_den(r::Ref{zzModPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint)::Nothing
+  @ccall libflint.nf_elem_get_nmod_poly_den(r::Ref{zzModPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField}, Cint(useden)::Cint)::Nothing
   return r
 end
 
@@ -891,7 +890,7 @@ function (R::zzModPolyRing)(a::AbsSimpleNumFieldElem)
 end
 
 function nf_elem_to_gfp_fmpz_poly!(r::FpPolyRingElem, a::AbsSimpleNumFieldElem, useden::Bool=true)
-  @ccall libflint.nf_elem_get_fmpz_mod_poly_den(r::Ref{FpPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, a.parent::Ref{AbsSimpleNumField}, Cint(useden)::Cint, r.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.nf_elem_get_fmpz_mod_poly_den(r::Ref{FpPolyRingElem}, a::Ref{AbsSimpleNumFieldElem}, parent(a)::Ref{AbsSimpleNumField}, Cint(useden)::Cint, base_ring(r).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return r
 end
 

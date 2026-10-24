@@ -78,10 +78,6 @@ function deepcopy_internal(a::FpMatrix, dict::IdDict)
   return z
 end
 
-number_of_rows(a::FpMatrix) = a.r
-
-number_of_columns(a::FpMatrix) = a.c
-
 base_ring(a::FpMatrix) = a.base_ring
 
 function one(a::FpMatrixSpace)
@@ -125,41 +121,6 @@ function Generic.add_one!(a::FpMatrix, i::Int, j::Int)
   return a
 end
 
-################################################################################
-#
-#  Windowing
-#
-################################################################################
-
-function _view_window(x::FpMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
-
-  _checkrange_or_empty(nrows(x), r1, r2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  _checkrange_or_empty(ncols(x), c1, c2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  if (r1 > r2)
-    r1 = 1
-    r2 = 0
-  end
-  if (c1 > c2)
-    c1 = 1
-    c2 = 0
-  end
-
-  z = FpMatrix()
-  z.base_ring = x.base_ring
-  z.view_parent = x
-  @ccall libflint.fmpz_mod_mat_window_init(z::Ref{FpMatrix}, x::Ref{FpMatrix}, (r1 - 1)::Int, (c1 - 1)::Int, r2::Int, c2::Int, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  finalizer(_gfp_fmpz_mat_window_clear_fn, z)
-  return z
-end
-
-function _gfp_fmpz_mat_window_clear_fn(a::FpMatrix)
-  @ccall libflint.fmpz_mod_mat_window_clear(a::Ref{FpMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-end
-
 ###############################################################################
 #
 #   Promotion rules
@@ -179,7 +140,7 @@ promote_rule(::Type{FpMatrix}, ::Type{ZZRingElem}) = FpMatrix
 ################################################################################
 
 function inv(a::FpMatrix)
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   z = similar(a)
   r = @ccall libflint.fmpz_mod_mat_inv(z::Ref{FpMatrix}, a::Ref{FpMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Int
   !Bool(r) && error("Matrix not invertible")
@@ -258,8 +219,7 @@ end
 #
 ################################################################################
 
-Solve.matrix_normal_form_type(::FpField) = Solve.LUTrait()
-Solve.matrix_normal_form_type(::FpMatrix) = Solve.LUTrait()
+Solve.matrix_normal_form_type(::Type{FpField}) = Solve.LUTrait()
 
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::FpMatrix, b::FpMatrix, task::Symbol; side::Symbol = :left)
   if side === :left
@@ -347,4 +307,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::FpMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(ZZRingElem)
+_entry_size(::Type{FpMatrix}) = sizeof(ZZRingElem)

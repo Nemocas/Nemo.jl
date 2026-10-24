@@ -230,26 +230,6 @@ const pkgdir = realpath(joinpath(dirname(@__DIR__)))
 #
 ###############################################################################
 
-# heavily inspired by https://discourse.julialang.org/t/a-minimal-example-with-base-redirect-stdout/64245/8
-function capture_stdout(f::Function)
-  pipe = Pipe()
-  started = Base.Event()
-  writer = @async redirect_stdout(pipe) do
-    notify(started)
-    try
-      f()
-    finally
-      Base.Libc.flush_cstdio()
-      close(pipe.in)
-    end
-  end
-  wait(started)
-  result = readchomp(pipe)
-  wait(writer)
-  close(pipe)
-  return result
-end
-
 function flint_abort()
   error("Problem in the FLINT-Subsystem")
 end
@@ -296,11 +276,16 @@ function Base.showerror(io::IO, e::FlintException)
 end
 
 function flint_throw(err_type::FlintExceptionType, cmsg::Cstring, va_list::Ptr{Cvoid})
-  # use flint_vsprintf once available, see https://github.com/flintlib/flint/issues/2388
-  msg = capture_stdout() do
-    @ccall libflint.flint_vprintf(cmsg::Cstring, va_list::Ptr{Cvoid})::Int
-  end
+  max_length = 1024
+  cmsgf = @ccall libflint.flint_malloc(max_length::Csize_t)::Cstring
+  length = @ccall libflint.flint_vsnprintf(cmsgf::Cstring, max_length::Csize_t, cmsg::Cstring, va_list::Ptr{Cvoid})::Int
   @ccall libflint.flint_va_end(va_list::Ptr{Cvoid})::Nothing
+  msg = unsafe_string(cmsgf)
+  @ccall libflint.flint_free(cmsgf::Cstring)::Nothing
+
+  if length >= max_length
+    msg *= "... (message truncated)"
+  end
   throw(FlintException(err_type, msg))
 end
 
@@ -381,7 +366,7 @@ function trace_memory(b::Bool)
     return
   end
   if b
-    @ccall :libgmp.__gmp_set_memory_functions(
+    @ccall Base.GMP.libgmp.__gmp_set_memory_functions(
       @cfunction(trace_counted_malloc, UInt, (UInt, ))::Ptr{Nothing},
       @cfunction(trace_counted_realloc, UInt, (UInt, UInt, UInt))::Ptr{Nothing},
       @cfunction(trace_counted_free, Nothing, (UInt, UInt))::Ptr{Nothing},
@@ -394,7 +379,7 @@ function trace_memory(b::Bool)
       @cfunction(trace_free, Nothing, (UInt, ))::Ptr{Nothing},
     )::Nothing
   else
-    @ccall :libgmp.__gmp_set_memory_functions(
+    @ccall Base.GMP.libgmp.__gmp_set_memory_functions(
       cglobal(:jl_gc_counted_malloc)::Ptr{Nothing},
       cglobal(:jl_gc_counted_realloc_with_old_size)::Ptr{Nothing},
       cglobal(:jl_gc_counted_free_with_size)::Ptr{Nothing},
@@ -438,7 +423,7 @@ function __init__()
   __isthreaded[] = get(ENV, "NEMO_THREADED", "") == "1"
 
   if __isthreaded[]
-    @ccall :libgmp.__gmp_set_memory_functions(0::Int, 0::Int, 0::Int)::Nothing
+    @ccall Base.GMP.libgmp.__gmp_set_memory_functions(0::Int, 0::Int, 0::Int)::Nothing
   end
 
   @ccall libflint.flint_set_abort(@cfunction(flint_abort, Nothing, ())::Ptr{Nothing})::Nothing
@@ -502,6 +487,17 @@ const TypeOrPtr{T} = Union{T, Ref{T}, Ptr{T}} where T
 
 ###############################################################################
 #
+#   Matrices wrapping a FLINT matrix struct
+#
+###############################################################################
+
+# Every subtype starts with the fields `entries`, `r`, `c`, `stride` of the
+# FLINT struct it wraps. For windows it has a field `view_parent` and a
+# constructor without arguments that sets no finalizer.
+abstract type FlintMatElem{T} <: MatElem{T} end
+
+###############################################################################
+#
 #   Load Nemo Rings/Fields/etc
 #
 ###############################################################################
@@ -548,7 +544,7 @@ include("julia/Float.jl")
 #
 ################################################################################
 
-function Base.summary(io::IO, A::T) where {T <: _MatTypes}
+function Base.summary(io::IO, A::T) where {T <: FlintMatElem}
   print(io, nrows(A), "x", ncols(A), " ", T)
 end
 
@@ -631,7 +627,7 @@ function flint_gmp_randseed!(a::rand_ctx, seed::BigInt)
     # gmp_state needs to be initialised
     @ccall libflint._flint_rand_init_gmp_state(a::Ref{rand_ctx})::Cvoid
   end
-  @ccall :libgmp.__gmp_randseed(a.gmp_state::Ptr{Cvoid}, seed::Ref{BigInt})::Cvoid
+  @ccall Base.GMP.libgmp.__gmp_randseed(a.gmp_state::Ptr{Cvoid}, seed::Ref{BigInt})::Cvoid
 end
 
 ################################################################################
@@ -643,8 +639,8 @@ end
 const _flint_rand_states = rand_ctx[]
 
 # Data from http://www.mersennewiki.org/index.php/Elliptic_Curve_Method
-const _ecm_B1 = Int[2, 11, 50, 250, 1000, 3000, 11000, 43000, 110000, 260000, 850000, 2900000];
-const _ecm_nC = Int[25, 90, 300, 700, 1800, 5100, 10600, 19300, 49000, 124000, 210000, 340000];
+const _ecm_B1 = Int[2, 11, 50, 250, 1000, 3000, 11000, 43000, 110000, 260000, 850000, 2900000]
+const _ecm_nC = Int[25, 90, 300, 700, 1800, 5100, 10600, 19300, 49000, 124000, 210000, 340000]
 
 const _ecm_B1s = Vector{Int}[_ecm_B1]
 const _ecm_nCs = Vector{Int}[_ecm_nC]
@@ -671,7 +667,7 @@ include("../benchmarks/runbenchmarks.jl")
 function test_module(x, y)
   julia_exe = Base.julia_cmd()
   test_file = joinpath(pkgdir, "test/$x/")
-  test_file = test_file * "$y-test.jl";
+  test_file = test_file * "$y-test.jl"
   test_function_name = "test_"
 
   if x in ["flint", "arb", "antic"]

@@ -18,39 +18,6 @@ is_zero_initialized(::Type{QQMatrix}) = true
 
 ###############################################################################
 #
-#   Windows - handle with care!!!
-#
-###############################################################################
-
-function _view_window(x::QQMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
-  _checkrange_or_empty(nrows(x), r1, r2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  _checkrange_or_empty(ncols(x), c1, c2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  if (r1 > r2)
-    r1 = 1
-    r2 = 0
-  end
-  if (c1 > c2)
-    c1 = 1
-    c2 = 0
-  end
-
-  b = QQMatrix()
-  b.view_parent = x
-  @ccall libflint.fmpq_mat_window_init(b::Ref{QQMatrix}, x::Ref{QQMatrix}, (r1 - 1)::Int, (c1 - 1)::Int, r2::Int, c2::Int)::Nothing
-  finalizer(_fmpq_mat_window_clear_fn, b)
-  return b
-end
-
-function _fmpq_mat_window_clear_fn(a::QQMatrix)
-  @ccall libflint.fmpq_mat_window_clear(a::Ref{QQMatrix})::Nothing
-end
-
-###############################################################################
-#
 #   Basic manipulation
 #
 ###############################################################################
@@ -87,10 +54,6 @@ function setindex!(a::QQMatrix, b::QQMatrix, r::UnitRange{Int64}, c::UnitRange{I
   A = view(a, r, c)
   set!(A, b)
 end
-
-number_of_rows(a::QQMatrix) = a.r
-
-number_of_columns(a::QQMatrix) = a.c
 
 iszero(a::QQMatrix) = @ccall libflint.fmpq_mat_is_zero(a::Ref{QQMatrix})::Bool
 
@@ -178,16 +141,6 @@ end
 #  Transpose
 #
 ################################################################################
-
-function transpose(a::QQMatrix)
-  z = similar(a, ncols(a), nrows(a))
-  return transpose!(z, a)
-end
-
-function transpose!(a::QQMatrixOrPtr)
-  @req is_square(a) "Matrix must be a square matrix"
-  return transpose!(a, a)
-end
 
 function transpose!(z::QQMatrixOrPtr, a::QQMatrixOrPtr)
   @ccall libflint.fmpq_mat_transpose(z::Ref{QQMatrix}, a::Ref{QQMatrix})::Nothing
@@ -343,7 +296,7 @@ end
 ###############################################################################
 
 function inv(x::QQMatrix)
-  !is_square(x) && error("Matrix not invertible")
+  check_square(x)
   z = similar(x)
   success = @ccall libflint.fmpq_mat_inv(z::Ref{QQMatrix}, x::Ref{QQMatrix})::Cint
   success == 0 && error("Matrix not invertible")
@@ -402,7 +355,7 @@ end
 ###############################################################################
 
 function charpoly(R::QQPolyRing, x::QQMatrix)
-  nrows(x) != ncols(x) && error("Non-square")
+  check_square(x)
   z = R()
   @ccall libflint.fmpq_mat_charpoly(z::Ref{QQPolyRingElem}, x::Ref{QQMatrix})::Nothing
   return z
@@ -415,7 +368,7 @@ end
 ###############################################################################
 
 function minpoly(R::QQPolyRing, x::QQMatrix)
-  nrows(x) != ncols(x) && error("Non-square")
+  check_square(x)
   z = R()
   @ccall libflint.fmpq_mat_minpoly(z::Ref{QQPolyRingElem}, x::Ref{QQMatrix})::Nothing
   return z
@@ -430,7 +383,7 @@ minpoly(x::QQMatrix) = minpoly(polynomial_ring(QQ; cached = false)[1], x)
 ###############################################################################
 
 function det(x::QQMatrix)
-  nrows(x) != ncols(x) && error("Non-square matrix")
+  check_square(x)
   z = QQFieldElem()
   @ccall libflint.fmpq_mat_det(z::Ref{QQFieldElem}, x::Ref{QQMatrix})::Nothing
   return z
@@ -454,7 +407,7 @@ more computation time).  Under a "uniformity assumption" the probability
 of a false positive is about `2^(-modulus_bitsize)`.
 """
 function is_probably_zero_det(M::QQMatrix; modulus_bitsize::Int = 100)
-  @req  is_square(M)  "matrix must be square"
+  check_square(M)
   @req ((modulus_bitsize >= 20) && (modulus_bitsize <= 1000))  "modulus_bitsize must be between 20 and 1000 (but bigger than about 250 is usually senseless)"
   # Dispose of two trivial cases:
   (nrows(M) == 0) && return false
@@ -584,7 +537,7 @@ Solve $ax = b$ by clearing denominators and using Dixon's algorithm. This is
 usually faster for large systems.
 """
 function _solve_dixon(a::QQMatrix, b::QQMatrix)
-  nrows(a) != ncols(a) && error("Not a square matrix in solve")
+  check_square(a)
   nrows(b) != nrows(a) && error("Incompatible dimensions in solve")
   z = similar(b)
   nonsing = @ccall libflint.fmpq_mat_solve_dixon(z::Ref{QQMatrix}, a::Ref{QQMatrix}, b::Ref{QQMatrix})::Bool
@@ -593,14 +546,14 @@ function _solve_dixon(a::QQMatrix, b::QQMatrix)
 end
 
 # Actually we use a modular algorithm in flint...
-Solve.matrix_normal_form_type(::QQField) = Solve.RREFTrait()
-Solve.matrix_normal_form_type(::QQMatrix) = Solve.RREFTrait()
+Solve.matrix_normal_form_type(::Type{QQField}) = Solve.RREFTrait()
 
-# fflu is much slower in some cases, so we do an rref (with transformation)
-# here and let flint choose an algorithm, see
-# https://github.com/Nemocas/Nemo.jl/issues/1710.
-function Solve.solve_context_type(::QQField)
-  return Solve.solve_context_type(Solve.RREFTrait(), QQFieldElem)
+function Solve.solve_context_type(::Type{QQField})
+  return Solve.solve_context_type(Solve.FFLUTrait(), QQFieldElem)
+end
+
+function Solve.solve_context_type(::Solve.FFLUTrait, ::Type{QQFieldElem})
+  return Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait, QQMatrix, ZZMatrix, ZZMatrix}
 end
 
 function Solve._can_solve_internal_no_check(::Solve.RREFTrait, A::QQMatrix, b::QQMatrix, task::Symbol; side::Symbol = :left)
@@ -620,12 +573,164 @@ end
 
 ###############################################################################
 #
+#   FFLU Solve context functionality
+#
+###############################################################################
+
+function __fflu_precomp(A::QQMatrix)
+  Aint = zero_matrix(ZZ, nrows(A), ncols(A))
+  dA = ZZ()
+  ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
+        (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), Aint, dA, A)
+  p = Generic.Perm(nrows(A))
+  dLU = ZZ()
+  p.d .-= 1
+  r = ccall((:fmpz_mat_fflu, libflint), Int,
+            (Ref{ZZMatrix}, Ref{ZZRingElem}, Ptr{Int}, Ref{ZZMatrix}, Cint),
+            Aint, dLU, p.d, Aint, Cint(false))
+  p.d .+= 1
+  inv!(p)
+  d = divexact(dA, QQ(dLU))
+
+  return Aint, p, r, d
+end
+
+function Solve._init_reduce(C::Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait})
+  if isdefined(C, :red)
+    return nothing
+  end
+  A = matrix(C)
+  Aint, p, r, d = __fflu_precomp(A)
+  Solve.set_rank!(C, r)
+  C.lu_perm = p
+  C.red = Aint
+  C.scaling_factor = d
+
+  if r < nrows(A)
+    A2 = p*A
+    A3 = view(A2, r + 1:nrows(A), 1:ncols(A))
+    C.permuted_matrix = A3
+  else
+    C.permuted_matrix = zero(A, 0, ncols(A))
+  end
+  return nothing
+end
+
+function Solve._init_reduce_transpose(C::Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait})
+  if isdefined(C, :red_transp)
+    return nothing
+  end
+
+  A = matrix(C)
+  Aint, p, r, d = __fflu_precomp(transpose(A))
+  Solve.set_rank!(C, r)
+  C.lu_perm_transp = p
+  C.red_transp = Aint
+  C.scaling_factor_transp = d
+
+  if r < ncols(A)
+    A2 = A*p
+    A3 = view(A2, 1:nrows(A), r + 1:ncols(A))
+    C.permuted_matrix_transp = A3
+  else
+    C.permuted_matrix_transp = zero(A, nrows(A), 0)
+  end
+  return nothing
+end
+
+function Solve._can_solve_internal_no_check(::Solve.FFLUTrait, C::Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait}, b::QQMatrix, task::Symbol; side::Symbol = :left)
+  # Split up in separate functions to make the compiler happy
+  if side === :right
+    return Solve._can_solve_internal_no_check_right(Solve.FFLUTrait(), C, b, task)
+  else
+    return Solve._can_solve_internal_no_check_left(Solve.FFLUTrait(), C, b, task)
+  end
+end
+
+function Solve._can_solve_internal_no_check_right(::Solve.FFLUTrait, C::Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait}, b::QQMatrix, task::Symbol)
+  bint = zero_matrix(ZZ, nrows(b), ncols(b))
+  db = ZZ()
+  ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
+        (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), bint, db, b)
+  yint = zero_matrix(ZZ, ncols(C), ncols(b))
+  p = inv(Solve.lu_permutation(C)).d .- 1
+  flag = ccall((:fmpz_mat_solve_fflu_precomp, libflint), Cint,
+               (Ref{ZZMatrix}, Ptr{Int}, Ref{ZZMatrix}, Ref{ZZMatrix}),
+               yint, p, Solve.reduced_matrix(C), bint)
+  fl = Bool(flag)
+  if !fl
+    return fl, zero(b, 0, 0), zero(b, 0, 0)
+  end
+  # We have fl == true, but we still have to check whether this really is a solution
+  y = zero_matrix(QQ, nrows(yint), ncols(yint))
+  ccall((:fmpq_mat_set_fmpz_mat_div_fmpz, libflint), Nothing,
+        (Ref{QQMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}),
+        y, yint, db)
+  ccall((:fmpq_mat_scalar_mul_fmpq, libflint), Nothing,
+        (Ref{QQMatrix}, Ref{QQMatrix}, Ref{QQFieldElem}),
+        y, y, Solve.scaling_factor(C))
+  # Now y == (yint//db)*scaling_factor(C)
+  if rank(C) < nrows(C)
+    # We have to check whether y is also a solution for the "lower part"
+    # of the system
+    pb = Solve.lu_permutation(C)*b
+    pA = Solve.permuted_matrix(C)
+    fl = pA*y == view(pb, rank(C) + 1:nrows(C), 1:ncols(b))
+  end
+  if task === :with_kernel
+    # I don't know how to compute the kernel using an (ff)lu factoring
+    return fl, y, kernel(C, side = :right)
+  else
+    return fl, y, zero(b, 0, 0)
+  end
+end
+
+function Solve._can_solve_internal_no_check_left(::Solve.FFLUTrait, C::Solve.SolveCtx{QQFieldElem, Solve.FFLUTrait}, b::QQMatrix, task::Symbol)
+  bint = zero_matrix(ZZ, ncols(b), nrows(b))
+  db = ZZ()
+  ccall((:fmpq_mat_get_fmpz_mat_matwise, libflint), Nothing,
+        (Ref{ZZMatrix}, Ref{ZZRingElem}, Ref{QQMatrix}), bint, db, transpose(b))
+  yint = zero_matrix(ZZ, nrows(C), ncols(bint))
+  p = inv(Solve.lu_permutation_of_transpose(C)).d .- 1
+  flag = ccall((:fmpz_mat_solve_fflu_precomp, libflint), Cint,
+               (Ref{ZZMatrix}, Ptr{Int}, Ref{ZZMatrix}, Ref{ZZMatrix}),
+               yint, p, Solve.reduced_matrix_of_transpose(C), bint)
+  fl = Bool(flag)
+  if !fl
+    return fl, zero(b, 0, 0), zero(b, 0, 0)
+  end
+  # We have fl == true, but we still have to check whether this really is a solution
+  y = zero_matrix(QQ, ncols(yint), nrows(yint))
+  ccall((:fmpq_mat_set_fmpz_mat_div_fmpz, libflint), Nothing,
+        (Ref{QQMatrix}, Ref{ZZMatrix}, Ref{ZZRingElem}),
+        y, transpose(yint), db)
+  ccall((:fmpq_mat_scalar_mul_fmpq, libflint), Nothing,
+        (Ref{QQMatrix}, Ref{QQMatrix}, Ref{QQFieldElem}),
+        y, y, Solve.scaling_factor_of_transpose(C))
+  # Now y == (transpose(yint)//db)*scaling_factor(C)
+  if rank(C) < ncols(C)
+    # We have to check whether y is also a solution for the "right hand part"
+    # of the system
+    pb = b*Solve.lu_permutation_of_transpose(C)
+    pA = Solve.permuted_matrix_of_transpose(C)
+    fl = y*pA == view(pb, 1:nrows(b), rank(C) + 1:ncols(C))
+  end
+  if task === :with_kernel
+    # I don't know how to compute the kernel using an (ff)lu factoring
+    return fl, y, kernel(C, side = :left)
+  else
+    return fl, y, zero(b, 0, 0)
+  end
+end
+
+###############################################################################
+#
 #   Trace
 #
 ###############################################################################
 
 function tr(x::QQMatrix)
-  nrows(x) != ncols(x) && error("Not a square matrix in trace")
+  check_square(x)
   d = QQFieldElem()
   @ccall libflint.fmpq_mat_trace(d::Ref{QQFieldElem}, x::Ref{QQMatrix})::Nothing
   return d
@@ -888,7 +993,7 @@ function QQMatrix(r::Int, c::Int, d::RationalUnion)
   z = QQMatrix(r, c)
   GC.@preserve z for i = 1:min(r, c)
     el = mat_entry_ptr(z, i, i)
-    set!(el, d)
+    set!(el, flintify(d))
   end
   return z
 end
@@ -905,7 +1010,7 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::QQMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(QQFieldElem)
+_entry_size(::Type{QQMatrix}) = sizeof(QQFieldElem)
 
 ################################################################################
 #

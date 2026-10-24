@@ -162,20 +162,20 @@ function +(a::ZZRelPowerSeriesRingElem, b::ZZRelPowerSeriesRingElem)
   check_parent(a, b)
   lena = pol_length(a)
   lenb = pol_length(b)
-  prec = min(a.prec, b.prec)
-  val = min(a.val, b.val)
-  lena = min(lena, prec - a.val)
-  lenb = min(lenb, prec - b.val)
+  prec = min(precision(a), precision(b))
+  val = min(valuation(a), valuation(b))
+  lena = min(lena, prec - valuation(a))
+  lenb = min(lenb, prec - valuation(b))
   z = parent(a)()
-  if a.val < b.val
-    lenz = max(lena, lenb + b.val - a.val)       
-    @ccall libflint.fmpz_poly_set_trunc(z::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - b.val + a.val)::Int)::Nothing
-    @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, (b.val - a.val)::Int)::Nothing
+  if valuation(a) < valuation(b)
+    lenz = max(lena, lenb + valuation(b) - valuation(a))       
+    @ccall libflint.fmpz_poly_set_trunc(z::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - valuation(b) + valuation(a))::Int)::Nothing
+    @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, (valuation(b) - valuation(a))::Int)::Nothing
     @ccall libflint.fmpz_poly_add_series(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, lenz::Int)::Nothing
-  elseif b.val < a.val
-    lenz = max(lena + a.val - b.val, lenb)
-    @ccall libflint.fmpz_poly_set_trunc(z::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - a.val + b.val)::Int)::Nothing
-    @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, (a.val - b.val)::Int)::Nothing
+  elseif valuation(b) < valuation(a)
+    lenz = max(lena + valuation(a) - valuation(b), lenb)
+    @ccall libflint.fmpz_poly_set_trunc(z::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - valuation(a) + valuation(b))::Int)::Nothing
+    @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, (valuation(a) - valuation(b))::Int)::Nothing
     @ccall libflint.fmpz_poly_add_series(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, lenz::Int)::Nothing
   else
     lenz = max(lena, lenb)
@@ -191,22 +191,22 @@ function -(a::ZZRelPowerSeriesRingElem, b::ZZRelPowerSeriesRingElem)
   check_parent(a, b)
   lena = pol_length(a)
   lenb = pol_length(b)
-  prec = min(a.prec, b.prec)
-  val = min(a.val, b.val)
-  lena = min(lena, prec - a.val)
-  lenb = min(lenb, prec - b.val)
+  prec = min(precision(a), precision(b))
+  val = min(valuation(a), valuation(b))
+  lena = min(lena, prec - valuation(a))
+  lenb = min(lenb, prec - valuation(b))
   lenz = max(lena, lenb)
   z = parent(a)()
-  if a.val < b.val
-    lenz = max(lena, lenb + b.val - a.val)
-    @ccall libflint.fmpz_poly_set_trunc(z::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - b.val + a.val)::Int)::Nothing
-    @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, (b.val - a.val)::Int)::Nothing
+  if valuation(a) < valuation(b)
+    lenz = max(lena, lenb + valuation(b) - valuation(a))
+    @ccall libflint.fmpz_poly_set_trunc(z::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - valuation(b) + valuation(a))::Int)::Nothing
+    @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, (valuation(b) - valuation(a))::Int)::Nothing
     @ccall libflint.fmpz_poly_neg(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem})::Nothing
     @ccall libflint.fmpz_poly_add_series(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, lenz::Int)::Nothing
-  elseif b.val < a.val
-    lenz = max(lena + a.val - b.val, lenb)
-    @ccall libflint.fmpz_poly_set_trunc(z::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - a.val + b.val)::Int)::Nothing
-    @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, (a.val - b.val)::Int)::Nothing
+  elseif valuation(b) < valuation(a)
+    lenz = max(lena + valuation(a) - valuation(b), lenb)
+    @ccall libflint.fmpz_poly_set_trunc(z::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - valuation(a) + valuation(b))::Int)::Nothing
+    @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, (valuation(a) - valuation(b))::Int)::Nothing
     @ccall libflint.fmpz_poly_sub_series(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, lenz::Int)::Nothing
   else
     lenz = max(lena, lenb)
@@ -224,12 +224,12 @@ function *(a::ZZRelPowerSeriesRingElem, b::ZZRelPowerSeriesRingElem)
   lenb = pol_length(b)
   aval = valuation(a)
   bval = valuation(b)
-  prec = min(a.prec - aval, b.prec - bval)
+  prec = min(precision(a) - aval, precision(b) - bval)
   lena = min(lena, prec)
   lenb = min(lenb, prec)
   z = parent(a)()
-  z.val = a.val + b.val
-  z.prec = prec + z.val
+  z.val = valuation(a) + valuation(b)
+  z.prec = prec + valuation(z)
   if lena == 0 || lenb == 0
     return z
   end
@@ -279,8 +279,8 @@ function shift_left(x::ZZRelPowerSeriesRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
   xlen = pol_length(x)
   z = ZZRelPowerSeriesRingElem(x)
-  z.prec = x.prec + len
-  z.val = x.val + len
+  z.prec = precision(x) + len
+  z.val = valuation(x) + len
   z.parent = parent(x)
   return z
 end
@@ -291,10 +291,10 @@ function shift_right(x::ZZRelPowerSeriesRingElem, len::Int)
   xval = valuation(x)
   z = parent(x)()
   if len >= xlen + xval
-    z.prec = max(0, x.prec - len)
-    z.val = max(0, x.prec - len)
+    z.prec = max(0, precision(x) - len)
+    z.val = max(0, precision(x) - len)
   else
-    z.prec = max(0, x.prec - len)
+    z.prec = max(0, precision(x) - len)
     z.val = max(0, xval - len)
     zlen = min(xlen + xval - len, xlen)
     @ccall libflint.fmpz_poly_shift_right(z::Ref{ZZRelPowerSeriesRingElem}, x::Ref{ZZRelPowerSeriesRingElem}, (xlen - zlen)::Int)::Nothing
@@ -339,7 +339,7 @@ function ^(a::ZZRelPowerSeriesRingElem, b::Int)
   if is_gen(a)
     z = parent(a)()
     z = setcoeff!(z, 0, ZZRingElem(1))
-    z.prec = a.prec + b - 1
+    z.prec = precision(a) + b - 1
     z.val = b
   elseif pol_length(a) == 0
     z = parent(a)()
@@ -352,9 +352,9 @@ function ^(a::ZZRelPowerSeriesRingElem, b::Int)
     return one(parent(a))
   else
     z = parent(a)()
-    z.prec = a.prec + (b - 1)*valuation(a)
+    z.prec = precision(a) + (b - 1)*valuation(a)
     z.val = b*valuation(a)
-    @ccall libflint.fmpz_poly_pow_trunc(z::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, b::Int, (z.prec - z.val)::Int)::Nothing
+    @ccall libflint.fmpz_poly_pow_trunc(z::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, b::Int, (precision(z) - valuation(z))::Int)::Nothing
   end
   return z
 end
@@ -367,15 +367,15 @@ end
 
 function ==(x::ZZRelPowerSeriesRingElem, y::ZZRelPowerSeriesRingElem)
   check_parent(x, y)
-  prec = min(x.prec, y.prec)
-  if prec <= x.val && prec <= y.val
+  prec = min(precision(x), precision(y))
+  if prec <= valuation(x) && prec <= valuation(y)
     return true
   end
-  if x.val != y.val
+  if valuation(x) != valuation(y)
     return false
   end
-  xlen = normalise(x, min(pol_length(x), prec - x.val))
-  ylen = normalise(y, min(pol_length(y), prec - y.val))
+  xlen = normalise(x, min(pol_length(x), prec - valuation(x)))
+  ylen = normalise(y, min(pol_length(y), prec - valuation(y)))
   if xlen != ylen
     return false
   end
@@ -386,7 +386,7 @@ function isequal(x::ZZRelPowerSeriesRingElem, y::ZZRelPowerSeriesRingElem)
   if parent(x) != parent(y)
     return false
   end
-  if x.prec != y.prec || x.val != y.val || pol_length(x) != pol_length(y)
+  if precision(x) != precision(y) || valuation(x) != valuation(y) || pol_length(x) != pol_length(y)
     return false
   end
   return Bool(@ccall libflint.fmpz_poly_equal(x::Ref{ZZRelPowerSeriesRingElem}, y::Ref{ZZRelPowerSeriesRingElem})::Cint)
@@ -404,7 +404,7 @@ function ==(x::ZZRelPowerSeriesRingElem, y::ZZRingElem)
   elseif pol_length(x) > 1
     return false
   elseif pol_length(x) == 1
-    if x.val == 0
+    if valuation(x) == 0
       z = ZZRingElem()
       @ccall libflint.fmpz_poly_get_coeff_fmpz(z::Ref{ZZRingElem}, x::Ref{ZZRelPowerSeriesRingElem}, 0::Int)::Nothing
       return @ccall libflint.fmpz_equal(z::Ref{ZZRingElem}, y::Ref{ZZRingElem}, 0::Int)::Bool
@@ -440,10 +440,10 @@ function divexact(x::ZZRelPowerSeriesRingElem, y::ZZRelPowerSeriesRingElem; chec
     x = shift_right(x, yval)
     y = shift_right(y, yval)
   end
-  prec = min(x.prec - x.val, y.prec - y.val)
+  prec = min(precision(x) - valuation(x), precision(y) - valuation(y))
   z = parent(x)()
   z.val = xval - yval
-  z.prec = prec + z.val
+  z.prec = prec + valuation(z)
   if prec != 0
     @ccall libflint.fmpz_poly_div_series(z::Ref{ZZRelPowerSeriesRingElem}, x::Ref{ZZRelPowerSeriesRingElem}, y::Ref{ZZRelPowerSeriesRingElem}, prec::Int)::Nothing
   end
@@ -489,7 +489,7 @@ function inv(a::ZZRelPowerSeriesRingElem)
   ainv = parent(a)()
   ainv.prec = a.prec
   ainv.val = 0
-  @ccall libflint.fmpz_poly_inv_series(ainv::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, a.prec::Int)::Nothing
+  @ccall libflint.fmpz_poly_inv_series(ainv::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, precision(a)::Int)::Nothing
   return ainv
 end
 
@@ -502,9 +502,9 @@ end
 function Base.sqrt(a::ZZRelPowerSeriesRingElem; check::Bool=true)
   asqrt = parent(a)()
   val = div(valuation(a), 2)
-  asqrt.prec = a.prec - val
+  asqrt.prec = precision(a) - val
   asqrt.val = val
-  flag = Bool(@ccall libflint.fmpz_poly_sqrt_series(asqrt::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, (a.prec - 2*val)::Int)::Cint)
+  flag = Bool(@ccall libflint.fmpz_poly_sqrt_series(asqrt::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, (precision(a) - 2*val)::Int)::Cint)
   check && flag == false && error("Not a square in sqrt")
   return asqrt
 end
@@ -517,14 +517,14 @@ end
 
 function zero!(x::ZZRelPowerSeriesRingElem)
   @ccall libflint.fmpz_poly_zero(x::Ref{ZZRelPowerSeriesRingElem})::Nothing
-  x.prec = parent(x).prec_max
-  x.val = parent(x).prec_max
+  x.prec = max_precision(parent(x))
+  x.val = max_precision(parent(x))
   return x
 end
 
 function one!(x::ZZRelPowerSeriesRingElem)
   @ccall libflint.fmpz_poly_one(x::Ref{ZZRelPowerSeriesRingElem})::Nothing
-  x.prec = parent(x).prec_max
+  x.prec = max_precision(parent(x))
   x.val = 0
   return x
 end
@@ -544,11 +544,11 @@ function mul!(z::ZZRelPowerSeriesRingElem, a::ZZRelPowerSeriesRingElem, b::ZZRel
   lenb = pol_length(b)
   aval = valuation(a)
   bval = valuation(b)
-  prec = min(a.prec - aval, b.prec - bval)
+  prec = min(precision(a) - aval, precision(b) - bval)
   lena = min(lena, prec)
   lenb = min(lenb, prec)
-  z.val = a.val + b.val
-  z.prec = prec + z.val
+  z.val = valuation(a) + valuation(b)
+  z.prec = prec + valuation(z)
   lenz = min(lena + lenb - 1, prec)
   if lena <= 0 || lenb <= 0
     lenz = 0
@@ -560,21 +560,21 @@ end
 function add!(a::ZZRelPowerSeriesRingElem, b::ZZRelPowerSeriesRingElem)
   lena = pol_length(a)
   lenb = pol_length(b)
-  prec = min(a.prec, b.prec)
-  val = min(a.val, b.val)
-  lena = min(lena, prec - a.val)
-  lenb = min(lenb, prec - b.val)
-  if a.val < b.val
+  prec = min(precision(a), precision(b))
+  val = min(valuation(a), valuation(b))
+  lena = min(lena, prec - valuation(a))
+  lenb = min(lenb, prec - valuation(b))
+  if valuation(a) < valuation(b)
     z = ZZRelPowerSeriesRingElem()
     z.parent = parent(a)
-    lenz = max(lena, lenb + b.val - a.val)
-    @ccall libflint.fmpz_poly_set_trunc(z::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - b.val + a.val)::Int)::Nothing
-    @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, (b.val - a.val)::Int)::Nothing
+    lenz = max(lena, lenb + valuation(b) - valuation(a))
+    @ccall libflint.fmpz_poly_set_trunc(z::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - valuation(b) + valuation(a))::Int)::Nothing
+    @ccall libflint.fmpz_poly_shift_left(z::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, (valuation(b) - valuation(a))::Int)::Nothing
     @ccall libflint.fmpz_poly_add_series(a::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, z::Ref{ZZRelPowerSeriesRingElem}, lenz::Int)::Nothing
-  elseif b.val < a.val
-    lenz = max(lena + a.val - b.val, lenb)
-    @ccall libflint.fmpz_poly_truncate(a::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - a.val + b.val)::Int)::Nothing
-    @ccall libflint.fmpz_poly_shift_left(a::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, (a.val - b.val)::Int)::Nothing
+  elseif valuation(b) < valuation(a)
+    lenz = max(lena + valuation(a) - valuation(b), lenb)
+    @ccall libflint.fmpz_poly_truncate(a::Ref{ZZRelPowerSeriesRingElem}, max(0, lenz - valuation(a) + valuation(b))::Int)::Nothing
+    @ccall libflint.fmpz_poly_shift_left(a::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, (valuation(a) - valuation(b))::Int)::Nothing
     @ccall libflint.fmpz_poly_add_series(a::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, lenz::Int)::Nothing
   else
     lenz = max(lena, lenb)
@@ -594,19 +594,19 @@ function add!(c::ZZRelPowerSeriesRingElem, a::ZZRelPowerSeriesRingElem, b::ZZRel
   end
   lena = pol_length(a)
   lenb = pol_length(b)
-  prec = min(a.prec, b.prec)
-  val = min(a.val, b.val)
-  lena = min(lena, prec - a.val)
-  lenb = min(lenb, prec - b.val)
-  if a.val < b.val
-    lenc = max(lena, lenb + b.val - a.val)
-    @ccall libflint.fmpz_poly_set_trunc(c::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, max(0, lenc - b.val + a.val)::Int)::Nothing
-    @ccall libflint.fmpz_poly_shift_left(c::Ref{ZZRelPowerSeriesRingElem}, c::Ref{ZZRelPowerSeriesRingElem}, (b.val - a.val)::Int)::Nothing
+  prec = min(precision(a), precision(b))
+  val = min(valuation(a), valuation(b))
+  lena = min(lena, prec - valuation(a))
+  lenb = min(lenb, prec - valuation(b))
+  if valuation(a) < valuation(b)
+    lenc = max(lena, lenb + valuation(b) - valuation(a))
+    @ccall libflint.fmpz_poly_set_trunc(c::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, max(0, lenc - valuation(b) + valuation(a))::Int)::Nothing
+    @ccall libflint.fmpz_poly_shift_left(c::Ref{ZZRelPowerSeriesRingElem}, c::Ref{ZZRelPowerSeriesRingElem}, (valuation(b) - valuation(a))::Int)::Nothing
     @ccall libflint.fmpz_poly_add_series(c::Ref{ZZRelPowerSeriesRingElem}, c::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, lenc::Int)::Nothing
-  elseif b.val < a.val
-    lenc = max(lena + a.val - b.val, lenb)
-    @ccall libflint.fmpz_poly_set_trunc(c::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, max(0, lenc - a.val + b.val)::Int)::Nothing
-    @ccall libflint.fmpz_poly_shift_left(c::Ref{ZZRelPowerSeriesRingElem}, c::Ref{ZZRelPowerSeriesRingElem}, (a.val - b.val)::Int)::Nothing
+  elseif valuation(b) < valuation(a)
+    lenc = max(lena + valuation(a) - valuation(b), lenb)
+    @ccall libflint.fmpz_poly_set_trunc(c::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, max(0, lenc - valuation(a) + valuation(b))::Int)::Nothing
+    @ccall libflint.fmpz_poly_shift_left(c::Ref{ZZRelPowerSeriesRingElem}, c::Ref{ZZRelPowerSeriesRingElem}, (valuation(a) - valuation(b))::Int)::Nothing
     @ccall libflint.fmpz_poly_add_series(c::Ref{ZZRelPowerSeriesRingElem}, c::Ref{ZZRelPowerSeriesRingElem}, b::Ref{ZZRelPowerSeriesRingElem}, lenc::Int)::Nothing
   else
     lenc = max(lena, lenb)
@@ -641,8 +641,8 @@ promote_rule(::Type{ZZRelPowerSeriesRingElem}, ::Type{ZZRingElem}) = ZZRelPowerS
 
 function (a::ZZRelPowerSeriesRing)()
   z = ZZRelPowerSeriesRingElem()
-  z.prec = a.prec_max
-  z.val = a.prec_max
+  z.prec = max_precision(a)
+  z.val = max_precision(a)
   z.parent = a
   return z
 end
@@ -650,10 +650,10 @@ end
 function (a::ZZRelPowerSeriesRing)(b::Integer)
   if b == 0
     z = ZZRelPowerSeriesRingElem()
-    z.prec = a.prec_max
-    z.val = a.prec_max
+    z.prec = max_precision(a)
+    z.val = max_precision(a)
   else
-    z = ZZRelPowerSeriesRingElem([ZZRingElem(b)], 1, a.prec_max, 0)
+    z = ZZRelPowerSeriesRingElem([ZZRingElem(b)], 1, max_precision(a), 0)
   end
   z.parent = a
   return z
@@ -662,10 +662,10 @@ end
 function (a::ZZRelPowerSeriesRing)(b::ZZRingElem)
   if b == 0
     z = ZZRelPowerSeriesRingElem()
-    z.prec = a.prec_max
-    z.val = a.prec_max
+    z.prec = max_precision(a)
+    z.val = max_precision(a)
   else
-    z = ZZRelPowerSeriesRingElem([b], 1, a.prec_max, 0)
+    z = ZZRelPowerSeriesRingElem([b], 1, max_precision(a), 0)
   end
   z.parent = a
   return z

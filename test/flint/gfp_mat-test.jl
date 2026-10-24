@@ -186,12 +186,16 @@ end
   @test t isa fpMatrix
   @test size(t) == (2, 3)
 
-  for (R, M) in ring_to_mat
+  for R in example_rings
     t = similar(s, R)
     @test size(t) == size(s)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
 
     t = similar(s, R, 2, 3)
     @test size(t) == (2, 3)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
   end
 end
 
@@ -563,13 +567,13 @@ end
 
   @test c == Z17(13)
 
-  @test_throws ErrorException tr(b)
+  @test_throws DomainError tr(b)
 
   c = det(a)
 
   @test c == zero(Z17)
 
-  @test_throws ErrorException det(b)
+  @test_throws DomainError det(b)
 
   c = det(aa)
 
@@ -621,7 +625,7 @@ end
 
   @test c == parent(aa)([12 13 1; 14 13 15; 4 4 1])
 
-  @test_throws ErrorException inv(a)
+  @test_throws DomainError inv(a)
 
   @test_throws ErrorException inv(transpose(a)*a)
 end
@@ -634,7 +638,9 @@ end
   a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(Z17) === AbstractAlgebra.Solve.LUTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(Z17)) === AbstractAlgebra.Solve.LUTrait()
   @test AbstractAlgebra.Solve.matrix_normal_form_type(a) === AbstractAlgebra.Solve.LUTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(a)) === AbstractAlgebra.Solve.LUTrait()
 
   b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
 
@@ -739,7 +745,9 @@ end
   A = matrix(F, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
   C = solve_init(A)
   @test C isa AbstractAlgebra.solve_context_type(F)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(F))
   @test C isa AbstractAlgebra.solve_context_type(A)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.LUTrait()
   @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), fpFieldElem)

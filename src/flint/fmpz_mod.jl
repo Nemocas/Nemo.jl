@@ -447,19 +447,6 @@ end
 
 Random.gentype(::Type{ZZModRing}) = elem_type(ZZModRing)
 
-# define rand(make(::ZZModRing, arr)), where arr is any abstract array with integer or ZZRingElem entries
-
-RandomExtensions.maketype(R::ZZModRing, _) = elem_type(R)
-
-rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{ZZModRingElem,ZZModRing,<:AbstractArray{<:IntegerUnion}}}) =
-sp[][1](rand(rng, sp[][2]))
-
-# define rand(::ZZModRing, arr), where arr is any abstract array with integer or ZZRingElem entries
-
-rand(r::Random.AbstractRNG, R::ZZModRing, b::AbstractArray) = rand(r, make(R, b))
-
-rand(R::ZZModRing, b::AbstractArray) = rand(Random.default_rng(), R, b)
-
 ###############################################################################
 #
 #   Conformance test element generation

@@ -172,15 +172,60 @@ function -(x::zzModRingElem, y::zzModRingElem)
   end
 end
 
+nmod_t(R::Union{zzModRing, fpField}) = nmod_t(R.n, R.ninv, R.norm)
+
+function nmod_t(n::UInt)
+  m = Ref{nmod_t}()
+  @ccall libflint.nmod_init(m::Ref{nmod_t}, n::UInt)::Nothing
+  return m[]
+end
+
 # ni needs to be an 'inverse' of n computing using :n_preinvert_limb in flint
 function mulmod(a::UInt, b::UInt, n::UInt, ni::UInt)
   return @ccall libflint.n_mulmod2_preinv(a::UInt, b::UInt, n::UInt, ni::UInt)::UInt
 end
 
+# a mod n, with ninv as above; Julia port of flint's n_mod2_preinv, so that
+# callers can inline the reduction instead of paying for a ccall
+@inline function mod2_preinv(a::UInt, n::UInt, ninv::UInt)
+  @assert !iszero(n)
+
+  bits = 8 * sizeof(UInt)
+  norm = leading_zeros(n)
+  n_norm = n << norm
+
+  # split a << norm into two limbs (u1, u0); a >> 64 is a well-defined 0 in Julia
+  u1 = a >> (bits - norm)
+  u0 = a << norm
+
+  # q = (q1, q0) approximates (u1, u0) * 2^64 / n_norm via q = u1 * ninv + (u1, u0)
+  prod = widemul(ninv, u1)
+  q1 = (prod >> bits) % UInt
+  q0 = prod % UInt
+  q0 += u0
+  q1 = q1 + u1 + (q0 < u0)
+
+  # candidate remainder, off by at most one correction step
+  r = u0 - (q1 + 1) * n_norm
+  if r > q0
+    r += n_norm
+  end
+
+  return r < n_norm ? (r >> norm) : ((r - n_norm) >> norm)
+end
+
+# a * b mod R.n for a, b < R.n; n_mulmod_preinv takes the residues and the
+# modulus shifted left by norm
+function _mulmod(a::UInt, b::UInt, R::Union{zzModRing, fpField})
+  s = R.norm
+  d = @ccall libflint.n_mulmod_preinv((a << s)::UInt, (b << s)::UInt, (R.n << s)::UInt, R.ninv::UInt, s::UInt)::UInt
+  return d >> s
+end
+
 function *(x::zzModRingElem, y::zzModRingElem)
   check_parent(x, y)
   R = parent(x)
-  d = mulmod(x.data, y.data, R.n, R.ninv)
+  d = _mulmod(x.data, y.data, R)
   return zzModRingElem(d, R)
 end
 
@@ -238,7 +283,7 @@ function ^(x::zzModRingElem, y::Int)
     x = inv(x)
     y = -y
   end
-  d = @ccall libflint.n_powmod2_preinv(UInt(x.data)::UInt, y::Int, R.n::UInt, R.ninv::UInt)::UInt
+  d = @ccall libflint.nmod_pow_ui(x.data::UInt, unsigned(y)::UInt, nmod_t(R)::nmod_t)::UInt
   return zzModRingElem(d, R)
 end
 
@@ -377,19 +422,6 @@ rand(rng::AbstractRNG, R::Random.SamplerSimple{zzModRing}) = zzModRingElem(rand(
 
 Random.gentype(::Type{zzModRing}) = elem_type(zzModRing)
 
-# define rand(make(R::zzModRing, arr)), where arr is any abstract array with integer or ZZRingElem entries
-
-RandomExtensions.maketype(R::zzModRing, _) = elem_type(R)
-
-rand(rng::AbstractRNG, sp::SamplerTrivial{<:Make2{zzModRingElem,zzModRing,<:AbstractArray{<:IntegerUnion}}}) =
-sp[][1](rand(rng, sp[][2]))
-
-# define rand(R::zzModRing, arr), where arr is any abstract array with integer or ZZRingElem entries
-
-rand(r::Random.AbstractRNG, R::zzModRing, b::AbstractArray) = rand(r, make(R, b))
-
-rand(R::zzModRing, b::AbstractArray) = rand(Random.default_rng(), R, b)
-
 ###############################################################################
 #
 #   Conformance test element generation
@@ -440,7 +472,7 @@ function (R::zzModRing)(a::Int)
     d += n
   end
   if d >= n
-    d = @ccall libflint.n_mod2_preinv(d::UInt, n::UInt, ninv::UInt)::UInt
+    d = mod2_preinv(d, n, ninv)
   end
   return zzModRingElem(d, R)
 end
@@ -448,7 +480,7 @@ end
 function (R::zzModRing)(a::UInt)
   n = R.n
   ninv = R.ninv
-  a = @ccall libflint.n_mod2_preinv(a::UInt, n::UInt, ninv::UInt)::UInt
+  a = mod2_preinv(a, n, ninv)
   return zzModRingElem(a, R)
 end
 

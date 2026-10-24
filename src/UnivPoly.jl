@@ -15,8 +15,11 @@ for op in (:+, :*, :-)
     $op(a::T, b::ZZRingElem) where {T <: Generic.UnivPoly} = T($op(data(a), b), parent(a))
     $op(a::ZZRingElem, b::T) where {T <: Generic.UnivPoly} = T($op(a, data(b)), parent(b))
 
-    # to avoid ambiguity
-    $op(a::T, b::ZZRingElem) where {T <: Generic.UnivPoly{ZZRingElem}} = T($op(data(a), b), parent(a))
-    $op(a::ZZRingElem, b::T) where {T <: Generic.UnivPoly{ZZRingElem}} = T($op(a, data(b)), parent(b))
+    # to avoid ambiguity: the `n::U` argument of AbstractAlgebra's methods for
+    # `UniversalRingElem{T, U}` is covariant, so a `ZZRingElem` there only
+    # forces `ZZRingElem <: U`. Both bounds are needed to cover exactly that
+    # overlap -- `Generic.UnivPoly{ZZRingElem}` alone leaves the ambiguity.
+    $op(a::T, b::ZZRingElem) where {ZZRingElem <: U <: RingElem, T <: Generic.UnivPoly{U}} = T($op(data(a), b), parent(a))
+    $op(a::ZZRingElem, b::T) where {ZZRingElem <: U <: RingElem, T <: Generic.UnivPoly{U}} = T($op(a, data(b)), parent(b))
   end
 end

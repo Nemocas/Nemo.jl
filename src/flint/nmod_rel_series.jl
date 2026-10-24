@@ -166,20 +166,20 @@ for (etype, rtype, mtype, brtype) in (
       check_parent(a, b)
       lena = pol_length(a)
       lenb = pol_length(b)
-      prec = min(a.prec, b.prec)
-      val = min(a.val, b.val)
-      lena = min(lena, prec - a.val)
-      lenb = min(lenb, prec - b.val)
+      prec = min(precision(a), precision(b))
+      val = min(valuation(a), valuation(b))
+      lena = min(lena, prec - valuation(a))
+      lenb = min(lenb, prec - valuation(b))
       z = parent(a)()
-      if a.val < b.val
-        lenz = max(lena, lenb + b.val - a.val)
-        @ccall libflint.nmod_poly_set_trunc(z::Ref{($etype)}, b::Ref{($etype)}, max(0, lenz - b.val + a.val)::Int)::Nothing
-        @ccall libflint.nmod_poly_shift_left(z::Ref{($etype)}, z::Ref{($etype)}, (b.val - a.val)::Int)::Nothing
+      if valuation(a) < valuation(b)
+        lenz = max(lena, lenb + valuation(b) - valuation(a))
+        @ccall libflint.nmod_poly_set_trunc(z::Ref{($etype)}, b::Ref{($etype)}, max(0, lenz - valuation(b) + valuation(a))::Int)::Nothing
+        @ccall libflint.nmod_poly_shift_left(z::Ref{($etype)}, z::Ref{($etype)}, (valuation(b) - valuation(a))::Int)::Nothing
         @ccall libflint.nmod_poly_add_series(z::Ref{($etype)}, z::Ref{($etype)}, a::Ref{($etype)}, lenz::Int)::Nothing
-      elseif b.val < a.val
-        lenz = max(lena + a.val - b.val, lenb)
-        @ccall libflint.nmod_poly_set_trunc(z::Ref{($etype)}, a::Ref{($etype)}, max(0, lenz - a.val + b.val)::Int)::Nothing
-        @ccall libflint.nmod_poly_shift_left(z::Ref{($etype)}, z::Ref{($etype)}, (a.val - b.val)::Int)::Nothing
+      elseif valuation(b) < valuation(a)
+        lenz = max(lena + valuation(a) - valuation(b), lenb)
+        @ccall libflint.nmod_poly_set_trunc(z::Ref{($etype)}, a::Ref{($etype)}, max(0, lenz - valuation(a) + valuation(b))::Int)::Nothing
+        @ccall libflint.nmod_poly_shift_left(z::Ref{($etype)}, z::Ref{($etype)}, (valuation(a) - valuation(b))::Int)::Nothing
         @ccall libflint.nmod_poly_add_series(z::Ref{($etype)}, z::Ref{($etype)}, b::Ref{($etype)}, lenz::Int)::Nothing
       else
         lenz = max(lena, lenb)
@@ -195,22 +195,22 @@ for (etype, rtype, mtype, brtype) in (
       check_parent(a, b)
       lena = pol_length(a)
       lenb = pol_length(b)
-      prec = min(a.prec, b.prec)
-      val = min(a.val, b.val)
-      lena = min(lena, prec - a.val)
-      lenb = min(lenb, prec - b.val)
+      prec = min(precision(a), precision(b))
+      val = min(valuation(a), valuation(b))
+      lena = min(lena, prec - valuation(a))
+      lenb = min(lenb, prec - valuation(b))
       lenz = max(lena, lenb)
       z = parent(a)()
-      if a.val < b.val
-        lenz = max(lena, lenb + b.val - a.val)
-        @ccall libflint.nmod_poly_set_trunc(z::Ref{($etype)}, b::Ref{($etype)}, max(0, lenz - b.val + a.val)::Int)::Nothing
-        @ccall libflint.nmod_poly_shift_left(z::Ref{($etype)}, z::Ref{($etype)}, (b.val - a.val)::Int)::Nothing
+      if valuation(a) < valuation(b)
+        lenz = max(lena, lenb + valuation(b) - valuation(a))
+        @ccall libflint.nmod_poly_set_trunc(z::Ref{($etype)}, b::Ref{($etype)}, max(0, lenz - valuation(b) + valuation(a))::Int)::Nothing
+        @ccall libflint.nmod_poly_shift_left(z::Ref{($etype)}, z::Ref{($etype)}, (valuation(b) - valuation(a))::Int)::Nothing
         @ccall libflint.nmod_poly_neg(z::Ref{($etype)}, z::Ref{($etype)})::Nothing
         @ccall libflint.nmod_poly_add_series(z::Ref{($etype)}, z::Ref{($etype)}, a::Ref{($etype)}, lenz::Int)::Nothing
-      elseif b.val < a.val
-        lenz = max(lena + a.val - b.val, lenb)
-        @ccall libflint.nmod_poly_set_trunc(z::Ref{($etype)}, a::Ref{($etype)}, max(0, lenz - a.val + b.val)::Int)::Nothing
-        @ccall libflint.nmod_poly_shift_left(z::Ref{($etype)}, z::Ref{($etype)}, (a.val - b.val)::Int)::Nothing
+      elseif valuation(b) < valuation(a)
+        lenz = max(lena + valuation(a) - valuation(b), lenb)
+        @ccall libflint.nmod_poly_set_trunc(z::Ref{($etype)}, a::Ref{($etype)}, max(0, lenz - valuation(a) + valuation(b))::Int)::Nothing
+        @ccall libflint.nmod_poly_shift_left(z::Ref{($etype)}, z::Ref{($etype)}, (valuation(a) - valuation(b))::Int)::Nothing
         @ccall libflint.nmod_poly_sub_series(z::Ref{($etype)}, z::Ref{($etype)}, b::Ref{($etype)}, lenz::Int)::Nothing
       else
         lenz = max(lena, lenb)
@@ -228,12 +228,12 @@ for (etype, rtype, mtype, brtype) in (
       lenb = pol_length(b)
       aval = valuation(a)
       bval = valuation(b)
-      prec = min(a.prec - aval, b.prec - bval)
+      prec = min(precision(a) - aval, precision(b) - bval)
       lena = min(lena, prec)
       lenb = min(lenb, prec)
       z = parent(a)()
-      z.val = a.val + b.val
-      z.prec = prec + z.val
+      z.val = valuation(a) + valuation(b)
+      z.prec = prec + valuation(z)
       if lena == 0 || lenb == 0
         return z
       end
@@ -297,8 +297,8 @@ for (etype, rtype, mtype, brtype) in (
       len < 0 && throw(DomainError(len, "Shift must be non-negative"))
       xlen = pol_length(x)
       z = ($etype)(x)
-      z.prec = x.prec + len
-      z.val = x.val + len
+      z.prec = precision(x) + len
+      z.val = valuation(x) + len
       z.parent = parent(x)
       return z
     end
@@ -309,10 +309,10 @@ for (etype, rtype, mtype, brtype) in (
       xval = valuation(x)
       z = parent(x)()
       if len >= xlen + xval
-        z.prec = max(0, x.prec - len)
-        z.val = max(0, x.prec - len)
+        z.prec = max(0, precision(x) - len)
+        z.val = max(0, precision(x) - len)
       else
-        z.prec = max(0, x.prec - len)
+        z.prec = max(0, precision(x) - len)
         z.val = max(0, xval - len)
         zlen = min(xlen + xval - len, xlen)
         @ccall libflint.nmod_poly_shift_right(z::Ref{($etype)}, x::Ref{($etype)}, (xlen - zlen)::Int)::Nothing
@@ -357,7 +357,7 @@ for (etype, rtype, mtype, brtype) in (
       if is_gen(a)
         z = parent(a)()
         z = setcoeff!(z, 0, UInt(1))
-        z.prec = a.prec + b - 1
+        z.prec = precision(a) + b - 1
         z.val = b
       elseif pol_length(a) == 0
         z = parent(a)()
@@ -372,9 +372,9 @@ for (etype, rtype, mtype, brtype) in (
         return one(parent(a))
       else
         z = parent(a)()
-        z.prec = a.prec + (b - 1)*valuation(a)
+        z.prec = precision(a) + (b - 1)*valuation(a)
         z.val = b*valuation(a)
-        @ccall libflint.nmod_poly_pow_trunc(z::Ref{($etype)}, a::Ref{($etype)}, b::Int, (z.prec - z.val)::Int)::Nothing
+        @ccall libflint.nmod_poly_pow_trunc(z::Ref{($etype)}, a::Ref{($etype)}, b::Int, (precision(z) - valuation(z))::Int)::Nothing
       end
       renormalize!(z)
       return z
@@ -388,15 +388,15 @@ for (etype, rtype, mtype, brtype) in (
 
     function ==(x::($etype), y::($etype))
       check_parent(x, y)
-      prec = min(x.prec, y.prec)
-      if prec <= x.val && prec <= y.val
+      prec = min(precision(x), precision(y))
+      if prec <= valuation(x) && prec <= valuation(y)
         return true
       end
-      if x.val != y.val
+      if valuation(x) != valuation(y)
         return false
       end
-      xlen = normalise(x, min(pol_length(x), prec - x.val))
-      ylen = normalise(y, min(pol_length(y), prec - y.val))
+      xlen = normalise(x, min(pol_length(x), prec - valuation(x)))
+      ylen = normalise(y, min(pol_length(y), prec - valuation(y)))
       if xlen != ylen
         return false
       end
@@ -407,7 +407,7 @@ for (etype, rtype, mtype, brtype) in (
       if parent(x) != parent(y)
         return false
       end
-      if x.prec != y.prec || x.val != y.val || pol_length(x) != pol_length(y)
+      if precision(x) != precision(y) || valuation(x) != valuation(y) || pol_length(x) != pol_length(y)
         return false
       end
       return Bool(@ccall libflint.nmod_poly_equal(x::Ref{($etype)}, y::Ref{($etype)})::Cint)
@@ -425,7 +425,7 @@ for (etype, rtype, mtype, brtype) in (
       elseif pol_length(x) > 1
         return false
       elseif pol_length(x) == 1
-        if x.val == 0
+        if valuation(x) == 0
           z = @ccall libflint.nmod_poly_get_coeff_ui(x::Ref{($etype)}, 0::Int)::UInt
           return data(y) == z
         else
@@ -444,7 +444,7 @@ for (etype, rtype, mtype, brtype) in (
       elseif pol_length(x) > 1
         return false
       elseif pol_length(x) == 1
-        if x.val == 0
+        if valuation(x) == 0
           r = @ccall libflint.fmpz_fdiv_ui(y::Ref{ZZRingElem}, modulus(x)::UInt)::UInt
           z = @ccall libflint.nmod_poly_get_coeff_ui(x::Ref{($etype)}, 0::Int)::UInt
           return r == z
@@ -465,7 +465,7 @@ for (etype, rtype, mtype, brtype) in (
       elseif pol_length(x) > 1
         return false
       elseif pol_length(x) == 1
-        if x.val == 0
+        if valuation(x) == 0
           r = mod(y, modulus(x))
           z = @ccall libflint.nmod_poly_get_coeff_ui(x::Ref{($etype)}, 0::Int)::UInt
           return r == z
@@ -502,10 +502,10 @@ for (etype, rtype, mtype, brtype) in (
         end
       end
       check && !is_unit(y) && error("Unable to invert power series")
-      prec = min(x.prec - x.val, y.prec - y.val)
+      prec = min(precision(x) - valuation(x), precision(y) - valuation(y))
       z = parent(x)()
       z.val = xval - yval
-      z.prec = prec + z.val
+      z.prec = prec + valuation(z)
       if prec != 0
         @ccall libflint.nmod_poly_div_series(z::Ref{($etype)}, x::Ref{($etype)}, y::Ref{($etype)}, prec::Int)::Nothing
       end
@@ -566,7 +566,7 @@ for (etype, rtype, mtype, brtype) in (
       ainv = parent(a)()
       ainv.prec = a.prec
       ainv.val = 0
-      @ccall libflint.nmod_poly_inv_series(ainv::Ref{($etype)}, a::Ref{($etype)}, a.prec::Int)::Nothing
+      @ccall libflint.nmod_poly_inv_series(ainv::Ref{($etype)}, a::Ref{($etype)}, precision(a)::Int)::Nothing
       return ainv
     end
 
@@ -614,14 +614,14 @@ for (etype, rtype, mtype, brtype) in (
 
     function zero!(x::($etype))
       @ccall libflint.nmod_poly_zero(x::Ref{($etype)})::Nothing
-      x.prec = parent(x).prec_max
-      x.val = parent(x).prec_max
+      x.prec = max_precision(parent(x))
+      x.val = max_precision(parent(x))
       return x
     end
 
     function one!(x::($etype))
       @ccall libflint.nmod_poly_one(x::Ref{($etype)})::Nothing
-      x.prec = parent(x).prec_max
+      x.prec = max_precision(parent(x))
       x.val = 0
       return x
     end
@@ -660,11 +660,11 @@ for (etype, rtype, mtype, brtype) in (
       lenb = pol_length(b)
       aval = valuation(a)
       bval = valuation(b)
-      prec = min(a.prec - aval, b.prec - bval)
+      prec = min(precision(a) - aval, precision(b) - bval)
       lena = min(lena, prec)
       lenb = min(lenb, prec)
-      z.val = a.val + b.val
-      z.prec = prec + z.val
+      z.val = valuation(a) + valuation(b)
+      z.prec = prec + valuation(z)
       lenz = min(lena + lenb - 1, prec)
       if lena <= 0 || lenb <= 0
         lenz = 0
@@ -677,22 +677,22 @@ for (etype, rtype, mtype, brtype) in (
     function add!(a::($etype), b::($etype))
       lena = pol_length(a)
       lenb = pol_length(b)
-      prec = min(a.prec, b.prec)
-      val = min(a.val, b.val)
-      lena = min(lena, prec - a.val)
-      lenb = min(lenb, prec - b.val)
+      prec = min(precision(a), precision(b))
+      val = min(valuation(a), valuation(b))
+      lena = min(lena, prec - valuation(a))
+      lenb = min(lenb, prec - valuation(b))
       n = modulus(parent(a))
-      if a.val < b.val
+      if valuation(a) < valuation(b)
         z = ($etype)(n)
         z.parent = parent(a)
-        lenz = max(lena, lenb + b.val - a.val)
-        @ccall libflint.nmod_poly_set_trunc(z::Ref{($etype)}, b::Ref{($etype)}, max(0, lenz - b.val + a.val)::Int)::Nothing
-        @ccall libflint.nmod_poly_shift_left(z::Ref{($etype)}, z::Ref{($etype)}, (b.val - a.val)::Int)::Nothing
+        lenz = max(lena, lenb + valuation(b) - valuation(a))
+        @ccall libflint.nmod_poly_set_trunc(z::Ref{($etype)}, b::Ref{($etype)}, max(0, lenz - valuation(b) + valuation(a))::Int)::Nothing
+        @ccall libflint.nmod_poly_shift_left(z::Ref{($etype)}, z::Ref{($etype)}, (valuation(b) - valuation(a))::Int)::Nothing
         @ccall libflint.nmod_poly_add_series(a::Ref{($etype)}, a::Ref{($etype)}, z::Ref{($etype)}, lenz::Int)::Nothing
-      elseif b.val < a.val
-        lenz = max(lena + a.val - b.val, lenb)
-        @ccall libflint.nmod_poly_truncate(a::Ref{($etype)}, max(0, lenz - a.val + b.val)::Int)::Nothing
-        @ccall libflint.nmod_poly_shift_left(a::Ref{($etype)}, a::Ref{($etype)}, (a.val - b.val)::Int)::Nothing
+      elseif valuation(b) < valuation(a)
+        lenz = max(lena + valuation(a) - valuation(b), lenb)
+        @ccall libflint.nmod_poly_truncate(a::Ref{($etype)}, max(0, lenz - valuation(a) + valuation(b))::Int)::Nothing
+        @ccall libflint.nmod_poly_shift_left(a::Ref{($etype)}, a::Ref{($etype)}, (valuation(a) - valuation(b))::Int)::Nothing
         @ccall libflint.nmod_poly_add_series(a::Ref{($etype)}, a::Ref{($etype)}, b::Ref{($etype)}, lenz::Int)::Nothing
       else
         lenz = max(lena, lenb)
@@ -712,19 +712,19 @@ for (etype, rtype, mtype, brtype) in (
       end
       lena = pol_length(a)
       lenb = pol_length(b)
-      prec = min(a.prec, b.prec)
-      val = min(a.val, b.val)
-      lena = min(lena, prec - a.val)
-      lenb = min(lenb, prec - b.val)
-      if a.val < b.val
-        lenc = max(lena, lenb + b.val - a.val)
-        @ccall libflint.nmod_poly_set_trunc(c::Ref{($etype)}, b::Ref{($etype)}, max(0, lenc - b.val + a.val)::Int)::Nothing
-        @ccall libflint.nmod_poly_shift_left(c::Ref{($etype)}, c::Ref{($etype)}, (b.val - a.val)::Int)::Nothing
+      prec = min(precision(a), precision(b))
+      val = min(valuation(a), valuation(b))
+      lena = min(lena, prec - valuation(a))
+      lenb = min(lenb, prec - valuation(b))
+      if valuation(a) < valuation(b)
+        lenc = max(lena, lenb + valuation(b) - valuation(a))
+        @ccall libflint.nmod_poly_set_trunc(c::Ref{($etype)}, b::Ref{($etype)}, max(0, lenc - valuation(b) + valuation(a))::Int)::Nothing
+        @ccall libflint.nmod_poly_shift_left(c::Ref{($etype)}, c::Ref{($etype)}, (valuation(b) - valuation(a))::Int)::Nothing
         @ccall libflint.nmod_poly_add_series(c::Ref{($etype)}, c::Ref{($etype)}, a::Ref{($etype)}, lenc::Int)::Nothing
-      elseif b.val < a.val
-        lenc = max(lena + a.val - b.val, lenb)
-        @ccall libflint.nmod_poly_set_trunc(c::Ref{($etype)}, a::Ref{($etype)}, max(0, lenc - a.val + b.val)::Int)::Nothing
-        @ccall libflint.nmod_poly_shift_left(c::Ref{($etype)}, c::Ref{($etype)}, (a.val - b.val)::Int)::Nothing
+      elseif valuation(b) < valuation(a)
+        lenc = max(lena + valuation(a) - valuation(b), lenb)
+        @ccall libflint.nmod_poly_set_trunc(c::Ref{($etype)}, a::Ref{($etype)}, max(0, lenc - valuation(a) + valuation(b))::Int)::Nothing
+        @ccall libflint.nmod_poly_shift_left(c::Ref{($etype)}, c::Ref{($etype)}, (valuation(a) - valuation(b))::Int)::Nothing
         @ccall libflint.nmod_poly_add_series(c::Ref{($etype)}, c::Ref{($etype)}, b::Ref{($etype)}, lenc::Int)::Nothing
       else
         lenc = max(lena, lenb)
@@ -761,8 +761,8 @@ for (etype, rtype, mtype, brtype) in (
 
     function (a::($rtype))()
       z = ($etype)(modulus(a))
-      z.prec = a.prec_max
-      z.val = a.prec_max
+      z.prec = max_precision(a)
+      z.val = max_precision(a)
       z.parent = a
       return z
     end
@@ -778,10 +778,10 @@ for (etype, rtype, mtype, brtype) in (
     function (a::($rtype))(b::($mtype))
       if iszero(b)
         z = ($etype)(modulus(a))
-        z.prec = a.prec_max
-        z.val = a.prec_max
+        z.prec = max_precision(a)
+        z.val = max_precision(a)
       else
-        z = ($etype)(modulus(a), [b], 1, a.prec_max, 0)
+        z = ($etype)(modulus(a), [b], 1, max_precision(a), 0)
       end
       z.parent = a
       return z
@@ -867,7 +867,7 @@ function sqrt_classical(a::fpRelPowerSeriesRingElem; check::Bool=true)
   if check && !iseven(v)
     return false, S()
   end
-  z.prec = a.prec - v2
+  z.prec = precision(a) - v2
   z.val = v2
   c = coeff(a, v)
   if check
@@ -879,7 +879,7 @@ function sqrt_classical(a::fpRelPowerSeriesRingElem; check::Bool=true)
     s = sqrt(c; check=check)
   end
   a = divexact(a, c)
-  @ccall libflint.nmod_poly_sqrt_series(z::Ref{fpRelPowerSeriesRingElem}, a::Ref{fpRelPowerSeriesRingElem}, a.prec::Int)::Nothing
+  @ccall libflint.nmod_poly_sqrt_series(z::Ref{fpRelPowerSeriesRingElem}, a::Ref{fpRelPowerSeriesRingElem}, precision(a)::Int)::Nothing
   if !isone(s)
     z *= s
   end

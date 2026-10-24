@@ -312,6 +312,17 @@ end
   g = (x + 1)*y + (x^3 + 2x + 2)
 
   @test divexact(f*g, f) == g
+  @test divexact(f*g, f; check=false) == g
+
+  @test_throws ArgumentError divexact(f*g + 1, f)
+  @test divexact(f*g + 1, f; check=false) == g
+
+  # dividend of lower degree than the divisor
+  @test_throws ArgumentError divexact(g, f^2)
+  @test iszero(divexact(g, f^2; check=false))
+
+  @test_throws DivideError divexact(f, zero(S))
+  @test_throws DivideError divexact(f, zero(S); check=false)
 end
 
 @testset "fqPolyRepPolyRingElem.adhoc_exact_division" begin

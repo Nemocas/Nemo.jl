@@ -428,31 +428,26 @@ conj(x::ZZRingElem) = x
 #
 ###############################################################################
 
-# Metaprogram to define functions +, -, *, gcd, lcm,
-#                                 &, |, $ (xor)
+for (fJ, fC) in ((:+, :add!), (:-, :sub!), (:*, :mul!))
+  @eval ($fJ)(x::ZZRingElem, y::ZZRingElem) = $fC(ZZRingElem(), x, y)
+end
 
-for (fJ, fC) in ((:+, :add), (:-,:sub), (:*, :mul),
-                 (:&, :and), (:|, :or), (:xor, :xor))
+# Metaprogram to define functions &, |, $ (xor)
+
+for (fJ, fC) in ((:&, :fmpz_and), (:|, :fmpz_or), (:xor, :fmpz_xor))
   @eval begin
     function ($fJ)(x::ZZRingElem, y::ZZRingElem)
       z = ZZRingElem()
-      @ccall libflint.$("fmpz_$fC")(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
+      @ccall libflint.$fC(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
       return z
     end
   end
 end
 
-# Metaprogram to define functions fdiv, cdiv, tdiv, div
-
-for (fJ, fC) in ((:fdiv, :fdiv_q), (:cdiv, :cdiv_q), (:tdiv, :tdiv_q),
-                 (:div, :fdiv_q))
-  @eval begin
-    function ($fJ)(x::ZZRingElem, y::ZZRingElem)
-      iszero(y) && throw(DivideError())
-      z = ZZRingElem()
-      @ccall libflint.$("fmpz_$fC")(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
-      return z
-    end
+for (fJ, fC) in ((:fdiv, :fdiv!), (:cdiv, :cdiv!), (:tdiv, :tdiv!), (:div, :fdiv!))
+  @eval function ($fJ)(x::ZZRingElem, y::ZZRingElem)
+    iszero(y) && throw(DivideError())
+    return $fC(ZZRingElem(), x, y)
   end
 end
 
@@ -461,14 +456,14 @@ end
 # Here we set Base.div to a version that agrees with Base
 function Base.div(x::ZZRingElem, y::ZZRingElem)
   iszero(y) && throw(DivideError())
-  z = ZZRingElem()
-  @ccall libflint.fmpz_tdiv_q(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
-  return z
+  return tdiv!(ZZRingElem(), x, y)
 end
 
 Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundToZero)) = tdiv(x, y)
 Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundUp)) = cdiv(x, y)
 Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundDown)) = fdiv(x, y)
+Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundFromZero)) =
+  signbit(x) == signbit(y) ? cdiv(x, y) : fdiv(x, y)
 
 function divexact(x::ZZRingElem, y::ZZRingElem; check::Bool=true)
   iszero(y) && throw(DivideError())
@@ -829,6 +824,10 @@ Base.divrem(x::ZZRingElem, y::Integer, r::RoundingMode) = Base.divrem(x, ZZ(y), 
 Base.divrem(x::Integer, y::ZZRingElem) = Base.divrem(ZZ(x), y)
 Base.divrem(x::Integer, y::ZZRingElem, r::RoundingMode) = Base.divrem(ZZ(x), y, r)
 
+# Resolve ambiguity with Base's `divrem(x, y, ::typeof(RoundFromZero))`
+Base.divrem(x::ZZRingElem, y::Integer, r::typeof(RoundFromZero)) = Base.divrem(x, ZZ(y), r)
+Base.divrem(x::Integer, y::ZZRingElem, r::typeof(RoundFromZero)) = Base.divrem(ZZ(x), y, r)
+
 ###############################################################################
 #
 #   Division with remainder
@@ -1060,9 +1059,9 @@ end
 
 function cmp(a::BigFloat, b::ZZRingElem)
   if _fmpz_is_small(b)
-    return Int(@ccall :libmpfr.mpfr_cmp_si(a::Ref{BigFloat}, b.d::Int)::Cint)
+    return Int(@ccall Base.MPFR.libmpfr.mpfr_cmp_si(a::Ref{BigFloat}, b.d::Int)::Cint)
   end
-  return Int(@ccall :libmpfr.mpfr_cmp_z(a::Ref{BigFloat}, (unsigned(b.d) << 2)::UInt)::Cint)
+  return Int(@ccall Base.MPFR.libmpfr.mpfr_cmp_z(a::Ref{BigFloat}, (unsigned(b.d) << 2)::UInt)::Cint)
 end
 
 ==(x::ZZRingElem, y::BigFloat) = cmp(y, x) == 0
@@ -1978,8 +1977,8 @@ function next_prime(x::ZZRingElem, proved::Bool = true)
 end
 
 function next_prime(x::UInt, proved::Bool = true)
-  if (Base.GMP.BITS_PER_LIMB == 64 && x >= 0xffffffffffffffc5) ||
-    (Base.GMP.BITS_PER_LIMB == 32 && x >= 0xfffffffb)
+  if (Sys.WORD_SIZE == 64 && x >= 0xffffffffffffffc5) ||
+    (Sys.WORD_SIZE == 32 && x >= 0xfffffffb)
     error("No larger single-limb prime exists")
   end
   return @ccall libflint.n_nextprime(x::UInt, proved::Cint)::UInt
@@ -2026,7 +2025,7 @@ function remove(a::BigInt, b::BigInt)
   b <= 1 && error("Factor <= 1")
   a == 0 && error("Not yet implemented")
   q = BigInt()
-  v = @ccall :libgmp.__gmpz_remove(q::Ref{BigInt}, a::Ref{BigInt}, b::Ref{BigInt})::Culong
+  v = @ccall Base.GMP.libgmp.__gmpz_remove(q::Ref{BigInt}, a::Ref{BigInt}, b::Ref{BigInt})::Culong
   return (Int(v), q)
 end
 
@@ -2551,6 +2550,63 @@ function Base.digits!(a::AbstractVector{T}, n::ZZRingElem; base::T = 10) where T
   end
   return a
 end
+
+@doc raw"""
+    digits_to_integer!(D::ZZMatrix; base::ZZRingElem = 10)
+
+Given an ``r``-by-``c`` matrix ``D``, returns a 1-by-``c`` matrix of integers whose
+``k``-th entry is ``\sum_{j=0}^{r-1} b^j D_{j+1, k}`` where ``b`` is the `base`.
+The ``k``-th column of ``D`` contains the digits (in the given base) of the ``k``-th
+integer in the result returned.  Note: the matrix ``D`` is modified by this function.
+"""
+function digits_to_integer!(D::ZZMatrix; base::IntegerUnion = 10)
+  # Code originally by Claus Fieker -- impressively quick!
+  nr = nrows(D)
+  @req  (nr > 0)  "Require at least 1 row"
+  (nr == 1) && return D
+  bb = ZZRingElem(Val(:raw))
+  b = ZZRingElem(Val(:raw))
+  set!(b, base)
+  while nr > 1
+    mul!(bb, b, b)
+    for i in 1:div(nr, 2)
+      add_row!(D, b, 2*i, 2*i-1)
+      swap_rows!(D, i, 2*i-1)
+      zero_row!(D, 2*i)  # to release memory early
+    end
+    if is_odd(nr)
+      add_row!(D, bb, nr, div(nr, 2))
+      zero_row!(D, nr)
+    end
+    nr = div(nr, 2)
+    b.d, bb.d = bb.d, b.d  # faster than b = bb;
+  end
+  Nemo._fmpz_clear_fn(bb)
+  Nemo._fmpz_clear_fn(b)
+  # All rows, but the 1st have been set to zero! - or have never been used.
+  # So no memory is lost...
+  return D[1:1,:]
+end
+
+
+@doc raw"""
+    digits_to_integer!(digits::Vector{ZZRingElem}; base::IntegerUnion = 10)
+    digits_to_integer!(digits::Vector{T}; base::IntegerUnion = Int(10)) where { T <: Integer }
+
+Returns the integer sum (base^j*d_{j+1}) where d_k is the k-th entry of digits.
+May overwrite digits.
+"""
+function digits_to_integer!(digits::Vector{ZZRingElem}; base::IntegerUnion = 10)
+  # Delegate to the matrix version (immediately above)
+  n = length(digits)
+  (n == 0) && return ZZ(0)
+  return digits_to_integer!(ZZMatrix(n,1, digits); base)[1,1]
+end
+
+function digits_to_integer!(digits::Vector{T}; base::IntegerUnion = 10) where { T <: Integer }
+  return digits_to_integer!(ZZ.(digits); base)
+end
+
 
 @doc raw"""
     nbits(x::ZZRingElem)
@@ -3202,9 +3258,7 @@ function rand(rng::AbstractRNG, a::ZZRingElemUnitRange)
   m < 0 && error("range empty")
   nd = ndigits(m, 2)
   nl, high = Base.divrem(nd, 8 * sizeof(Base.GMP.Limb))
-  if high > 0
-    mask = m >> (nl * 8 * sizeof(Base.GMP.Limb))
-  end
+  mask = m >> (nl * 8 * sizeof(Base.GMP.Limb))
   s = ZZRingElem(0)
   c = (8 * sizeof(Base.GMP.Limb))
   while true
@@ -3262,8 +3316,6 @@ end
 ###############################################################################
 
 ZZRingElem(s::AbstractString) = parse(ZZRingElem, s)
-
-ZZRingElem(z::Integer) = ZZRingElem(BigInt(z))
 
 ZZRingElem(z::Float16) = ZZRingElem(Float64(z))
 
@@ -3342,8 +3394,8 @@ promote_rule(::Type{ZZRingElem}, ::Type{T}) where {T <: Integer} = ZZRingElem
 
 
 #output sensitive rational_reconstruction, in particular if
-#numerator is larger than den 
-#used below in rational_reconstruction and, more seriously, in the 
+#numerator is larger than den
+#used below in rational_reconstruction and, more seriously, in the
 #solvers in ZZMatrix-Linalg
 
 function _ratrec!(n::ZZRingElem, d::ZZRingElem, a::ZZRingElem, b::ZZRingElem, N::ZZRingElem = ZZ(), D::ZZRingElem= ZZ())
@@ -3387,7 +3439,7 @@ end
 Tries to solve $ay=x mod b$ for $x,y < sqrt(b/2)$. If possible, returns
   (`true`, $x$, $y$) or (`false`, garbage) if not possible.
 
-If `unbalanced` is set to `true`, a solution is accepted if `nbits(x) + nbits(y) + 30 <= nbits(b)` or if the compined size of smaller than half of the modulus - this allows for the numberator or denominator to be much smaller
+If `unbalanced` is set to `true`, a solution is accepted if `nbits(x) + nbits(y) + 30 <= nbits(b)` or if the compined size of smaller than half of the modulus - this allows for the numerator or denominator to be much smaller
 than the other one.
 
 By default `y` and `b` have to be coprime for a valid solution. It is

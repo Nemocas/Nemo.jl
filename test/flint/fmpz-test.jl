@@ -50,6 +50,18 @@ end
   @test g == 0
 end
 
+@testset "ZZRingElem.constructors.inference" begin
+  # the caller knows only that the argument is an Integer
+  apply(f, r::Ref{Integer}) = f(r[])
+
+  for x in (3, UInt(3), big(3), Int8(3), true)
+    r = Ref{Integer}(x)
+    @test (@inferred apply(ZZRingElem, r)) == x
+    @test (@inferred apply(ZZ, r)) == x
+    @test (@inferred apply(Base.Fix1(convert, ZZRingElem), r)) == x
+  end
+end
+
 @testset "ZZRingElem.rand" begin
   test_rand(ZZ, 1:9)
   test_rand(ZZ, Int16(1):Int16(9))
@@ -717,7 +729,7 @@ end
 
 @testset "divrem and div with other rings" begin
   for (x, y) in [(12, 5), (-12, 5)]
-    for r in [RoundToZero, RoundUp, RoundDown]
+    for r in [RoundToZero, RoundUp, RoundDown, RoundFromZero]
       @test (
         ZZ(Base.div(x, y, r))
         == Base.div(ZZ(x), y, r)
@@ -934,6 +946,24 @@ end
   # Nemo PR #2325
   p = -primorial(ZZ(307))
   @test maximum(digits(p; base=ZZ(10))) <= 0
+
+  function column_matrix(c::Vector{T}) where { T <: Integer }
+    return matrix(ZZ, length(c), 1, c)
+  end
+  for sz in 0:5
+    n = factorial(ZZ(10^sz))
+    @test digits_to_integer!(digits(n)) == n
+    @test digits_to_integer!(digits(-n)) == -n
+    @test digits_to_integer!(column_matrix(digits(n)))[1,1] == n
+    @test digits_to_integer!(column_matrix(digits(-n)))[1,1] == -n
+
+    for base in [2, 3, 10, 32768, typemax(Int)]
+      @test digits_to_integer!(digits(n; base); base) == n
+      @test digits_to_integer!(digits(-n; base); base) == -n
+      @test digits_to_integer!(column_matrix(digits(n; base)); base)[1,1] == n
+      @test digits_to_integer!(column_matrix(digits(-n; base)); base)[1,1] == -n
+    end
+  end
 end
 
 @testset "ZZRingElem.string_io" begin

@@ -113,12 +113,16 @@ end
   @test t isa ComplexMatrix
   @test size(t) == (2, 3)
 
-  for (R, M) in ring_to_mat
+  for R in example_rings
     t = similar(s, R)
     @test size(t) == size(s)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
 
     t = similar(s, R, 2, 3)
     @test size(t) == (2, 3)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
   end
 end
 
@@ -141,6 +145,14 @@ end
   B[1, 1] = ZZRingElem(3)
 
   @test B[1, 1] == CC(3)
+
+  for y in [(1, 2), (big(1), big(2)), (1.0, 2.0), (big(1.0), big(2.0)),
+            (ZZ(1), ZZ(2)), (QQ(1), QQ(2)), (1//1, 2//1), (RR(1), RR(2)),
+            ("1", "2")]
+    B[1, 2] = y
+    @test B[1, 2] == CC(1, 2)
+    B[1, 2] = 0
+  end
 
   @test nrows(B) == 3
   @test ncols(B) == 3
@@ -171,6 +183,22 @@ end
   C = transpose(A)*A
 
   @test overlaps(transpose(C), C)
+
+  E = matrix(CC, [1 2 3; 4 5 6])
+  Z = similar(E, 3, 2)
+  @test transpose!(Z, E) === Z
+  @test Z == matrix(CC, [1 4; 2 5; 3 6])
+
+  D = matrix(CC, [1 2; 3 4])
+  GC.@preserve D E begin
+    for (d, e) in ((D, E), (Ref(D), Ref(E)),
+                   (Ptr{ComplexMatrix}(pointer_from_objref(D)), Ptr{ComplexMatrix}(pointer_from_objref(E))))
+      @test transpose!(d) === d
+      @test D == matrix(CC, [1 3; 2 4])
+      transpose!(D)
+      @test_throws DomainError transpose!(e)
+    end
+  end
 end
 
 @testset "ComplexMatrix.binary_ops" begin
@@ -302,6 +330,15 @@ end
 
   @test A == B
   @test B == A
+
+  D = matrix(RR, [2 3 5; 1 4 7; 9 6 3])
+
+  @test S(D) isa ComplexMatrix
+  @test S(D) == A
+  @test A == D
+  @test D == A
+  @test A != D + 1
+  @test_throws ErrorException S(zero_matrix(RR, 2, 3))
 end
 
 @testset "ComplexMatrix.predicates" begin
@@ -450,7 +487,9 @@ end
          "8.0 +/- 0.01" "8.0 +/- 0.01" "9.0 +/- 0.01"])
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(CC) === AbstractAlgebra.Solve.LUTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(CC)) === AbstractAlgebra.Solve.LUTrait()
   @test AbstractAlgebra.Solve.matrix_normal_form_type(A) === AbstractAlgebra.Solve.LUTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(A)) === AbstractAlgebra.Solve.LUTrait()
 
   b = transpose(CC["6.0 +/- 0.1" "15.0 +/- 0.1" "25.0 +/- 0.1"])
   b2 = 2*b
@@ -473,7 +512,9 @@ end
 
   C = solve_init(A)
   @test C isa AbstractAlgebra.solve_context_type(CC)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(CC))
   @test C isa AbstractAlgebra.solve_context_type(A)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.LUTrait()
   @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), elem_type(CC))

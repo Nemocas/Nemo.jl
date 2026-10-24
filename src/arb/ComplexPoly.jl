@@ -87,7 +87,7 @@ end
 function polynomial(R::ComplexField, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
   coeffs = map(R, arr)
   coeffs = length(coeffs) == 0 ? ComplexFieldElem[] : coeffs
-  z = ComplexPolyRingElem(coeffs, R.prec)
+  z = ComplexPolyRingElem(coeffs, precision(Balls))
   z.parent = ComplexPolyRing(R, Symbol(var), cached)
   return z
 end

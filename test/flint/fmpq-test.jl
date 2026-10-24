@@ -74,6 +74,25 @@ end
   end
 end
 
+@testset "QQFieldElem.constructors.inference" begin
+  # the caller knows only that the arguments are Integers, resp. a Rational
+  apply(f, r::Ref{Integer}, s::Ref{Integer}) = f(r[], s[])
+  apply(f, r::Ref{Rational}) = f(r[])
+
+  for (a, b) in ((2, 3), (big(2), 3), (Int8(2), UInt(3)))
+    r, s = Ref{Integer}(a), Ref{Integer}(b)
+    @test (@inferred apply(QQFieldElem, r, s)) == a//b
+    @test (@inferred apply(QQ, r, s)) == a//b
+  end
+
+  for x in (2//3, big(2)//3, Int8(2)//Int8(3))
+    r = Ref{Rational}(x)
+    @test (@inferred apply(QQFieldElem, r)) == x
+    @test (@inferred apply(QQ, r)) == x
+    @test (@inferred apply(Base.Fix1(convert, QQFieldElem), r)) == x
+  end
+end
+
 @testset "QQFieldElem.rand" begin
   for bits in 1:100
     t = rand_bits(QQ, bits)
@@ -112,13 +131,30 @@ end
   @test Rational{BigInt}(QQFieldElem(3, 7)) == 3//7
 
   @test ZZ(QQFieldElem(3)) isa ZZRingElem
-  @test_throws Exception ZZ(QQFieldElem(3, 2))
+  @test ZZ(QQFieldElem(3)) == 3
+  @test_throws InexactError ZZ(QQFieldElem(3, 2))
 
   @test ZZ(3//1) isa ZZRingElem
-  @test_throws Exception ZZ(3//2)
+  @test ZZ(3//1) == 3
+  @test_throws InexactError ZZ(3//2)
 
   @test ZZ(big(3)//1) isa ZZRingElem
-  @test_throws Exception ZZ(big(3)//2)
+  @test ZZ(big(3)//1) == 3
+  @test_throws InexactError ZZ(big(3)//2)
+
+  @test ZZRingElem(QQFieldElem(-3)) isa ZZRingElem
+  @test ZZRingElem(QQFieldElem(-3)) == -3
+  @test_throws InexactError ZZRingElem(QQFieldElem(3, 2))
+
+  @testset "$T" for T in (Int, Int8, UInt, BigInt)
+    @test T(QQFieldElem(3)) isa T
+    @test T(QQFieldElem(3)) == 3
+    @test_throws InexactError T(QQFieldElem(3, 2))
+  end
+  @test Int(QQFieldElem(-3)) == -3
+  @test_throws InexactError UInt(QQFieldElem(-3))
+  @test_throws InexactError Int8(QQFieldElem(128))
+  @test_throws InexactError Int(QQFieldElem(ZZ(2)^64))
 
   @test BigFloat(QQFieldElem(3, 4)) == BigFloat(0.75)
   @test Float64(QQFieldElem(3, 4)) == 0.75
@@ -699,6 +735,7 @@ end
 
 @testset "Rings.QQ.constructors" begin
    @test QQ === fraction_field(ZZ)
+   @test QQField === fraction_field_type(ZZ)
 
    @test QQ(1, 2) isa QQFieldElem
    @test QQ(1, ZZ(2)) isa QQFieldElem

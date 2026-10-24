@@ -125,20 +125,38 @@ lift(::ZZPolyRing, ::QadicFieldElem)
 
 **Examples**
 
-```julia
-R, _ = qadic_field(7, 1, precision = 30);
+```jldoctest
+julia> R, _ = qadic_field(7, 1, precision = 30);
 
-a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
-b = 7^2 + 3*7^3 + O(R, 7^5)
-c = R(2)
+julia> a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
+7^0 + 2*7^1 + 4*7^2 + O(7^3)
 
-k = precision(a)
-m = prime(R)
-n = valuation(b)
-Qx, x = QQ["x"]
-p = lift(Qx, a)
-Zy, y = ZZ["y"]
-q = lift(Zy, divexact(a, b))
+julia> b = 7^2 + 3*7^3 + O(R, 7^5)
+7^2 + 3*7^3 + O(7^5)
+
+julia> c = R(2)
+2*7^0 + O(7^30)
+
+julia> k = precision(a)
+3
+
+julia> m = prime(R)
+7
+
+julia> n = valuation(b)
+2
+
+julia> Zy, y = ZZ["y"]
+(Univariate polynomial ring in y over ZZ, y)
+
+julia> p = lift(Zy, a)
+211
+
+julia> Qx, x = QQ["x"]
+(Univariate polynomial ring in x over QQ, x)
+
+julia> q = lift(Qx, divexact(a, b))
+337//49
 ```
 
 ### Square root

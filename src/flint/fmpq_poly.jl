@@ -907,7 +907,7 @@ function (R::FqPolyRing)(g::QQPolyRingElem)
   error("Coercion not supported; instead use `change_base_ring(base_ring(R), g; parent = R)`")
 end
 
-function AbstractAlgebra._map(R::FqField, g::QQPolyRingElem, parent::FqFieldElem)
+function AbstractAlgebra._map(R::FqField, g::QQPolyRingElem, parent::FqPolyRing)
   @assert R === base_ring(parent)
   return fmpq_poly_to_fq_default_poly_raw!(parent(), g)
 end
@@ -982,24 +982,4 @@ end
 
 function AbstractAlgebra._map(::QQField, p::ZZPolyRingElem, parent::QQPolyRing)
   return QQPolyRingElem(parent, p)
-end
-
-###############################################################################
-#
-#   Roots mod p
-#
-###############################################################################
-
-#TODO:
-# expand systematically for all finite fields
-# and for ZZRingElem/QQFieldElem poly
-
-# TODO: Can't we use the generic AbstractAlgebra `roots(::Field, ::PolyRingElem)`?
-# It doesn't multiply by the denominator, but if the denominator is 0 in R, then
-# then this function builds the zero polynomial and gives the root 0?
-function roots(R::T, f::QQPolyRingElem) where {T<:Union{fqPolyRepField, fpField}}
-  Rt, t = polynomial_ring(R, :t, cached=false)
-  fp = polynomial_ring(ZZ, cached=false)[1](f * denominator(f))
-  fpp = Rt(fp)
-  return roots(fpp)
 end

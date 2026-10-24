@@ -59,8 +59,6 @@ function set_length!(x::T, n::Int) where {T <: Zmodn_poly}
   return x
 end
 
-degree(x::T) where T <: Zmodn_poly = @ccall libflint.nmod_poly_degree(x::Ref{T})::Int
-
 function coeff(x::T, n::Int) where T <: Zmodn_poly
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   return base_ring(x)(@ccall libflint.nmod_poly_get_coeff_ui(x::Ref{T}, n::Int)::UInt)
@@ -82,6 +80,8 @@ is_gen(a::T) where T <: Zmodn_poly = (degree(a) <= 1 &&
 iszero(a::T) where T <: Zmodn_poly = Bool(@ccall libflint.nmod_poly_is_zero(a::Ref{T})::Int32)
 
 modulus(a::T) where T <: Zmodn_poly = modulus(parent(a))
+
+nmod_t(a::Zmodn_poly) = nmod_t(a.mod_n, a.mod_ninv, a.mod_norm)
 
 modulus(R::zzModPolyRing) = modulus(base_ring(R))
 
@@ -139,24 +139,18 @@ end
 ################################################################################
 
 function +(x::T, y::T) where T <: Zmodn_poly
-  check_parent(x,y)
-  z = parent(x)()
-  @ccall libflint.nmod_poly_add(z::Ref{T}, x::Ref{T}, y::Ref{T})::Nothing
-  return z
+  check_parent(x, y)
+  return add!(parent(x)(), x, y)
 end
 
 function -(x::T, y::T) where T <: Zmodn_poly
-  check_parent(x,y)
-  z = parent(x)()
-  @ccall libflint.nmod_poly_sub(z::Ref{T}, x::Ref{T}, y::Ref{T})::Nothing
-  return z
+  check_parent(x, y)
+  return sub!(parent(x)(), x, y)
 end
 
 function *(x::T, y::T) where T <: Zmodn_poly
-  check_parent(x,y)
-  z = parent(x)()
-  @ccall libflint.nmod_poly_mul(z::Ref{T}, x::Ref{T}, y::Ref{T})::Nothing
-  return z
+  check_parent(x, y)
+  return mul!(parent(x)(), x, y)
 end
 
 ###############################################################################
@@ -804,7 +798,7 @@ end
 ################################################################################
 
 function det(M::Generic.Mat{zzModPolyRingElem})
-  nrows(M) != ncols(M) && error("Not a square matrix in det")
+  check_square(M)
   nrows(M) == 0 && return one(base_ring(M))
 
   if is_prime(modulus(base_ring(M)))

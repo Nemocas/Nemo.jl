@@ -523,27 +523,10 @@ println(io, AbstractAlgebra.obj_to_string(_fq_default_dummy(a), context = io))
 
 function _fq_field_from_fmpz_mod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   K = base_ring(f)
-  @assert _fq_default_ctx_type(K) == _FQ_DEFAULT_FMPZ_NMOD
+  @assert raw_field_type(K) === FpField
   # f is an fmpz_mod_poly in disguise
   # I cannot use the FqField constructor, since f has the wrong type
   # on the julia side
-  #
-  # The following trick of picking the fmpz_mod_ctx_struct from the fq_default_ctx
-  # does not work anymore:
-  #
-  # It is in K but the first 4 bytes are the type
-  # z = @new_struct(FqField) # this is just new() usable outside the type definition
-  # z.var = string(s)
-  # Temporary hack
-  #_K = _get_raw_type(FpField, K)
-  # ss = string(s)
-  # GC.@preserve K ss begin
-  #   ccall((:fq_default_ctx_init_modulus, libflint), Nothing,
-  #         (Ref{FqField}, Ref{FqPolyRingElem}, Ptr{Nothing}, Ptr{UInt8}),
-  #         #z, f, _K.ninv, string(s))
-  #         z, f, pointer_from_objref(K) + 2 * sizeof(Cint), ss)
-  #   finalizer(_fq_default_ctx_clear_fn, z)
-  # end
   _K = _get_raw_type(FpField, K)
   ff = map_coefficients(c -> _K(lift(ZZ, c)), f; cached = false)
   z = FqField(ff, s, false; check = false)
@@ -568,7 +551,7 @@ end
 
 function _fq_field_from_nmod_poly_in_disguise(f::FqPolyRingElem, s::Symbol)
   K = base_ring(f)
-  @assert _fq_default_ctx_type(K) == _FQ_DEFAULT_NMOD
+  @assert raw_field_type(K) === fpField
   # f is an nmod_poly in disguise
   # I cannot use the FqField constructor, since f has the wrong type
   # on the julia side
@@ -605,11 +588,11 @@ function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::B
       # K is F_p
       # f is either nmod_poly or fmpz_mod_poly
       # we can define K[t]/(f) directly on the C side with the right modulus
-      _fq_ctx_type = _fq_default_ctx_type(K)
-      if _fq_ctx_type == _FQ_DEFAULT_NMOD
+      T = raw_field_type(K)
+      if T === fpField
         z = _fq_field_from_nmod_poly_in_disguise(f, s)
       else
-        @assert _fq_ctx_type == _FQ_DEFAULT_FMPZ_NMOD
+        @assert T === FpField
         z = _fq_field_from_fmpz_mod_poly_in_disguise(f, s)
       end
     else
@@ -678,6 +661,18 @@ function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::B
       L.backwardmap = backwardmap
       L.image_basefield = e
       L.preimage_basefield = backwardmap_basefield
+
+      # Coercion between absolute fields goes through the lattice of
+      # embeddings; put e there, so that embed(K, L) and everything derived
+      # from it is compatible with forwardmap. The lattice is keyed by
+      # degree(), which is only the absolute degree for absolute fields.
+      if absolute && is_absolute(K)
+        morph = FinFieldMorphism(K, L, e, backwardmap_basefield)
+        AddOverfield!(K, morph)
+        AddSubfield!(L, morph)
+        transitive_closure(morph)
+      end
+
       return L
     end::FqField
   end
@@ -701,6 +696,19 @@ function (a::FqField)(b::FqFieldElem)
     return b
   end
   characteristic(k) != characteristic(a) && error("Coercion impossible")
+
+  # A field defined by a polynomial over k fixes its own embedding of k,
+  # which embed(k, a) need not agree with
+  if k === base_field(a) && isdefined(a, :image_basefield)
+    return (a.image_basefield)(b)::FqFieldElem
+  end
+
+  if a === base_field(k) && isdefined(k, :preimage_basefield)
+    c = (k.preimage_basefield)(b)::FqFieldElem
+    (k.image_basefield)(c) == b || throw(ArgumentError("not an element of the base field"))
+    return c
+  end
+
   if is_absolute(a)
     da = degree(a)
     dk = degree(k)
@@ -713,10 +721,6 @@ function (a::FqField)(b::FqFieldElem)
       f = preimage_map(a, k)
       return f(b)
     end
-  end
-
-  if k === base_field(a)
-    return (a.image_basefield)(b)::FqFieldElem
   end
 
   # To make it work in towers
@@ -781,7 +785,7 @@ function (F::FqField)(p::FqPolyRingElem)
       @ccall libflint.fq_default_set_nmod_poly(y::Ref{FqFieldElem}, p::Ref{FqPolyRingElem}, F::Ref{FqField})::Nothing
       return y
     else
-      @assert _fq_ctx_type == _FQ_DEFAULT_FMPZ_NMOD
+      @assert _fq_ctx_type == _FQ_DEFAULT_FMPZ_MOD
       y = FqFieldElem(F)
       @ccall libflint.fq_default_set_fmpz_mod_poly(y::Ref{FqFieldElem}, p::Ref{FqPolyRingElem}, F::Ref{FqField})::Nothing
       return y
@@ -805,7 +809,7 @@ function _lift_standard(R::FqPolyRing, a::FqFieldElem)
     @ccall libflint.fq_default_get_nmod_poly(p::Ref{FqPolyRingElem}, a::Ref{FqFieldElem}, K::Ref{FqField})::Nothing
     return p
   else
-    @assert _fq_ctx_type == _FQ_DEFAULT_FMPZ_NMOD
+    @assert _fq_ctx_type == _FQ_DEFAULT_FMPZ_MOD
     @ccall libflint.fq_default_get_fmpz_mod_poly(p::Ref{FqPolyRingElem}, a::Ref{FqFieldElem}, K::Ref{FqField})::Nothing
     return p
   end

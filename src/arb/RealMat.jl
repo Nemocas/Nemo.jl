@@ -61,10 +61,6 @@ function one(x::RealMatrixSpace)
   return one!(x())
 end
 
-number_of_rows(a::RealMatrix) = a.r
-
-number_of_columns(a::RealMatrix) = a.c
-
 function deepcopy_internal(x::RealMatrix, dict::IdDict)
   z = RealMatrix(nrows(x), ncols(x))
   @ccall libflint.arb_mat_set(z::Ref{RealMatrix}, x::Ref{RealMatrix})::Nothing
@@ -85,8 +81,7 @@ end
 #
 ################################################################################
 
-function transpose(x::RealMatrix)
-  z = similar(x, ncols(x), nrows(x))
+function transpose!(z::RealMatrixOrPtr, x::RealMatrixOrPtr)
   @ccall libflint.arb_mat_transpose(z::Ref{RealMatrix}, x::Ref{RealMatrix})::Nothing
   return z
 end
@@ -125,7 +120,7 @@ end
 ################################################################################
 
 function ^(x::RealMatrix, y::UInt)
-  nrows(x) != ncols(x) && error("Matrix must be square")
+  check_square(x)
   z = similar(x)
   @ccall libflint.arb_mat_pow_ui(z::Ref{RealMatrix}, x::Ref{RealMatrix}, y::UInt, precision(Balls)::Int)::Nothing
   return z
@@ -473,8 +468,7 @@ function _solve_lu_precomp(P::Perm, LU::RealMatrix, y::RealMatrix)
   return z
 end
 
-Solve.matrix_normal_form_type(::RealField) = Solve.LUTrait()
-Solve.matrix_normal_form_type(::RealMatrix) = Solve.LUTrait()
+Solve.matrix_normal_form_type(::Type{RealField}) = Solve.LUTrait()
 
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::RealMatrix, b::RealMatrix, task::Symbol; side::Symbol = :left)
   nrows(A) != ncols(A) && error("Only implemented for square matrices")
@@ -735,8 +729,7 @@ end
 #
 ################################################################################
 
-@inline mat_entry_ptr(A::RealMatrix, i::Int, j::Int) = 
-@ccall libflint.arb_mat_entry_ptr(A::Ref{RealMatrix}, (i-1)::Int, (j-1)::Int)::Ptr{RealFieldElem}
+_entry_size(::Type{RealMatrix}) = sizeof(arb_struct)
 
 ###############################################################################
 #

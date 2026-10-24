@@ -75,13 +75,13 @@ end
 function Base.hash(a::FlintPuiseuxSeriesElem, h::UInt)
   b = 0xec4c3951832c37f0%UInt
   b = xor(b, hash(a.data, h))
-  b = xor(b, hash(a.scale, h))
+  b = xor(b, hash(scale(a), h))
   return b
 end
 
-precision(a::FlintPuiseuxSeriesElem) = precision(a.data)//a.scale
+precision(a::FlintPuiseuxSeriesElem) = precision(a.data)//scale(a)
 
-valuation(a::FlintPuiseuxSeriesElem) = valuation(a.data)//a.scale
+valuation(a::FlintPuiseuxSeriesElem) = valuation(a.data)//scale(a)
 
 scale(a::FlintPuiseuxSeriesElem) = a.scale
 
@@ -171,26 +171,26 @@ functions are assumed to rescale their output.
 """
 function rescale!(a::FlintPuiseuxSeriesElem)
   if !iszero(a)
-    d = gcd(a.scale, gcd(scale(a.data), gcd(valuation(a.data), precision(a.data))))
+    d = gcd(scale(a), gcd(scale(a.data), gcd(valuation(a.data), precision(a.data))))
     if d != 1
       a.data = set_scale!(a.data, div(scale(a.data), d))
       a.data = set_precision!(a.data, div(precision(a.data), d))
       a.data = set_valuation!(a.data, div(valuation(a.data), d))
-      a.scale = div(a.scale, d)
+      a.scale = div(scale(a), d)
     end
   else
-    d = gcd(precision(a.data), a.scale)
+    d = gcd(precision(a.data), scale(a))
     if d != 1
       a.data = set_precision!(a.data, div(precision(a.data), d))
       a.data = set_valuation!(a.data, div(valuation(a.data), d))
-      a.scale = div(a.scale, d)
+      a.scale = div(scale(a), d)
     end
   end
   return a
 end
 
 function deepcopy_internal(a::FlintPuiseuxSeriesElem, dict::IdDict)
-  return parent(a)(deepcopy(a.data), a.scale)
+  return parent(a)(deepcopy(a.data), scale(a))
 end
 
 ###############################################################################
@@ -205,7 +205,7 @@ function expressify(a::FlintPuiseuxSeriesElem,
   for i in 0:pol_length(a.data) - 1
     c = polcoeff(a.data, i)
     if !iszero(c)
-      q = (i*scale(a.data) + valuation(a.data))//a.scale
+      q = (i*scale(a.data) + valuation(a.data))//scale(a)
       xk = iszero(q) ? 1 : isone(q) ? x :
       Expr(:call, :^, x, expressify(q, context = context))
       if isone(c)
@@ -215,7 +215,7 @@ function expressify(a::FlintPuiseuxSeriesElem,
       end
     end
   end
-  q = precision(a.data)//a.scale
+  q = precision(a.data)//scale(a)
   push!(sum.args, Expr(:call, :O,
                        Expr(:call, :^, x, expressify(q, context = context))))
   return sum
@@ -259,7 +259,7 @@ end
 
 function -(a::FlintPuiseuxSeriesElem)
   R = parent(a)
-  return R(-a.data, a.scale)
+  return R(-a.data, scale(a))
 end
 
 ###############################################################################
@@ -269,30 +269,30 @@ end
 ###############################################################################
 
 function +(a::FlintPuiseuxSeriesElem{T}, b::FlintPuiseuxSeriesElem{T}) where T <: RingElem
-  s = gcd(a.scale, b.scale)
-  zscale = div(a.scale*b.scale, s)
-  ainf = div(a.scale, s)
-  binf = div(b.scale, s)
+  s = gcd(scale(a), scale(b))
+  zscale = div(scale(a)*scale(b), s)
+  ainf = div(scale(a), s)
+  binf = div(scale(b), s)
   z = parent(a)(inflate(a.data, binf) + inflate(b.data, ainf), zscale)
   z = rescale!(z)
   return z
 end
 
 function -(a::FlintPuiseuxSeriesElem{T}, b::FlintPuiseuxSeriesElem{T}) where T <: RingElem
-  s = gcd(a.scale, b.scale)
-  zscale = div(a.scale*b.scale, s)
-  ainf = div(a.scale, s)
-  binf = div(b.scale, s)
+  s = gcd(scale(a), scale(b))
+  zscale = div(scale(a)*scale(b), s)
+  ainf = div(scale(a), s)
+  binf = div(scale(b), s)
   z = parent(a)(inflate(a.data, binf) - inflate(b.data, ainf), zscale)
   z = rescale!(z)
   return z
 end
 
 function *(a::FlintPuiseuxSeriesElem{T}, b::FlintPuiseuxSeriesElem{T}) where T <: RingElem
-  s = gcd(a.scale, b.scale)
-  zscale = div(a.scale*b.scale, s)
-  ainf = div(a.scale, s)
-  binf = div(b.scale, s)
+  s = gcd(scale(a), scale(b))
+  zscale = div(scale(a)*scale(b), s)
+  ainf = div(scale(a), s)
+  binf = div(scale(b), s)
   z = parent(a)(inflate(a.data, binf)*inflate(b.data, ainf), zscale)
   z = rescale!(z)
   return z
@@ -305,7 +305,7 @@ end
 ###############################################################################
 
 function *(x::FlintPuiseuxSeriesElem, y::Integer)
-  z = parent(x)(x.data*y, x.scale)
+  z = parent(x)(x.data*y, scale(x))
   z = rescale!(z)
   return z
 end
@@ -319,10 +319,10 @@ end
 ###############################################################################
 
 function divexact(a::FlintPuiseuxSeriesElem{T}, b::FlintPuiseuxSeriesElem{T}; check::Bool=true) where T <: RingElem
-  s = gcd(a.scale, b.scale)
-  zscale = div(a.scale*b.scale, s)
-  ainf = div(a.scale, s)
-  binf = div(b.scale, s)
+  s = gcd(scale(a), scale(b))
+  zscale = div(scale(a)*scale(b), s)
+  ainf = div(scale(a), s)
+  binf = div(scale(b), s)
   z = parent(a)(divexact(inflate(a.data, binf), inflate(b.data, ainf); check=check), zscale)
   z = rescale!(z)
   return z
@@ -335,7 +335,7 @@ end
 ###############################################################################
 
 function inv(a::FlintPuiseuxSeriesElem{T}) where T <: RingElement
-  z = parent(a)(inv(a.data), a.scale)
+  z = parent(a)(inv(a.data), scale(a))
   z = rescale!(z)
   return z
 end
@@ -349,12 +349,12 @@ end
 function ^(a::FlintPuiseuxSeriesElem{T}, b::Int) where T <: RingElem
   # special case powers of x for constructing power series efficiently
   if iszero(a.data)
-    return parent(a)(a.data^b, a.scale)
+    return parent(a)(a.data^b, scale(a))
   elseif b == 0
     # in fact, the result would be exact 1 if we had exact series
     return one(parent(a))
   elseif pol_length(a.data) == 1
-    return parent(a)(a.data^b, a.scale)
+    return parent(a)(a.data^b, scale(a))
   elseif b == 1
     return deepcopy(a)
   elseif b == -1
@@ -366,14 +366,14 @@ function ^(a::FlintPuiseuxSeriesElem{T}, b::Int) where T <: RingElem
     b = -b
   end
 
-  z = parent(a)(a.data^b, a.scale)
+  z = parent(a)(a.data^b, scale(a))
   z = rescale!(z)
   return z
 end
 
 function ^(a::FlintPuiseuxSeriesElem{T}, b::Rational{Int}) where T <: RingElem
   (pol_length(a.data) != 1 || polcoeff(a.data, 0) != 1) && error("Rational power not implemented")
-  z = parent(a)(a.data^numerator(b), a.scale*denominator(b))
+  z = parent(a)(a.data^numerator(b), scale(a)*denominator(b))
   z = rescale!(z)
   return z
 end
@@ -386,15 +386,15 @@ end
 
 function ==(a::FlintPuiseuxSeriesElem{T}, b::FlintPuiseuxSeriesElem{T}) where T <: RingElement
   check_parent(a, b)
-  s = gcd(a.scale, b.scale)
-  zscale = div(a.scale*b.scale, s)
-  ainf = div(a.scale, s)
-  binf = div(b.scale, s)
+  s = gcd(scale(a), scale(b))
+  zscale = div(scale(a)*scale(b), s)
+  ainf = div(scale(a), s)
+  binf = div(scale(b), s)
   return inflate(a.data, binf) == inflate(b.data, ainf)
 end
 
 function isequal(a::FlintPuiseuxSeriesElem{T}, b::FlintPuiseuxSeriesElem{T}) where T <: RingElement
-  return a.scale == b.scale && isequal(a.data, b.data)
+  return scale(a) == scale(b) && isequal(a.data, b.data)
 end
 
 ###############################################################################
@@ -417,9 +417,9 @@ function sqrt(a::FlintPuiseuxSeriesElem{T}; check::Bool=true) where T <: RingEle
   val = valuation(a.data)
   S = parent(a)
   if mod(val, 2) != 0
-    return S(sqrt(inflate(a.data, 2); check=check), a.scale*2)
+    return S(sqrt(inflate(a.data, 2); check=check), scale(a)*2)
   else
-    return S(sqrt(a.data; check=check), a.scale)
+    return S(sqrt(a.data; check=check), scale(a))
   end
 end
 
@@ -430,7 +430,7 @@ end
 ###############################################################################
 
 function exp(a::FlintPuiseuxSeriesElem{T}) where T <: RingElem
-  z = parent(a)(exp(a.data), a.scale)
+  z = parent(a)(exp(a.data), scale(a))
   z = rescale!(z)
   return z
 end
@@ -463,7 +463,8 @@ function rand(rng::AbstractRNG, S::FlintPuiseuxSeriesRingOrField,
   rand(rng, make(S, val_range, scale_range, v...))
 end
 
-rand(S::FlintPuiseuxSeriesRingOrField, val_range, scale_range, v...) =
+rand(S::FlintPuiseuxSeriesRingOrField, val_range::AbstractUnitRange{Int},
+    scale_range::AbstractUnitRange{Int}, v...) =
 rand(Random.default_rng(), S, val_range, scale_range, v...)
 
 ###############################################################################
@@ -479,10 +480,10 @@ function zero!(a::FlintPuiseuxSeriesElem{T}) where T <: RingElem
 end
 
 function mul!(c::FlintPuiseuxSeriesElem{T}, a::FlintPuiseuxSeriesElem{T}, b::FlintPuiseuxSeriesElem{T}) where T <: RingElem
-  s = gcd(a.scale, b.scale)
-  zscale = div(a.scale*b.scale, s)
-  ainf = div(a.scale, s)
-  binf = div(b.scale, s)
+  s = gcd(scale(a), scale(b))
+  zscale = div(scale(a)*scale(b), s)
+  ainf = div(scale(a), s)
+  binf = div(scale(b), s)
   c.data = mul!(c.data, inflate(a.data, binf), inflate(b.data, ainf))
   c.scale = zscale
   c = rescale!(c)
@@ -490,10 +491,10 @@ function mul!(c::FlintPuiseuxSeriesElem{T}, a::FlintPuiseuxSeriesElem{T}, b::Fli
 end
 
 function add!(c::FlintPuiseuxSeriesElem{T}, a::FlintPuiseuxSeriesElem{T}, b::FlintPuiseuxSeriesElem{T}) where T <: RingElem
-  s = gcd(a.scale, b.scale)
-  zscale = div(a.scale*b.scale, s)
-  ainf = div(a.scale, s)
-  binf = div(b.scale, s)
+  s = gcd(scale(a), scale(b))
+  zscale = div(scale(a)*scale(b), s)
+  ainf = div(scale(a), s)
+  binf = div(scale(b), s)
   c.data = add!(c.data, inflate(a.data, binf), inflate(b.data, ainf))
   c.scale = zscale
   c = rescale!(c)

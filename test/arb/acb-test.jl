@@ -502,6 +502,8 @@ end
 
   @test Phi == x^2*y+16*x-y^2
 
+  @test lindep(matrix(CC, vals), 150) == C
+
   CC = AcbField(64)
 end
 

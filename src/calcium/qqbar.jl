@@ -843,7 +843,7 @@ end
 # Return the eigenvalues with repetition according to the algebraic multiplicity
 function _eigvals_internal(R::QQBarField, A::ZZMatrix)
   n = nrows(A)
-  !is_square(A) && throw(DomainError(A, "a square matrix is required"))
+  check_square(A)
   if n == 0
     return QQBarFieldElem[]
   end
@@ -857,7 +857,7 @@ end
 # Return the eigenvalues with repetition according to the algebraic multiplicity
 function _eigvals_internal(R::QQBarField, A::QQMatrix)
   n = nrows(A)
-  !is_square(A) && throw(DomainError(A, "a square matrix is required"))
+  check_square(A)
   if n == 0
     return QQBarFieldElem[]
   end

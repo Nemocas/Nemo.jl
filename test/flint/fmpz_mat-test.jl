@@ -96,15 +96,19 @@ end
   @test size(t) == (2, 3)
   @test iszero(t)
 
-  for (R, M) in ring_to_mat
+  for R in example_rings
     t = sim_zero(s, R)
     @test size(t) == size(s)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
     if sim_zero == zero
       @test iszero(t)
     end
 
     t = sim_zero(s, R, 2, 3)
     @test size(t) == (2, 3)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
     if sim_zero == zero
       @test iszero(t)
     end
@@ -156,6 +160,10 @@ end
   @test map_entries(F, A) == F[1 2 3; 4 5 6]
   R, _ = residue_ring(ZZ, ZZ(10))
   @test map_entries(R, A) == R[1 2 3; 4 5 6]
+
+  for R in [residue_ring(ZZ, 10)[1], Native.GF(11), residue_ring(ZZ, ZZ(10))[1], QQ]
+    @test change_base_ring(R, A) == R[1 2 3; 4 5 6]
+  end
 end
 
 @testset "ZZMatrix.manipulation" begin
@@ -236,6 +244,25 @@ end
   @test collect(v) == [3, 6, 9]
   v[1] = 1
   @test A == S([1 2 1; 4 5 6; 7 8 9])
+end
+
+@testset "ZZMatrix.reshape" begin
+  A = ZZ[1 2 3; 4 5 6; 7 8 9]
+
+  # the result shares its entries with the matrix
+  B = reshape(A, 1, 9)
+  @test B == ZZ[1 2 3 4 5 6 7 8 9]
+  B[1, 5] = 50
+  @test A[2, 2] == 50
+
+  # the rows of a view narrower than its parent are not consecutive in memory
+  @test_throws ErrorException reshape(view(A, 1:2, 1:2), 1, 4)
+  @test_throws ErrorException reshape(view(A, 2:3, 2:3), 1, 4)
+
+  # those of a view as wide as its parent, with one row or without entries are
+  @test reshape(view(A, 2:3, :), 1, 6) == ZZ[4 50 6 7 8 9]
+  @test reshape(view(A, 3:3, 2:3), 1, 2) == ZZ[8 9]
+  @test reshape(view(A, 1:3, 2:1), 1, 0) == zero_matrix(ZZ, 1, 0)
 end
 
 @testset "ZZMatrix.sub" begin
@@ -409,6 +436,18 @@ end
   C = transpose(A)*A
 
   @test transpose(C) == C
+
+  D = ZZ[1 2; 3 4]
+  E = ZZ[1 2 3; 4 5 6]
+  GC.@preserve D E begin
+    for (d, e) in ((D, E), (Ref(D), Ref(E)),
+                   (Ptr{ZZMatrix}(pointer_from_objref(D)), Ptr{ZZMatrix}(pointer_from_objref(E))))
+      set!(D, ZZ[1 2; 3 4])
+      @test transpose!(d) === d
+      @test D == ZZ[1 3; 2 4]
+      @test_throws DomainError transpose!(e)
+    end
+  end
 end
 
 @testset "ZZMatrix.row_col_swapping" begin
@@ -472,7 +511,7 @@ end
   @test inv(A)*A == one(S)
 
   a = ZZ[1 1;]
-  @test_throws ArgumentError inv(a)
+  @test_throws DomainError inv(a)
   b = ZZ[1 0; 0 2]
   @test_throws ArgumentError inv(b)
   c = ZZ[1 1; 1 1]
@@ -668,8 +707,8 @@ end
   G = lll_gram(A)
   @test G == A
 
-  @test_throws ArgumentError lll_gram(ZZ[1 0])
-  @test_throws ArgumentError lll_gram_with_transform(ZZ[1 0])
+  @test_throws DomainError lll_gram(ZZ[1 0])
+  @test_throws DomainError lll_gram_with_transform(ZZ[1 0])
   @test_throws ArgumentError lll_gram(ZZ[1 0; 1 1])
   @test_throws ArgumentError lll_gram_with_transform(ZZ[1 0; 1 1])
 
@@ -844,7 +883,9 @@ end
   L_triang = matrix(ZZ, 3, 3, [1,0,0, 2,3,0, 4,5,6])
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(ZZ) === AbstractAlgebra.Solve.HermiteFormTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(ZZ)) === AbstractAlgebra.Solve.HermiteFormTrait()
   @test AbstractAlgebra.Solve.matrix_normal_form_type(U_triang) === AbstractAlgebra.Solve.HermiteFormTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(U_triang)) === AbstractAlgebra.Solve.HermiteFormTrait()
   @test AbstractAlgebra.Solve.matrix_normal_form_type(L_triang) === AbstractAlgebra.Solve.HermiteFormTrait()
 
   X = matrix(ZZ, 3, 2, [3,1, 4,1, 5,9])
@@ -905,7 +946,9 @@ end
 
   C = solve_init(A)
   @test C isa AbstractAlgebra.solve_context_type(ZZ)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(ZZ))
   @test C isa AbstractAlgebra.solve_context_type(A)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.HermiteFormTrait()
   @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.HermiteFormTrait(), ZZRingElem)
@@ -1000,6 +1043,22 @@ end
   end
 end
 
+@testset "ZZMatrix.mul!_vector" begin
+  b = ZZRingElem[7, -8]
+  c = ZZRingElem[1, 0, -1]
+  # entries below and above the cutoff for fmpz_mat_mul_fmpz_vec_ptr
+  for A in (ZZ[1 2; 3 4; 5 6], ZZ(2)^70 * ZZ[1 2; 3 4; 5 6])
+    Ab = [A[i, 1] * b[1] + A[i, 2] * b[2] for i in 1:3]
+    cA = [A[1, j] * c[1] + A[2, j] * c[2] + A[3, j] * c[3] for j in 1:2]
+    GC.@preserve A begin
+      for a in (A, Ref(A), Ptr{ZZMatrix}(pointer_from_objref(A)))
+        @test mul!([ZZ(), ZZ(), ZZ()], a, b) == Ab
+        @test mul!([ZZ(), ZZ()], c, a) == cA
+      end
+    end
+  end
+end
+
 @testset "ZZMatrix.add_one!" begin
   A = ZZ[0 0; 0 0]
   Generic.add_one!(A, 1, 1)
@@ -1066,4 +1125,23 @@ end
 
   add_column!(A, -3, 2, 3, 1:1)
   @test A == ZZ[0 3 5; 0 6 21]
+end
+
+@testset "ZZMatrix.multiply_column!" begin
+  for s in (ZZ(3), 3)
+    A = ZZ[2 3 5; 4 6 3]
+
+    multiply_column!(A, s, 1)
+    @test A == ZZ[6 3 5; 12 6 3]
+
+    multiply_column!(A, s, 3, 2:2)
+    @test A == ZZ[6 3 5; 12 6 9]
+
+    # an Int in fourth position is a row, not a second column
+    multiply_column!(A, s, 3, 1)
+    @test A == ZZ[6 3 15; 12 6 9]
+
+    @test_throws AssertionError multiply_column!(A, s, 4)
+    @test_throws AssertionError multiply_column!(A, s, 1, 1:3)
+  end
 end

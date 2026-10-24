@@ -117,6 +117,12 @@
   @test isa(M4, QQMatrix)
   @test base_ring(M4) == QQ
 
+  for d in [3, ZZ(3), big(3), 3//2, big(3)//2, QQ(3, 2)]
+    M5 = QQMatrix(2, 3, d)
+    @test isa(M5, QQMatrix)
+    @test M5 == matrix(QQ, [d 0 0; 0 d 0])
+  end
+
   a = zero_matrix(QQ, 2, 2)
   b = zero_matrix(QQ, 2, 3)
   @test a in [a, b]
@@ -138,12 +144,16 @@ end
   @test t isa QQMatrix
   @test size(t) == (2, 3)
 
-  for (R, M) in ring_to_mat
+  for R in example_rings
     t = similar(s, R)
     @test size(t) == size(s)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
 
     t = similar(s, R, 2, 3)
     @test size(t) == (2, 3)
+    @test t isa dense_matrix_type(R)
+    @test base_ring(t) == R
   end
 end
 
@@ -256,6 +266,8 @@ end
   @test collect(v) == [4, 5, 6]
   v[2] = 7
   @test A == S([1 2 3; 4 7 6; 7 8 9])
+  v[3] = QQ(1, 2)
+  @test A == S([1 2 3; 4 7 1//2; 7 8 9])
   A = S([1 2 3; 4 5 6; 7 8 9])
   v = @view A[:, 3]
   @test v isa AbstractVector{elem_type(QQ)}
@@ -264,6 +276,8 @@ end
   @test collect(v) == [3, 6, 9]
   v[1] = 1
   @test A == S([1 2 1; 4 5 6; 7 8 9])
+  v[2] = 1//3
+  @test A == S([1 2 1; 4 5 1//3; 7 8 9])
 end
 
 @testset "QQMatrix.sub" begin
@@ -441,6 +455,18 @@ end
   @test D == transpose(A)
   transpose!(A)
   @test D == A
+
+  D = QQ[1 2; 3 4]
+  E = QQ[1 2 3; 4 5 6]
+  GC.@preserve D E begin
+    for (d, e) in ((D, E), (Ref(D), Ref(E)),
+                   (Ptr{QQMatrix}(pointer_from_objref(D)), Ptr{QQMatrix}(pointer_from_objref(E))))
+      set!(D, QQ[1 2; 3 4])
+      @test transpose!(d) === d
+      @test D == QQ[1 3; 2 4]
+      @test_throws DomainError transpose!(e)
+    end
+  end
 end
 
 @testset "QQMatrix.row_col_swapping" begin
@@ -498,7 +524,7 @@ end
   @test C*inv(C) == one(S)
 
   a = QQ[1 1;]
-  @test_throws ErrorException inv(a)
+  @test_throws DomainError inv(a)
   a = QQ[1 1; 1 1]
   @test_throws ErrorException inv(a)
 end
@@ -590,7 +616,9 @@ end
   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 2 2])
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(QQ) === AbstractAlgebra.Solve.RREFTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(QQ)) === AbstractAlgebra.Solve.RREFTrait()
   @test AbstractAlgebra.Solve.matrix_normal_form_type(A) === AbstractAlgebra.Solve.RREFTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(A)) === AbstractAlgebra.Solve.RREFTrait()
 
   T = matrix_space(QQ, 3, 1)
 
@@ -719,15 +747,17 @@ end
   A = matrix(QQ, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
   C = solve_init(A)
   @test C isa AbstractAlgebra.solve_context_type(QQ)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(QQ))
   @test C isa AbstractAlgebra.solve_context_type(A)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
 
-  @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.RREFTrait()
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), QQFieldElem)
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), QQ())
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), QQField)
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), QQ)
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), typeof(A))
-  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.RREFTrait(), A)
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.FFLUTrait()
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), QQFieldElem)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), QQ())
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), QQField)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), QQ)
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), typeof(A))
+  @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), A)
 
   @test_throws ErrorException solve(C, [ QQ(1) ])
   @test_throws ErrorException solve(C, [ QQ(1) ], side = :right)
@@ -786,6 +816,17 @@ end
     @test is_zero(K*A)
     @test nrows(K) == 0
   end
+
+  # Make sure RREFTrait() stays supported
+  C = solve_init(AbstractAlgebra.Solve.RREFTrait(), A)
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.RREFTrait()
+  b = [QQ(1), QQ(2), QQ(3), QQ(4), QQ(5)]
+  @test @inferred can_solve(C, b)
+  x = @inferred solve(C, b)
+  @test x * A == b
+  fl, x = @inferred can_solve_with_solution(C, b)
+  @test fl
+  @test x*A == b
 
   N = zero_matrix(QQ, 2, 1)
   C = solve_init(N)
@@ -923,6 +964,15 @@ end
   Generic.add_one!(A, 1, 1)
   @test A == QQ[1 0; 0 0]
   @test_throws BoundsError Generic.add_one!(A, 3, 1)
+
+  GC.@preserve A begin
+    for a in (Ref(A), Ptr{QQMatrix}(pointer_from_objref(A)))
+      zero!(A)
+      @test Generic.add_one!(a, 1, 2) === a
+      @test A == QQ[0 1; 0 0]
+      @test_throws BoundsError Generic.add_one!(a, 3, 1)
+    end
+  end
 end
 
 @testset "QQMatrix.denominator" begin

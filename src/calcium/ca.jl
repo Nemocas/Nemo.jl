@@ -23,7 +23,7 @@ is_domain_type(::Type{CalciumFieldElem}) = true
 characteristic(a::CalciumField) = 0
 
 function deepcopy_internal(a::CalciumFieldElem, dict::IdDict)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_set(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   return r
@@ -35,18 +35,18 @@ end
 
 # todo: distinguish unknown
 function check_special(a::CalciumFieldElem)
-  if !a.parent.extended && _isspecial(a)
+  if !parent(a).extended && _isspecial(a)
     throw(DomainError(a, "Non-number result"))
   end
 end
 
 function same_parent(a::CalciumFieldElem, b::CalciumFieldElem)
-  if a.parent == b.parent
+  if parent(a) == parent(b)
     return (a, b)
   else
-    C = a.parent
+    C = parent(a)
     r = C()
-    @ccall libflint.ca_transfer(r::Ref{CalciumFieldElem}, a.parent::Ref{CalciumField}, b::Ref{CalciumFieldElem}, b.parent::Ref{CalciumField})::Nothing
+    @ccall libflint.ca_transfer(r::Ref{CalciumFieldElem}, parent(a)::Ref{CalciumField}, b::Ref{CalciumFieldElem}, parent(b)::Ref{CalciumField})::Nothing
     check_special(r)
     return (a, r)
   end
@@ -80,7 +80,7 @@ function show(io::IO, C::CalciumField)
 end
 
 function native_string(x::CalciumFieldElem)
-  cstr = @ccall libflint.ca_get_str(x::Ref{CalciumFieldElem}, x.parent::Ref{CalciumField})::Ptr{UInt8}
+  cstr = @ccall libflint.ca_get_str(x::Ref{CalciumFieldElem}, parent(x)::Ref{CalciumField})::Ptr{UInt8}
   res = unsafe_string(cstr)
   @ccall libflint.flint_free(cstr::Ptr{UInt8})::Nothing
 
@@ -147,14 +147,14 @@ end
 
 function ==(a::CalciumFieldElem, b::CalciumFieldElem)
   a, b = same_parent(a, b)
-  C = a.parent
+  C = parent(a)
   t = @ccall libflint.ca_check_equal(a::Ref{CalciumFieldElem}, b::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
   return truth_as_bool(t, :isequal)
 end
 
 function isless(a::CalciumFieldElem, b::CalciumFieldElem)
   a, b = same_parent(a, b)
-  C = a.parent
+  C = parent(a)
   t = @ccall libflint.ca_check_lt(a::Ref{CalciumFieldElem}, b::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
   return truth_as_bool(t, :isless)
 end
@@ -174,19 +174,19 @@ isless(a::Int, b::CalciumFieldElem) = isless(parent(b)(a), b)
 Return whether `a` is a number, i.e. not an infinity or undefined.
 """
 function is_number(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   t = @ccall libflint.ca_check_is_number(a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
   return truth_as_bool(t, :is_number)
 end
 
 function iszero(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   t = @ccall libflint.ca_check_is_zero(a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
   return truth_as_bool(t, :iszero)
 end
 
 function isone(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   t = @ccall libflint.ca_check_is_one(a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
   return truth_as_bool(t, :isone)
 end
@@ -197,7 +197,7 @@ end
 Return whether `a` is an algebraic number.
 """
 function is_algebraic(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   t = @ccall libflint.ca_check_is_algebraic(a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
   return truth_as_bool(t, :is_algebraic)
 end
@@ -208,13 +208,13 @@ end
 Return whether `a` is a rational number.
 """
 function is_rational(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   t = @ccall libflint.ca_check_is_rational(a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
   return truth_as_bool(t, :is_rational)
 end
 
 function isinteger(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   t = @ccall libflint.ca_check_is_integer(a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
   return truth_as_bool(t, :isinteger)
 end
@@ -226,7 +226,7 @@ Return whether `a` is a real number. This returns `false`
 if `a` is a pure real infinity.
 """
 function isreal(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   t = @ccall libflint.ca_check_is_real(a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
   return truth_as_bool(t, :isreal)
 end
@@ -238,7 +238,7 @@ Return whether `a` is an imaginary number. This returns `false`
 if `a` is a pure imaginary infinity.
 """
 function is_imaginary(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   t = @ccall libflint.ca_check_is_imaginary(a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
   return truth_as_bool(t, :is_imaginary)
 end
@@ -249,7 +249,7 @@ end
 Return whether `a` is the special value *Undefined*.
 """
 function is_undefined(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   t = @ccall libflint.ca_check_is_undefined(a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
   return truth_as_bool(t, :is_undefined)
 end
@@ -260,7 +260,7 @@ end
 Return whether `a` is any infinity (signed or unsigned).
 """
 function isinf(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   t = @ccall libflint.ca_check_is_infinity(a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
   return truth_as_bool(t, :isinf)
 end
@@ -271,7 +271,7 @@ end
 Return whether `a` is unsigned infinity.
 """
 function is_uinf(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   t = @ccall libflint.ca_check_is_uinf(a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
   return truth_as_bool(t, :is_uinf)
 end
@@ -282,7 +282,7 @@ end
 Return whether `a` is any signed infinity.
 """
 function is_signed_inf(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   t = @ccall libflint.ca_check_is_signed_inf(a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
   return truth_as_bool(t, :is_signed_inf)
 end
@@ -294,7 +294,7 @@ Return whether `a` is the special value *Unknown*. This is a representation
 property and not a mathematical predicate.
 """
 function is_unknown(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   t = Bool(@ccall libflint.ca_is_unknown(a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint)
   return t
 end
@@ -306,7 +306,7 @@ end
 ###############################################################################
 
 function -(a::CalciumFieldElem)
-  r = neg!(a.parent(), a)
+  r = neg!(parent(a)(), a)
   check_special(r)
   return r
 end
@@ -319,7 +319,7 @@ end
 
 function +(a::CalciumFieldElem, b::CalciumFieldElem)
   a, b = same_parent(a, b)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_add(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -327,7 +327,7 @@ function +(a::CalciumFieldElem, b::CalciumFieldElem)
 end
 
 function -(a::Int, b::CalciumFieldElem)
-  C = b.parent
+  C = parent(b)
   r = C()
   @ccall libflint.ca_si_sub(r::Ref{CalciumFieldElem}, a::Int, b::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -336,7 +336,7 @@ end
 
 function *(a::CalciumFieldElem, b::CalciumFieldElem)
   a, b = same_parent(a, b)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_mul(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -350,7 +350,7 @@ end
 ###############################################################################
 
 function +(a::CalciumFieldElem, b::Int)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_add_si(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Int, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -358,7 +358,7 @@ function +(a::CalciumFieldElem, b::Int)
 end
 
 function +(a::CalciumFieldElem, b::ZZRingElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_add_fmpz(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{ZZRingElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -366,7 +366,7 @@ function +(a::CalciumFieldElem, b::ZZRingElem)
 end
 
 function +(a::CalciumFieldElem, b::QQFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_add_fmpq(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{QQFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -382,7 +382,7 @@ end
 
 function -(a::CalciumFieldElem, b::CalciumFieldElem)
   a, b = same_parent(a, b)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_sub(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -390,7 +390,7 @@ function -(a::CalciumFieldElem, b::CalciumFieldElem)
 end
 
 function -(a::CalciumFieldElem, b::Int)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_sub_si(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Int, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -398,7 +398,7 @@ function -(a::CalciumFieldElem, b::Int)
 end
 
 function -(a::CalciumFieldElem, b::ZZRingElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_sub_fmpz(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{ZZRingElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -406,7 +406,7 @@ function -(a::CalciumFieldElem, b::ZZRingElem)
 end
 
 function -(a::CalciumFieldElem, b::QQFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_sub_fmpq(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{QQFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -416,7 +416,7 @@ end
 -(a::CalciumFieldElem, b::QQBarFieldElem) = a - parent(a)(b)
 
 function -(a::ZZRingElem, b::CalciumFieldElem)
-  C = b.parent
+  C = parent(b)
   r = C()
   @ccall libflint.ca_fmpz_sub(r::Ref{CalciumFieldElem}, a::Ref{ZZRingElem}, b::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -424,7 +424,7 @@ function -(a::ZZRingElem, b::CalciumFieldElem)
 end
 
 function -(a::QQFieldElem, b::CalciumFieldElem)
-  C = b.parent
+  C = parent(b)
   r = C()
   @ccall libflint.ca_fmpq_sub(r::Ref{CalciumFieldElem}, a::Ref{QQFieldElem}, b::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -435,7 +435,7 @@ end
 
 
 function *(a::CalciumFieldElem, b::Int)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_mul_si(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Int, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -443,7 +443,7 @@ function *(a::CalciumFieldElem, b::Int)
 end
 
 function *(a::CalciumFieldElem, b::ZZRingElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_mul_fmpz(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{ZZRingElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -451,7 +451,7 @@ function *(a::CalciumFieldElem, b::ZZRingElem)
 end
 
 function *(a::CalciumFieldElem, b::QQFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_mul_fmpq(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{QQFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -473,7 +473,7 @@ end
 
 function //(a::CalciumFieldElem, b::CalciumFieldElem)
   a, b = same_parent(a, b)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_div(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -483,7 +483,7 @@ end
 divexact(a::CalciumFieldElem, b::CalciumFieldElem; check::Bool=true) = a // b
 
 function inv(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_inv(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -497,7 +497,7 @@ end
 ###############################################################################
 
 function //(a::CalciumFieldElem, b::Int)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_div_si(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Int, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -505,7 +505,7 @@ function //(a::CalciumFieldElem, b::Int)
 end
 
 function //(a::CalciumFieldElem, b::ZZRingElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_div_fmpz(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{ZZRingElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -513,7 +513,7 @@ function //(a::CalciumFieldElem, b::ZZRingElem)
 end
 
 function //(a::CalciumFieldElem, b::QQFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_div_fmpq(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{QQFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -523,7 +523,7 @@ end
 //(a::CalciumFieldElem, b::QQBarFieldElem) = a // parent(a)(b)
 
 function //(a::Int, b::CalciumFieldElem)
-  C = b.parent
+  C = parent(b)
   r = C()
   @ccall libflint.ca_si_div(r::Ref{CalciumFieldElem}, a::Int, b::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -531,7 +531,7 @@ function //(a::Int, b::CalciumFieldElem)
 end
 
 function //(a::ZZRingElem, b::CalciumFieldElem)
-  C = b.parent
+  C = parent(b)
   r = C()
   @ccall libflint.ca_fmpz_div(r::Ref{CalciumFieldElem}, a::Ref{ZZRingElem}, b::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -539,7 +539,7 @@ function //(a::ZZRingElem, b::CalciumFieldElem)
 end
 
 function //(a::QQFieldElem, b::CalciumFieldElem)
-  C = b.parent
+  C = parent(b)
   r = C()
   @ccall libflint.ca_fmpq_div(r::Ref{CalciumFieldElem}, a::Ref{QQFieldElem}, b::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -565,7 +565,7 @@ divexact(a::QQBarFieldElem, b::CalciumFieldElem; check::Bool=true) = a // b
 
 function ^(a::CalciumFieldElem, b::CalciumFieldElem)
   a, b = same_parent(a, b)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_pow(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -573,7 +573,7 @@ function ^(a::CalciumFieldElem, b::CalciumFieldElem)
 end
 
 function ^(a::CalciumFieldElem, b::Int)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_pow_si(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Int, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -581,7 +581,7 @@ function ^(a::CalciumFieldElem, b::Int)
 end
 
 function ^(a::CalciumFieldElem, b::ZZRingElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_pow_fmpz(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{ZZRingElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -589,7 +589,7 @@ function ^(a::CalciumFieldElem, b::ZZRingElem)
 end
 
 function ^(a::CalciumFieldElem, b::QQFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_pow_fmpq(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Ref{QQFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -723,7 +723,7 @@ end
 Return the real part of `a`.
 """
 function real(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_re(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -736,7 +736,7 @@ end
 Return the imaginary part of `a`.
 """
 function imag(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_im(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -749,7 +749,7 @@ end
 Return the complex argument of `a`.
 """
 function angle(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_arg(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -766,7 +766,7 @@ Equivalently, $\operatorname{csgn}(x) = x / \sqrt{x^2}$ except that the value is
 at zero.
 """
 function csgn(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_csgn(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -781,7 +781,7 @@ and as $a / |a|$ for any other complex number. This function also
 extracts the sign when `a` is a signed infinity.
 """
 function sign(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_sgn(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -794,7 +794,7 @@ end
 Return the absolute value of `a`.
 """
 function abs(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_abs(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -822,7 +822,7 @@ simplifications are possible.
 In `:deep` form, complex conjugation is performed recursively.
 """
 function conj(a::CalciumFieldElem; form::Symbol=:default)
-  C = a.parent
+  C = parent(a)
   r = C()
   if form == :default
     @ccall libflint.ca_conj(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
@@ -843,7 +843,7 @@ end
 Return the floor function of `a`.
 """
 function floor(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_floor(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -856,7 +856,7 @@ end
 Return the ceiling function of `a`.
 """
 function ceil(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_ceil(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -875,7 +875,7 @@ end
 Return the principal square root of `a`.
 """
 function Base.sqrt(a::CalciumFieldElem; check::Bool=true)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_sqrt(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -888,7 +888,7 @@ end
 Return the exponential function of `a`.
 """
 function exp(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_exp(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -901,7 +901,7 @@ end
 Return the natural logarithm of `a`.
 """
 function log(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_log(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -920,7 +920,7 @@ performed arithmetically in the field of `a`, regardless of the size
 of the exponent `b`.
 """
 function pow(a::CalciumFieldElem, b::Int; form::Symbol=:default)
-  C = a.parent
+  C = parent(a)
   r = C()
   if form == :default
     @ccall libflint.ca_pow_si(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, b::Int, C::Ref{CalciumField})::Nothing
@@ -945,7 +945,7 @@ using tangents. In `:direct` form, the value is represented directly
 using a sine or cosine.
 """
 function sin(a::CalciumFieldElem; form::Symbol=:default)
-  C = a.parent
+  C = parent(a)
   r = C()
   if form == :default
     @ccall libflint.ca_sin(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
@@ -974,7 +974,7 @@ using tangents. In `:direct` form, the value is represented directly
 using a sine or cosine.
 """
 function cos(a::CalciumFieldElem; form::Symbol=:default)
-  C = a.parent
+  C = parent(a)
   r = C()
   if form == :default
     @ccall libflint.ca_cos(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
@@ -1003,7 +1003,7 @@ represented directly using tangents. In `:sine_cosine` form, the value is
 represented using sines or cosines.
 """
 function tan(a::CalciumFieldElem; form::Symbol=:default)
-  C = a.parent
+  C = parent(a)
   r = C()
   if form == :default
     @ccall libflint.ca_tan(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
@@ -1031,7 +1031,7 @@ using complex logarithms. In `:direct` or `:arctangent` form, the value is
 represented directly using arctangents.
 """
 function atan(a::CalciumFieldElem; form::Symbol=:default)
-  C = a.parent
+  C = parent(a)
   r = C()
   if form == :default
     @ccall libflint.ca_atan(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
@@ -1057,7 +1057,7 @@ using complex logarithms. In `:direct` form, the value is
 represented directly using an inverse sine or cosine.
 """
 function asin(a::CalciumFieldElem; form::Symbol=:default)
-  C = a.parent
+  C = parent(a)
   r = C()
   if form == :default
     @ccall libflint.ca_asin(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
@@ -1083,7 +1083,7 @@ using complex logarithms. In `:direct` form, the value is
 represented directly using an inverse sine or cosine.
 """
 function acos(a::CalciumFieldElem; form::Symbol=:default)
-  C = a.parent
+  C = parent(a)
   r = C()
   if form == :default
     @ccall libflint.ca_acos(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
@@ -1104,7 +1104,7 @@ end
 Return the gamma function of `a`.
 """
 function gamma(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_gamma(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -1117,7 +1117,7 @@ end
 Return the error function of `a`.
 """
 function erf(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_erf(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -1130,7 +1130,7 @@ end
 Return the imaginary error function of `a`.
 """
 function erfi(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_erfi(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -1143,7 +1143,7 @@ end
 Return the complementary error function of `a`.
 """
 function erfc(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_erfc(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -1181,7 +1181,7 @@ transformation), but this transformation can nevertheless be a useful
 heuristic for simplification.
 """
 function complex_normal_form(a::CalciumFieldElem; deep::Bool=true)
-  C = a.parent
+  C = parent(a)
   r = C()
   @ccall libflint.ca_rewrite_complex_normal_form(r::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, deep::Cint, C::Ref{CalciumField})::Nothing
   check_special(r)
@@ -1195,7 +1195,7 @@ end
 ###############################################################################
 
 function QQFieldElem(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   res = QQFieldElem()
   ok = Bool(@ccall libflint.ca_get_fmpq(res::Ref{QQFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint)
   !ok && error("unable to convert to a rational number")
@@ -1203,7 +1203,7 @@ function QQFieldElem(a::CalciumFieldElem)
 end
 
 function ZZRingElem(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   res = ZZRingElem()
   ok = Bool(@ccall libflint.ca_get_fmpz(res::Ref{ZZRingElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint)
   !ok && error("unable to convert to an integer")
@@ -1211,7 +1211,7 @@ function ZZRingElem(a::CalciumFieldElem)
 end
 
 function QQBarFieldElem(a::CalciumFieldElem)
-  C = a.parent
+  C = parent(a)
   res = QQBarFieldElem()
   ok = Bool(@ccall libflint.ca_get_qqbar(res::Ref{QQBarFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint)
   !ok && error("unable to convert to an algebraic number")
@@ -1223,7 +1223,7 @@ end
 (R::QQBarField)(a::CalciumFieldElem) = QQBarFieldElem(a)
 
 function (R::AcbField)(a::CalciumFieldElem; parts::Bool=false)
-  C = a.parent
+  C = parent(a)
   prec = precision(R)
   z = R()
   if parts
@@ -1235,7 +1235,7 @@ function (R::AcbField)(a::CalciumFieldElem; parts::Bool=false)
 end
 
 function (R::ArbField)(a::CalciumFieldElem; check::Bool=true)
-  C = a.parent
+  C = parent(a)
   prec = precision(R)
   if check
     z = AcbField(prec)(a, parts=true)
@@ -1275,38 +1275,38 @@ end
 ###############################################################################
 
 function zero!(z::CalciumFieldElem)
-  C = z.parent
+  C = parent(z)
   @ccall libflint.ca_zero(z::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   return z
 end
 
 function one!(z::CalciumFieldElem)
-  C = z.parent
+  C = parent(z)
   @ccall libflint.ca_one(z::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   return z
 end
 
 function neg!(z::CalciumFieldElem, a::CalciumFieldElem)
-  C = z.parent
+  C = parent(z)
   @ccall libflint.ca_neg(z::Ref{CalciumFieldElem}, a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   return z
 end
 
 function mul!(z::CalciumFieldElem, x::CalciumFieldElem, y::CalciumFieldElem)
-  if z.parent != x.parent || x.parent != y.parent
+  if parent(z) != parent(x) || parent(x) != parent(y)
     error("different parents in in-place operation")
   end
-  C = z.parent
+  C = parent(z)
   @ccall libflint.ca_mul(z::Ref{CalciumFieldElem}, x::Ref{CalciumFieldElem}, y::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(z)
   return z
 end
 
 function add!(z::CalciumFieldElem, x::CalciumFieldElem, y::CalciumFieldElem)
-  if z.parent != x.parent || x.parent != y.parent
+  if parent(z) != parent(x) || parent(x) != parent(y)
     error("different parents in in-place operation")
   end
-  C = z.parent
+  C = parent(z)
   @ccall libflint.ca_add(z::Ref{CalciumFieldElem}, x::Ref{CalciumFieldElem}, y::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Nothing
   check_special(z)
   return z
@@ -1324,7 +1324,7 @@ function (C::CalciumField)()
 end
 
 function (C::CalciumField)(v::CalciumFieldElem)
-  D = v.parent
+  D = parent(v)
   if C == D
     return v
   end

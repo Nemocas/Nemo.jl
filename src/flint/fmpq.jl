@@ -1019,10 +1019,11 @@ end
 #
 ###############################################################################
 
-_num_ptr(c::QQFieldElem) = Ptr{ZZRingElem}(pointer_from_objref(c))
-_num_ptr(c::Ptr{QQFieldElem}) = Ptr{ZZRingElem}(c)
-_num_ptr(c::Ref{QQFieldElem}) = _num_ptr(c[])
-_den_ptr(c::TypeOrPtr{QQFieldElem}) = _num_ptr(c) + sizeof(ZZRingElem)
+_base_ptr(c::QQFieldElem) = Ptr{QQFieldElem}(pointer_from_objref(c))
+_base_ptr(c::Ptr{QQFieldElem}) = c
+_base_ptr(c::Ref{QQFieldElem}) = _base_ptr(c[])
+_num_ptr(c::TypeOrPtr{QQFieldElem}) = Ptr{ZZRingElem}(_base_ptr(c) + fieldoffset(QQFieldElem, Base.fieldindex(QQFieldElem, :num)))
+_den_ptr(c::TypeOrPtr{QQFieldElem}) = Ptr{ZZRingElem}(_base_ptr(c) + fieldoffset(QQFieldElem, Base.fieldindex(QQFieldElem, :den)))
 
 function zero!(c::TypeOrPtr{QQFieldElem})
   @ccall libflint.fmpq_zero(c::Ref{QQFieldElem})::Nothing
@@ -1233,15 +1234,9 @@ end
 
 (a::QQField)(b::QQFieldElem) = b
 
-function (a::ZZRing)(b::QQFieldElem)
-  is_one(_den_ptr(b)) || error("Denominator must be 1")
-  return numerator(b)
-end
+(a::ZZRing)(b::QQFieldElem) = ZZRingElem(b)
 
-function (::ZZRing)(x::Rational{<:IntegerUnion})
-  @assert denominator(x) == 1
-  return ZZRingElem(numerator(x))
-end
+(a::ZZRing)(b::Rational{T}) where {T <: Integer} = ZZRingElem(T(b))
 
 ###############################################################################
 #
@@ -1333,6 +1328,14 @@ end
 
 Base.Float64(a::QQFieldElem) = Float64(BigFloat(a))
 
+function ZZRingElem(a::QQFieldElem)
+  isinteger(a) || throw(InexactError(:ZZRingElem, ZZRingElem, a))
+  return numerator(a)
+end
+
+(::Type{T})(a::QQFieldElem) where T <: Integer = T(ZZRingElem(a))
+
+
 ###############################################################################
 #
 #   Convenience methods for arithmetics (since `QQFieldElem` and `ZZRingElem` are not `Number` types)
@@ -1357,3 +1360,5 @@ Base.Float64(a::QQFieldElem) = Float64(BigFloat(a))
 ###############################################################################
 
 fraction_field(base::ZZRing) = QQ
+
+fraction_field_type(::Type{ZZRing}) = QQField

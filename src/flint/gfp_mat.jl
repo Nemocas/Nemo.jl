@@ -135,44 +135,9 @@ end
 ################################################################################
 
 function det(a::fpMatrix)
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   r = @ccall libflint.nmod_mat_det(a::Ref{fpMatrix})::UInt
   return base_ring(a)(r)
-end
-
-################################################################################
-#
-#  Windowing
-#
-################################################################################
-
-function _view_window(x::fpMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
-
-  _checkrange_or_empty(nrows(x), r1, r2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  _checkrange_or_empty(ncols(x), c1, c2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  if (r1 > r2)
-    r1 = 1
-    r2 = 0
-  end
-  if (c1 > c2)
-    c1 = 1
-    c2 = 0
-  end
-
-  z = fpMatrix()
-  z.base_ring = x.base_ring
-  z.view_parent = x
-  @ccall libflint.nmod_mat_window_init(z::Ref{fpMatrix}, x::Ref{fpMatrix}, (r1 - 1)::Int, (c1 - 1)::Int, r2::Int, c2::Int)::Nothing
-  finalizer(_gfp_mat_window_clear_fn, z)
-  return z
-end
-
-function _gfp_mat_window_clear_fn(a::fpMatrix)
-  @ccall libflint.nmod_mat_window_clear(a::Ref{fpMatrix})::Nothing
 end
 
 ################################################################################
@@ -219,7 +184,7 @@ promote_rule(::Type{fpMatrix}, ::Type{ZZRingElem}) = fpMatrix
 ################################################################################
 
 function inv(a::fpMatrix)
-  !is_square(a) && error("Matrix must be a square matrix")
+  check_square(a)
   z = similar(a)
   r = @ccall libflint.nmod_mat_inv(z::Ref{fpMatrix}, a::Ref{fpMatrix})::Int
   !Bool(r) && error("Matrix not invertible")
@@ -232,8 +197,7 @@ end
 #
 ################################################################################
 
-Solve.matrix_normal_form_type(::fpField) = Solve.LUTrait()
-Solve.matrix_normal_form_type(::fpMatrix) = Solve.LUTrait()
+Solve.matrix_normal_form_type(::Type{fpField}) = Solve.LUTrait()
 
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::fpMatrix, b::fpMatrix, task::Symbol; side::Symbol = :left)
   if side === :left
@@ -288,7 +252,7 @@ function (a::fpMatrixSpace)(arr::AbstractVecOrMat{fpFieldElem})
 end
 
 function (a::fpMatrixSpace)(b::ZZMatrix)
-  (ncols(a) != b.c || nrows(a) != b.r) && error("Dimensions do not fit")
+  (ncols(a) != ncols(b) || nrows(a) != nrows(b)) && error("Dimensions do not fit")
   z = fpMatrix(modulus(base_ring(a)), b)
   z.base_ring = a.base_ring
   return z

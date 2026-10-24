@@ -9,8 +9,7 @@ DocTestSetup = Nemo.doctestsetup()
 Dense matrices can be created over any computable ring R. There
 are two different kinds of implementation: a generic one for the case where no
 specific implementation exists (provided by AbstractAlgebra.jl), and efficient
-implementations of matrices over numerous specific rings, usually provided by C/C++
-libraries.
+implementations of matrices over numerous specific rings provided by FLINT.
 
 The following table shows the available matrix types, together with their
 base ring R and the corresponding Julia types (the type information is
@@ -26,10 +25,10 @@ $\mathbb{Q}$                          | FLINT               | `QQMatrix`        
 $\mathbb{Z}/p\mathbb{Z}$ (small $p$)  | FLINT               | `fpMatrix`          | `fpMatrixSpace`
 $\mathbb{F}_{p^n}$ (small $p$)        | FLINT               | `fqPolyRepMatrix`   | `fqPolyRepMatrixSpace`
 $\mathbb{F}_{p^n}$ (large $p$)        | FLINT               | `FqPolyRepMatrix`   | `FqPolyRepMatrixSpace`
-$\mathbb{R}$ (arbitrary precision)    | Arb                 | `RealMatrix`        | `RealMatrixSpace`
-$\mathbb{C}$ (arbitrary precision)    | Arb                 | `ComplexMatrix`     | `ComplexMatrixSpace`
-$\mathbb{R}$ (fixed precision)        | Arb                 | `ArbMatrix`         | `ArbMatrixSpace`
-$\mathbb{C}$ (fixed precision)        | Arb                 | `AcbMatrix`         | `AcbMatrixSpace`
+$\mathbb{R}$ (arbitrary precision)    | FLINT               | `RealMatrix`        | `RealMatrixSpace`
+$\mathbb{C}$ (arbitrary precision)    | FLINT               | `ComplexMatrix`     | `ComplexMatrixSpace`
+$\mathbb{R}$ (fixed precision)        | FLINT               | `ArbMatrix`         | `ArbMatrixSpace`
+$\mathbb{C}$ (fixed precision)        | FLINT               | `AcbMatrix`         | `AcbMatrixSpace`
 
 The dimensions and base ring $R$ of a generic matrix are stored in its parent
 object.
@@ -549,9 +548,20 @@ Julia matrices use a different data structure than Nemo matrices. Conversion to 
 
 This conversion can be performed with standard Julia syntax, such as the following, where `A` is an `ZZMatrix`:
 
-```julia
-Matrix{Int}(A)
-Matrix{BigInt}(A)
+```jldoctest
+julia> A = ZZ[1 2; 3 4]
+[1   2]
+[3   4]
+
+julia> Matrix{Int}(A)
+2×2 Matrix{Int64}:
+ 1  2
+ 3  4
+
+julia> Matrix{BigInt}(A)
+2×2 Matrix{BigInt}:
+ 1  2
+ 3  4
 ```
 
 In case the matrix cannot be converted without loss, an `InexactError` is thrown: in this case, cast to a matrix of `BigInt`s rather than `Int`s.

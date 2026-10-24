@@ -9,6 +9,58 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.57.1](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.57.1) - 2026-10-16
+
+### New or extended functionality
+
+- [#2392](https://github.com/Nemocas/Nemo.jl/pull/2392) Add abstract type `FlintMatElem` for all FLINT matrix types; support `getindex!` and `Ref`/`Ptr` arguments to `nrows`, `ncols`, `is_square` for all of them
+- [#2398](https://github.com/Nemocas/Nemo.jl/pull/2398) Define views for every FLINT matrix type, including RealMatrix, ArbMatrix, ComplexMatrix, AcbMatrix and ZZPolyRingMatrix
+- [#2402](https://github.com/Nemocas/Nemo.jl/pull/2402) Add `log(b::Int, x)` for `RealFieldElem` and `ArbFieldElem`
+- [#2402](https://github.com/Nemocas/Nemo.jl/pull/2402) Deprecate `log(x::RealFieldElem, prec::Int)` in favour of `log(x; precision = prec)`
+
+### Performance improvements or improved testing
+
+- [#2389](https://github.com/Nemocas/Nemo.jl/pull/2389) Add FLINT-backed `divexact` for Fq polynomials
+
+### Fixed bugs that returned incorrect results
+
+- [#2391](https://github.com/Nemocas/Nemo.jl/pull/2391) Fix `multiply_column!`, `multiply_row!` and `add_column!` of `ZZMatrix`, `ZZModMatrix` and `FpMatrix` returning wrong entries
+- [#2407](https://github.com/Nemocas/Nemo.jl/pull/2407) Fix conversion of `Rational`s to `RealFieldElem`/`ArbFieldElem` returning a ball that does not contain the rational
+
+### Fixed bugs that resulted in unexpected errors
+
+- [#2384](https://github.com/Nemocas/Nemo.jl/pull/2384) Fix several methods that threw errors for valid arguments
+- [#2386](https://github.com/Nemocas/Nemo.jl/pull/2386) Fix `round!(::ZZMatrix, ::RealMatrix)` and assigning float tuples to complex matrix entries
+
+## [0.57.0](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.57.0) - 2026-10-07
+
+### Breaking changes
+
+> !These changes break compatibility from previous versions!
+
+#### New or extended functionality
+
+- [#2367](https://github.com/Nemocas/Nemo.jl/pull/2367) Add conversions from `QQFieldElem` to `ZZRingElem` and `Integer` types
+
+#### Miscellaneous changes
+
+- [#2234](https://github.com/Nemocas/Nemo.jl/pull/2234) Add `fqPolyRepField` coercions from nmod polynomials (imported from Hecke), add or fix a bunch of `set!` methods
+- [#2364](https://github.com/Nemocas/Nemo.jl/pull/2364) Require `AbstractVector` scales in `rand` for `LocalizedEuclideanRing`, and `AbstractUnitRange{Int}` ranges in `rand` for Laurent and Puiseux series rings
+- [#2369](https://github.com/Nemocas/Nemo.jl/pull/2369) Revert to FFLU for solve contexts over QQ
+- [#2376](https://github.com/Nemocas/Nemo.jl/pull/2376) Change `rand(K::AbsSimpleNumField, r)` to return integer coefficients in `r` (not fractions); add `rand(K, r, d)` with a denominator range `d`
+- [#2378](https://github.com/Nemocas/Nemo.jl/pull/2378) Update AbstractAlgebra to v0.51
+
+## [0.56.2](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.56.2) - 2026-09-30
+
+### New or extended functionality
+
+- [#2321](https://github.com/Nemocas/Nemo.jl/pull/2321) Unify `non-square matrix` error messages
+- [#2329](https://github.com/Nemocas/Nemo.jl/pull/2329) New function `digits_to_integer!` (inverse to `digits`)
+
+### Fixed bugs that returned incorrect results
+
+- [#2340](https://github.com/Nemocas/Nemo.jl/pull/2340) Fix three-arg `+`, `-`, `*`, `//` for real and complex fields
+
 ## [0.56.1](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.56.1) - 2026-06-31
 
 ### New or extended functionality

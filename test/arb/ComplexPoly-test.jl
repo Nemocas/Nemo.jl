@@ -53,6 +53,28 @@ coeff_types = [Int8, Int, UInt, BigInt,
   end
 end
 
+@testset "ComplexPolyRingElem.polynomial" begin
+  f = polynomial(CC, [])
+  g = polynomial(CC, [1, 2, 3])
+  h = polynomial(CC, ZZRingElem[1, 2, 3])
+  k = polynomial(CC, [CC(1), CC(2), CC(3)])
+  p = polynomial(CC, [1, 2, 3], "y")
+
+  @test isa(f, ComplexPolyRingElem)
+  @test isa(g, ComplexPolyRingElem)
+  @test isa(h, ComplexPolyRingElem)
+  @test isa(k, ComplexPolyRingElem)
+  @test isa(p, ComplexPolyRingElem)
+
+  @test iszero(f)
+  @test g == h == k
+  @test coeff(g, 2) == 3
+
+  q = polynomial(CC, [1, 2, 3], cached=false)
+
+  @test parent(g) != parent(q)
+end
+
 @testset "ComplexPolyRingElem.printing" begin
   R, x = polynomial_ring(CC, "x")
   f = x^3 + 2x^2 + x + 1
