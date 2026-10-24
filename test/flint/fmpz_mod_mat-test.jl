@@ -311,6 +311,30 @@ end
   @test d == matrix_space(Z17, 4, 4)([11 11 8 7; 11 0 14 6; 8 14 14 5; 7 6 5 5])
 end
 
+@testset "ZZModMatrix.vector_mul" begin
+  R, = residue_ring(ZZ, ZZ(7)^30)
+
+  for (r, c) in ((1, 2), (3, 5), (5, 3), (9, 9))
+    a = matrix(R, [rand(R) for i in 1:r, j in 1:c])
+    v = [rand(R) for j in 1:c]
+    w = [rand(R) for i in 1:r]
+    Av = a * matrix(R, c, 1, v)
+    Av = [Av[i, 1] for i in 1:r]
+    wA = matrix(R, 1, r, w) * a
+    wA = [wA[1, j] for j in 1:c]
+    for f in (mul!, Nemo.mul!_flint, Nemo.mul!_through_matrix)
+      z = [rand(R) for i in 1:r]
+      @test f(z, a, v) == z == Av
+      z = [rand(R) for j in 1:c]
+      @test f(z, w, a) == z == wA
+      z = [ZZ(i) for i in 1:r]
+      @test f(z, a, lift.(v)) == z == lift.(Av)
+      z = [ZZ(j) for j in 1:c]
+      @test f(z, lift.(w), a) == z == lift.(wA)
+    end
+  end
+end
+
 @testset "ZZModMatrix.mul!" begin
   # Large modulus to exercise the fmpz_mod path with values that wrap.
   R, = residue_ring(ZZ, ZZ(7)^30)

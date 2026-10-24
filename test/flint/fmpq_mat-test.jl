@@ -957,6 +957,27 @@ end
     @test A * T[1, 2, 3] == QQFieldElem[14, 32]
     @test T[2, 1] * A == QQFieldElem[6, 9, 12]
   end
+
+  rz() = rand(ZZ, -ZZ(2)^70:ZZ(2)^70)
+  rq() = QQ(rz(), rand(ZZ, ZZ(1):ZZ(2)^70))
+
+  for (r, c) in ((1, 2), (3, 5), (5, 3), (9, 9))
+    a = matrix(QQ, [rq() for i in 1:r, j in 1:c])
+    for (v, w) in (([rq() for j in 1:c], [rq() for i in 1:r]), ([rz() for j in 1:c], [rz() for i in 1:r]))
+      Av = a * matrix(QQ, c, 1, v)
+      Av = [Av[i, 1] for i in 1:r]
+      wA = matrix(QQ, 1, r, w) * a
+      wA = [wA[1, j] for j in 1:c]
+      vector_as = eltype(v) === ZZRingElem ? ZZMatrix : QQMatrix
+      through_matrix(z, x, y) = Nemo.mul!_through_matrix(z, x, y; vector_as)
+      for f in (mul!, Nemo.mul!_flint, through_matrix)
+        z = [rq() for i in 1:r]
+        @test f(z, a, v) == z == Av
+        z = [rq() for j in 1:c]
+        @test f(z, w, a) == z == wA
+      end
+    end
+  end
 end
 
 @testset "QQMatrix.add_one!" begin
