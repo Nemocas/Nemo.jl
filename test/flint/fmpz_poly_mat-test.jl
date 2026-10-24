@@ -172,6 +172,21 @@ end
   for i in 1:2, j in 1:3
     @test Bt[j, i] == B[i, j]
   end
+
+  Z = similar(B, 3, 2)
+  @test transpose!(Z, B) === Z
+  @test Z == Bt
+
+  D = ZZPolyRingMatrix(matrix(R, [1 x; 3 4]))
+  GC.@preserve D B begin
+    for (d, e) in ((D, B), (Ref(D), Ref(B)),
+                   (Ptr{ZZPolyRingMatrix}(pointer_from_objref(D)), Ptr{ZZPolyRingMatrix}(pointer_from_objref(B))))
+      @test transpose!(d) === d
+      @test D == ZZPolyRingMatrix(matrix(R, [1 3; x 4]))
+      transpose!(D)
+      @test_throws DomainError transpose!(e)
+    end
+  end
 end
 
 @testset "ZZPolyRingMatrix.det" begin

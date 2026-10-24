@@ -123,16 +123,6 @@ isequal(a::T, b::T) where T <: Zmodn_mat = ==(a, b)
 #
 ################################################################################
 
-function transpose(a::T) where T <: Zmodn_mat
-  z = similar(a, ncols(a), nrows(a))
-  return transpose!(z, a)
-end
-
-function transpose!(a::T) where T <: Zmodn_mat
-  check_square(a)
-  return transpose!(a, a)
-end
-
 function transpose!(z::T, a::T) where T <: Zmodn_mat
   @ccall libflint.nmod_mat_transpose(z::Ref{T}, a::Ref{T})::Nothing
   return z

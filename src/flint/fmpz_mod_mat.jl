@@ -105,16 +105,6 @@ isequal(a::T, b::T) where T <: Zmod_fmpz_mat = ==(a, b)
 #
 ################################################################################
 
-function transpose(a::T) where T <: Zmod_fmpz_mat
-  z = similar(a, ncols(a), nrows(a))
-  return transpose!(z, a)
-end
-
-function transpose!(a::T) where T <: Zmod_fmpz_mat
-  check_square(a)
-  return transpose!(a, a)
-end
-
 function transpose!(z::T, a::T) where T <: Zmod_fmpz_mat
   @ccall libflint.fmpz_mod_mat_transpose(z::Ref{T}, a::Ref{T}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z

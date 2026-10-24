@@ -95,8 +95,7 @@ end
 #
 ################################################################################
 
-function transpose(x::AcbMatrix)
-  z = similar(x, ncols(x), nrows(x))
+function transpose!(z::AcbMatrixOrPtr, x::AcbMatrixOrPtr)
   @ccall libflint.acb_mat_transpose(z::Ref{AcbMatrix}, x::Ref{AcbMatrix})::Nothing
   return z
 end

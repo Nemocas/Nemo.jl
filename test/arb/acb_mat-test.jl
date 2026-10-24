@@ -183,6 +183,22 @@ end
   C = transpose(A)*A
 
   @test overlaps(transpose(C), C)
+
+  E = matrix(CC, [1 2 3; 4 5 6])
+  Z = similar(E, 3, 2)
+  @test transpose!(Z, E) === Z
+  @test Z == matrix(CC, [1 4; 2 5; 3 6])
+
+  D = matrix(CC, [1 2; 3 4])
+  GC.@preserve D E begin
+    for (d, e) in ((D, E), (Ref(D), Ref(E)),
+                   (Ptr{AcbMatrix}(pointer_from_objref(D)), Ptr{AcbMatrix}(pointer_from_objref(E))))
+      @test transpose!(d) === d
+      @test D == matrix(CC, [1 3; 2 4])
+      transpose!(D)
+      @test_throws DomainError transpose!(e)
+    end
+  end
 end
 
 @testset "AcbMatrix.binary_ops" begin

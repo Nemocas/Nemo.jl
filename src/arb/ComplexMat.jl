@@ -93,8 +93,7 @@ end
 #
 ################################################################################
 
-function transpose(x::ComplexMatrix)
-  z = similar(x, ncols(x), nrows(x))
+function transpose!(z::ComplexMatrixOrPtr, x::ComplexMatrixOrPtr)
   @ccall libflint.acb_mat_transpose(z::Ref{ComplexMatrix}, x::Ref{ComplexMatrix})::Nothing
   return z
 end

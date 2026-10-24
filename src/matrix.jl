@@ -208,6 +208,19 @@ end
 
 ################################################################################
 #
+#  Transpose
+#
+################################################################################
+
+# Each type implements `transpose!(z, a)`; AbstractAlgebra's fallbacks build
+# `transpose` and `transpose!(a)` on it, but take a `MatElem` only.
+function transpose!(a::Union{Ref{T}, Ptr{T}}) where {T <: FlintMatElem}
+  is_square(a) || throw(DomainError(a, "Argument must be a square matrix"))
+  return transpose!(a, a)
+end
+
+################################################################################
+#
 #  (No) lazy transpose
 #
 ################################################################################

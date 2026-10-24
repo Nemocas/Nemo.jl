@@ -81,8 +81,7 @@ end
 #
 ################################################################################
 
-function transpose(x::RealMatrix)
-  z = similar(x, ncols(x), nrows(x))
+function transpose!(z::RealMatrixOrPtr, x::RealMatrixOrPtr)
   @ccall libflint.arb_mat_transpose(z::Ref{RealMatrix}, x::Ref{RealMatrix})::Nothing
   return z
 end
