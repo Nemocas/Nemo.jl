@@ -429,6 +429,13 @@ end
   @test !is_square(R(2))
   @test !is_square(R(3))
 
+  # squareness of a unit depends on its first 3 digits
+  x = gen(R) + O(R, 2)
+  @test_throws ErrorException is_square(x^2)
+  @test_throws ErrorException is_square_with_sqrt(1 + O(R, 2^2))
+  @test_throws ErrorException sqrt(1 + O(R, 2^2))
+  @test !is_square(2 + O(R, 2^2))
+
   # error paths not reachable through the public API
   user_data = Nemo.Qadic2SqrtPrecomp(R)
   @test_throws DomainError Nemo.Qadic2SqrtPrecomp(QadicField(3, 2)[1])

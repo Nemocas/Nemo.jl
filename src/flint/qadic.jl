@@ -509,16 +509,19 @@ function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bo
   @req ctx === data.parent "precomputation belongs to a different q-adic field"
   av = valuation(a)
   isodd(av) && return (false, a)
+
+  # Squareness of a unit depends on its first 3 digits. FLINT treats the
+  # stored digits as exact, so with fewer known digits its answer is wrong.
+  rel_pr = precision(a)-av
+  rel_pr < 3 && error("Insufficient precision to decide whether a q-adic is a square")
   z = QadicFieldElem(precision(a) - div(av, 2))
   z.parent = ctx
 
   GC.@preserve data begin
     res = Bool(@ccall libflint._qadic_char2_sqrt_with_precomp(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField}, data.ptr::Ptr{Nothing})::Cint)
   end
-  # A unit known mod 2^n has its root determined only mod 2^(n-1) if n >= 2,
-  # so drop the last digit: FLINT computes to whatever precision z has.
-  rel_pr = precision(a)-av
-  (rel_pr < 2) && return (res, z)
+  # A unit known mod 2^n has its root determined only mod 2^(n-1), so drop
+  # the last digit: FLINT computes to whatever precision z has.
   p = QQ(prime(ctx))
   return (res, z+O(ctx, p^(div(av,2)+rel_pr-1)))
 end
