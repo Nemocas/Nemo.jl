@@ -392,7 +392,8 @@ function eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
   @assert is_square(M)
   f = charpoly(M)
   x = gen(parent(f))
-  r = roots(f)
+  # `roots` may list a root once for each multiplicity
+  r = unique(roots(f))
   return [ (a, valuation(f, x - a)) for a in r ]
 end
 
@@ -421,7 +422,8 @@ multiplicities as a vector of tuples.
 function eigenvalues_with_multiplicities(L::Field, M::MatElem{T}) where T <: RingElem
   @assert is_square(M)
   f = change_base_ring(L, charpoly(M))
-  r = roots(L, charpoly(M))
+  # `roots` may list a root once for each multiplicity
+  r = unique(roots(L, charpoly(M)))
   x = gen(parent(f))
   return [ (a, valuation(f, x - a)) for a in r ]
 end
