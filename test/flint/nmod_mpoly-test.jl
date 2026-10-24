@@ -446,6 +446,16 @@ end
   end
 end
 
+@testset "zzModMPolyRingElem.divexact_by_zero" begin
+  R, = residue_ring(ZZ, 6)
+  S, = polynomial_ring(R, 2)
+  test_divexact_by_zero(S, zero(R), 0, ZZ(0))
+
+  R, = residue_ring(ZZ, 1)
+  S, = polynomial_ring(R, 2)
+  @test divexact(one(S), zero(S)) == 0
+end
+
 @testset "zzModMPolyRingElem.euclidean_division" begin
   R, = residue_ring(ZZ, 23)
 

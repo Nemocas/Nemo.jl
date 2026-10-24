@@ -516,6 +516,7 @@ for (etype, rtype, ftype, ctype, utype) in (
 
     function divexact(a::($etype), b::($etype); check::Bool=true)
       check_parent(a, b)
+      iszero(b) && !is_trivial(parent(b)) && throw(DivideError())
       b, q = divides(a, b)
       check && !b && error("Division is not exact in divexact")
       return q
