@@ -99,7 +99,7 @@ end
 
 mutable struct fmpz_factor
   sign::Cint
-  p::Ptr{Nothing} # Array of fmpz_struct's
+  p::Ptr{ZZRingElem} # array of fmpz
   exp::Ptr{UInt}
   alloc::Int
   num::Int
@@ -311,7 +311,7 @@ end
 const FmpzPolyID = CacheDictType{Symbol, ZZPolyRing}()
 
 mutable struct ZZPolyRingElem <: PolyRingElem{ZZRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   # end flint struct
@@ -379,7 +379,7 @@ end
 const FmpqPolyID = CacheDictType{Symbol, QQPolyRing}()
 
 mutable struct QQPolyRingElem <: PolyRingElem{QQFieldElem}
-  coeffs::Ptr{Int}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   den::Int
@@ -511,15 +511,15 @@ end
 
 mutable struct fmpz_mod_ctx_struct
   n::Int # fmpz_t
-  add_fxn::Ptr{Nothing}
-  sub_fxn::Ptr{Nothing}
-  mul_fxn::Ptr{Nothing}
+  add_fxn::Ptr{Cvoid}
+  sub_fxn::Ptr{Cvoid}
+  mul_fxn::Ptr{Cvoid}
   n2::UInt
   ninv::UInt
   norm::UInt
   n_limbs::Tuple{UInt, UInt, UInt}
   ninv_limbs::Tuple{UInt, UInt, UInt}
-  ninv_huge::Ptr{Nothing} # fmpz_preinvn_struct
+  ninv_huge::Ptr{Cvoid} # fmpz_preinvn_struct *
 
   function fmpz_mod_ctx_struct()
     z = new()
@@ -621,7 +621,7 @@ end
 const NmodPolyRingID = CacheDictType{Tuple{zzModRing, Symbol}, zzModPolyRing}()
 
 mutable struct zzModPolyRingElem <: PolyRingElem{zzModRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
   alloc::Int
   length::Int
   mod_n::UInt
@@ -735,7 +735,7 @@ end
 const GFPPolyRingID = CacheDictType{Tuple{fpField, Symbol}, fpPolyRing}()
 
 mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
   alloc::Int
   length::Int
   mod_n::UInt
@@ -865,7 +865,7 @@ end
 const FmpzModPolyRingID = CacheDictType{Tuple{ZZModRing, Symbol}, ZZModPolyRing}()
 
 mutable struct ZZModPolyRingElem <: PolyRingElem{ZZModRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   # end of flint struct
@@ -981,7 +981,7 @@ end
 const GFPFmpzPolyRingID = CacheDictType{Tuple{FpField, Symbol}, FpPolyRing}()
 
 mutable struct FpPolyRingElem <: PolyRingElem{FpFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   # end flint struct
@@ -1143,8 +1143,8 @@ ZZMPolyRing(::ZZRing, s::Vector{Symbol}, S::Symbol, cached::Bool=true) = ZZMPoly
 const FmpzMPolyID = CacheDictType{Tuple{Vector{Symbol}, Symbol}, ZZMPolyRing}()
 
 mutable struct ZZMPolyRingElem <: MPolyRingElem{ZZRingElem}
-  coeffs::Ptr{Nothing}
-  exps::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
+  exps::Ptr{UInt} # array of ulong
   alloc::Int
   length::Int
   bits::Int
@@ -1214,8 +1214,8 @@ end
 mutable struct fmpz_mpoly_factor
   constant::Int
   constant_den::Int
-  poly::Ptr{Nothing}
-  exp::Ptr{Nothing}
+  poly::Ptr{Cvoid} # array of fmpz_mpoly_struct
+  exp::Ptr{ZZRingElem} # array of fmpz
   num::Int
   alloc::Int
   # end flint struct
@@ -1267,8 +1267,8 @@ const FmpqMPolyID = CacheDictType{Tuple{Vector{Symbol}, Symbol}, QQMPolyRing}()
 mutable struct QQMPolyRingElem <: MPolyRingElem{QQFieldElem}
   content_num::Int
   content_den::Int
-  coeffs::Ptr{Nothing}
-  exps::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
+  exps::Ptr{UInt} # array of ulong
   alloc::Int
   length::Int
   bits::Int
@@ -1340,8 +1340,8 @@ end
 mutable struct fmpq_mpoly_factor
   constant_num::Int
   constant_den::Int
-  poly::Ptr{Nothing}
-  exp::Ptr{Nothing}
+  poly::Ptr{Cvoid} # array of fmpq_mpoly_struct
+  exp::Ptr{ZZRingElem} # array of fmpz
   num::Int
   alloc::Int
   # end flint struct
@@ -1397,8 +1397,8 @@ end
 const NmodMPolyID = CacheDictType{Tuple{zzModRing, Vector{Symbol}, Symbol}, zzModMPolyRing}()
 
 mutable struct zzModMPolyRingElem <: MPolyRingElem{zzModRingElem}
-  coeffs::Ptr{Nothing}
-  exps::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
+  exps::Ptr{UInt} # array of ulong
   length::Int
   bits::Int
   coeffs_alloc::Int
@@ -1477,8 +1477,8 @@ end
 
 mutable struct nmod_mpoly_factor
   constant::UInt
-  poly::Ptr{Nothing}
-  exp::Ptr{Nothing}
+  poly::Ptr{Cvoid} # array of nmod_mpoly_struct
+  exp::Ptr{ZZRingElem} # array of fmpz
   num::Int
   alloc::Int
   # end flint struct
@@ -1534,8 +1534,8 @@ end
 const GFPMPolyID = CacheDictType{Tuple{fpField, Vector{Symbol}, Symbol}, fpMPolyRing}()
 
 mutable struct fpMPolyRingElem <: MPolyRingElem{fpFieldElem}
-  coeffs::Ptr{Nothing}
-  exps::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
+  exps::Ptr{UInt} # array of ulong
   length::Int
   bits::Int
   coeffs_alloc::Int
@@ -1614,8 +1614,8 @@ end
 
 mutable struct gfp_mpoly_factor
   constant::UInt
-  poly::Ptr{Nothing}
-  exp::Ptr{Nothing}
+  poly::Ptr{Cvoid} # array of nmod_mpoly_struct
+  exp::Ptr{ZZRingElem} # array of fmpz
   num::Int
   alloc::Int
   # end flint struct
@@ -1647,15 +1647,15 @@ end
   lut1::NTuple{Sys.WORD_SIZE, UInt8}
 
   n::Int # fmpz_t
-  add_fxn::Ptr{Nothing}
-  sub_fxn::Ptr{Nothing}
-  mul_fxn::Ptr{Nothing}
+  add_fxn::Ptr{Cvoid}
+  sub_fxn::Ptr{Cvoid}
+  mul_fxn::Ptr{Cvoid}
   n2::UInt
   ninv::UInt
   norm::UInt
   n_limbs::Tuple{UInt, UInt, UInt}
   ninv_limbs::Tuple{UInt, UInt, UInt}
-  ninv_huge::Ptr{Nothing} # fmpz_preinvn_struct
+  ninv_huge::Ptr{Cvoid} # fmpz_preinvn_struct *
   # end of flint struct
 
   base_ring::FpField
@@ -1678,8 +1678,8 @@ end
 const GFPFmpzMPolyID = CacheDictType{Tuple{FpField, Vector{Symbol}, Symbol}, FpMPolyRing}()
 
 mutable struct FpMPolyRingElem <: MPolyRingElem{FpFieldElem}
-  coeffs::Ptr{Nothing}
-  exps::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
+  exps::Ptr{UInt} # array of ulong
   length::Int
   bits::Int
   coeffs_alloc::Int
@@ -1725,8 +1725,8 @@ end
 
 mutable struct gfp_fmpz_mpoly_factor
   constant::Int
-  poly::Ptr{Nothing}
-  exp::Ptr{Nothing}
+  poly::Ptr{Cvoid} # array of fmpz_mod_mpoly_struct
+  exp::Ptr{ZZRingElem} # array of fmpz
   num::Int
   alloc::Int
   # end flint struct
@@ -1760,22 +1760,22 @@ See [`FqPolyRepField`](@ref) for $p$ being a [`ZZRingElem`](@ref). See [`fqPolyR
   norm :: UInt
   sparse_modulus :: Cint
   is_conway :: Cint
-  a :: Ptr{Nothing}
-  j :: Ptr{Nothing}
+  a :: Ptr{UInt} # array of ulong
+  j :: Ptr{Int} # array of slong
   len :: Int
-  mod_coeffs :: Ptr{Nothing}
+  mod_coeffs :: Ptr{UInt} # array of ulong
   mod_alloc :: Int
   mod_length :: Int
   mod_n :: Int
   mod_ninv :: Int
   mod_norm :: Int
-  inv_coeffs :: Ptr{Nothing}
+  inv_coeffs :: Ptr{UInt} # array of ulong
   inv_alloc :: Int
   inv_length :: Int
   inv_n :: Int
   inv_ninv :: Int
   inv_norm :: Int
-  var :: Ptr{Nothing}
+  var :: Cstring
   # end of flint struct
 
   overfields :: Dict{Int, Vector{FinFieldMorphism{fqPolyRepField, fqPolyRepField}}}
@@ -1835,7 +1835,7 @@ An element $\sum_{i=0}^{d-1} a_i t^i$ of a finite field $\mathbb F_{p^d} \cong \
 Represented internally as $(a_i)_{0\le i<d}$. See [`fqPolyRepField`](@ref).
 """
 mutable struct fqPolyRepFieldElem <: FinFieldElem
-  coeffs :: Ptr{Nothing}
+  coeffs :: Ptr{UInt} # array of ulong
   alloc :: Int
   length :: Int
   n :: Int
@@ -1892,7 +1892,7 @@ A finite field. The constructor automatically determines a fast implementation.
   data::NTuple{6 * sizeof(UInt), Int8}
   which_ring::UInt
   sizeof_elem::Int
-  methods::Ptr{Nothing}
+  methods::Ptr{Ptr{Cvoid}} # array of gr_funcptr
   size_limit::UInt
   # end of flint struct
 
@@ -2041,28 +2041,28 @@ See [`fqPolyRepField`](@ref) for $p$ being an [`Int`](@ref). See [`FqPolyRepFiel
 """
 @attributes mutable struct FqPolyRepField <: FinField
   p::Int # fmpz_t
-  add_fxn::Ptr{Nothing}
-  sub_fxn::Ptr{Nothing}
-  mul_fxn::Ptr{Nothing}
+  add_fxn::Ptr{Cvoid}
+  sub_fxn::Ptr{Cvoid}
+  mul_fxn::Ptr{Cvoid}
   n2::UInt
   ninv::UInt
   norm::UInt
   n_limbs::Tuple{UInt, UInt, UInt}
   ninv_limbs::Tuple{UInt, UInt, UInt}
-  ninv_huge::Ptr{Nothing} # fmpz_preinvn_struct
+  ninv_huge::Ptr{Cvoid} # fmpz_preinvn_struct *
 
   sparse_modulus :: Cint
   is_conway :: Cint
-  a::Ptr{Nothing}
-  j::Ptr{Nothing}
+  a::Ptr{ZZRingElem} # array of fmpz
+  j::Ptr{Int} # array of slong
   len::Int
-  mod_coeffs::Ptr{Nothing}
+  mod_coeffs::Ptr{ZZRingElem} # array of fmpz
   mod_alloc::Int
   mod_length::Int
-  inv_coeffs::Ptr{Nothing}
+  inv_coeffs::Ptr{ZZRingElem} # array of fmpz
   inv_alloc::Int
   inv_length::Int
-  var::Ptr{Nothing}
+  var::Cstring
   # end of flint struct
 
   overfields :: Dict{Int, Vector{FinFieldMorphism{FqPolyRepField, FqPolyRepField}}}
@@ -2115,7 +2115,7 @@ An element $\sum_{i=0}^{d-1} a_i t^i$ of a finite field $\mathbb F_{p^d} \cong \
 Represented internally as $(a_i)_{0\le i<d}$. See [`FqPolyRepField`](@ref).
 """
 mutable struct FqPolyRepFieldElem <: FinFieldElem
-  coeffs :: Ptr{Nothing}
+  coeffs :: Ptr{ZZRingElem} # array of fmpz
   alloc :: Int
   length :: Int
   parent::FqPolyRepField
@@ -2164,22 +2164,22 @@ end
   norm :: Int
   sparse_modulus :: Cint
   is_conway :: Cint
-  a :: Ptr{Nothing}
-  j :: Ptr{Nothing}
+  a :: Ptr{UInt} # array of ulong
+  j :: Ptr{Int} # array of slong
   len :: Int
-  mod_coeffs :: Ptr{Nothing}
+  mod_coeffs :: Ptr{UInt} # array of ulong
   mod_alloc :: Int
   mod_length :: Int
   mod_n :: Int
   mod_ninv :: Int
   mod_norm :: Int
-  inv_coeffs :: Ptr{Nothing}
+  inv_coeffs :: Ptr{UInt} # array of ulong
   inv_alloc :: Int
   inv_length :: Int
   inv_n :: Int
   inv_ninv :: Int
   inv_norm :: Int
-  var :: Ptr{Nothing}
+  var :: Cstring
   # end of flint struct
 
   base_ring::fqPolyRepField
@@ -2202,8 +2202,8 @@ end
 const FqNmodMPolyID = CacheDictType{Tuple{fqPolyRepField, Vector{Symbol}, Symbol}, fqPolyRepMPolyRing}()
 
 mutable struct fqPolyRepMPolyRingElem <: MPolyRingElem{fqPolyRepFieldElem}
-  coeffs::Ptr{Nothing}
-  exps::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
+  exps::Ptr{UInt} # array of ulong
   length::Int
   bits::Int
   coeffs_alloc::Int
@@ -2279,15 +2279,15 @@ mutable struct fqPolyRepMPolyRingElem <: MPolyRingElem{fqPolyRepFieldElem}
 end
 
 mutable struct fq_nmod_mpoly_factor
-  constant_coeffs::Ptr{Nothing}
+  constant_coeffs::Ptr{UInt} # array of ulong
   constant_alloc::Int
   constant_length::Int
   constant_n::UInt
   constant_ninv::UInt
   constant_norm::Int
 
-  poly::Ptr{Nothing}
-  exp::Ptr{Nothing}
+  poly::Ptr{Cvoid} # array of fq_nmod_mpoly_struct
+  exp::Ptr{ZZRingElem} # array of fmpz
   num::Int
   alloc::Int
   # end flint struct
@@ -2336,7 +2336,7 @@ A $p$-adic field for some prime $p$.
 @attributes mutable struct PadicField <: FlintLocalField
   p::Int
   pinv::Float64
-  pow::Ptr{Nothing}
+  pow::Ptr{ZZRingElem} # array of fmpz
   minpre::Int
   maxpre::Int
   mode::Cint
@@ -2391,12 +2391,12 @@ A $p^n$-adic field for some prime power $p^n$.
 @attributes mutable struct QadicField <: FlintLocalField
   p::Int
   pinv::Float64
-  pow::Ptr{Nothing}
+  pow::Ptr{ZZRingElem} # array of fmpz
   minpre::Int
   maxpre::Int
   mode::Cint
   a::Int         # ZZRingElem
-  j::Ptr{Nothing}   # slong*
+  j::Ptr{Int} # array of slong
   len::Int
   var::Cstring   # char*
   prec_max::Int
@@ -2470,7 +2470,7 @@ end
 An element of a $q$-adic field. See [`QadicField`](@ref).
 """
 mutable struct QadicFieldElem <: FlintLocalFieldElem
-  coeffs::Int
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   val::Int
@@ -2492,12 +2492,12 @@ Opaque precomputation used to speed up square roots in a $q$-adic field of
 characteristic 2. Wraps a FLINT `struct qadic2_sqrt_precomp *`.
 """
 mutable struct Qadic2SqrtPrecomp
-  ptr::Ptr{Nothing}
+  ptr::Ptr{Cvoid}
   parent::QadicField
 
   function Qadic2SqrtPrecomp(R::QadicField)
     prime(R) == 2 || throw(DomainError(prime(R), "characteristic must be 2"))
-    ptr = @ccall libflint._qadic_char2_sqrt_precomp_init(R::Ref{QadicField})::Ptr{Nothing}
+    ptr = @ccall libflint._qadic_char2_sqrt_precomp_init(R::Ref{QadicField})::Ptr{Cvoid}
     z = new(ptr, R)
     finalizer(_qadic_char2_sqrt_precomp_clear_fn, z)
     return z
@@ -2524,7 +2524,7 @@ end
 const FmpzRelSeriesID = CacheDictType{Tuple{Int, Symbol}, ZZRelPowerSeriesRing}()
 
 mutable struct ZZRelPowerSeriesRingElem <: RelPowerSeriesRingElem{ZZRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   # end flint struct
@@ -2579,7 +2579,7 @@ end
 const FmpzAbsSeriesID = CacheDictType{Tuple{Int, Symbol}, ZZAbsPowerSeriesRing}()
 
 mutable struct ZZAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{ZZRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   prec :: Int
@@ -2684,7 +2684,7 @@ end
 const FmpzLaurentSeriesID = CacheDictType{Tuple{Int, Symbol}, ZZLaurentSeriesRing}()
 
 mutable struct ZZLaurentSeriesRingElem <: RingElem
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   prec::Int
@@ -2739,7 +2739,7 @@ end
 const FmpqRelSeriesID = CacheDictType{Tuple{Int, Symbol}, QQRelPowerSeriesRing}()
 
 mutable struct QQRelPowerSeriesRingElem <: RelPowerSeriesRingElem{QQFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   den::Int
@@ -2795,7 +2795,7 @@ end
 const FmpqAbsSeriesID = CacheDictType{Tuple{Int, Symbol}, QQAbsPowerSeriesRing}()
 
 mutable struct QQAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{QQFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   den::Int
@@ -2852,7 +2852,7 @@ const GFPRelSeriesID = CacheDictType{Tuple{fpField, Int, Symbol},
                                      fpRelPowerSeriesRing}()
 
 mutable struct fpRelPowerSeriesRingElem <: RelPowerSeriesRingElem{fpFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
   alloc::Int
   length::Int
   mod_n::UInt
@@ -2940,7 +2940,7 @@ const NmodRelSeriesID = CacheDictType{Tuple{zzModRing, Int, Symbol},
                                       zzModRelPowerSeriesRing}()
 
 mutable struct zzModRelPowerSeriesRingElem <: RelPowerSeriesRingElem{zzModRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
   alloc::Int
   length::Int
   mod_n::UInt
@@ -3028,7 +3028,7 @@ const GFPFmpzRelSeriesID = CacheDictType{Tuple{FpField, Int, Symbol},
                                          FpRelPowerSeriesRing}()
 
 mutable struct FpRelPowerSeriesRingElem <: RelPowerSeriesRingElem{FpFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   # end flint struct
@@ -3120,7 +3120,7 @@ const FmpzModRelSeriesID = CacheDictType{Tuple{ZZModRing, Int, Symbol},
                                          ZZModRelPowerSeriesRing}()
 
 mutable struct ZZModRelPowerSeriesRingElem <: RelPowerSeriesRingElem{ZZModRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   # end flint struct
@@ -3212,7 +3212,7 @@ const GFPFmpzAbsSeriesID = CacheDictType{Tuple{FpField, Int, Symbol},
                                          FpAbsPowerSeriesRing}()
 
 mutable struct FpAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{FpFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   # end flint struct
@@ -3300,7 +3300,7 @@ const NmodAbsSeriesID = CacheDictType{Tuple{zzModRing, Int, Symbol},
                                       zzModAbsPowerSeriesRing}()
 
 mutable struct zzModAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{zzModRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
   alloc::Int
   length::Int
   mod_n::UInt
@@ -3388,7 +3388,7 @@ const GFPAbsSeriesID = CacheDictType{Tuple{fpField, Int, Symbol},
                                      fpAbsPowerSeriesRing}()
 
 mutable struct fpAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{fpFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{UInt} # array of ulong
   alloc::Int
   length::Int
   mod_n::UInt
@@ -3474,7 +3474,7 @@ const FmpzModAbsSeriesID = CacheDictType{Tuple{ZZModRing, Int, Symbol},
                                          ZZModAbsPowerSeriesRing}()
 
 mutable struct ZZModAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{ZZModRingElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{ZZRingElem} # array of fmpz
   alloc::Int
   length::Int
   # end flint struct
@@ -3618,7 +3618,7 @@ end
 const FqRelSeriesID = CacheDictType{Tuple{FqPolyRepField, Int, Symbol}, FqPolyRepRelPowerSeriesRing}()
 
 mutable struct FqPolyRepRelPowerSeriesRingElem <: RelPowerSeriesRingElem{FqPolyRepFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{Cvoid} # array of fq_struct
   alloc::Int
   length::Int
   prec::Int
@@ -3731,7 +3731,7 @@ end
 const FqAbsSeriesID = CacheDictType{Tuple{FqPolyRepField, Int, Symbol}, FqPolyRepAbsPowerSeriesRing}()
 
 mutable struct FqPolyRepAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{FqPolyRepFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{Cvoid} # array of fq_struct
   alloc::Int
   length::Int
   prec::Int
@@ -3787,7 +3787,7 @@ const FqNmodRelSeriesID = CacheDictType{Tuple{fqPolyRepField, Int, Symbol},
                                         fqPolyRepRelPowerSeriesRing}()
 
 mutable struct fqPolyRepRelPowerSeriesRingElem <: RelPowerSeriesRingElem{fqPolyRepFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{Cvoid} # array of fq_nmod_struct
   alloc::Int
   length::Int
   prec::Int
@@ -3845,7 +3845,7 @@ const FqNmodAbsSeriesID = CacheDictType{Tuple{fqPolyRepField, Int, Symbol},
                                         fqPolyRepAbsPowerSeriesRing}()
 
 mutable struct fqPolyRepAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{fqPolyRepFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{Cvoid} # array of fq_nmod_struct
   alloc::Int
   length::Int
   prec::Int
@@ -4683,7 +4683,7 @@ end
 const FqPolyID = CacheDictType{Tuple{FqPolyRepField, Symbol}, FqPolyRepPolyRing}()
 
 mutable struct FqPolyRepPolyRingElem <: PolyRingElem{FqPolyRepFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{Cvoid} # array of fq_struct
   alloc::Int
   length::Int
   parent::FqPolyRepPolyRing
@@ -4785,7 +4785,7 @@ end
 const FqNmodPolyID = CacheDictType{Tuple{fqPolyRepField, Symbol}, fqPolyRepPolyRing}()
 
 mutable struct fqPolyRepPolyRingElem <: PolyRingElem{fqPolyRepFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{Cvoid} # array of fq_nmod_struct
   alloc::Int
   length::Int
   parent::fqPolyRepPolyRing
@@ -5437,7 +5437,7 @@ function _qadic_ctx_clear_fn(a::QadicField)
 end
 
 function _qadic_char2_sqrt_precomp_clear_fn(a::Qadic2SqrtPrecomp)
-  @ccall libflint._qadic_char2_sqrt_precomp_clear(a.ptr::Ptr{Nothing})::Nothing
+  @ccall libflint._qadic_char2_sqrt_precomp_clear(a.ptr::Ptr{Cvoid})::Nothing
 end
 
 function _rand_ctx_clear_fn(a::rand_ctx)
