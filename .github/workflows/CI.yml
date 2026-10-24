@@ -26,19 +26,17 @@ jobs:
       fail-fast: false
       matrix:
         julia-version:
-          - '1.10'
-          - '1.11'
-          - '1.12'
-          - '1.13'
-          - '1.14-nightly'
+          - 'min'
+          - '1'
+          - 'pre'
           - 'nightly'
         os:
           - ubuntu-latest
         include:
           # Add a few windows and macOS jobs (not too many, the number we can run in parallel is limited)
-          - julia-version: '1.10'
+          - julia-version: 'min'
             os: macOS-latest
-          - julia-version: '1.10'
+          - julia-version: 'min'
             os: windows-latest
 
     steps:
@@ -60,7 +58,7 @@ jobs:
         with:
           depwarn: error
       - name: "Run doctests"
-        if: ${{ matrix.julia-version == '1.10' }}
+        if: ${{ matrix.julia-version == 'min' }}
         run: |
           julia --project=docs --color=yes --code-coverage -e '
             using Pkg
