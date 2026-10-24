@@ -390,7 +390,11 @@ algebraic multiplicities as a vector of tuples of (root, multiplicity).
 """
 function eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
   @assert is_square(M)
-  return roots_with_multiplicities(charpoly(M))
+  f = charpoly(M)
+  x = gen(parent(f))
+  # `roots` may list a root once for each multiplicity
+  r = unique(roots(f))
+  return [ (a, valuation(f, x - a)) for a in r ]
 end
 
 # This function just aims to give a helpful error message if the
@@ -417,7 +421,11 @@ multiplicities as a vector of tuples.
 """
 function eigenvalues_with_multiplicities(L::Field, M::MatElem{T}) where T <: RingElem
   @assert is_square(M)
-  return roots_with_multiplicities(change_base_ring(L, charpoly(M)))
+  f = change_base_ring(L, charpoly(M))
+  # `roots` may list a root once for each multiplicity
+  r = unique(roots(L, charpoly(M)))
+  x = gen(parent(f))
+  return [ (a, valuation(f, x - a)) for a in r ]
 end
 
 @doc raw"""

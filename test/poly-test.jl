@@ -69,6 +69,15 @@ end
     N = change_base_ring(L, M)
     @test issetequal(eigenvalues_with_multiplicities(N), [(L(2), 2), (L(3), 1)])
   end
+
+  # generic matrices take the roots from `roots(L, charpoly(M))`: there is no
+  # `factor` over `QQBar`, and its `roots` repeat a root by its multiplicity
+  K = algebraic_closure(QQ)
+  i = sqrt(K(-1))
+  A = Generic.MatSpaceElem{ZZRingElem}(ZZ, ZZ.([0 1; -1 0]))
+  @test issetequal(eigenvalues_with_multiplicities(K, A), [(i, 1), (-i, 1)])
+  J = Generic.MatSpaceElem{QQFieldElem}(QQ, QQ.([1 1; 0 1]))
+  @test eigenvalues_with_multiplicities(K, J) == [(K(1), 2)]
 end
 
 @testset "convolution" begin
