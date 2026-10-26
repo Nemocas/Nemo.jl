@@ -45,7 +45,7 @@ end
 end
 
 @testset "roots_with_multiplicities" begin
-  # the generic method, over rings without a FLINT root finder
+  # AbstractAlgebra's generic method, over rings without a FLINT root finder
   for R in (ZZ, QQ)
     S, y = polynomial_ring(R, "y")
     f = 3 * (y - 1)^3 * (y + 2) * (y^2 + 1)

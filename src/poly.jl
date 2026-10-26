@@ -103,38 +103,6 @@ end
 
 ################################################################################
 #
-#  Roots with multiplicities
-#
-################################################################################
-
-@doc raw"""
-    roots_with_multiplicities(f::PolyRingElem) -> Vector{Tuple{T, Int}}
-
-Return the roots of `f` in its base ring, whose element type is `T`, each with
-its multiplicity: the largest $e$ such that $(x - r)^e$ divides `f`. The order
-of the roots is not specified. The base ring must be exact, and `f` non-zero.
-
-# Examples
-
-```jldoctest
-julia> R, x = polynomial_ring(GF(7), :x);
-
-julia> sort(roots_with_multiplicities((x - 1)^2 * (x - 2) * (x^2 + 1)); by = last)
-2-element Vector{Tuple{FqFieldElem, Int64}}:
- (2, 1)
- (1, 2)
-```
-"""
-function roots_with_multiplicities(f::PolyRingElem)
-  @req !iszero(f) "Argument must be non-zero"
-  @req is_exact_type(elem_type(base_ring(f))) "Multiplicities can only be computed over exact rings"
-  x = gen(parent(f))
-  # `roots` does not promise to list each root once
-  return [(r, valuation(f, x - r)) for r in unique(roots(f))]
-end
-
-################################################################################
-#
 #  Mulhigh
 #
 ################################################################################

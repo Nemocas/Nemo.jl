@@ -559,7 +559,6 @@ export root_of_unity
 export root_of_unity_as_args
 export roots
 export roots_upper_bound
-export roots_with_multiplicities
 export round
 export round!
 export rref
