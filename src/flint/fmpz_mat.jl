@@ -2129,33 +2129,13 @@ end
 #
 ################################################################################
 
-# Vector{fmpz} * fmpz_mat can be performed using
-# - fmpz_mat_fmpz_vec_mul_ptr
-# - or conversion + fmpz_mat_mul
-#
-# The fmpz_mat_fmpz_vec_mul_ptr variants are not optimized.
-# Thus, if the conversion is negliable, we convert and call fmpz_mat.
-# The conversion is done on the julia side, trying to reduce the number of
-# allocations and objects tracked by the GC.
+_pack_entries(a::Vector{ZZRingElem}) = [x.d for x in a]
 
-function _very_unsafe_convert(::Type{ZZMatrix}, a::Vector{ZZRingElem}, row = true)
-  # a must be GC.@preserved
-  # row = true -> make it a row
-  # row = false -> make it a column
-  # the matrix owns nothing, the returned vector holds its entries
-  M = Nemo.@new_struct(ZZMatrix)
-  Me = [x.d for x in a]
-  M.entries = reinterpret(Ptr{ZZRingElem}, pointer(Me))
-  if row
-    M.r = 1
-    M.c = length(a)
-    M.stride = M.c
-  else
-    M.r = length(a)
-    M.c = 1
-    M.stride = M.c
+function _unpack_entries!(z::Vector{ZZRingElem}, Me::Vector{Int})
+  for i in 1:length(z)
+    z[i].d = Me[i]
   end
-  return M, Me
+  return z
 end
 
 function mul!_flint(z::Vector{ZZRingElem}, a::ZZMatrixOrPtr, b::Vector{ZZRingElem})
@@ -2168,41 +2148,25 @@ function mul!_flint(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::ZZMatrixOrP
   return z
 end
 
+function _use_mul!_flint(a::ZZMatrixOrPtr, len::Int, out::Int; vec_times_mat::Bool)
+  len * out < 16 && return true
+  # FLINT has a fast path below 31 bits
+  return (len < 8 || out < 2) && maximum(nbits, a) < 31
+end
+
 function mul!(z::Vector{ZZRingElem}, a::ZZMatrixOrPtr, b::Vector{ZZRingElem})
-  # cutoff for the flint method
-  if nrows(a) < 50 && maximum(nbits, a) < 10
+  if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)
     return mul!_flint(z, a, b)
   end
 
-  GC.@preserve z b begin
-    bb, dk1 = _very_unsafe_convert(ZZMatrix, b, false)
-    zz, dk3 = _very_unsafe_convert(ZZMatrix, z, false)
-    GC.@preserve dk1 dk3 begin
-      mul!(zz, a, bb)
-      for i in 1:length(z)
-        z[i].d = dk3[i]
-      end
-    end
-  end
-  return z
+  return mul!_through_matrix(z, a, b)
 end
 
 function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::ZZMatrixOrPtr)
-  # cutoff for the flint method
-  if nrows(b) < 50 && maximum(nbits, b) < 10
+  if _use_mul!_flint(b, nrows(b), ncols(b); vec_times_mat = true)
     return mul!_flint(z, a, b)
   end
-  GC.@preserve z a begin
-    aa, dk1 = _very_unsafe_convert(ZZMatrix, a)
-    zz, dk3 = _very_unsafe_convert(ZZMatrix, z)
-    GC.@preserve dk1 dk3 begin
-      mul!(zz, aa, b)
-      for i in 1:length(z)
-        z[i].d = dk3[i]
-      end
-    end
-  end
-  return z
+  return mul!_through_matrix(z, a, b)
 end
 
 ###############################################################################

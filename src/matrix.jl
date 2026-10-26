@@ -59,7 +59,9 @@ end
 # there), those words.
 
 # These types store no ring: `base_ring` depends on the type alone.
-_set_ring!(z::T, x::T) where {T <: Union{ZZMatrix, QQMatrix, RealMatrix, ComplexMatrix}} = z
+_set_ring!(z::ZZMatrix, x::Union{ZZMatrixOrPtr, QQMatrixOrPtr}) = z
+_set_ring!(z::QQMatrix, x::QQMatrixOrPtr) = z
+_set_ring!(z::T, x::T) where {T <: Union{RealMatrix, ComplexMatrix}} = z
 
 _set_ring!(z::T, x::T) where {T <: FlintMatElem} = (z.base_ring = x.base_ring; z)
 
@@ -175,6 +177,65 @@ end
 function Base.view(x::FlintMatElem, r::Union{Colon, AbstractUnitRange{Int}}, c::Int)
   A = view(x, r, c:c)
   return MatrixView{typeof(x), elem_type(base_ring(x))}(A)
+end
+
+################################################################################
+#
+#  Matrix times vector through matrix multiplication
+#
+################################################################################
+
+# For some types, FLINT's matrix-vector functions, or the generic method, are
+# slower than FLINT's matrix multiplication with the vector as a one-row or
+# one-column matrix. That matrix borrows the entries: `_pack_entries(a)` copies
+# their C structs into a word vector, `_unpack_entries!(z, Me)` copies the
+# result back into `z`. The entries of `z` must not share objects.
+#
+# `_use_mul!_flint(a, len, out; vec_times_mat)` tells whether `mul!_flint` is
+# faster, for a vector of length `len` and a result of length `out`.
+
+function _very_unsafe_convert(::Type{S}, a::Vector, m::TypeOrPtr{T}; row::Bool) where {S <: FlintMatElem, T <: FlintMatElem}
+  # a must be GC.@preserved
+  # m provides the ring
+  # the matrix owns nothing, the returned vector holds its entries
+  M = Nemo.@new_struct(S)
+  Me = @inline _pack_entries(a)
+  M.entries = reinterpret(fieldtype(S, :entries), pointer(Me))
+  if row
+    M.r = 1
+    M.c = length(a)
+  else
+    M.r = length(a)
+    M.c = 1
+  end
+  M.stride = M.c
+  _set_ring!(M, m)
+  return M, Me
+end
+
+# `vector_as` is the matrix type the input vector becomes
+function mul!_through_matrix(z::Vector, a::TypeOrPtr{T}, b::Vector; vector_as::Type{S} = T) where {T <: FlintMatElem, S <: FlintMatElem}
+  GC.@preserve z b begin
+    bb, dk1 = _very_unsafe_convert(S, b, a; row = false)
+    zz, dk3 = _very_unsafe_convert(T, z, a; row = false)
+    GC.@preserve dk1 dk3 begin
+      mul!(zz, a, bb)
+      @inline _unpack_entries!(z, dk3)
+    end
+  end
+  return z
+end
+
+function mul!_through_matrix(z::Vector, a::Vector, b::TypeOrPtr{T}; vector_as::Type{S} = T) where {T <: FlintMatElem, S <: FlintMatElem}
+  GC.@preserve z a begin
+    aa, dk1 = _very_unsafe_convert(S, a, b; row = true)
+    zz, dk3 = _very_unsafe_convert(T, z, b; row = true)
+    GC.@preserve dk1 dk3 begin
+      mul!(zz, aa, b)
+      @inline _unpack_entries!(z, dk3)
+    end
+  end
+  return z
 end
 
 ################################################################################

@@ -215,6 +215,99 @@ function mul!(a::FqMatrix, b::FqMatrix, c::FqMatrix)
   return a
 end
 
+# size of the FLINT struct of an element of F, stored at the start of its
+# `opaque` field
+function _entry_size(F::FqField)
+  T = raw_field_type(F)
+  # fq_zech_struct is one ulong
+  T === nothing && return sizeof(UInt)
+  return _entry_size(dense_matrix_type(T))::Int
+end
+
+# a must be GC.@preserved
+function _pack_entries(a::Vector{FqFieldElem})
+  w = isempty(a) ? 0 : _entry_size(parent(a[1])) ÷ sizeof(Int)
+  Me = Vector{Int}(undef, w * length(a))
+  for i in 1:length(a)
+    unsafe_copyto!(pointer(Me, w * (i - 1) + 1), Ptr{Int}(pointer_from_objref(a[i])), w)
+  end
+  return Me
+end
+
+# z must be GC.@preserved
+function _unpack_entries!(z::Vector{FqFieldElem}, Me::Vector{Int})
+  w = isempty(z) ? 0 : _entry_size(parent(z[1])) ÷ sizeof(Int)
+  for i in 1:length(z)
+    unsafe_copyto!(Ptr{Int}(pointer_from_objref(z[i])), pointer(Me, w * (i - 1) + 1), w)
+  end
+  return z
+end
+
+function mul!_flint(z::Vector{FqFieldElem}, a::FqMatrix, b::Vector{FqFieldElem})
+  F = base_ring(a)
+  t = _fq_default_ctx_type(F)
+  GC.@preserve F begin
+    ctx = @ccall libflint.fq_default_ctx_inner(F::Ref{FqField})::Ptr{Nothing}
+    if t == _FQ_DEFAULT_FQ_ZECH
+      @ccall libflint.fq_zech_mat_mul_vec_ptr(z::Ptr{Ref{FqFieldElem}}, a::Ref{FqMatrix}, b::Ptr{Ref{FqFieldElem}}, length(b)::Int, ctx::Ptr{Nothing})::Nothing
+    elseif t == _FQ_DEFAULT_FQ_NMOD
+      @ccall libflint.fq_nmod_mat_mul_vec_ptr(z::Ptr{Ref{FqFieldElem}}, a::Ref{FqMatrix}, b::Ptr{Ref{FqFieldElem}}, length(b)::Int, ctx::Ptr{Nothing})::Nothing
+    elseif t == _FQ_DEFAULT_FQ
+      @ccall libflint.fq_mat_mul_vec_ptr(z::Ptr{Ref{FqFieldElem}}, a::Ref{FqMatrix}, b::Ptr{Ref{FqFieldElem}}, length(b)::Int, ctx::Ptr{Nothing})::Nothing
+    elseif t == _FQ_DEFAULT_NMOD
+      @ccall libflint.nmod_mat_mul_nmod_vec_ptr(z::Ptr{Ref{FqFieldElem}}, a::Ref{FqMatrix}, b::Ptr{Ref{FqFieldElem}}, length(b)::Int)::Nothing
+    else#if t == _FQ_DEFAULT_FMPZ_MOD
+      @ccall libflint.fmpz_mod_mat_mul_fmpz_vec_ptr(z::Ptr{Ref{FqFieldElem}}, a::Ref{FqMatrix}, b::Ptr{Ref{FqFieldElem}}, length(b)::Int, ctx::Ptr{Nothing})::Nothing
+    end
+  end
+  return z
+end
+
+function mul!_flint(z::Vector{FqFieldElem}, a::Vector{FqFieldElem}, b::FqMatrix)
+  F = base_ring(b)
+  t = _fq_default_ctx_type(F)
+  GC.@preserve F begin
+    ctx = @ccall libflint.fq_default_ctx_inner(F::Ref{FqField})::Ptr{Nothing}
+    if t == _FQ_DEFAULT_FQ_ZECH
+      @ccall libflint.fq_zech_mat_vec_mul_ptr(z::Ptr{Ref{FqFieldElem}}, a::Ptr{Ref{FqFieldElem}}, length(a)::Int, b::Ref{FqMatrix}, ctx::Ptr{Nothing})::Nothing
+    elseif t == _FQ_DEFAULT_FQ_NMOD
+      @ccall libflint.fq_nmod_mat_vec_mul_ptr(z::Ptr{Ref{FqFieldElem}}, a::Ptr{Ref{FqFieldElem}}, length(a)::Int, b::Ref{FqMatrix}, ctx::Ptr{Nothing})::Nothing
+    elseif t == _FQ_DEFAULT_FQ
+      @ccall libflint.fq_mat_vec_mul_ptr(z::Ptr{Ref{FqFieldElem}}, a::Ptr{Ref{FqFieldElem}}, length(a)::Int, b::Ref{FqMatrix}, ctx::Ptr{Nothing})::Nothing
+    elseif t == _FQ_DEFAULT_NMOD
+      @ccall libflint.nmod_mat_nmod_vec_mul_ptr(z::Ptr{Ref{FqFieldElem}}, a::Ptr{Ref{FqFieldElem}}, length(a)::Int, b::Ref{FqMatrix})::Nothing
+    else#if t == _FQ_DEFAULT_FMPZ_MOD
+      @ccall libflint.fmpz_mod_mat_fmpz_vec_mul_ptr(z::Ptr{Ref{FqFieldElem}}, a::Ptr{Ref{FqFieldElem}}, length(a)::Int, b::Ref{FqMatrix}, ctx::Ptr{Nothing})::Nothing
+    end
+  end
+  return z
+end
+
+function _use_mul!_flint(a::FqMatrix, len::Int, out::Int; vec_times_mat::Bool)
+  t = _fq_default_ctx_type(base_ring(a))
+  # the fq_zech and nmod matrix products are not faster for a single column
+  t == _FQ_DEFAULT_FQ_ZECH && return true
+  t == _FQ_DEFAULT_NMOD && return !vec_times_mat || len < 32 || out < 2
+  t == _FQ_DEFAULT_FMPZ_MOD && return len < 8
+  return len < (t == _FQ_DEFAULT_FQ_NMOD ? 3 : 2)
+end
+
+function mul!(z::Vector{FqFieldElem}, a::FqMatrix, b::Vector{FqFieldElem})
+  if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)
+    return mul!_flint(z, a, b)
+  end
+
+  return mul!_through_matrix(z, a, b)
+end
+
+function mul!(z::Vector{FqFieldElem}, a::Vector{FqFieldElem}, b::FqMatrix)
+  if _use_mul!_flint(b, nrows(b), ncols(b); vec_times_mat = true)
+    return mul!_flint(z, a, b)
+  end
+
+  return mul!_through_matrix(z, a, b)
+end
+
 function mul!(a::FqMatrix, b::FqMatrix, c::FqFieldElem)
   F = base_ring(a)
   if _fq_default_ctx_type(F) == _FQ_DEFAULT_NMOD

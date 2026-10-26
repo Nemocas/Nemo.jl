@@ -215,14 +215,51 @@ function sub!(a::fqPolyRepMatrix, b::fqPolyRepMatrix, c::fqPolyRepMatrix)
   return a
 end
 
-function mul!(z::Vector{fqPolyRepFieldElem}, a::fqPolyRepMatrix, b::Vector{fqPolyRepFieldElem})
+function mul!_flint(z::Vector{fqPolyRepFieldElem}, a::fqPolyRepMatrix, b::Vector{fqPolyRepFieldElem})
   @ccall libflint.fq_nmod_mat_mul_vec_ptr(z::Ptr{Ref{fqPolyRepFieldElem}}, a::Ref{fqPolyRepMatrix}, b::Ptr{Ref{fqPolyRepFieldElem}}, length(b)::Int, base_ring(a)::Ref{fqPolyRepField})::Nothing
   return z
 end
 
-function mul!(z::Vector{fqPolyRepFieldElem}, a::Vector{fqPolyRepFieldElem}, b::fqPolyRepMatrix)
+function mul!_flint(z::Vector{fqPolyRepFieldElem}, a::Vector{fqPolyRepFieldElem}, b::fqPolyRepMatrix)
   @ccall libflint.fq_nmod_mat_vec_mul_ptr(z::Ptr{Ref{fqPolyRepFieldElem}}, a::Ptr{Ref{fqPolyRepFieldElem}}, length(a)::Int, b::Ref{fqPolyRepMatrix}, base_ring(b)::Ref{fqPolyRepField})::Nothing
   return z
+end
+
+# a must be GC.@preserved
+function _pack_entries(a::Vector{fqPolyRepFieldElem})
+  w = _entry_size(fqPolyRepMatrix) ÷ sizeof(Int)
+  Me = Vector{Int}(undef, w * length(a))
+  for i in 1:length(a)
+    unsafe_copyto!(pointer(Me, w * (i - 1) + 1), Ptr{Int}(pointer_from_objref(a[i])), w)
+  end
+  return Me
+end
+
+# z must be GC.@preserved
+function _unpack_entries!(z::Vector{fqPolyRepFieldElem}, Me::Vector{Int})
+  w = _entry_size(fqPolyRepMatrix) ÷ sizeof(Int)
+  for i in 1:length(z)
+    unsafe_copyto!(Ptr{Int}(pointer_from_objref(z[i])), pointer(Me, w * (i - 1) + 1), w)
+  end
+  return z
+end
+
+_use_mul!_flint(a::fqPolyRepMatrix, len::Int, out::Int; vec_times_mat::Bool) = len < 2
+
+function mul!(z::Vector{fqPolyRepFieldElem}, a::fqPolyRepMatrix, b::Vector{fqPolyRepFieldElem})
+  if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)
+    return mul!_flint(z, a, b)
+  end
+
+  return mul!_through_matrix(z, a, b)
+end
+
+function mul!(z::Vector{fqPolyRepFieldElem}, a::Vector{fqPolyRepFieldElem}, b::fqPolyRepMatrix)
+  if _use_mul!_flint(b, nrows(b), ncols(b); vec_times_mat = true)
+    return mul!_flint(z, a, b)
+  end
+
+  return mul!_through_matrix(z, a, b)
 end
 
 function Generic.add_one!(a::fqPolyRepMatrix, i::Int, j::Int)
