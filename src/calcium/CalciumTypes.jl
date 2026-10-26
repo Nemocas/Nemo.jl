@@ -35,7 +35,7 @@ mutable struct qqbar_struct
 end
 @flint_fields qqbar_struct
 @flint_legacy_fields qqbar_struct begin
-  coeffs = cstruct.poly.coeffs
+  coeffs = Ptr{ZZRingElem}(cstruct.poly.coeffs)
   alloc = cstruct.poly.alloc
   length = cstruct.poly.length
   real_mid_exp = cstruct.enclosure.real.mid.exp
@@ -108,7 +108,7 @@ mutable struct QQBarFieldElem <: FieldElem
 end
 @flint_fields QQBarFieldElem
 @flint_legacy_fields QQBarFieldElem begin
-  coeffs = cstruct.poly.coeffs
+  coeffs = Ptr{ZZRingElem}(cstruct.poly.coeffs)
   alloc = cstruct.poly.alloc
   length = cstruct.poly.length
   real_mid_exp = cstruct.enclosure.real.mid.exp

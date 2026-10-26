@@ -551,7 +551,7 @@ mutable struct RealPolyRingElem <: PolyRingElem{RealFieldElem}
     return z
   end
 end
-@flint_fields RealPolyRingElem
+@flint_fields RealPolyRingElem coeffs = Ptr{arb_struct}
 
 function _RealPoly_clear_fn(x::RealPolyRingElem)
   @ccall libflint.arb_poly_clear(x::Ref{RealPolyRingElem})::Nothing
@@ -627,7 +627,7 @@ mutable struct ArbPolyRingElem <: PolyRingElem{ArbFieldElem}
     return z
   end
 end
-@flint_fields ArbPolyRingElem
+@flint_fields ArbPolyRingElem coeffs = Ptr{arb_struct}
 
 function _arb_poly_clear_fn(x::ArbPolyRingElem)
   @ccall libflint.arb_poly_clear(x::Ref{ArbPolyRingElem})::Nothing
@@ -715,7 +715,7 @@ mutable struct ComplexPolyRingElem <: PolyRingElem{ComplexFieldElem}
     return z
   end
 end
-@flint_fields ComplexPolyRingElem
+@flint_fields ComplexPolyRingElem coeffs = Ptr{acb_struct}
 
 function _acb_poly_clear_fn(x::ComplexPolyRingElem)
   @ccall libflint.acb_poly_clear(x::Ref{ComplexPolyRingElem})::Nothing
@@ -798,7 +798,7 @@ mutable struct AcbPolyRingElem <: PolyRingElem{AcbFieldElem}
     return z
   end
 end
-@flint_fields AcbPolyRingElem
+@flint_fields AcbPolyRingElem coeffs = Ptr{acb_struct}
 
 function _acb_poly_clear_fn(x::AcbPolyRingElem)
   @ccall libflint.acb_poly_clear(x::Ref{AcbPolyRingElem})::Nothing

@@ -39,16 +39,16 @@ for some more specialized fields.
 end
 @flint_fields AbsSimpleNumField
 @flint_legacy_fields AbsSimpleNumField begin
-  pol_coeffs = cstruct.pol.coeffs
+  pol_coeffs = Ptr{ZZRingElem}(cstruct.pol.coeffs)
   pol_alloc = cstruct.pol.alloc
   pol_length = cstruct.pol.length
   pol_den = cstruct.pol.den
-  pinv_dinv = Ptr{Cvoid}(_union_word(cstruct.pinv, 1))
+  pinv_dinv = Ptr{UInt}(_union_word(cstruct.pinv, 1))
   pinv_n = _union_word(cstruct.pinv, 2) % Int
   pinv_norm = _union_word(cstruct.pinv, 3) % Int
   powers = Ptr{Cvoid}(_union_word(cstruct.powers, 1))
   powers_len = _union_word(cstruct.powers, 2) % Int
-  traces_coeffs = cstruct.traces.coeffs
+  traces_coeffs = Ptr{ZZRingElem}(cstruct.traces.coeffs)
   traces_alloc = cstruct.traces.alloc
   traces_length = cstruct.traces.length
   traces_den = cstruct.traces.den
@@ -96,7 +96,7 @@ mutable struct AbsSimpleNumFieldElem <: SimpleNumFieldElem{QQFieldElem}
 end
 @flint_fields AbsSimpleNumFieldElem
 @flint_extra_fields AbsSimpleNumFieldElem begin
-  elem_coeffs = Ptr{Cvoid}(_union_word(cstruct, 1))
+  elem_coeffs = Ptr{ZZRingElem}(_union_word(cstruct, 1))
   elem_coeffs! = _set_union_word(cstruct, 1, v)
   elem_alloc = _union_word(cstruct, 2) % Int
   elem_alloc! = _set_union_word(cstruct, 2, v)
