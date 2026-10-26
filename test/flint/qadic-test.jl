@@ -405,8 +405,8 @@ end
 @testset "QadicFieldElem.square_root_char2_precomp" begin
   R, _ = QadicField(2, 3)
 
-  zero9 = O(R,2^9)
-  zero8 = O(R,2^8)
+  zero9 = O(R, 2^9)
+  zero8 = O(R, 2^8)
   @test is_square_with_sqrt(zero8)[1]
   @test is_square_with_sqrt(zero9)[1]
   sqrt_zero8 = is_square_with_sqrt(zero8)[2]

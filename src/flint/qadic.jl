@@ -495,16 +495,17 @@ end
 #
 ###############################################################################
 
-function Base.sqrt(a::QadicFieldElem; check::Bool=true)  # IGNORE kwarg "check"
-  b,z = is_square_with_sqrt(a)
+# `check` is ignored: FLINT reports whether `a` is a square at no extra cost
+function Base.sqrt(a::QadicFieldElem; check::Bool=true)
+  b, z = is_square_with_sqrt(a)
   !b && throw(DomainError(a, "Square root of q-adic does not exist"))
   return z
 end
 
 # Internal: square root in characteristic 2 using a precomputed Artin-Schreier LUP decomposition.
 # Return value is (bool, value): bool=false means no sqrt exists; bool=true means that the sqrt is the 2nd component
-function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bool=true)  # IGNORE kwarg "check"
-  @req !is_zero(a)  "sqrt(0) not handled in this function"
+function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp)
+  @req !is_zero(a) "sqrt(0) not handled in this function"
   ctx = parent(a)
   @req ctx === data.parent "precomputation belongs to a different q-adic field"
   av = valuation(a)
@@ -523,7 +524,7 @@ function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bo
   # A unit known mod 2^n has its root determined only mod 2^(n-1), so drop
   # the last digit: FLINT computes to whatever precision z has.
   p = QQ(prime(ctx))
-  return (res, z+O(ctx, p^(div(av,2)+rel_pr-1)))
+  return (res, z+O(ctx, p^(div(av, 2)+rel_pr-1)))
 end
 
 function is_square_with_sqrt(a::QadicFieldElem)
@@ -531,7 +532,7 @@ function is_square_with_sqrt(a::QadicFieldElem)
   if is_zero(a)
     pr = precision(a)
     p = QQ(prime(ctx))  # needs to be QQ in case pr < -1
-    return (true, O(ctx, p^div(pr+1,2)))
+    return (true, O(ctx, p^div(pr+1, 2)))
   end
   if prime(ctx) == 2
     precomp_data = get_attribute!(ctx, :char2_sqrt_precomp) do
@@ -550,16 +551,15 @@ function is_square_with_sqrt(a::QadicFieldElem)
 end
 
 function is_square(a::QadicFieldElem)
-  is_zero(a)  &&  return true
+  is_zero(a) && return true
   va = valuation(a)
-  is_odd(va)  &&  return false
+  is_odd(va) && return false
   # squareness is decided by the first digit of a, or the first 3 if p == 2
   R = parent(a)
   p = prime(R)
   trunc_a = a + O(R, QQ(p)^(va + (p == 2 ? 3 : 1)))
   return is_square_with_sqrt(trunc_a)[1]
 end
-
 
 ###############################################################################
 #
