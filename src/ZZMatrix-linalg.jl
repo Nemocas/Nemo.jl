@@ -1097,7 +1097,7 @@ end
 # solving random linear systems (algorithm :JOHN not yet available).
 function det_hcol_hnf(A::ZZMatrix, U::AbstractArray= -100:100; solver=:NEMO_DIXON)
   @req  is_square(A)  "Matrix must be square"
-  (solver in [:NEMO_DIXON, :JOHN, :OSCAR]) || error("solver must be one of NEMO_DIXON, JOHN, OSCAR")
+  (solver in [:NEMO_DIXON, :OSCAR]) || error("solver must be one of NEMO_DIXON, OSCAR")
   n = ncols(A)
   (n == 0)  &&  return ZZ(1)
   (n == 1)  &&  return A[1,1]
