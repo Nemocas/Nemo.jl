@@ -452,7 +452,7 @@ end
 const RealPolyRingID = CacheDictType{Tuple{Symbol}, RealPolyRing}()
 
 mutable struct RealPolyRingElem <: PolyRingElem{RealFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{arb_struct} # array of arb_struct
   alloc::Int
   length::Int
   parent::RealPolyRing
@@ -529,7 +529,7 @@ end
 const ArbPolyRingID = CacheDictType{Tuple{ArbField, Symbol}, ArbPolyRing}()
 
 mutable struct ArbPolyRingElem <: PolyRingElem{ArbFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{arb_struct} # array of arb_struct
   alloc::Int
   length::Int
   parent::ArbPolyRing
@@ -611,7 +611,7 @@ end
 const ComplexPolyRingID = CacheDictType{Tuple{Symbol}, ComplexPolyRing}()
 
 mutable struct ComplexPolyRingElem <: PolyRingElem{ComplexFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{acb_struct} # array of acb_struct
   alloc::Int
   length::Int
   parent::ComplexPolyRing
@@ -695,7 +695,7 @@ end
 const AcbPolyRingID = CacheDictType{Tuple{AcbField, Symbol}, AcbPolyRing}()
 
 mutable struct AcbPolyRingElem <: PolyRingElem{AcbFieldElem}
-  coeffs::Ptr{Nothing}
+  coeffs::Ptr{acb_struct} # array of acb_struct
   alloc::Int
   length::Int
   parent::AcbPolyRing

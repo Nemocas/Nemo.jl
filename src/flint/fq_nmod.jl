@@ -43,7 +43,7 @@ end
 function coeffs_raw(x::fqPolyRepFieldElem)
   GC.@preserve x begin
     len = degree(parent(x))
-    V = unsafe_wrap(Vector{UInt}, reinterpret(Ptr{UInt}, x.coeffs), x.length)
+    V = unsafe_wrap(Vector{UInt}, x.coeffs, x.length)
     Vcopy = Vector{UInt}(undef, len)
     for i = 1:x.length
       Vcopy[i] = V[i]
@@ -110,7 +110,7 @@ end
 ###############################################################################
 
 function expressify(a::fqPolyRepFieldElem; context = nothing)
-  x = unsafe_string(reinterpret(Cstring, parent(a).var))
+  x = unsafe_string(parent(a).var)
   d = degree(parent(a))
 
   sum = Expr(:call, :+)
@@ -675,7 +675,7 @@ function fqPolyRepFieldElem(a::fqPolyRepField, b::Vector{UInt})
   len = degree(a)
   length(b) != len && error("Vector does not have correct length")
   norm = 0
-  V = unsafe_wrap(Vector{UInt}, reinterpret(Ptr{UInt}, r.coeffs), len)
+  V = unsafe_wrap(Vector{UInt}, r.coeffs, len)
   for i = 1:len
     V[i] = b[i]
     if b[i] != 0
