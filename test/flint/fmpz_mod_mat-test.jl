@@ -633,7 +633,9 @@ end
   a = matrix(R, [1 2 3; 3 2 1; 0 0 2])
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(R) === AbstractAlgebra.Solve.HowellFormTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(R)) === AbstractAlgebra.Solve.HowellFormTrait()
   @test AbstractAlgebra.Solve.matrix_normal_form_type(a) === AbstractAlgebra.Solve.HowellFormTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(a)) === AbstractAlgebra.Solve.HowellFormTrait()
 
   b = matrix(R, [2 1 0 1; 0 0 0 0; 0 1 2 0])
   c = a*b
@@ -662,7 +664,9 @@ end
   A = matrix(R, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
   C = solve_init(A)
   @test C isa AbstractAlgebra.solve_context_type(R)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(R))
   @test C isa AbstractAlgebra.solve_context_type(A)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.HowellFormTrait()
   @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.HowellFormTrait(), ZZModRingElem)
@@ -1071,6 +1075,15 @@ end
   add_row!(A, 1, 1, 1)
   @test is_zero_row(A, 1)
 
+  # the modulus of the matrix has to divide that of the scalar
+  S, _ = residue_ring(ZZ, ZZ(9))
+  T, _ = residue_ring(ZZ, ZZ(16))
+  U, _ = residue_ring(ZZ, ZZ(14))
+  F = Native.GF(ZZ(7))
+  @test_throws ErrorException add_row!(R[2 3 5; 4 6 3], S(3), 1, 2)
+  @test_throws ErrorException add_row!(F[2 3 5; 4 6 3], R(3), 1, 2)
+  @test add_row!(R[2 3 5; 4 6 3], T(11), 1, 2) == R[2 3 5; 2 7 2]
+  @test add_row!(F[2 3 5; 4 6 3], U(10), 1, 2) == F[2 3 5; 3 1 4]
 end
 
 @testset "ZZModMatrix.add_column!" begin
@@ -1097,7 +1110,15 @@ end
   add_column!(A, 1, 1, 1)
   @test is_zero_column(A, 1)
 
-
+  # the modulus of the matrix has to divide that of the scalar
+  S, _ = residue_ring(ZZ, ZZ(9))
+  T, _ = residue_ring(ZZ, ZZ(16))
+  U, _ = residue_ring(ZZ, ZZ(14))
+  F = Native.GF(ZZ(7))
+  @test_throws ErrorException add_column!(R[2 3 5; 4 6 3], S(3), 1, 2)
+  @test_throws ErrorException add_column!(F[2 3 5; 4 6 3], R(3), 1, 2)
+  @test add_column!(R[2 3 5; 4 6 3], T(11), 1, 2) == R[2 1 5; 4 2 3]
+  @test add_column!(F[2 3 5; 4 6 3], U(10), 1, 2) == F[2 2 5; 4 4 3]
 end
 
 @testset "ZZModMatrix.multiply_row!" begin
@@ -1113,6 +1134,16 @@ end
 
   multiply_row!(A, R(2), 2, 2:3)
   @test A == R[0 4 4; 4 4 6]
+
+  # the modulus of the matrix has to divide that of the scalar
+  S, _ = residue_ring(ZZ, ZZ(9))
+  T, _ = residue_ring(ZZ, ZZ(16))
+  U, _ = residue_ring(ZZ, ZZ(14))
+  F = Native.GF(ZZ(7))
+  @test_throws ErrorException multiply_row!(R[2 3 5; 4 6 3], S(3), 1)
+  @test_throws ErrorException multiply_row!(F[2 3 5; 4 6 3], R(3), 1)
+  @test multiply_row!(R[2 3 5; 4 6 3], T(11), 1) == R[6 1 7; 4 6 3]
+  @test multiply_row!(F[2 3 5; 4 6 3], U(10), 1) == F[6 2 1; 4 6 3]
 end
 
 @testset "ZZModMatrix.multiply_column!" begin
@@ -1125,5 +1156,22 @@ end
 
   multiply_column!(A, R(2), 3, 1:1)
   @test A == R[4 3 2; 0 6 3]
+
+  # an Int in fourth position is a row, not a second column
+  multiply_column!(A, R(3), 3, 2)
+  @test A == R[4 3 2; 0 6 1]
+
+  @test_throws AssertionError multiply_column!(A, R(2), 4)
+  @test_throws AssertionError multiply_column!(A, R(2), 1, 1:3)
+
+  # the modulus of the matrix has to divide that of the scalar
+  S, _ = residue_ring(ZZ, ZZ(9))
+  T, _ = residue_ring(ZZ, ZZ(16))
+  U, _ = residue_ring(ZZ, ZZ(14))
+  F = Native.GF(ZZ(7))
+  @test_throws ErrorException multiply_column!(R[2 3 5; 4 6 3], S(3), 1)
+  @test_throws ErrorException multiply_column!(F[2 3 5; 4 6 3], R(3), 1)
+  @test multiply_column!(R[2 3 5; 4 6 3], T(11), 1) == R[6 3 5; 4 6 3]
+  @test multiply_column!(F[2 3 5; 4 6 3], U(10), 1) == F[6 3 5; 5 6 3]
 end
 

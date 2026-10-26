@@ -708,3 +708,24 @@ end
 
   @test !v
 end
+
+@testset "fpPolyRingElem._set_mod!" begin
+  R, x = polynomial_ring(Native.GF(7), "x")
+  S, y = polynomial_ring(Native.GF(11), "y")
+  f = x^2 + 3x + 5
+
+  g = Nemo._set_mod!(deepcopy(f), S)
+  @test parent(g) === S
+  @test Nemo.nmod_t(g) == Nemo.nmod_t(base_ring(S))
+  @test g == y^2 + 3y + 5
+  # FLINT reduces modulo the new modulus (mod 7 the square would differ)
+  @test g * g == (y^2 + 3y + 5)^2
+
+  h = Nemo._set_mod!(deepcopy(f), base_ring(S))
+  @test parent(h) === R
+  @test Nemo.nmod_t(h) == Nemo.nmod_t(base_ring(S))
+
+  h = Nemo._set_mod!(deepcopy(f), UInt(11))
+  @test parent(h) === R
+  @test Nemo.nmod_t(h) == Nemo.nmod_t(base_ring(S))
+end

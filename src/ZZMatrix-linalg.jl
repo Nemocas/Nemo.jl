@@ -18,7 +18,7 @@
 #######################################################
 
 function _det(a::fpMatrix)
-  a.r < 9 && return det(a).data  # inspired by FLINT source code
+  nrows(a) < 9 && return det(a).data  # inspired by FLINT source code
   #_det avoids a copy: det is computed destructively
   r = @ccall libflint._nmod_mat_det(a::Ref{fpMatrix})::UInt
   return r
@@ -26,7 +26,7 @@ end
 
 # Use this function with great care!
 function _unsafe_change_base_ring!(k::Nemo.fpField, a::fpMatrix)
-  @ccall libflint.nmod_mat_set_mod(a::Ref{fpMatrix}, k.n::UInt)::Cvoid
+  _set_mod!(a, k)
   a.base_ring = k  # exploiting that the internal repr is the indep of char
   return a
 end
@@ -320,8 +320,8 @@ function _induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; error_toler
         end
         Nemo.set!(A_ptr, n)
 
-        a_ptr += sizeof(ZZRingElem)
-        A_ptr += sizeof(ZZRingElem)
+        a_ptr += _entry_size(a)
+        A_ptr += _entry_size(A)
       end
     end
   end
@@ -526,28 +526,22 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
         else
           xp = next_prime(D.p)
 #          @show ceil(Int, (sz - nbits(ppow))/60)
-          local Ap::fpMatrix
-          local Bp::fpMatrix
-          local nump::fpMatrix
-          local lhs::fpMatrix
-          local rhs::fpMatrix
+          # the modulus of these is reset for each prime
+          k = Nemo.fpField(xp, false)
+          Ap = zero_matrix(k, nrows(D.A), ncols(D.A))
+          Bp = zero_matrix(k, nrows(_B), ncols(_B))
+          nump = zero_matrix(k, nrows(num), ncols(num))
+          lhs = zero_matrix(k, nrows(D.A), ncols(num))
+          rhs = zero_matrix(k, nrows(_B), ncols(_B))
           for i=1:ceil(Int, (sz - nbits(ppow))/60)
             k = Nemo.fpField(xp, false)
-            if i == 1
-              Ap = map_entries(k, D.A)
-              Bp = map_entries(k, _B)
-              nump = map_entries(k, num)
-              lhs = Ap*nump
-              rhs = Bp*k(den)
-            else
-              map_entries!(k, Ap, D.A)
-              map_entries!(k, Bp, _B)
-              map_entries!(k, nump, num)
-              _unsafe_change_base_ring!(k, lhs)
-              mul!(lhs, Ap, nump)
-              _unsafe_change_base_ring!(k, rhs)
-              mul!(rhs, Bp, k(den))
-            end
+            map_entries!(k, Ap, D.A)
+            map_entries!(k, Bp, _B)
+            map_entries!(k, nump, num)
+            _unsafe_change_base_ring!(k, lhs)
+            mul!(lhs, Ap, nump)
+            _unsafe_change_base_ring!(k, rhs)
+            mul!(rhs, Bp, k(den))
             fl = lhs == rhs
             fl || break
             xp = next_prime(xp)
@@ -566,17 +560,18 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
     # A*y: either direct as ZZMatrix or using CRT approach.
     # CHALLENGE: make the criterion for choosing the stategy smarter!!
     if ncols(_B) == 1
-      n = nrows(D.A)
+      A = D.A
+      n = nrows(A)
       GC.@preserve D d begin
         for i=1:n
           Ay_ptr = mat_entry_ptr(D.Ay, i, 1)
-          A_ptr = mat_entry_ptr(D.A, i, 1)
+          A_ptr = mat_entry_ptr(A, i, 1)
           d_ptr = mat_entry_ptr(d, i, 1)
           zero!(Ay_ptr)
           for j=1:n
             y_ptr = Nemo.mat_entry_ptr(D.y_mod, j, 1)
             addmul!(Ay_ptr, A_ptr, unsafe_load(y_ptr))
-            A_ptr += sizeof(ZZRingElem)
+            A_ptr += _entry_size(A)
           end
           sub!(d_ptr, d_ptr, Ay_ptr)
         end
@@ -807,7 +802,7 @@ end
 #saves essentially the allocation of A.rows
 #Edit: A.rows no longer exists, not sure if this is still useful
 function view!(A::ZZMatrix, B::ZZMatrix, r::UnitRange{Int}, ::Colon)
-  A.entries = B.entries + B.stride * sizeof(ZZRingElem) * (r.start - 1)
+  A.entries = B.entries + B.stride * _entry_size(B) * (r.start - 1)
   A.r = length(r)
   A.c = B.c
   A.stride = B.stride
@@ -956,11 +951,8 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
       GC.enable(false)
     end
   end
-  mu = vcat([_to_base!(t, m) for t = allV]...)
-  tau = _induce_rational_reconstruction(mu, mex; unbalanced = true)
-  @assert tau[1]
   GC.enable(GC_d)
-  return tau[2], tau[3]
+  error("UniCertSolve failed to find a solution")
 end
 
 #inplace conversion
@@ -1094,7 +1086,7 @@ end
 # det_PauderisStorjohann when there are "many" non-trivial
 # Smith invariant factors.
 # kwarg solver is to choose the linear system solver for
-# solving random linear systems (algorithm :JOHN not yet available).
+# solving random linear systems.
 function det_hcol_hnf(A::ZZMatrix, U::AbstractArray= -100:100; solver=:NEMO_DIXON)
   @req  is_square(A)  "Matrix must be square"
   (solver in [:NEMO_DIXON, :OSCAR]) || error("solver must be one of NEMO_DIXON, OSCAR")
@@ -1221,10 +1213,6 @@ function det_hcol_hnf(A::ZZMatrix, U::AbstractArray= -100:100; solver=:NEMO_DIXO
       @vtime :det 2   soln2 = Nemo.dixon_solve(A, b)
       d = soln2[2]
       s = soln2[1]
-    elseif solver == :JOHN
-      @vprintln(:det,2,"  ...solving using LinSolve")
-      ctx = LinSolveCtx(A)
-      @vtime :det 2  s,d = LinSolve(ctx,b)
     else # solver == :OSCAR
       @vprintln(:det,2,"  ...solving using OSCAR solve function")
       @vtime :det 2  x = solve(matrix(QQ,A),matrix(QQ,b); side = :right)

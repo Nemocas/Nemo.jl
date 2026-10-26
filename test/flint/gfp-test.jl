@@ -340,6 +340,10 @@ end
       end
     end
   end
+
+  # -typemin(Int) overflows
+  x = Native.GF(7)(3)
+  @test x^typemin(Int) == (inv(x)^(2^62))^2
 end
 
 @testset "gfp.comparison" begin

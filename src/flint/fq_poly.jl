@@ -32,7 +32,7 @@ length(x::FqPolyRepPolyRingElem) = x.length
 
 function coeff(x::FqPolyRepPolyRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
-  F = (x.parent).base_ring
+  F = base_ring(x)
   temp = F(1)
   @ccall libflint.fq_poly_get_coeff(temp::Ref{FqPolyRepFieldElem}, x::Ref{FqPolyRepPolyRingElem}, n::Int, F::Ref{FqPolyRepField})::Nothing
   return temp
@@ -49,9 +49,9 @@ one(a::FqPolyRepPolyRing) = a(one(base_ring(a)))
 
 gen(a::FqPolyRepPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
-is_gen(x::FqPolyRepPolyRingElem) = @ccall libflint.fq_poly_is_gen(x::Ref{FqPolyRepPolyRingElem}, base_ring(x.parent)::Ref{FqPolyRepField})::Bool
+is_gen(x::FqPolyRepPolyRingElem) = @ccall libflint.fq_poly_is_gen(x::Ref{FqPolyRepPolyRingElem}, base_ring(x)::Ref{FqPolyRepField})::Bool
 
-isone(x::FqPolyRepPolyRingElem) = @ccall libflint.fq_poly_is_one(x::Ref{FqPolyRepPolyRingElem}, base_ring(x.parent)::Ref{FqPolyRepField})::Bool
+isone(x::FqPolyRepPolyRingElem) = @ccall libflint.fq_poly_is_one(x::Ref{FqPolyRepPolyRingElem}, base_ring(x)::Ref{FqPolyRepField})::Bool
 
 function deepcopy_internal(a::FqPolyRepPolyRingElem, dict::IdDict)
   z = FqPolyRepPolyRingElem(a)
@@ -104,24 +104,18 @@ end
 ################################################################################
 
 function +(x::FqPolyRepPolyRingElem, y::FqPolyRepPolyRingElem)
-  check_parent(x,y)
-  z = parent(x)()
-  @ccall libflint.fq_poly_add(z::Ref{FqPolyRepPolyRingElem}, x::Ref{FqPolyRepPolyRingElem}, y::Ref{FqPolyRepPolyRingElem}, base_ring(parent(x))::Ref{FqPolyRepField})::Nothing
-  return z
+  check_parent(x, y)
+  return add!(parent(x)(), x, y)
 end
 
 function -(x::FqPolyRepPolyRingElem, y::FqPolyRepPolyRingElem)
-  check_parent(x,y)
-  z = parent(x)()
-  @ccall libflint.fq_poly_sub(z::Ref{FqPolyRepPolyRingElem}, x::Ref{FqPolyRepPolyRingElem}, y::Ref{FqPolyRepPolyRingElem}, base_ring(parent(x))::Ref{FqPolyRepField})::Nothing
-  return z
+  check_parent(x, y)
+  return sub!(parent(x)(), x, y)
 end
 
 function *(x::FqPolyRepPolyRingElem, y::FqPolyRepPolyRingElem)
-  check_parent(x,y)
-  z = parent(x)()
-  @ccall libflint.fq_poly_mul(z::Ref{FqPolyRepPolyRingElem}, x::Ref{FqPolyRepPolyRingElem}, y::Ref{FqPolyRepPolyRingElem}, base_ring(parent(x))::Ref{FqPolyRepField})::Nothing
-  return z
+  check_parent(x, y)
+  return mul!(parent(x)(), x, y)
 end
 
 ################################################################################
@@ -283,6 +277,22 @@ function shift_right(x::FqPolyRepPolyRingElem, len::Int)
   z = parent(x)()
   @ccall libflint.fq_poly_shift_right(z::Ref{FqPolyRepPolyRingElem}, x::Ref{FqPolyRepPolyRingElem}, len::Int, base_ring(parent(x))::Ref{FqPolyRepField})::Nothing
   return z
+end
+
+################################################################################
+#
+#   Exact division
+#
+################################################################################
+
+function divexact(x::FqPolyRepPolyRingElem, y::FqPolyRepPolyRingElem; check::Bool=true)
+  check_parent(x, y)
+  iszero(y) && throw(DivideError())
+  check || return div(x, y)
+
+  q, r = divrem(x, y)
+  iszero(r) || throw(ArgumentError("not an exact division"))
+  return q
 end
 
 ################################################################################

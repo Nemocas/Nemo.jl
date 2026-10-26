@@ -172,6 +172,14 @@ function -(x::zzModRingElem, y::zzModRingElem)
   end
 end
 
+nmod_t(R::Union{zzModRing, fpField}) = nmod_t(R.n, R.ninv, R.norm)
+
+function nmod_t(n::UInt)
+  m = Ref{nmod_t}()
+  @ccall libflint.nmod_init(m::Ref{nmod_t}, n::UInt)::Nothing
+  return m[]
+end
+
 # ni needs to be an 'inverse' of n computing using :n_preinvert_limb in flint
 function mulmod(a::UInt, b::UInt, n::UInt, ni::UInt)
   return @ccall libflint.n_mulmod2_preinv(a::UInt, b::UInt, n::UInt, ni::UInt)::UInt
@@ -206,10 +214,18 @@ end
   return r < n_norm ? (r >> norm) : ((r - n_norm) >> norm)
 end
 
+# a * b mod R.n for a, b < R.n; n_mulmod_preinv takes the residues and the
+# modulus shifted left by norm
+function _mulmod(a::UInt, b::UInt, R::Union{zzModRing, fpField})
+  s = R.norm
+  d = @ccall libflint.n_mulmod_preinv((a << s)::UInt, (b << s)::UInt, (R.n << s)::UInt, R.ninv::UInt, s::UInt)::UInt
+  return d >> s
+end
+
 function *(x::zzModRingElem, y::zzModRingElem)
   check_parent(x, y)
   R = parent(x)
-  d = mulmod(x.data, y.data, R.n, R.ninv)
+  d = _mulmod(x.data, y.data, R)
   return zzModRingElem(d, R)
 end
 
@@ -267,7 +283,7 @@ function ^(x::zzModRingElem, y::Int)
     x = inv(x)
     y = -y
   end
-  d = @ccall libflint.n_powmod2_preinv(UInt(x.data)::UInt, y::Int, R.n::UInt, R.ninv::UInt)::UInt
+  d = @ccall libflint.nmod_pow_ui(x.data::UInt, unsigned(y)::UInt, nmod_t(R)::nmod_t)::UInt
   return zzModRingElem(d, R)
 end
 

@@ -53,9 +53,9 @@ end
 for W in ((:(T <: RingElement),), (:(ZZRingElem <: T <: RingElem),))
   @eval function (a::Generic.AbsPowerSeriesRing{T})(b::ZZRingElem) where {$(W...)}
     if iszero(b)
-      z = Generic.AbsSeries{T}(T[], 0, a.prec_max)
+      z = Generic.AbsSeries{T}(T[], 0, max_precision(a))
     else
-      z = Generic.AbsSeries{T}([base_ring(a)(b)], 1, a.prec_max)
+      z = Generic.AbsSeries{T}([base_ring(a)(b)], 1, max_precision(a))
     end
     z.parent = a
     return z
@@ -113,9 +113,9 @@ end
 for W in ((:(T <: RingElement),), (:(ZZRingElem <: T <: RingElem),))
   @eval function (a::Generic.RelPowerSeriesRing{T})(b::ZZRingElem) where {$(W...)}
     if iszero(b)
-      z = Generic.RelSeries{T}(T[], 0, a.prec_max, a.prec_max)
+      z = Generic.RelSeries{T}(T[], 0, max_precision(a), max_precision(a))
     else
-      z = Generic.RelSeries{T}([base_ring(a)(b)], 1, a.prec_max, 0)
+      z = Generic.RelSeries{T}([base_ring(a)(b)], 1, max_precision(a), 0)
     end
     z.parent = a
     return z
@@ -217,7 +217,7 @@ function *(a::Generic.MPoly{T}, n::ZZRingElem) where T <: RingElem
     end
   end
   r.length = j - 1
-  resize!(r.coeffs, r.length)
+  resize!(r.coeffs, length(r))
   return r
 end
 
@@ -226,8 +226,8 @@ end
 function ==(a::Generic.MPoly{T}, n::ZZRingElem) where T <: RingElem
   N = size(a.exps, 1)
   if iszero(n)
-    return a.length == 0
-  elseif a.length == 1
+    return length(a) == 0
+  elseif length(a) == 1
     return a.coeffs[1] == n && monomial_iszero(a.exps, 1, N)
   end
   return false
@@ -238,26 +238,26 @@ function evaluate(a::Generic.MPoly{T}, A::Vector{ZZRingElem}) where {T <: RingEl
     return base_ring(a)()
   end
   N = size(a.exps, 1)
-  ord = parent(a).ord
+  ord = internal_ordering(parent(a))
   if ord == :lex
     start_var = N
   else
     start_var = N - 1
   end
   if ord == :degrevlex
-    while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
+    while length(a) > 1 || (length(a) == 1 && !monomial_iszero(a.exps, length(a), N))
       k = main_variable(a, start_var)
       p = main_variable_extract(a, k)
       a = evaluate(p, A[k])
     end
   else
-    while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
+    while length(a) > 1 || (length(a) == 1 && !monomial_iszero(a.exps, length(a), N))
       k = main_variable(a, start_var)
       p = main_variable_extract(a, k)
       a = evaluate(p, A[start_var - k + 1])
     end
   end
-  if a.length == 0
+  if length(a) == 0
     return base_ring(a)()
   else
     return a.coeffs[1]
@@ -289,7 +289,7 @@ end
 *(n::ZZRingElem, a::Generic.SparsePoly{T}) where T <: RingElem = a*n
 
 function ==(a::Generic.SparsePoly{T}, b::ZZRingElem) where T <: RingElem
-  return length(a) == 0 ? iszero(b) : a.length == 1 &
+  return length(a) == 0 ? iszero(b) : length(a) == 1 &
   a.exps[1] == 0 && a.coeffs[1] == b
 end
 
@@ -407,13 +407,13 @@ for (S, W) in ((:MatElem, ()),
 end
 
 function (a::Generic.MatSpace{T})(b::ZZMatrix) where {T <: RingElement}
-  if a.nrows != nrows(b) || a.ncols != ncols(b)
+  if nrows(a) != nrows(b) || ncols(a) != ncols(b)
     error("incompatible matrix dimensions")
   end
   A = a()
   R = base_ring(a)
-  for i=1:a.nrows
-    for j=1:a.ncols
+  for i=1:nrows(a)
+    for j=1:ncols(a)
       A[i,j] = R(b[i,j])
     end
   end

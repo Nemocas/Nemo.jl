@@ -74,9 +74,10 @@ mutable struct ZZRingElem <: RingElem
     return z
   end
 
-  function ZZRingElem(x::BigInt)
+  function ZZRingElem(x::Integer)
+    y = BigInt(x)::BigInt
     z = ZZRingElem()
-    @ccall libflint.fmpz_set_mpz(z::Ref{ZZRingElem}, x::Ref{BigInt})::Nothing
+    @ccall libflint.fmpz_set_mpz(z::Ref{ZZRingElem}, y::Ref{BigInt})::Nothing
     return z
   end
 
@@ -421,6 +422,14 @@ end
 #
 ###############################################################################
 
+# FLINT's `nmod_t`, passed by value; the leading fields of `zzModRing` and
+# `fpField`
+struct nmod_t
+  n::UInt
+  ninv::UInt
+  norm::UInt
+end
+
 @doc raw"""
     zzModRing <: Ring
 
@@ -431,11 +440,14 @@ For the modulus being a [`ZZRingElem`](@ref) see [`ZZModRing`](@ref).
 @attributes mutable struct zzModRing <: ResidueRing{UInt}
   n::UInt
   ninv::UInt
+  norm::UInt
+  # end of flint struct
 
   function zzModRing(n::UInt, cached::Bool=true)
     return get_cached!(NmodRingID, n, cached) do
-      ninv = @ccall libflint.n_preinvert_limb(n::UInt)::UInt
-      return new(n, ninv)
+      z = new()
+      @ccall libflint.nmod_init(z::Ref{zzModRing}, n::UInt)::Nothing
+      return z
     end
   end
 end
@@ -467,11 +479,14 @@ Implementation for $p$ being a machine integer [`Int`](@ref).
 @attributes mutable struct fpField <: FinField
   n::UInt
   ninv::UInt
+  norm::UInt
+  # end of flint struct
 
   function fpField(n::UInt, cached::Bool=true)
     return get_cached!(GaloisFieldID, n, cached) do
-      ninv = @ccall libflint.n_preinvert_limb(n::UInt)::UInt
-      return new(n, ninv)
+      z = new()
+      @ccall libflint.nmod_init(z::Ref{fpField}, n::UInt)::Nothing
+      return z
     end
   end
 end
@@ -798,6 +813,22 @@ mutable struct fpPolyRingElem <: PolyRingElem{fpFieldElem}
   end
 end
 
+function _set_mod!(z::T, m::nmod_t) where {T <: Union{zzModPolyRingElem, fpPolyRingElem}}
+  @ccall libflint.nmod_poly_set_mod(z::Ref{T}, m::nmod_t)::Nothing
+  return z
+end
+
+_set_mod!(z::Union{zzModPolyRingElem, fpPolyRingElem}, R::Union{zzModRing, fpField}) = _set_mod!(z, nmod_t(R))
+
+_set_mod!(z::Union{zzModPolyRingElem, fpPolyRingElem}, n::UInt) = _set_mod!(z, nmod_t(n))
+
+# Moves `z` to the polynomial ring `P`, keeping the coefficients.
+function _set_mod!(z::Union{zzModPolyRingElem, fpPolyRingElem}, P::Union{zzModPolyRing, fpPolyRing})
+  _set_mod!(z, base_ring(P))
+  z.parent = P
+  return z
+end
+
 mutable struct gfp_poly_factor
   poly::Ptr{fpPolyRingElem}  # array of flint nmod_poly_struct's
   exp::Ptr{Int}
@@ -1052,7 +1083,37 @@ end
 #
 ###############################################################################
 
+# values of FLINT's `ordering_t`
+const _ORD_LEX       = Cint(0)
+const _ORD_DEGLEX    = Cint(1)
+const _ORD_DEGREVLEX = Cint(2)
+
+# used by the tests
 const flint_orderings = [:lex, :deglex, :degrevlex]
+
+function _flint_ordering(S::Symbol)
+  if S == :lex
+    return _ORD_LEX
+  elseif S == :deglex
+    return _ORD_DEGLEX
+  elseif S == :degrevlex
+    return _ORD_DEGREVLEX
+  else
+    throw(ArgumentError("$S is not a valid ordering"))
+  end
+end
+
+function _flint_ordering_symbol(b::Cint)
+  if b == _ORD_LEX
+    return :lex
+  elseif b == _ORD_DEGLEX
+    return :deglex
+  elseif b == _ORD_DEGREVLEX
+    return :degrevlex
+  else
+    throw(ArgumentError("$b is not a valid FLINT ordering"))
+  end
+end
 
 @attributes mutable struct ZZMPolyRing <: MPolyRing{ZZRingElem}
   nvars::Int
@@ -1060,25 +1121,17 @@ const flint_orderings = [:lex, :deglex, :degrevlex]
   ord::Cint
   deg::Cint
   rev::Cint
-  lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}
-  lut1::NTuple{Base.GMP.BITS_PER_LIMB, UInt8}
+  lut::NTuple{Sys.WORD_SIZE, Int}
+  lut1::NTuple{Sys.WORD_SIZE, UInt8}
 
   S::Vector{Symbol}
 
   function ZZMPolyRing(s::Vector{Symbol}, S::Symbol, cached::Bool = true)
     return get_cached!(FmpzMPolyID, (s, S), cached) do
-      if S == :lex
-        ord = 0
-      elseif S == :deglex
-        ord = 1
-      elseif S == :degrevlex
-        ord = 2
-      else
-        error("$S is not a valid ordering")
-      end
+      ord = _flint_ordering(S)
 
       z = new()
-      @ccall libflint.fmpz_mpoly_ctx_init(z::Ref{ZZMPolyRing}, length(s)::Int, ord::Int)::Nothing
+      @ccall libflint.fmpz_mpoly_ctx_init(z::Ref{ZZMPolyRing}, length(s)::Int, ord::Cint)::Nothing
       z.S = s
       finalizer(_fmpz_mpoly_ctx_clear_fn, z)
       return z
@@ -1190,25 +1243,17 @@ end
   ord::Cint
   deg::Cint
   rev::Cint
-  lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}
-  lut1::NTuple{Base.GMP.BITS_PER_LIMB, UInt8}
+  lut::NTuple{Sys.WORD_SIZE, Int}
+  lut1::NTuple{Sys.WORD_SIZE, UInt8}
 
   S::Vector{Symbol}
 
   function QQMPolyRing(s::Vector{Symbol}, S::Symbol, cached::Bool = true)
     return get_cached!(FmpqMPolyID, (s, S), cached) do
-      if S == :lex
-        ord = 0
-      elseif S == :deglex
-        ord = 1
-      elseif S == :degrevlex
-        ord = 2
-      else
-        error("$S is not a valid ordering")
-      end
+      ord = _flint_ordering(S)
 
       z = new()
-      @ccall libflint.fmpq_mpoly_ctx_init(z::Ref{QQMPolyRing}, length(s)::Int, ord::Int)::Nothing
+      @ccall libflint.fmpq_mpoly_ctx_init(z::Ref{QQMPolyRing}, length(s)::Int, ord::Cint)::Nothing
       z.S = s
       finalizer(_fmpq_mpoly_ctx_clear_fn, z)
       return z
@@ -1324,8 +1369,8 @@ end
   ord::Cint
   deg::Cint
   rev::Cint
-  lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}
-  lut1::NTuple{Base.GMP.BITS_PER_LIMB, UInt8}
+  lut::NTuple{Sys.WORD_SIZE, Int}
+  lut1::NTuple{Sys.WORD_SIZE, UInt8}
 
   n::UInt
   ninv::UInt
@@ -1337,15 +1382,7 @@ end
 
   function zzModMPolyRing(R::zzModRing, s::Vector{Symbol}, S::Symbol, cached::Bool = true)
     return get_cached!(NmodMPolyID, (R, s, S), cached) do
-      if S == :lex
-        ord = 0
-      elseif S == :deglex
-        ord = 1
-      elseif S == :degrevlex
-        ord = 2
-      else
-        error("$S is not a valid ordering")
-      end
+      ord = _flint_ordering(S)
 
       z = new()
       @ccall libflint.nmod_mpoly_ctx_init(z::Ref{zzModMPolyRing}, length(s)::Int, ord::Cint, R.n::UInt)::Nothing
@@ -1469,8 +1506,8 @@ end
   ord::Cint
   deg::Cint
   rev::Cint
-  lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}
-  lut1::NTuple{Base.GMP.BITS_PER_LIMB, UInt8}
+  lut::NTuple{Sys.WORD_SIZE, Int}
+  lut1::NTuple{Sys.WORD_SIZE, UInt8}
 
   n::UInt
   ninv::UInt
@@ -1482,15 +1519,7 @@ end
 
   function fpMPolyRing(R::fpField, s::Vector{Symbol}, S::Symbol, cached::Bool = true)
     return get_cached!(GFPMPolyID, (R, s, S), cached) do
-      if S == :lex
-        ord = 0
-      elseif S == :deglex
-        ord = 1
-      elseif S == :degrevlex
-        ord = 2
-      else
-        error("$S is not a valid ordering")
-      end
+      ord = _flint_ordering(S)
 
       z = new()
       @ccall libflint.nmod_mpoly_ctx_init(z::Ref{fpMPolyRing}, length(s)::Int, ord::Cint, UInt(modulus(R))::UInt)::Nothing
@@ -1614,8 +1643,8 @@ end
   ord::Cint
   deg::Cint
   rev::Cint
-  lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}
-  lut1::NTuple{Base.GMP.BITS_PER_LIMB, UInt8}
+  lut::NTuple{Sys.WORD_SIZE, Int}
+  lut1::NTuple{Sys.WORD_SIZE, UInt8}
 
   n::Int # fmpz_t
   add_fxn::Ptr{Nothing}
@@ -1634,15 +1663,7 @@ end
 
   function FpMPolyRing(R::FpField, s::Vector{Symbol}, S::Symbol, cached::Bool = true)
     return get_cached!(GFPFmpzMPolyID, (R, s, S), cached) do
-      if S == :lex
-        ord = 0
-      elseif S == :deglex
-        ord = 1
-      elseif S == :degrevlex
-        ord = 2
-      else
-        error("$S is not a valid ordering")
-      end
+      ord = _flint_ordering(S)
 
       z = new()
       @ccall libflint.fmpz_mod_mpoly_ctx_init(z::Ref{FpMPolyRing}, length(s)::Int, ord::Cint, modulus(R)::Ref{ZZRingElem})::Nothing
@@ -2135,10 +2156,9 @@ end
   ord::Cint
   deg::Cint
   rev::Cint
-  lut::NTuple{Base.GMP.BITS_PER_LIMB, Int}
-  lut1::NTuple{Base.GMP.BITS_PER_LIMB, UInt8}
+  lut::NTuple{Sys.WORD_SIZE, Int}
+  lut1::NTuple{Sys.WORD_SIZE, UInt8}
 
-  p :: Int
   n :: Int
   ninv :: Int
   norm :: Int
@@ -2167,15 +2187,7 @@ end
 
   function fqPolyRepMPolyRing(R::fqPolyRepField, s::Vector{Symbol}, S::Symbol, cached::Bool = true)
     return get_cached!(FqNmodMPolyID, (R, s, S), cached) do
-      if S == :lex
-        ord = 0
-      elseif S == :deglex
-        ord = 1
-      elseif S == :degrevlex
-        ord = 2
-      else
-        error("$S is not a valid ordering")
-      end
+      ord = _flint_ordering(S)
 
       z = new()
       @ccall libflint.fq_nmod_mpoly_ctx_init(z::Ref{fqPolyRepMPolyRing}, length(s)::Int, ord::Cint, R::Ref{fqPolyRepField})::Nothing
@@ -2315,8 +2327,6 @@ const NALocalFieldElem = NonArchLocalFieldElem
 #   PadicField / PadicFieldElem
 #
 ###############################################################################
-
-const flint_padic_printing_mode = [:terse, :series, :val_unit]
 
 @doc raw"""
     PadicField <: FlintLocalField <: NonArchLocalField <: Field
@@ -3878,7 +3888,7 @@ const QQMatrixSpace = AbstractAlgebra.Generic.MatSpace{QQFieldElem}
 
 QQMatrixSpace(r::Int, c::Int) = QQMatrixSpace(QQ, r, c)
 
-mutable struct QQMatrix <: MatElem{QQFieldElem}
+mutable struct QQMatrix <: FlintMatElem{QQFieldElem}
   entries::Ptr{QQFieldElem}
   r::Int
   c::Int
@@ -3918,7 +3928,7 @@ const ZZMatrixSpace = AbstractAlgebra.Generic.MatSpace{ZZRingElem}
 
 ZZMatrixSpace(r::Int, c::Int) = ZZMatrixSpace(ZZ, r, c)
 
-mutable struct ZZMatrix <: MatElem{ZZRingElem}
+mutable struct ZZMatrix <: FlintMatElem{ZZRingElem}
   entries::Ptr{ZZRingElem}
   r::Int
   c::Int
@@ -3954,18 +3964,24 @@ end
 #
 ###############################################################################
 
-mutable struct ZZPolyRingMatrix <: MatElem{ZZPolyRingElem}
+mutable struct ZZPolyRingMatrix <: FlintMatElem{ZZPolyRingElem}
   entries::Ptr{ZZPolyRingElem}
   r::Int
   c::Int
   stride::Int
   # end flint struct
   base_ring::ZZPolyRing
+  view_parent
 
   # MatElem interface
   function ZZPolyRingMatrix(R::ZZPolyRing, ::UndefInitializer, r::Int, c::Int)
     z = ZZPolyRingMatrix(r, c, R)
     return z
+  end
+
+  # Used by view, not finalised!!
+  function ZZPolyRingMatrix()
+    return new()
   end
 
   function ZZPolyRingMatrix(r::Int, c::Int, R::ZZPolyRing)
@@ -3993,7 +4009,7 @@ end
 
 const zzModMatrixSpace = AbstractAlgebra.Generic.MatSpace{zzModRingElem}
 
-mutable struct zzModMatrix <: MatElem{zzModRingElem}
+mutable struct zzModMatrix <: FlintMatElem{zzModRingElem}
   entries::Ptr{UInt}
   r::Int                  # Int
   c::Int                  # Int
@@ -4006,7 +4022,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
 
   # MatElem interface
   function zzModMatrix(R::zzModRing, ::UndefInitializer, r::Int, c::Int)
-    z = zzModMatrix(r, c, R.n)
+    z = zzModMatrix(r, c, R)
     z.base_ring = R
     return z
   end
@@ -4016,7 +4032,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
     return new()
   end
 
-  function zzModMatrix(r::Int, c::Int, n::UInt)
+  function zzModMatrix(r::Int, c::Int, n::Union{UInt, zzModRing})
     z = new()
     # The entry buffer is Julia-owned; `view_parent` keeps it alive, so no
     # finalizer is needed and FLINT must never be asked to clear this matrix.
@@ -4026,7 +4042,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
     z.r = r
     z.c = c
     z.stride = c
-    @ccall libflint.nmod_mat_set_mod(z::Ref{zzModMatrix}, n::UInt)::Nothing
+    _set_mod!(z, n)
     return z
   end
 
@@ -4105,7 +4121,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
   end
 
   function zzModMatrix(n::UInt, b::ZZMatrix)
-    z = zzModMatrix(b.r, b.c, n)
+    z = zzModMatrix(nrows(b), ncols(b), n)
     @ccall libflint.fmpz_mat_get_nmod_mat(z::Ref{zzModMatrix}, b::Ref{ZZMatrix})::Nothing
     return z
   end
@@ -4131,7 +4147,7 @@ end
 
 const ZZModMatrixSpace = AbstractAlgebra.Generic.MatSpace{ZZModRingElem}
 
-mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
+mutable struct ZZModMatrix <: FlintMatElem{ZZModRingElem}
   entries::Ptr{ZZRingElem}
   r::Int
   c::Int
@@ -4258,10 +4274,10 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
     (n < 2) && error("Modulus must be >= 2")
     z = new()
     R = ZZModRing(n)
-    @ccall libflint.fmpz_mod_mat_init(z::Ref{ZZModMatrix}, b.r::Int, b.c::Int, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+    @ccall libflint.fmpz_mod_mat_init(z::Ref{ZZModMatrix}, nrows(b)::Int, ncols(b)::Int, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
     finalizer(_fmpz_mod_mat_clear_fn, z)
-    for i = 1:b.r
-      for j = 1:b.c
+    for i = 1:nrows(b)
+      for j = 1:ncols(b)
         setindex_raw!(z, _reduce(b[i,j], R.ninv), i, j)
       end
     end
@@ -4277,7 +4293,7 @@ end
 
 const FpMatrixSpace = AbstractAlgebra.Generic.MatSpace{FpFieldElem}
 
-mutable struct FpMatrix <: MatElem{FpFieldElem}
+mutable struct FpMatrix <: FlintMatElem{FpFieldElem}
   entries::Ptr{ZZRingElem}
   r::Int
   c::Int
@@ -4377,7 +4393,7 @@ end
 
 const fpMatrixSpace = AbstractAlgebra.Generic.MatSpace{fpFieldElem}
 
-mutable struct fpMatrix <: MatElem{fpFieldElem}
+mutable struct fpMatrix <: FlintMatElem{fpFieldElem}
   entries::Ptr{UInt}
   r::Int                  # Int
   c::Int                  # Int
@@ -4390,7 +4406,7 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
 
   # MatElem interface
   function fpMatrix(R::fpField, ::UndefInitializer, r::Int, c::Int)
-    z = fpMatrix(r, c, R.n)
+    z = fpMatrix(r, c, R)
     z.base_ring = R
     return z
   end
@@ -4400,7 +4416,7 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
     return new()
   end
 
-  function fpMatrix(r::Int, c::Int, n::UInt)
+  function fpMatrix(r::Int, c::Int, n::Union{UInt, fpField})
     z = new()
     # The entry buffer is Julia-owned; `view_parent` keeps it alive, so no
     # finalizer is needed and FLINT must never be asked to clear this matrix.
@@ -4410,7 +4426,7 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
     z.r = r
     z.c = c
     z.stride = c
-    @ccall libflint.nmod_mat_set_mod(z::Ref{fpMatrix}, n::UInt)::Nothing
+    _set_mod!(z, n)
     return z
   end
 
@@ -4489,7 +4505,7 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
   end
 
   function fpMatrix(n::UInt, b::ZZMatrix)
-    z = fpMatrix(b.r, b.c, n)
+    z = fpMatrix(nrows(b), ncols(b), n)
     @ccall libflint.fmpz_mat_get_nmod_mat(z::Ref{fpMatrix}, b::Ref{ZZMatrix})::Nothing
     return z
   end
@@ -4505,6 +4521,19 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
     error("Modulus must be smaller than ", ZZRingElem(typemax(UInt)))
     return fpMatrix(UInt(n), b)
   end
+end
+
+# Copying the ring's `nmod_t` avoids recomputing `ninv` in `nmod_mat_set_mod`.
+function _set_mod!(z::Union{zzModMatrix, fpMatrix}, R::Union{zzModRing, fpField})
+  z.n = R.n
+  z.ninv = R.ninv
+  z.norm = R.norm
+  return z
+end
+
+function _set_mod!(z::T, n::UInt) where {T <: Union{zzModMatrix, fpMatrix}}
+  @ccall libflint.nmod_mat_set_mod(z::Ref{T}, n::UInt)::Nothing
+  return z
 end
 
 ###############################################################################
@@ -4846,9 +4875,14 @@ end
 
 const FqMatrixSpace = AbstractAlgebra.Generic.MatSpace{FqFieldElem}
 
-mutable struct FqMatrix <: MatElem{FqFieldElem}
-  # fq_default_mat_struct is 56 bytes on 64 bit machine
-  opaque::NTuple{56, Int8}
+mutable struct FqMatrix <: FlintMatElem{FqFieldElem}
+  # fq_default_mat_struct is a union of FLINT matrix structs. They all start
+  # with these four fields; nmod_mat_struct, the largest, has three more words.
+  entries::Ptr{FqFieldElem}
+  r::Int
+  c::Int
+  stride::Int
+  opaque::NTuple{3, UInt}
   # end of flint struct
 
   base_ring::FqField
@@ -4948,7 +4982,7 @@ end
 
 const FqPolyRepMatrixSpace = AbstractAlgebra.Generic.MatSpace{FqPolyRepFieldElem}
 
-mutable struct FqPolyRepMatrix <: MatElem{FqPolyRepFieldElem}
+mutable struct FqPolyRepMatrix <: FlintMatElem{FqPolyRepFieldElem}
   entries::Ptr{FqPolyRepFieldElem}
   r::Int
   c::Int
@@ -5025,7 +5059,7 @@ end
 
 const fqPolyRepMatrixSpace = AbstractAlgebra.Generic.MatSpace{fqPolyRepFieldElem}
 
-mutable struct fqPolyRepMatrix <: MatElem{fqPolyRepFieldElem}
+mutable struct fqPolyRepMatrix <: FlintMatElem{fqPolyRepFieldElem}
   entries::Ptr{fqPolyRepFieldElem}
   r::Int
   c::Int

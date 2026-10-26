@@ -266,6 +266,8 @@ end
   @test collect(v) == [4, 5, 6]
   v[2] = 7
   @test A == S([1 2 3; 4 7 6; 7 8 9])
+  v[3] = QQ(1, 2)
+  @test A == S([1 2 3; 4 7 1//2; 7 8 9])
   A = S([1 2 3; 4 5 6; 7 8 9])
   v = @view A[:, 3]
   @test v isa AbstractVector{elem_type(QQ)}
@@ -274,6 +276,8 @@ end
   @test collect(v) == [3, 6, 9]
   v[1] = 1
   @test A == S([1 2 1; 4 5 6; 7 8 9])
+  v[2] = 1//3
+  @test A == S([1 2 1; 4 5 1//3; 7 8 9])
 end
 
 @testset "QQMatrix.sub" begin
@@ -451,6 +455,18 @@ end
   @test D == transpose(A)
   transpose!(A)
   @test D == A
+
+  D = QQ[1 2; 3 4]
+  E = QQ[1 2 3; 4 5 6]
+  GC.@preserve D E begin
+    for (d, e) in ((D, E), (Ref(D), Ref(E)),
+                   (Ptr{QQMatrix}(pointer_from_objref(D)), Ptr{QQMatrix}(pointer_from_objref(E))))
+      set!(D, QQ[1 2; 3 4])
+      @test transpose!(d) === d
+      @test D == QQ[1 3; 2 4]
+      @test_throws DomainError transpose!(e)
+    end
+  end
 end
 
 @testset "QQMatrix.row_col_swapping" begin
@@ -600,7 +616,9 @@ end
   A = S([QQFieldElem(2) 3 5; 1 4 7; 9 2 2])
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(QQ) === AbstractAlgebra.Solve.RREFTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(QQ)) === AbstractAlgebra.Solve.RREFTrait()
   @test AbstractAlgebra.Solve.matrix_normal_form_type(A) === AbstractAlgebra.Solve.RREFTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(A)) === AbstractAlgebra.Solve.RREFTrait()
 
   T = matrix_space(QQ, 3, 1)
 
@@ -729,7 +747,9 @@ end
   A = matrix(QQ, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
   C = solve_init(A)
   @test C isa AbstractAlgebra.solve_context_type(QQ)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(QQ))
   @test C isa AbstractAlgebra.solve_context_type(A)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.FFLUTrait()
   @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.FFLUTrait(), QQFieldElem)
@@ -944,6 +964,15 @@ end
   Generic.add_one!(A, 1, 1)
   @test A == QQ[1 0; 0 0]
   @test_throws BoundsError Generic.add_one!(A, 3, 1)
+
+  GC.@preserve A begin
+    for a in (Ref(A), Ptr{QQMatrix}(pointer_from_objref(A)))
+      zero!(A)
+      @test Generic.add_one!(a, 1, 2) === a
+      @test A == QQ[0 1; 0 0]
+      @test_throws BoundsError Generic.add_one!(a, 3, 1)
+    end
+  end
 end
 
 @testset "QQMatrix.denominator" begin

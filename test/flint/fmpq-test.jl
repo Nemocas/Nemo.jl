@@ -74,6 +74,25 @@ end
   end
 end
 
+@testset "QQFieldElem.constructors.inference" begin
+  # the caller knows only that the arguments are Integers, resp. a Rational
+  apply(f, r::Ref{Integer}, s::Ref{Integer}) = f(r[], s[])
+  apply(f, r::Ref{Rational}) = f(r[])
+
+  for (a, b) in ((2, 3), (big(2), 3), (Int8(2), UInt(3)))
+    r, s = Ref{Integer}(a), Ref{Integer}(b)
+    @test (@inferred apply(QQFieldElem, r, s)) == a//b
+    @test (@inferred apply(QQ, r, s)) == a//b
+  end
+
+  for x in (2//3, big(2)//3, Int8(2)//Int8(3))
+    r = Ref{Rational}(x)
+    @test (@inferred apply(QQFieldElem, r)) == x
+    @test (@inferred apply(QQ, r)) == x
+    @test (@inferred apply(Base.Fix1(convert, QQFieldElem), r)) == x
+  end
+end
+
 @testset "QQFieldElem.rand" begin
   for bits in 1:100
     t = rand_bits(QQ, bits)

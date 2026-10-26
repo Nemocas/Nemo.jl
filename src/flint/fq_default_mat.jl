@@ -33,11 +33,21 @@ end
   return z
 end
 
-@inline function setindex!(a::FqMatrix, u::TypeOrPtr{FqFieldElem}, i::Int, j::Int)
+@inline function setindex!(a::FqMatrix, u::FqFieldElem, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   uu = base_ring(a)(u)
   @ccall libflint.fq_default_mat_entry_set(
     a::Ref{FqMatrix}, (i-1)::Int, (j-1)::Int, uu::Ref{FqFieldElem}, base_ring(a)::Ref{FqField}
+  )::Nothing
+end
+
+@inline setindex!(a::FqMatrix, u::Ref{FqFieldElem}, i::Int, j::Int) = setindex!(a, u[], i, j)
+
+# must point to an element of `base_ring(a)`
+@inline function setindex!(a::FqMatrix, u::Ptr{FqFieldElem}, i::Int, j::Int)
+  @boundscheck _checkbounds(a, i, j)
+  @ccall libflint.fq_default_mat_entry_set(
+    a::Ref{FqMatrix}, (i-1)::Int, (j-1)::Int, u::Ref{FqFieldElem}, base_ring(a)::Ref{FqField}
   )::Nothing
 end
 
@@ -60,14 +70,6 @@ function deepcopy_internal(a::FqMatrix, dict::IdDict)
   z = FqMatrix(nrows(a), ncols(a), base_ring(a))
   @ccall libflint.fq_default_mat_set(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
   return z
-end
-
-function number_of_rows(a::FqMatrix)
-  return @ccall libflint.fq_default_mat_nrows(a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Int
-end
-
-function number_of_columns(a::FqMatrix)
-  return @ccall libflint.fq_default_mat_ncols(a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Int
 end
 
 base_ring(a::FqMatrix) = a.base_ring
@@ -97,7 +99,7 @@ end
 ################################################################################
 
 function ==(a::FqMatrix, b::FqMatrix)
-  if !(a.base_ring == b.base_ring)
+  if !(base_ring(a) == base_ring(b))
     return false
   end
   r = @ccall libflint.fq_default_mat_equal(a::Ref{FqMatrix}, b::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Cint
@@ -111,16 +113,6 @@ isequal(a::FqMatrix, b::FqMatrix) = ==(a, b)
 #  Transpose
 #
 ################################################################################
-
-function transpose(a::FqMatrix)
-  z = similar(a, ncols(a), nrows(a))
-  return transpose!(z, a)
-end
-
-function transpose!(a::FqMatrix)
-  check_square(a)
-  return transpose!(a, a)
-end
 
 function transpose!(z::FqMatrix, a::FqMatrix)
   @ccall libflint.fq_default_mat_transpose(z::Ref{FqMatrix}, a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
@@ -371,8 +363,7 @@ end
 #
 ################################################################################
 
-Solve.matrix_normal_form_type(::FqField) = Solve.LUTrait()
-Solve.matrix_normal_form_type(::FqMatrix) = Solve.LUTrait()
+Solve.matrix_normal_form_type(::Type{FqField}) = Solve.LUTrait()
 
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::FqMatrix, b::FqMatrix, task::Symbol; side::Symbol = :left)
   if side === :left
@@ -441,41 +432,6 @@ function lu(x::FqMatrix, P = SymmetricGroup(nrows(x)))
     end
   end
   return rank, p, L, U
-end
-
-################################################################################
-#
-#  Windowing
-#
-################################################################################
-
-function _view_window(x::FqMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
-
-  _checkrange_or_empty(nrows(x), r1, r2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  _checkrange_or_empty(ncols(x), c1, c2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  if (r1 > r2)
-    r1 = 1
-    r2 = 0
-  end
-  if (c1 > c2)
-    c1 = 1
-    c2 = 0
-  end
-
-  z = FqMatrix()
-  z.base_ring = x.base_ring
-  z.view_parent = x
-  @ccall libflint.fq_default_mat_window_init(z::Ref{FqMatrix}, x::Ref{FqMatrix}, (r1 - 1)::Int, (c1 - 1)::Int, r2::Int, c2::Int, base_ring(x)::Ref{FqField})::Nothing
-  finalizer(_fq_default_mat_window_clear_fn, z)
-  return z
-end
-
-function _fq_default_mat_window_clear_fn(a::FqMatrix)
-  @ccall libflint.fq_default_mat_window_clear(a::Ref{FqMatrix}, base_ring(a)::Ref{FqField})::Nothing
 end
 
 ################################################################################
@@ -641,7 +597,7 @@ function mat_entry_ptr(a::FqMatrix, i::Int, j::Int)
     pptr = @ccall libflint.fq_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   elseif t == _FQ_DEFAULT_NMOD
     pptr = @ccall libflint.nmod_mat_entry_ptr(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
-  else#if t == _FQ_DEFAULT_FMPZ_NMOD
+  else#if t == _FQ_DEFAULT_FMPZ_MOD
     pptr = @ccall libflint.fmpz_mod_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
   end
   return pptr

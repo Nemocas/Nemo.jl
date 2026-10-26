@@ -30,13 +30,13 @@ var(a::FqPolyRing) = a.S
 ################################################################################
 
 function length(x::FqPolyRingElem)
-  F = (x.parent).base_ring
+  F = base_ring(x)
   @ccall libflint.fq_default_poly_length(x::Ref{FqPolyRingElem}, F::Ref{FqField})::Int
 end
 
 function coeff(x::FqPolyRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
-  F = (x.parent).base_ring
+  F = base_ring(x)
   temp = F(1)
   @ccall libflint.fq_default_poly_get_coeff(temp::Ref{FqFieldElem}, x::Ref{FqPolyRingElem}, n::Int, F::Ref{FqField})::Nothing
   return temp
@@ -54,9 +54,9 @@ one(a::FqPolyRing) = a(one(base_ring(a)))
 
 gen(a::FqPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
-is_gen(x::FqPolyRingElem) = @ccall libflint.fq_default_poly_is_gen(x::Ref{FqPolyRingElem}, base_ring(x.parent)::Ref{FqField})::Bool
+is_gen(x::FqPolyRingElem) = @ccall libflint.fq_default_poly_is_gen(x::Ref{FqPolyRingElem}, base_ring(x)::Ref{FqField})::Bool
 
-isone(x::FqPolyRingElem) = @ccall libflint.fq_default_poly_is_one(x::Ref{FqPolyRingElem}, base_ring(x.parent)::Ref{FqField})::Bool
+isone(x::FqPolyRingElem) = @ccall libflint.fq_default_poly_is_one(x::Ref{FqPolyRingElem}, base_ring(x)::Ref{FqField})::Bool
 
 function deepcopy_internal(a::FqPolyRingElem, dict::IdDict)
   z = FqPolyRingElem(a, base_ring(a))
@@ -96,24 +96,18 @@ end
 ################################################################################
 
 function +(x::FqPolyRingElem, y::FqPolyRingElem)
-  check_parent(x,y)
-  z = parent(x)()
-  @ccall libflint.fq_default_poly_add(z::Ref{FqPolyRingElem}, x::Ref{FqPolyRingElem}, y::Ref{FqPolyRingElem}, base_ring(parent(x))::Ref{FqField})::Nothing
-  return z
+  check_parent(x, y)
+  return add!(parent(x)(), x, y)
 end
 
 function -(x::FqPolyRingElem, y::FqPolyRingElem)
-  check_parent(x,y)
-  z = parent(x)()
-  @ccall libflint.fq_default_poly_sub(z::Ref{FqPolyRingElem}, x::Ref{FqPolyRingElem}, y::Ref{FqPolyRingElem}, base_ring(parent(x))::Ref{FqField})::Nothing
-  return z
+  check_parent(x, y)
+  return sub!(parent(x)(), x, y)
 end
 
 function *(x::FqPolyRingElem, y::FqPolyRingElem)
-  check_parent(x,y)
-  z = parent(x)()
-  @ccall libflint.fq_default_poly_mul(z::Ref{FqPolyRingElem}, x::Ref{FqPolyRingElem}, y::Ref{FqPolyRingElem}, base_ring(parent(x))::Ref{FqField})::Nothing
-  return z
+  check_parent(x, y)
+  return mul!(parent(x)(), x, y)
 end
 
 ################################################################################
@@ -275,6 +269,22 @@ function shift_right(x::FqPolyRingElem, len::Int)
   z = parent(x)()
   @ccall libflint.fq_default_poly_shift_right(z::Ref{FqPolyRingElem}, x::Ref{FqPolyRingElem}, len::Int, base_ring(parent(x))::Ref{FqField})::Nothing
   return z
+end
+
+################################################################################
+#
+#   Exact division
+#
+################################################################################
+
+function divexact(x::FqPolyRingElem, y::FqPolyRingElem; check::Bool=true)
+  check_parent(x, y)
+  iszero(y) && throw(DivideError())
+  check || return div(x, y)
+
+  q, r = divrem(x, y)
+  iszero(r) || throw(ArgumentError("not an exact division"))
+  return q
 end
 
 ################################################################################
@@ -767,9 +777,11 @@ function lift(R::ZZPolyRing, f::FqPolyRingElem)
     @ccall libflint.fmpz_poly_set_nmod_poly_unsigned(z::Ref{ZZPolyRingElem}, f::Ref{FqPolyRingElem})::Nothing
     return z
   else
-    @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_NMOD
+    @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_MOD
     z = R()
-    @ccall libflint.fmpz_mod_poly_get_fmpz_poly(z::Ref{ZZPolyRingElem}, f::Ref{FqPolyRingElem}, (pointer_from_objref(F) + 2 * sizeof(Cint))::Ptr{Nothing})::Nothing
+    GC.@preserve F begin
+      @ccall libflint.fmpz_mod_poly_get_fmpz_poly(z::Ref{ZZPolyRingElem}, f::Ref{FqPolyRingElem}, _fmpz_mod_ctx_ptr(F)::Ptr{fmpz_mod_ctx_struct})::Nothing
+    end
     return z
   end
 end
@@ -785,9 +797,9 @@ function QadicField(f::FqPolyRingElem, prec::Int = 64, var::String = "a"; cached
   absolute_degree(K) == 1 || throw(ArgumentError("base ring of polynomial must be a prime field"))
 
   z = get_cached!(QadicBaseFqPol, (base_field, f), cached) do
-    ctx_type = _fq_default_ctx_type(K)
-    @assert ctx_type in (_FQ_DEFAULT_NMOD, _FQ_DEFAULT_FMPZ_NMOD)
-    _K = ctx_type == _FQ_DEFAULT_NMOD ? _get_raw_type(fpField, K) : _get_raw_type(FpField, K)
+    T = raw_field_type(K)
+    @assert T in (fpField, FpField)
+    _K = _get_raw_type(T, K)
     ff = map_coefficients(c -> _K(lift(ZZ, c)), f; cached = false)
     return QadicField(ff, prec, var; cached = false, check = check, base_field = base_field)[1]
   end

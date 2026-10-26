@@ -18,39 +18,6 @@ is_zero_initialized(::Type{QQMatrix}) = true
 
 ###############################################################################
 #
-#   Windows - handle with care!!!
-#
-###############################################################################
-
-function _view_window(x::QQMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
-  _checkrange_or_empty(nrows(x), r1, r2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  _checkrange_or_empty(ncols(x), c1, c2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  if (r1 > r2)
-    r1 = 1
-    r2 = 0
-  end
-  if (c1 > c2)
-    c1 = 1
-    c2 = 0
-  end
-
-  b = QQMatrix()
-  b.view_parent = x
-  @ccall libflint.fmpq_mat_window_init(b::Ref{QQMatrix}, x::Ref{QQMatrix}, (r1 - 1)::Int, (c1 - 1)::Int, r2::Int, c2::Int)::Nothing
-  finalizer(_fmpq_mat_window_clear_fn, b)
-  return b
-end
-
-function _fmpq_mat_window_clear_fn(a::QQMatrix)
-  @ccall libflint.fmpq_mat_window_clear(a::Ref{QQMatrix})::Nothing
-end
-
-###############################################################################
-#
 #   Basic manipulation
 #
 ###############################################################################
@@ -87,10 +54,6 @@ function setindex!(a::QQMatrix, b::QQMatrix, r::UnitRange{Int64}, c::UnitRange{I
   A = view(a, r, c)
   set!(A, b)
 end
-
-number_of_rows(a::QQMatrix) = a.r
-
-number_of_columns(a::QQMatrix) = a.c
 
 iszero(a::QQMatrix) = @ccall libflint.fmpq_mat_is_zero(a::Ref{QQMatrix})::Bool
 
@@ -178,16 +141,6 @@ end
 #  Transpose
 #
 ################################################################################
-
-function transpose(a::QQMatrix)
-  z = similar(a, ncols(a), nrows(a))
-  return transpose!(z, a)
-end
-
-function transpose!(a::QQMatrixOrPtr)
-  @req is_square(a) "Matrix must be a square matrix"
-  return transpose!(a, a)
-end
 
 function transpose!(z::QQMatrixOrPtr, a::QQMatrixOrPtr)
   @ccall libflint.fmpq_mat_transpose(z::Ref{QQMatrix}, a::Ref{QQMatrix})::Nothing
@@ -593,10 +546,9 @@ function _solve_dixon(a::QQMatrix, b::QQMatrix)
 end
 
 # Actually we use a modular algorithm in flint...
-Solve.matrix_normal_form_type(::QQField) = Solve.RREFTrait()
-Solve.matrix_normal_form_type(::QQMatrix) = Solve.RREFTrait()
+Solve.matrix_normal_form_type(::Type{QQField}) = Solve.RREFTrait()
 
-function Solve.solve_context_type(::QQField)
+function Solve.solve_context_type(::Type{QQField})
   return Solve.solve_context_type(Solve.FFLUTrait(), QQFieldElem)
 end
 
@@ -1058,7 +1010,7 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::QQMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(QQFieldElem)
+_entry_size(::Type{QQMatrix}) = sizeof(QQFieldElem)
 
 ################################################################################
 #

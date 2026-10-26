@@ -428,31 +428,26 @@ conj(x::ZZRingElem) = x
 #
 ###############################################################################
 
-# Metaprogram to define functions +, -, *, gcd, lcm,
-#                                 &, |, $ (xor)
+for (fJ, fC) in ((:+, :add!), (:-, :sub!), (:*, :mul!))
+  @eval ($fJ)(x::ZZRingElem, y::ZZRingElem) = $fC(ZZRingElem(), x, y)
+end
 
-for (fJ, fC) in ((:+, :add), (:-,:sub), (:*, :mul),
-                 (:&, :and), (:|, :or), (:xor, :xor))
+# Metaprogram to define functions &, |, $ (xor)
+
+for (fJ, fC) in ((:&, :fmpz_and), (:|, :fmpz_or), (:xor, :fmpz_xor))
   @eval begin
     function ($fJ)(x::ZZRingElem, y::ZZRingElem)
       z = ZZRingElem()
-      @ccall libflint.$("fmpz_$fC")(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
+      @ccall libflint.$fC(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
       return z
     end
   end
 end
 
-# Metaprogram to define functions fdiv, cdiv, tdiv, div
-
-for (fJ, fC) in ((:fdiv, :fdiv_q), (:cdiv, :cdiv_q), (:tdiv, :tdiv_q),
-                 (:div, :fdiv_q))
-  @eval begin
-    function ($fJ)(x::ZZRingElem, y::ZZRingElem)
-      iszero(y) && throw(DivideError())
-      z = ZZRingElem()
-      @ccall libflint.$("fmpz_$fC")(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
-      return z
-    end
+for (fJ, fC) in ((:fdiv, :fdiv!), (:cdiv, :cdiv!), (:tdiv, :tdiv!), (:div, :fdiv!))
+  @eval function ($fJ)(x::ZZRingElem, y::ZZRingElem)
+    iszero(y) && throw(DivideError())
+    return $fC(ZZRingElem(), x, y)
   end
 end
 
@@ -461,9 +456,7 @@ end
 # Here we set Base.div to a version that agrees with Base
 function Base.div(x::ZZRingElem, y::ZZRingElem)
   iszero(y) && throw(DivideError())
-  z = ZZRingElem()
-  @ccall libflint.fmpz_tdiv_q(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, y::Ref{ZZRingElem})::Nothing
-  return z
+  return tdiv!(ZZRingElem(), x, y)
 end
 
 Base.div(x::ZZRingElem, y::ZZRingElem, ::typeof(RoundToZero)) = tdiv(x, y)
@@ -1066,9 +1059,9 @@ end
 
 function cmp(a::BigFloat, b::ZZRingElem)
   if _fmpz_is_small(b)
-    return Int(@ccall :libmpfr.mpfr_cmp_si(a::Ref{BigFloat}, b.d::Int)::Cint)
+    return Int(@ccall Base.MPFR.libmpfr.mpfr_cmp_si(a::Ref{BigFloat}, b.d::Int)::Cint)
   end
-  return Int(@ccall :libmpfr.mpfr_cmp_z(a::Ref{BigFloat}, (unsigned(b.d) << 2)::UInt)::Cint)
+  return Int(@ccall Base.MPFR.libmpfr.mpfr_cmp_z(a::Ref{BigFloat}, (unsigned(b.d) << 2)::UInt)::Cint)
 end
 
 ==(x::ZZRingElem, y::BigFloat) = cmp(y, x) == 0
@@ -1984,8 +1977,8 @@ function next_prime(x::ZZRingElem, proved::Bool = true)
 end
 
 function next_prime(x::UInt, proved::Bool = true)
-  if (Base.GMP.BITS_PER_LIMB == 64 && x >= 0xffffffffffffffc5) ||
-    (Base.GMP.BITS_PER_LIMB == 32 && x >= 0xfffffffb)
+  if (Sys.WORD_SIZE == 64 && x >= 0xffffffffffffffc5) ||
+    (Sys.WORD_SIZE == 32 && x >= 0xfffffffb)
     error("No larger single-limb prime exists")
   end
   return @ccall libflint.n_nextprime(x::UInt, proved::Cint)::UInt
@@ -2032,7 +2025,7 @@ function remove(a::BigInt, b::BigInt)
   b <= 1 && error("Factor <= 1")
   a == 0 && error("Not yet implemented")
   q = BigInt()
-  v = @ccall :libgmp.__gmpz_remove(q::Ref{BigInt}, a::Ref{BigInt}, b::Ref{BigInt})::Culong
+  v = @ccall Base.GMP.libgmp.__gmpz_remove(q::Ref{BigInt}, a::Ref{BigInt}, b::Ref{BigInt})::Culong
   return (Int(v), q)
 end
 
@@ -3265,9 +3258,7 @@ function rand(rng::AbstractRNG, a::ZZRingElemUnitRange)
   m < 0 && error("range empty")
   nd = ndigits(m, 2)
   nl, high = Base.divrem(nd, 8 * sizeof(Base.GMP.Limb))
-  if high > 0
-    mask = m >> (nl * 8 * sizeof(Base.GMP.Limb))
-  end
+  mask = m >> (nl * 8 * sizeof(Base.GMP.Limb))
   s = ZZRingElem(0)
   c = (8 * sizeof(Base.GMP.Limb))
   while true
@@ -3325,8 +3316,6 @@ end
 ###############################################################################
 
 ZZRingElem(s::AbstractString) = parse(ZZRingElem, s)
-
-ZZRingElem(z::Integer) = ZZRingElem(BigInt(z))
 
 ZZRingElem(z::Float16) = ZZRingElem(Float64(z))
 

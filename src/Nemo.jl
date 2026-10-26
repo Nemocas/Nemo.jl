@@ -366,7 +366,7 @@ function trace_memory(b::Bool)
     return
   end
   if b
-    @ccall :libgmp.__gmp_set_memory_functions(
+    @ccall Base.GMP.libgmp.__gmp_set_memory_functions(
       @cfunction(trace_counted_malloc, UInt, (UInt, ))::Ptr{Nothing},
       @cfunction(trace_counted_realloc, UInt, (UInt, UInt, UInt))::Ptr{Nothing},
       @cfunction(trace_counted_free, Nothing, (UInt, UInt))::Ptr{Nothing},
@@ -379,7 +379,7 @@ function trace_memory(b::Bool)
       @cfunction(trace_free, Nothing, (UInt, ))::Ptr{Nothing},
     )::Nothing
   else
-    @ccall :libgmp.__gmp_set_memory_functions(
+    @ccall Base.GMP.libgmp.__gmp_set_memory_functions(
       cglobal(:jl_gc_counted_malloc)::Ptr{Nothing},
       cglobal(:jl_gc_counted_realloc_with_old_size)::Ptr{Nothing},
       cglobal(:jl_gc_counted_free_with_size)::Ptr{Nothing},
@@ -423,7 +423,7 @@ function __init__()
   __isthreaded[] = get(ENV, "NEMO_THREADED", "") == "1"
 
   if __isthreaded[]
-    @ccall :libgmp.__gmp_set_memory_functions(0::Int, 0::Int, 0::Int)::Nothing
+    @ccall Base.GMP.libgmp.__gmp_set_memory_functions(0::Int, 0::Int, 0::Int)::Nothing
   end
 
   @ccall libflint.flint_set_abort(@cfunction(flint_abort, Nothing, ())::Ptr{Nothing})::Nothing
@@ -487,6 +487,17 @@ const TypeOrPtr{T} = Union{T, Ref{T}, Ptr{T}} where T
 
 ###############################################################################
 #
+#   Matrices wrapping a FLINT matrix struct
+#
+###############################################################################
+
+# Every subtype starts with the fields `entries`, `r`, `c`, `stride` of the
+# FLINT struct it wraps. For windows it has a field `view_parent` and a
+# constructor without arguments that sets no finalizer.
+abstract type FlintMatElem{T} <: MatElem{T} end
+
+###############################################################################
+#
 #   Load Nemo Rings/Fields/etc
 #
 ###############################################################################
@@ -533,7 +544,7 @@ include("julia/Float.jl")
 #
 ################################################################################
 
-function Base.summary(io::IO, A::T) where {T <: _MatTypes}
+function Base.summary(io::IO, A::T) where {T <: FlintMatElem}
   print(io, nrows(A), "x", ncols(A), " ", T)
 end
 
@@ -616,7 +627,7 @@ function flint_gmp_randseed!(a::rand_ctx, seed::BigInt)
     # gmp_state needs to be initialised
     @ccall libflint._flint_rand_init_gmp_state(a::Ref{rand_ctx})::Cvoid
   end
-  @ccall :libgmp.__gmp_randseed(a.gmp_state::Ptr{Cvoid}, seed::Ref{BigInt})::Cvoid
+  @ccall Base.GMP.libgmp.__gmp_randseed(a.gmp_state::Ptr{Cvoid}, seed::Ref{BigInt})::Cvoid
 end
 
 ################################################################################

@@ -168,7 +168,7 @@ function +(a::QQAbsPowerSeriesRingElem, b::QQAbsPowerSeriesRingElem)
   lena = length(a)
   lenb = length(b)
 
-  prec = min(a.prec, b.prec)
+  prec = min(precision(a), precision(b))
 
   lena = min(lena, prec)
   lenb = min(lenb, prec)
@@ -185,7 +185,7 @@ function -(a::QQAbsPowerSeriesRingElem, b::QQAbsPowerSeriesRingElem)
   lena = length(a)
   lenb = length(b)
 
-  prec = min(a.prec, b.prec)
+  prec = min(precision(a), precision(b))
 
   lena = min(lena, prec)
   lenb = min(lenb, prec)
@@ -205,7 +205,7 @@ function *(a::QQAbsPowerSeriesRingElem, b::QQAbsPowerSeriesRingElem)
   aval = valuation(a)
   bval = valuation(b)
 
-  prec = min(a.prec + bval, b.prec + aval)
+  prec = min(precision(a) + bval, precision(b) + aval)
   prec = min(prec, max_precision(parent(a)))
 
   lena = min(lena, prec)
@@ -284,9 +284,9 @@ function shift_left(x::QQAbsPowerSeriesRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
   xlen = length(x)
   z = parent(x)()
-  z.prec = x.prec + len
-  z.prec = min(z.prec, max_precision(parent(x)))
-  zlen = min(z.prec, xlen + len)
+  z.prec = precision(x) + len
+  z.prec = min(precision(z), max_precision(parent(x)))
+  zlen = min(precision(z), xlen + len)
   @ccall libflint.fmpq_poly_shift_left(z::Ref{QQAbsPowerSeriesRingElem}, x::Ref{QQAbsPowerSeriesRingElem}, len::Int)::Nothing
   @ccall libflint.fmpq_poly_set_trunc(z::Ref{QQAbsPowerSeriesRingElem}, z::Ref{QQAbsPowerSeriesRingElem}, zlen::Int)::Nothing
   return z
@@ -297,9 +297,9 @@ function shift_right(x::QQAbsPowerSeriesRingElem, len::Int)
   xlen = length(x)
   z = parent(x)()
   if len >= xlen
-    z.prec = max(0, x.prec - len)
+    z.prec = max(0, precision(x) - len)
   else
-    z.prec = x.prec - len
+    z.prec = precision(x) - len
     @ccall libflint.fmpq_poly_shift_right(z::Ref{QQAbsPowerSeriesRingElem}, x::Ref{QQAbsPowerSeriesRingElem}, len::Int)::Nothing
   end
   return z
@@ -370,7 +370,7 @@ end
 
 function ==(x::QQAbsPowerSeriesRingElem, y::QQAbsPowerSeriesRingElem)
   check_parent(x, y)
-  prec = min(x.prec, y.prec)
+  prec = min(precision(x), precision(y))
 
   n = max(length(x), length(y))
   n = min(n, prec)
@@ -382,7 +382,7 @@ function isequal(x::QQAbsPowerSeriesRingElem, y::QQAbsPowerSeriesRingElem)
   if parent(x) != parent(y)
     return false
   end
-  if x.prec != y.prec || length(x) != length(y)
+  if precision(x) != precision(y) || length(x) != length(y)
     return false
   end
   return Bool(@ccall libflint.fmpq_poly_equal(x::Ref{QQAbsPowerSeriesRingElem}, y::Ref{QQAbsPowerSeriesRingElem})::Cint)
@@ -420,7 +420,7 @@ function divexact(x::QQAbsPowerSeriesRingElem, y::QQAbsPowerSeriesRingElem; chec
     end
   end
   check && !is_unit(y) && error("Unable to invert power series")
-  prec = min(x.prec, y.prec - v2 + v1)
+  prec = min(precision(x), precision(y) - v2 + v1)
   z = parent(x)()
   z.prec = prec
   @ccall libflint.fmpq_poly_div_series(z::Ref{QQAbsPowerSeriesRingElem}, x::Ref{QQAbsPowerSeriesRingElem}, y::Ref{QQAbsPowerSeriesRingElem}, prec::Int)::Nothing
@@ -472,7 +472,7 @@ function inv(a::QQAbsPowerSeriesRingElem)
   !is_unit(a) && error("Unable to invert power series")
   ainv = parent(a)()
   ainv.prec = a.prec
-  @ccall libflint.fmpq_poly_inv_series(ainv::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, a.prec::Int)::Nothing
+  @ccall libflint.fmpq_poly_inv_series(ainv::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, precision(a)::Int)::Nothing
   return ainv
 end
 
@@ -484,140 +484,140 @@ end
 
 function Base.exp(a::QQAbsPowerSeriesRingElem)
   !iszero(coeff(a, 0)) && error("Constant term not zero in exp")
-  if length(a) == 0 || a.prec == 1
-    return parent(a)([QQFieldElem(1)], 1, a.prec)
+  if length(a) == 0 || precision(a) == 1
+    return parent(a)([QQFieldElem(1)], 1, precision(a))
   end
   z = parent(a)()
   z.prec = a.prec
-  @ccall libflint.fmpq_poly_exp_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, a.prec::Int)::Nothing
+  @ccall libflint.fmpq_poly_exp_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, precision(a)::Int)::Nothing
   return z
 end
 
 function log(a::QQAbsPowerSeriesRingElem)
   !isone(coeff(a, 0)) && error("Constant term not one in log")
-  if length(a) == 1 || a.prec < 2
+  if length(a) == 1 || precision(a) < 2
     return parent(a)()
   end
   z = parent(a)()
   z.prec = a.prec
-  @ccall libflint.fmpq_poly_log_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, a.prec::Int)::Nothing
+  @ccall libflint.fmpq_poly_log_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, precision(a)::Int)::Nothing
   return z
 end
 
 function tan(a::QQAbsPowerSeriesRingElem)
   !iszero(coeff(a, 0)) && error("Constant term not zero in tan")
-  if iszero(a) || a.prec < 2
+  if iszero(a) || precision(a) < 2
     return parent(a)()
   end
   z = parent(a)()
   z.prec = a.prec
-  @ccall libflint.fmpq_poly_tan_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, a.prec::Int)::Nothing
+  @ccall libflint.fmpq_poly_tan_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, precision(a)::Int)::Nothing
   return z
 end
 
 function tanh(a::QQAbsPowerSeriesRingElem)
   !iszero(coeff(a, 0)) && error("Constant term not zero in tanh")
-  if iszero(a) || a.prec < 2
+  if iszero(a) || precision(a) < 2
     return parent(a)()
   end
   z = parent(a)()
   z.prec = a.prec
-  @ccall libflint.fmpq_poly_tanh_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, a.prec::Int)::Nothing
+  @ccall libflint.fmpq_poly_tanh_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, precision(a)::Int)::Nothing
   return z
 end
 
 function sin(a::QQAbsPowerSeriesRingElem)
   !iszero(coeff(a, 0)) && error("Constant term not zero in sin")
-  if iszero(a) || a.prec < 2
+  if iszero(a) || precision(a) < 2
     return parent(a)()
   end
   z = parent(a)()
   z.prec = a.prec
-  @ccall libflint.fmpq_poly_sin_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, a.prec::Int)::Nothing
+  @ccall libflint.fmpq_poly_sin_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, precision(a)::Int)::Nothing
   return z
 end
 
 function sinh(a::QQAbsPowerSeriesRingElem)
   !iszero(coeff(a, 0)) && error("Constant term not zero in sinh")
-  if iszero(a) || a.prec < 2
+  if iszero(a) || precision(a) < 2
     return parent(a)()
   end
   z = parent(a)()
   z.prec = a.prec
-  @ccall libflint.fmpq_poly_sinh_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, a.prec::Int)::Nothing
+  @ccall libflint.fmpq_poly_sinh_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, precision(a)::Int)::Nothing
   return z
 end
 
 function cos(a::QQAbsPowerSeriesRingElem)
   !iszero(coeff(a, 0)) && error("Constant term not zero in cos")
-  if length(a) == 0 || a.prec == 1
+  if length(a) == 0 || precision(a) == 1
     return one(parent(a))
   end
   z = parent(a)()
   z.prec = a.prec
-  @ccall libflint.fmpq_poly_cos_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, a.prec::Int)::Nothing
+  @ccall libflint.fmpq_poly_cos_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, precision(a)::Int)::Nothing
   return z
 end
 
 function cosh(a::QQAbsPowerSeriesRingElem)
   !iszero(coeff(a, 0)) && error("Constant term not zero in cosh")
-  if length(a) == 0 || a.prec == 1
+  if length(a) == 0 || precision(a) == 1
     return one(parent(a))
   end
   z = parent(a)()
   z.prec = a.prec
-  @ccall libflint.fmpq_poly_cosh_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, a.prec::Int)::Nothing
+  @ccall libflint.fmpq_poly_cosh_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, precision(a)::Int)::Nothing
   return z
 end
 
 function asin(a::QQAbsPowerSeriesRingElem)
   !iszero(coeff(a, 0)) && error("Constant term not zero in asin")
-  if iszero(a) || a.prec < 2
+  if iszero(a) || precision(a) < 2
     return parent(a)()
   end
   z = parent(a)()
   z.prec = a.prec
-  @ccall libflint.fmpq_poly_asin_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, a.prec::Int)::Nothing
+  @ccall libflint.fmpq_poly_asin_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, precision(a)::Int)::Nothing
   return z
 end
 
 function asinh(a::QQAbsPowerSeriesRingElem)
   !iszero(coeff(a, 0)) && error("Constant term not zero in asinh")
-  if iszero(a) || a.prec < 2
+  if iszero(a) || precision(a) < 2
     return parent(a)()
   end
   z = parent(a)()
   z.prec = a.prec
-  @ccall libflint.fmpq_poly_asinh_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, a.prec::Int)::Nothing
+  @ccall libflint.fmpq_poly_asinh_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, precision(a)::Int)::Nothing
   return z
 end
 
 function atan(a::QQAbsPowerSeriesRingElem)
   !iszero(coeff(a, 0)) && error("Constant term not zero in atan")
-  if iszero(a) || a.prec < 2
+  if iszero(a) || precision(a) < 2
     return parent(a)()
   end
   z = parent(a)()
   z.prec = a.prec
-  @ccall libflint.fmpq_poly_atan_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, a.prec::Int)::Nothing
+  @ccall libflint.fmpq_poly_atan_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, precision(a)::Int)::Nothing
   return z
 end
 
 function atanh(a::QQAbsPowerSeriesRingElem)
   !iszero(coeff(a, 0)) && error("Constant term not zero in atanh")
-  if iszero(a) || a.prec < 2
+  if iszero(a) || precision(a) < 2
     return parent(a)()
   end
   z = parent(a)()
   z.prec = a.prec
-  @ccall libflint.fmpq_poly_atanh_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, a.prec::Int)::Nothing
+  @ccall libflint.fmpq_poly_atanh_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, precision(a)::Int)::Nothing
   return z
 end
 
 function Base.sqrt(a::QQAbsPowerSeriesRingElem; check::Bool=true)
   v = valuation(a)
   z = parent(a)()
-  z.prec = a.prec - div(v, 2)
+  z.prec = precision(a) - div(v, 2)
   if iszero(a)
     return z
   end
@@ -626,8 +626,8 @@ function Base.sqrt(a::QQAbsPowerSeriesRingElem; check::Bool=true)
   c = coeff(a, 0)
   s = sqrt(c; check=check)
   a = divexact(a, c)
-  z.prec = a.prec - div(v, 2)
-  @ccall libflint.fmpq_poly_sqrt_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, a.prec::Int)::Nothing
+  z.prec = precision(a) - div(v, 2)
+  @ccall libflint.fmpq_poly_sqrt_series(z::Ref{QQAbsPowerSeriesRingElem}, a::Ref{QQAbsPowerSeriesRingElem}, precision(a)::Int)::Nothing
   if !isone(s)
     z *= s
   end
@@ -645,13 +645,13 @@ end
 
 function zero!(z::QQAbsPowerSeriesRingElem)
   @ccall libflint.fmpq_poly_zero(z::Ref{QQAbsPowerSeriesRingElem})::Nothing
-  z.prec = parent(z).prec_max
+  z.prec = max_precision(parent(z))
   return z
 end
 
 function one!(z::QQAbsPowerSeriesRingElem)
   @ccall libflint.fmpq_poly_one(z::Ref{QQAbsPowerSeriesRingElem})::Nothing
-  z.prec = parent(z).prec_max
+  z.prec = max_precision(parent(z))
   return z
 end
 
@@ -672,7 +672,7 @@ function mul!(z::QQAbsPowerSeriesRingElem, a::QQAbsPowerSeriesRingElem, b::QQAbs
   aval = valuation(a)
   bval = valuation(b)
 
-  prec = min(a.prec + bval, b.prec + aval)
+  prec = min(precision(a) + bval, precision(b) + aval)
   prec = min(prec, max_precision(parent(a)))
 
   lena = min(lena, prec)
@@ -692,7 +692,7 @@ function add!(c::QQAbsPowerSeriesRingElem, a::QQAbsPowerSeriesRingElem, b::QQAbs
   lena = length(a)
   lenb = length(b)
 
-  prec = min(a.prec, b.prec)
+  prec = min(precision(a), precision(b))
 
   lena = min(lena, prec)
   lenb = min(lenb, prec)
@@ -730,7 +730,7 @@ promote_rule(::Type{QQAbsPowerSeriesRingElem}, ::Type{QQFieldElem}) = QQAbsPower
 
 function (a::QQAbsPowerSeriesRing)()
   z = QQAbsPowerSeriesRingElem()
-  z.prec = a.prec_max
+  z.prec = max_precision(a)
   z.parent = a
   return z
 end
@@ -738,9 +738,9 @@ end
 function (a::QQAbsPowerSeriesRing)(b::Integer)
   if b == 0
     z = QQAbsPowerSeriesRingElem()
-    z.prec = a.prec_max
+    z.prec = max_precision(a)
   else
-    z = QQAbsPowerSeriesRingElem([QQFieldElem(b)], 1, a.prec_max)
+    z = QQAbsPowerSeriesRingElem([QQFieldElem(b)], 1, max_precision(a))
   end
   z.parent = a
   return z
@@ -749,9 +749,9 @@ end
 function (a::QQAbsPowerSeriesRing)(b::ZZRingElem)
   if iszero(b)
     z = QQAbsPowerSeriesRingElem()
-    z.prec = a.prec_max
+    z.prec = max_precision(a)
   else
-    z = QQAbsPowerSeriesRingElem([QQFieldElem(b)], 1, a.prec_max)
+    z = QQAbsPowerSeriesRingElem([QQFieldElem(b)], 1, max_precision(a))
   end
   z.parent = a
   return z
@@ -760,9 +760,9 @@ end
 function (a::QQAbsPowerSeriesRing)(b::QQFieldElem)
   if iszero(b)
     z = QQAbsPowerSeriesRingElem()
-    z.prec = a.prec_max
+    z.prec = max_precision(a)
   else
-    z = QQAbsPowerSeriesRingElem([b], 1, a.prec_max)
+    z = QQAbsPowerSeriesRingElem([b], 1, max_precision(a))
   end
   z.parent = a
   return z

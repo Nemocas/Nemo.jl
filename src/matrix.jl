@@ -1,6 +1,46 @@
-# Types of all FLINT-backed matrices
-const _FieldMatTypes = Union{QQMatrix, fpMatrix, FpMatrix, FqMatrix, fqPolyRepMatrix, FqPolyRepMatrix}
-const _MatTypes = Union{_FieldMatTypes, ZZMatrix, zzModMatrix, ZZModMatrix}
+################################################################################
+#
+#  Access through `Ref` and `Ptr`
+#
+################################################################################
+
+# A `Ptr` to a FlintMatElem may point to a bare C struct, so single fields are
+# loaded through it, not the Julia object. Asserting the type of `a[]` keeps
+# inference concrete for an abstract `Ref{T}`.
+
+# field `name` of the C struct at `p`, a pointer to a `T` or to its C part alone
+@inline function _unsafe_load_field(p::Ptr{T}, ::Val{name}) where {T, name}
+  i = Base.fieldindex(T, name)
+  return unsafe_load(Ptr{fieldtype(T, i)}(p + fieldoffset(T, i)))
+end
+
+number_of_rows(a::FlintMatElem) = a.r
+number_of_rows(a::Ref{T}) where {T <: FlintMatElem} = number_of_rows(a[]::T)
+number_of_rows(a::Ptr{<:FlintMatElem}) = _unsafe_load_field(a, Val(:r))
+
+number_of_columns(a::FlintMatElem) = a.c
+number_of_columns(a::Ref{T}) where {T <: FlintMatElem} = number_of_columns(a[]::T)
+number_of_columns(a::Ptr{<:FlintMatElem}) = _unsafe_load_field(a, Val(:c))
+
+is_square(a::Ref{<:FlintMatElem}) = nrows(a) == ncols(a)
+
+_entries(a::FlintMatElem) = a.entries
+_entries(a::Ref{T}) where {T <: FlintMatElem} = _entries(a[]::T)
+_entries(a::Ptr{<:FlintMatElem}) = _unsafe_load_field(a, Val(:entries))
+
+_stride(a::FlintMatElem) = a.stride
+_stride(a::Ref{T}) where {T <: FlintMatElem} = _stride(a[]::T)
+_stride(a::Ptr{<:FlintMatElem}) = _unsafe_load_field(a, Val(:stride))
+
+# `_entry_size(T)` is the size of the C struct of one entry, which is smaller
+# than the Julia element type if that has fields of its own, such as a parent.
+# For FqMatrix it depends on the base ring, so there is none: FqMatrix has a
+# method of its own and no entry pointers through a `Ref` or `Ptr`.
+function mat_entry_ptr(A::TypeOrPtr{T}, i::Int, j::Int) where {T <: FlintMatElem}
+  return _entries(A) + ((i - 1) * _stride(A) + (j - 1)) * _entry_size(T)
+end
+
+_entry_size(::TypeOrPtr{T}) where {T <: FlintMatElem} = _entry_size(T)
 
 ################################################################################
 #
@@ -8,15 +48,77 @@ const _MatTypes = Union{_FieldMatTypes, ZZMatrix, zzModMatrix, ZZModMatrix}
 #
 ################################################################################
 
-function Base.view(x::_MatTypes, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
+function _checkrange_or_empty(l::Int, start::Int, stop::Int)
+  (stop < start) ||
+  (_checkbounds(l, start) &&
+   _checkbounds(l, stop))
+end
+
+# `_set_ring!(z, x)` gives the window `z` the ring of `x`: the base ring and,
+# where the FLINT struct has words after `stride` (nmod_mat keeps its modulus
+# there), those words.
+
+# These types store no ring: `base_ring` depends on the type alone.
+_set_ring!(z::T, x::T) where {T <: Union{ZZMatrix, QQMatrix, RealMatrix, ComplexMatrix}} = z
+
+_set_ring!(z::T, x::T) where {T <: FlintMatElem} = (z.base_ring = x.base_ring; z)
+
+for T in [zzModMatrix, fpMatrix]
+  @eval function _set_ring!(z::$T, x::$T)
+    z.n = x.n
+    z.ninv = x.ninv
+    z.norm = x.norm
+    z.base_ring = x.base_ring
+    return z
+  end
+end
+
+function _set_ring!(z::FqMatrix, x::FqMatrix)
+  z.opaque = x.opaque
+  z.base_ring = x.base_ring
+  return z
+end
+
+# A window of `x` is an object of the same Julia type as `x`. Its FLINT struct
+# consists of the pointer to its top left entry in `x`, its size and the stride
+# of `x`; it owns no memory. FLINT's `*_mat_window_clear` are left over from
+# FLINT < 3.3, where a window owned an array of row pointers, and are empty.
+# So a window needs no finalizer; `view_parent` keeps the entries alive.
+function _view_window(x::T, r1::Int, c1::Int, r2::Int, c2::Int) where {T <: FlintMatElem}
+  _checkrange_or_empty(nrows(x), r1, r2) ||
+  Base.throw_boundserror(x, (r1:r2, c1:c2))
+
+  _checkrange_or_empty(ncols(x), c1, c2) ||
+  Base.throw_boundserror(x, (r1:r2, c1:c2))
+
+  if r1 > r2
+    r1 = 1
+    r2 = 0
+  end
+  if c1 > c2
+    c1 = 1
+    c2 = 0
+  end
+
+  z = T()
+  z.entries = mat_entry_ptr(x, r1, c1)
+  z.r = r2 - r1 + 1
+  z.c = c2 - c1 + 1
+  z.stride = x.stride
+  _set_ring!(z, x)
+  z.view_parent = x
+  return z
+end
+
+function Base.view(x::FlintMatElem, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
   return _view_window(x, first(r), first(c), last(r), last(c))
 end
 
-function sub(x::_MatTypes, r1::Int, c1::Int, r2::Int, c2::Int)
+function sub(x::FlintMatElem, r1::Int, c1::Int, r2::Int, c2::Int)
   return deepcopy(view(x, r1:r2, c1:c2))
 end
 
-function sub(x::_MatTypes, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
+function sub(x::FlintMatElem, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int})
   return deepcopy(view(x, r, c))
 end
 
@@ -44,7 +146,7 @@ for T in [ZZMatrix, QQMatrix]
 end
 
 # make x[r, c] sugar for sub(x, r, c)
-getindex(x::_MatTypes, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) = sub(x, r, c)
+getindex(x::FlintMatElem, r::AbstractUnitRange{Int}, c::AbstractUnitRange{Int}) = sub(x, r, c)
 
 ################################################################################
 #
@@ -61,18 +163,16 @@ Base.length(V::MatrixView) = length(V.A)
 
 Base.getindex(V::MatrixView, i::Int) = V.A[i]
 
-Base.setindex!(V::MatrixView, z::ZZRingElem, i::Int) = (V.A[i] = z)
-
-Base.setindex!(V::MatrixView, z, i::Int) = setindex!(V, ZZ(z), i)
+Base.setindex!(V::MatrixView, z, i::Int) = (V.A[i] = z)
 
 Base.size(V::MatrixView) = (length(V.A), )
 
-function Base.view(x::_MatTypes, r::Int, c::Union{Colon, AbstractUnitRange{Int}})
+function Base.view(x::FlintMatElem, r::Int, c::Union{Colon, AbstractUnitRange{Int}})
   A = view(x, r:r, c)
   return MatrixView{typeof(x), elem_type(base_ring(x))}(A)
 end
 
-function Base.view(x::_MatTypes, r::Union{Colon, AbstractUnitRange{Int}}, c::Int)
+function Base.view(x::FlintMatElem, r::Union{Colon, AbstractUnitRange{Int}}, c::Int)
   A = view(x, r, c:c)
   return MatrixView{typeof(x), elem_type(base_ring(x))}(A)
 end
@@ -108,13 +208,26 @@ end
 
 ################################################################################
 #
+#  Transpose
+#
+################################################################################
+
+# Each type implements `transpose!(z, a)`; AbstractAlgebra's fallbacks build
+# `transpose` and `transpose!(a)` on it, but take a `MatElem` only.
+function transpose!(a::Union{Ref{T}, Ptr{T}}) where {T <: FlintMatElem}
+  is_square(a) || throw(DomainError(a, "Argument must be a square matrix"))
+  return transpose!(a, a)
+end
+
+################################################################################
+#
 #  (No) lazy transpose
 #
 ################################################################################
 
 # Producing a LazyTransposedMatElem from a flint matrix should always be
 # unintended because the resulting matrix will use generic code and not flint
-Solve.lazy_transpose(A::_MatTypes) = transpose(A)
+Solve.lazy_transpose(A::FlintMatElem) = transpose(A)
 
 ################################################################################
 #
@@ -410,8 +523,11 @@ end
 #
 ###############################################################################
 
-# Unfortunately, there is no fmpq_mat_set_perm etc. in flint
-function *(P::Perm, x::_FieldMatTypes)
+# Unfortunately, there is no fmpq_mat_set_perm etc. in flint.
+# The loops run without bounds checks, which is only safe if the degree of `P`
+# is the number of rows or columns it permutes.
+function *(P::Perm, x::FlintMatElem)
+  length(P.d) == nrows(x) || throw(DimensionMismatch("permutation of degree $(length(P.d)) cannot act on $(nrows(x)) rows"))
   z = similar(x)
   t = base_ring(x)()
   @inbounds for i = 1:nrows(x)
@@ -422,7 +538,8 @@ function *(P::Perm, x::_FieldMatTypes)
   return z
 end
 
-function *(x::_FieldMatTypes, P::Perm)
+function *(x::FlintMatElem, P::Perm)
+  length(P.d) == ncols(x) || throw(DimensionMismatch("permutation of degree $(length(P.d)) cannot act on $(ncols(x)) columns"))
   z = similar(x)
   t = base_ring(x)()
   @inbounds for i = 1:nrows(x)

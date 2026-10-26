@@ -20,6 +20,9 @@ is_zero_initialized(::Type{zzModMatrix}) = true
 #
 ################################################################################
 
+# v.data is immutable so we can't do anything in-place
+getindex!(v::zzModRingElem, a::zzModMatrix, i::Int, j::Int) = getindex(a, i, j)
+
 @inline function getindex(a::zzModMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   u = getindex_raw(a, i, j)
@@ -86,10 +89,6 @@ function deepcopy_internal(a::zzModMatrix, dict::IdDict)
   return z
 end
 
-number_of_rows(a::T) where T <: Zmodn_mat = a.r
-
-number_of_columns(a::T) where T <: Zmodn_mat = a.c
-
 base_ring(a::T) where T <: Zmodn_mat = a.base_ring
 
 function one(a::zzModMatrixSpace)
@@ -113,7 +112,7 @@ end
 #
 ################################################################################
 
-==(a::T, b::T) where T <: Zmodn_mat = (a.base_ring == b.base_ring) &&
+==(a::T, b::T) where T <: Zmodn_mat = (base_ring(a) == base_ring(b)) &&
 Bool(@ccall libflint.nmod_mat_equal(a::Ref{T}, b::Ref{T})::Cint)
 
 isequal(a::T, b::T) where T <: Zmodn_mat = ==(a, b)
@@ -123,16 +122,6 @@ isequal(a::T, b::T) where T <: Zmodn_mat = ==(a, b)
 #  Transpose
 #
 ################################################################################
-
-function transpose(a::T) where T <: Zmodn_mat
-  z = similar(a, ncols(a), nrows(a))
-  return transpose!(z, a)
-end
-
-function transpose!(a::T) where T <: Zmodn_mat
-  check_square(a)
-  return transpose!(a, a)
-end
 
 function transpose!(z::T, a::T) where T <: Zmodn_mat
   @ccall libflint.nmod_mat_transpose(z::Ref{T}, a::Ref{T})::Nothing
@@ -577,48 +566,13 @@ end
 
 ################################################################################
 #
-#  Windowing
-#
-################################################################################
-
-function _view_window(x::zzModMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
-
-  _checkrange_or_empty(nrows(x), r1, r2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  _checkrange_or_empty(ncols(x), c1, c2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  if (r1 > r2)
-    r1 = 1
-    r2 = 0
-  end
-  if (c1 > c2)
-    c1 = 1
-    c2 = 0
-  end
-
-  z = zzModMatrix()
-  z.base_ring = x.base_ring
-  z.view_parent = x
-  @ccall libflint.nmod_mat_window_init(z::Ref{zzModMatrix}, x::Ref{zzModMatrix}, (r1 - 1)::Int, (c1 - 1)::Int, r2::Int, c2::Int)::Nothing
-  finalizer(_nmod_mat_window_clear_fn, z)
-  return z
-end
-
-function _nmod_mat_window_clear_fn(a::zzModMatrix)
-  @ccall libflint.nmod_mat_window_clear(a::Ref{zzModMatrix})::Nothing
-end
-
-################################################################################
-#
 #  Concatenation
 #
 ################################################################################
 
 function hcat(x::T, y::T) where T <: Zmodn_mat
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
-  (x.r != y.r) && error("Matrices must have same number of rows")
+  (nrows(x) != nrows(y)) && error("Matrices must have same number of rows")
   z = similar(x, nrows(x), ncols(x) + ncols(y))
   @ccall libflint.nmod_mat_concat_horizontal(z::Ref{T}, x::Ref{T}, y::Ref{T})::Nothing
   return z
@@ -626,7 +580,7 @@ end
 
 function vcat(x::T, y::T) where T <: Zmodn_mat
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
-  (x.c != y.c) && error("Matrices must have same number of columns")
+  (ncols(x) != ncols(y)) && error("Matrices must have same number of columns")
   z = similar(x, nrows(x) + nrows(y), ncols(x))
   @ccall libflint.nmod_mat_concat_vertical(z::Ref{T}, x::Ref{T}, y::Ref{T})::Nothing
   return z
@@ -719,7 +673,7 @@ function (a::zzModMatrixSpace)(arr::AbstractVecOrMat{zzModRingElem})
 end
 
 function (a::zzModMatrixSpace)(b::ZZMatrix)
-  (ncols(a) != b.c || nrows(a) != b.r) && error("Dimensions do not fit")
+  (ncols(a) != ncols(b) || nrows(a) != nrows(b)) && error("Dimensions do not fit")
   z = zzModMatrix(modulus(base_ring(a)), b)
   z.base_ring = a.base_ring
   return z
@@ -776,4 +730,4 @@ end
 #
 ################################################################################
 
-mat_entry_ptr(A::Zmodn_mat, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * sizeof(UInt)
+_entry_size(::Type{<:Zmodn_mat}) = sizeof(UInt)

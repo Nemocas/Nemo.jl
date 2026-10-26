@@ -50,6 +50,18 @@ end
   @test g == 0
 end
 
+@testset "ZZRingElem.constructors.inference" begin
+  # the caller knows only that the argument is an Integer
+  apply(f, r::Ref{Integer}) = f(r[])
+
+  for x in (3, UInt(3), big(3), Int8(3), true)
+    r = Ref{Integer}(x)
+    @test (@inferred apply(ZZRingElem, r)) == x
+    @test (@inferred apply(ZZ, r)) == x
+    @test (@inferred apply(Base.Fix1(convert, ZZRingElem), r)) == x
+  end
+end
+
 @testset "ZZRingElem.rand" begin
   test_rand(ZZ, 1:9)
   test_rand(ZZ, Int16(1):Int16(9))

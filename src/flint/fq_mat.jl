@@ -69,10 +69,6 @@ function deepcopy_internal(a::FqPolyRepMatrix, dict::IdDict)
   return z
 end
 
-number_of_rows(a::FqPolyRepMatrix) = a.r
-
-number_of_columns(a::FqPolyRepMatrix) = a.c
-
 base_ring(a::FqPolyRepMatrix) = a.base_ring
 
 function one(a::FqPolyRepMatrixSpace)
@@ -100,7 +96,7 @@ end
 ################################################################################
 
 function ==(a::FqPolyRepMatrix, b::FqPolyRepMatrix)
-  if !(a.base_ring == b.base_ring)
+  if !(base_ring(a) == base_ring(b))
     return false
   end
   r = @ccall libflint.fq_mat_equal(a::Ref{FqPolyRepMatrix}, b::Ref{FqPolyRepMatrix}, base_ring(a)::Ref{FqPolyRepField})::Cint
@@ -114,16 +110,6 @@ isequal(a::FqPolyRepMatrix, b::FqPolyRepMatrix) = ==(a, b)
 #  Transpose
 #
 ################################################################################
-
-function transpose(a::FqPolyRepMatrix)
-  z = similar(a, ncols(a), nrows(a))
-  return transpose!(z, a)
-end
-
-function transpose!(a::FqPolyRepMatrix)
-  check_square(a)
-  return transpose!(a, a)
-end
 
 function transpose!(z::FqPolyRepMatrix, a::FqPolyRepMatrix)
   @ccall libflint.fq_mat_transpose(z::Ref{FqPolyRepMatrix}, a::Ref{FqPolyRepMatrix}, base_ring(a)::Ref{FqPolyRepField})::Nothing
@@ -366,8 +352,7 @@ end
 #
 ################################################################################
 
-Solve.matrix_normal_form_type(::FqPolyRepField) = Solve.LUTrait()
-Solve.matrix_normal_form_type(::FqPolyRepMatrix) = Solve.LUTrait()
+Solve.matrix_normal_form_type(::Type{FqPolyRepField}) = Solve.LUTrait()
 
 function Solve._can_solve_internal_no_check(::Solve.LUTrait, A::FqPolyRepMatrix, b::FqPolyRepMatrix, task::Symbol; side::Symbol = :left)
   if side === :left
@@ -440,48 +425,13 @@ end
 
 ################################################################################
 #
-#  Windowing
-#
-################################################################################
-
-function _view_window(x::FqPolyRepMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
-
-  _checkrange_or_empty(nrows(x), r1, r2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  _checkrange_or_empty(ncols(x), c1, c2) ||
-  Base.throw_boundserror(x, (r1:r2, c1:c2))
-
-  if (r1 > r2)
-    r1 = 1
-    r2 = 0
-  end
-  if (c1 > c2)
-    c1 = 1
-    c2 = 0
-  end
-
-  z = FqPolyRepMatrix()
-  z.base_ring = x.base_ring
-  z.view_parent = x
-  @ccall libflint.fq_mat_window_init(z::Ref{FqPolyRepMatrix}, x::Ref{FqPolyRepMatrix}, (r1 - 1)::Int, (c1 - 1)::Int, r2::Int, c2::Int, base_ring(x)::Ref{FqPolyRepField})::Nothing
-  finalizer(_fq_mat_window_clear_fn, z)
-  return z
-end
-
-function _fq_mat_window_clear_fn(a::FqPolyRepMatrix)
-  @ccall libflint.fq_mat_window_clear(a::Ref{FqPolyRepMatrix}, base_ring(a)::Ref{FqPolyRepField})::Nothing
-end
-
-################################################################################
-#
 #  Concatenation
 #
 ################################################################################
 
 function hcat(x::FqPolyRepMatrix, y::FqPolyRepMatrix)
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
-  (x.r != y.r) && error("Matrices must have same number of rows")
+  (nrows(x) != nrows(y)) && error("Matrices must have same number of rows")
   z = similar(x, nrows(x), ncols(x) + ncols(y))
   @ccall libflint.fq_mat_concat_horizontal(z::Ref{FqPolyRepMatrix}, x::Ref{FqPolyRepMatrix}, y::Ref{FqPolyRepMatrix}, base_ring(x)::Ref{FqPolyRepField})::Nothing
   return z
@@ -489,7 +439,7 @@ end
 
 function vcat(x::FqPolyRepMatrix, y::FqPolyRepMatrix)
   (base_ring(x) != base_ring(y)) && error("Matrices must have same base ring")
-  (x.c != y.c) && error("Matrices must have same number of columns")
+  (ncols(x) != ncols(y)) && error("Matrices must have same number of columns")
   z = similar(x, nrows(x) + nrows(y), ncols(x))
   @ccall libflint.fq_mat_concat_vertical(z::Ref{FqPolyRepMatrix}, x::Ref{FqPolyRepMatrix}, y::Ref{FqPolyRepMatrix}, base_ring(x)::Ref{FqPolyRepField})::Nothing
   return z
@@ -584,7 +534,7 @@ function (a::FqPolyRepMatrixSpace)(arr::AbstractVector{FqPolyRepFieldElem})
 end
 
 function (a::FqPolyRepMatrixSpace)(b::ZZMatrix)
-  (ncols(a) != b.c || nrows(a) != b.r) && error("Dimensions do not fit")
+  (ncols(a) != ncols(b) || nrows(a) != nrows(b)) && error("Dimensions do not fit")
   return FqPolyRepMatrix(b, base_ring(a))
 end
 
@@ -630,4 +580,4 @@ end
 #   length :: Int
 # The `parent` member of struct FqPolyRepFieldElem is not replicated in each
 # struct member, so we cannot use `sizeof(FqPolyRepFieldElem)`.
-mat_entry_ptr(A::FqPolyRepMatrix, i::Int, j::Int) = A.entries + ((i - 1) * A.stride + (j - 1)) * (sizeof(Ptr) + 2 * sizeof(Int))
+_entry_size(::Type{FqPolyRepMatrix}) = sizeof(Ptr) + 2 * sizeof(Int)

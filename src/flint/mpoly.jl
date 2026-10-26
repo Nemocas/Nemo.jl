@@ -80,14 +80,14 @@ end
 
 function _hash_mpoly_coeffs(a::Union{ZZMPolyRingElem, FpMPolyRingElem}, h::UInt)
   GC.@preserve a begin
-    h = _hash_integer_array(convert(Ptr{Int}, a.coeffs), a.length, h)
+    h = _hash_integer_array(convert(Ptr{Int}, a.coeffs), length(a), h)
     return h
   end
 end
 
 function _hash_mpoly_coeffs(a::QQMPolyRingElem, h::UInt)
   GC.@preserve a begin
-    h = _hash_integer_array(convert(Ptr{Int}, a.coeffs), a.length, h)
+    h = _hash_integer_array(convert(Ptr{Int}, a.coeffs), length(a), h)
     h = _hash_integer(a.content_num, h)
     h = _hash_integer(a.content_den, h)
     return h
@@ -96,7 +96,7 @@ end
 
 function _hash_mpoly_coeffs(a::fpMPolyRingElem, h::UInt)
   GC.@preserve a begin
-    h = _hash_ui_array(convert(Ptr{UInt}, a.coeffs), a.length, h)
+    h = _hash_ui_array(convert(Ptr{UInt}, a.coeffs), length(a), h)
     return h
   end
 end
@@ -105,7 +105,7 @@ function _hash_mpoly_coeffs(a::fqPolyRepMPolyRingElem, h::UInt)
   GC.@preserve a begin
     d = degree(base_ring(a))
     h = hash(d, h)
-    h = _hash_ui_array(convert(Ptr{UInt}, a.coeffs), d*a.length, h)
+    h = _hash_ui_array(convert(Ptr{UInt}, a.coeffs), d*length(a), h)
     return h
   end
 end

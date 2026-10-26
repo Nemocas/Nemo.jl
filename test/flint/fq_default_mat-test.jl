@@ -257,6 +257,17 @@ end
   @test a[2,2] == F4(4)
   @test_throws BoundsError a[-2,2] = F4(4)
 
+  u = F4(3)
+  GC.@preserve u b begin
+    @test b[1,1] == u
+    for uu in (Ref(u), Ptr{FqFieldElem}(pointer_from_objref(u)), Nemo.mat_entry_ptr(b, 1, 1))
+      a[2,2] = F4(4)
+      a[2,2] = uu
+      @test a[2,2] == u
+      @test_throws BoundsError a[-2,2] = uu
+    end
+  end
+
   a[1,2] = 5
 
   @test a[1,2] == F4(5)
@@ -598,7 +609,9 @@ end
   a = R([ 1 2 3 ; 3 2 1 ; 0 0 2 ])
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(F17) === AbstractAlgebra.Solve.LUTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(F17)) === AbstractAlgebra.Solve.LUTrait()
   @test AbstractAlgebra.Solve.matrix_normal_form_type(a) === AbstractAlgebra.Solve.LUTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(a)) === AbstractAlgebra.Solve.LUTrait()
 
   b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
 
@@ -689,7 +702,9 @@ end
   A = matrix(F, [1 2 3 4 5; 0 0 8 9 10; 0 0 0 14 15])
   C = solve_init(A)
   @test C isa AbstractAlgebra.solve_context_type(F)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(F))
   @test C isa AbstractAlgebra.solve_context_type(A)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.LUTrait()
   @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), FqFieldElem)

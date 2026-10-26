@@ -178,6 +178,22 @@ end
   C = transpose(A)*A
 
   @test overlaps(transpose(C), C)
+
+  E = matrix(RR, [1 2 3; 4 5 6])
+  Z = similar(E, 3, 2)
+  @test transpose!(Z, E) === Z
+  @test Z == matrix(RR, [1 4; 2 5; 3 6])
+
+  D = matrix(RR, [1 2; 3 4])
+  GC.@preserve D E begin
+    for (d, e) in ((D, E), (Ref(D), Ref(E)),
+                   (Ptr{RealMatrix}(pointer_from_objref(D)), Ptr{RealMatrix}(pointer_from_objref(E))))
+      @test transpose!(d) === d
+      @test D == matrix(RR, [1 3; 2 4])
+      transpose!(D)
+      @test_throws DomainError transpose!(e)
+    end
+  end
 end
 
 @testset "RealMatrix.binary_ops" begin
@@ -428,7 +444,9 @@ end
          "8.0 +/- 0.01" "8.0 +/- 0.01" "9.0 +/- 0.01"])
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(RR) === AbstractAlgebra.Solve.LUTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(RR)) === AbstractAlgebra.Solve.LUTrait()
   @test AbstractAlgebra.Solve.matrix_normal_form_type(A) === AbstractAlgebra.Solve.LUTrait()
+  @test AbstractAlgebra.Solve.matrix_normal_form_type(typeof(A)) === AbstractAlgebra.Solve.LUTrait()
 
   b = transpose(RR["6.0 +/- 0.1" "15.0 +/- 0.1" "25.0 +/- 0.1"])
   b2 = 2*b
@@ -451,7 +469,9 @@ end
 
   C = solve_init(A)
   @test C isa AbstractAlgebra.solve_context_type(RR)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(RR))
   @test C isa AbstractAlgebra.solve_context_type(A)
+  @test C isa AbstractAlgebra.solve_context_type(typeof(A))
 
   @test AbstractAlgebra.Solve.matrix_normal_form_type(C) === AbstractAlgebra.Solve.LUTrait()
   @test C isa AbstractAlgebra.solve_context_type(AbstractAlgebra.Solve.LUTrait(), elem_type(RR))
@@ -514,4 +534,27 @@ end
 
   A = zero_matrix(RR, 0, 0)
   @test contains_zero(norm(A))
+end
+
+@testset "RealMatrix.rounding" begin
+  A = RR[2.2 3.1 5.4; 1.5 4.7 7.2]
+  B = zero_matrix(ZZ, 2, 3)
+  round!(B, A)
+  @test B == ZZ[2 3 5; 2 5 7]
+
+  @test round(ZZRingElem, RR(-2.7)) == -3
+  @test round(ZZRingElem, RR(ZZ(2)^60 + 1)) == ZZ(2)^60 + 1
+  @test_throws InexactError round(ZZRingElem, RR("1 +/- 0.3"))
+
+  # a midpoint may carry more bits than the current precision
+  x = set_precision!(Balls, 1024) do
+    RR(ZZ(2)^300 + 1)
+  end
+  @test round(ZZRingElem, x) == ZZ(2)^300 + 1
+
+  @test round(ZZRingElem, RR(2.5)) == 2
+  @test round(ZZRingElem, RR(3.5)) == 4
+  @test round(ZZRingElem, RR(-2.5)) == -2
+  @test_throws InexactError round(ZZRingElem, RR("inf"))
+  @test_throws InexactError round(ZZRingElem, RR("nan"))
 end

@@ -130,14 +130,14 @@ end
 function real(x::AcbFieldElem)
   z = ArbFieldElem()
   @ccall libflint.acb_get_real(z::Ref{ArbFieldElem}, x::Ref{AcbFieldElem})::Nothing
-  z.parent = ArbField(parent(x).prec)
+  z.parent = ArbField(precision(parent(x)))
   return z
 end
 
 function imag(x::AcbFieldElem)
   z = ArbFieldElem()
   @ccall libflint.acb_get_imag(z::Ref{ArbFieldElem}, x::Ref{AcbFieldElem})::Nothing
-  z.parent = ArbField(parent(x).prec)
+  z.parent = ArbField(precision(parent(x)))
   return z
 end
 
@@ -193,14 +193,8 @@ end
 #
 ################################################################################
 
-for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (://, "acb_div"), (:-,"acb_sub"), (:^,"acb_pow"))
-  @eval begin
-    function ($s)(x::AcbFieldElem, y::AcbFieldElem)
-      z = parent(x)()
-      @ccall libflint.$f(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
-      return z
-    end
-  end
+for (f, s) in ((:+, :add!), (:-, :sub!), (:*, :mul!), (://, :div!), (:^, :pow!))
+  @eval ($f)(x::AcbFieldElem, y::AcbFieldElem) = $s(parent(x)(), x, y)
 end
 
 for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
@@ -208,25 +202,25 @@ for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
 
     function ($f)(x::AcbFieldElem, y::UInt)
       z = parent(x)()
-      @ccall libflint.$("acb_$(s)_ui")(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::UInt, parent(x).prec::Int)::Nothing
+      @ccall libflint.$("acb_$(s)_ui")(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::UInt, precision(parent(x))::Int)::Nothing
       return z
     end
 
     function ($f)(x::AcbFieldElem, y::Int)
       z = parent(x)()
-      @ccall libflint.$("acb_$(s)_si")(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Int, parent(x).prec::Int)::Nothing
+      @ccall libflint.$("acb_$(s)_si")(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Int, precision(parent(x))::Int)::Nothing
       return z
     end
 
     function ($f)(x::AcbFieldElem, y::ZZRingElem)
       z = parent(x)()
-      @ccall libflint.$("acb_$(s)_fmpz")(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{ZZRingElem}, parent(x).prec::Int)::Nothing
+      @ccall libflint.$("acb_$(s)_fmpz")(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{ZZRingElem}, precision(parent(x))::Int)::Nothing
       return z
     end
 
     function ($f)(x::AcbFieldElem, y::ArbFieldElem)
       z = parent(x)()
-      @ccall libflint.$("acb_$(s)_arb")(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{ArbFieldElem}, parent(x).prec::Int)::Nothing
+      @ccall libflint.$("acb_$(s)_arb")(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{ArbFieldElem}, precision(parent(x))::Int)::Nothing
       return z
     end
   end
@@ -253,25 +247,25 @@ end
 
 function -(x::UInt, y::AcbFieldElem)
   z = parent(y)()
-  @ccall libflint.acb_sub_ui(z::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, x::UInt, parent(y).prec::Int)::Nothing
+  @ccall libflint.acb_sub_ui(z::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, x::UInt, precision(parent(y))::Int)::Nothing
   return neg!(z)
 end
 
 function -(x::Int, y::AcbFieldElem)
   z = parent(y)()
-  @ccall libflint.acb_sub_si(z::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, x::Int, parent(y).prec::Int)::Nothing
+  @ccall libflint.acb_sub_si(z::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, x::Int, precision(parent(y))::Int)::Nothing
   return neg!(z)
 end
 
 function -(x::ZZRingElem, y::AcbFieldElem)
   z = parent(y)()
-  @ccall libflint.acb_sub_fmpz(z::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, x::Ref{ZZRingElem}, parent(y).prec::Int)::Nothing
+  @ccall libflint.acb_sub_fmpz(z::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, x::Ref{ZZRingElem}, precision(parent(y))::Int)::Nothing
   return neg!(z)
 end
 
 function -(x::ArbFieldElem, y::AcbFieldElem)
   z = parent(y)()
-  @ccall libflint.acb_sub_arb(z::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, x::Ref{ArbFieldElem}, parent(y).prec::Int)::Nothing
+  @ccall libflint.acb_sub_arb(z::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, x::Ref{ArbFieldElem}, precision(parent(y))::Int)::Nothing
   return neg!(z)
 end
 
@@ -534,8 +528,8 @@ is_negative(x::AcbFieldElem) = isreal(x) && is_negative(real(x))
 
 function abs(x::AcbFieldElem)
   z = ArbFieldElem()
-  @ccall libflint.acb_abs(z::Ref{ArbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
-  z.parent = ArbField(parent(x).prec)
+  @ccall libflint.acb_abs(z::Ref{ArbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
+  z.parent = ArbField(precision(parent(x)))
   return z
 end
 
@@ -551,7 +545,7 @@ end
 
 function inv(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_inv(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_inv(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -627,8 +621,8 @@ end
 
 function angle(x::AcbFieldElem)
   z = ArbFieldElem()
-  @ccall libflint.acb_arg(z::Ref{ArbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
-  z.parent = ArbField(parent(x).prec)
+  @ccall libflint.acb_arg(z::Ref{ArbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
+  z.parent = ArbField(precision(parent(x)))
   return z
 end
 
@@ -659,7 +653,7 @@ end
 
 function Base.sqrt(x::AcbFieldElem; check::Bool=true)
   z = parent(x)()
-  @ccall libflint.acb_sqrt(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_sqrt(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -670,31 +664,31 @@ Return the reciprocal of the square root of $x$, i.e. $1/\sqrt{x}$.
 """
 function rsqrt(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_rsqrt(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_rsqrt(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function log(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_log(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_log(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function log1p(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_log1p(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_log1p(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function Base.exp(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_exp(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_exp(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function Base.expm1(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_expm1(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_expm1(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -705,7 +699,7 @@ Return the exponential of $\pi i x$.
 """
 function cispi(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_exp_pi_i(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_exp_pi_i(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -717,85 +711,85 @@ Return $\exp(2\pi i/k)$.
 function root_of_unity(C::AcbField, k::Int)
   k <= 0 && throw(ArgumentError("Order must be positive ($k)"))
   z = C()
-  @ccall libflint.acb_unit_root(z::Ref{AcbFieldElem}, k::UInt, C.prec::Int)::Nothing
+  @ccall libflint.acb_unit_root(z::Ref{AcbFieldElem}, k::UInt, precision(C)::Int)::Nothing
   return z
 end
 
 function sin(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_sin(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_sin(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function cos(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_cos(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_cos(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function tan(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_tan(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_tan(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function cot(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_cot(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_cot(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function sinpi(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_sin_pi(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_sin_pi(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function cospi(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_cos_pi(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_cos_pi(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function tanpi(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_tan_pi(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_tan_pi(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function cotpi(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_cot_pi(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_cot_pi(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function sinh(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_sinh(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_sinh(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function cosh(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_cosh(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_cosh(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function tanh(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_tanh(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_tanh(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function coth(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_coth(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_coth(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function atan(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_atan(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_atan(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -806,7 +800,7 @@ Return $\log\sin(\pi x)$, constructed without branch cuts off the real line.
 """
 function log_sinpi(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_log_sin_pi(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_log_sin_pi(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -817,7 +811,7 @@ Return the Gamma function evaluated at $x$.
 """
 function gamma(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_gamma(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_gamma(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -828,7 +822,7 @@ Return the reciprocal of the Gamma function evaluated at $x$.
 """
 function rgamma(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_rgamma(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_rgamma(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -839,7 +833,7 @@ Return the logarithm of the Gamma function evaluated at $x$.
 """
 function lgamma(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_lgamma(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_lgamma(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -851,7 +845,7 @@ i.e. $\psi(x)$.
 """
 function digamma(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_digamma(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_digamma(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -862,7 +856,7 @@ Return the Riemann zeta function evaluated at $x$.
 """
 function zeta(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_zeta(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_zeta(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -873,7 +867,7 @@ Return the Barnes $G$-function, evaluated at $x$.
 """
 function barnes_g(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_barnes_g(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_barnes_g(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -884,7 +878,7 @@ Return the logarithm of the Barnes $G$-function, evaluated at $x$.
 """
 function log_barnes_g(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_log_barnes_g(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_log_barnes_g(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -895,7 +889,7 @@ Return the arithmetic-geometric mean of $1$ and $x$.
 """
 function agm(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_agm1(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_agm1(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -906,7 +900,7 @@ Return the error function evaluated at $x$.
 """
 function erf(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_erf(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_erf(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -917,7 +911,7 @@ Return the imaginary error function evaluated at $x$.
 """
 function erfi(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_erfi(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_erfi(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -928,7 +922,7 @@ Return the complementary error function evaluated at $x$.
 """
 function erfc(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_erfc(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_erfc(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -939,7 +933,7 @@ Return the exponential integral evaluated at $x$.
 """
 function exp_integral_ei(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_ei(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_ei(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -950,7 +944,7 @@ Return the sine integral evaluated at $x$.
 """
 function sin_integral(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_si(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_si(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -961,7 +955,7 @@ Return the exponential cosine integral evaluated at $x$.
 """
 function cos_integral(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_ci(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_ci(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -972,7 +966,7 @@ Return the hyperbolic sine integral evaluated at $x$.
 """
 function sinh_integral(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_shi(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_shi(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -983,7 +977,7 @@ Return the hyperbolic cosine integral evaluated at $x$.
 """
 function cosh_integral(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_chi(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_chi(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -994,7 +988,7 @@ Return the Dedekind eta function $\eta(\tau)$ at $\tau = x$.
 """
 function dedekind_eta(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_modular_eta(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_modular_eta(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -1042,7 +1036,7 @@ Return the $j$-invariant $j(\tau)$ at $\tau = x$.
 """
 function j_invariant(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_modular_j(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_modular_j(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -1053,7 +1047,7 @@ Return the modular lambda function $\lambda(\tau)$ at $\tau = x$.
 """
 function modular_lambda(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_modular_lambda(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_modular_lambda(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -1064,7 +1058,7 @@ Return the modular delta function $\Delta(\tau)$ at $\tau = x$.
 """
 function modular_delta(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_modular_delta(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_modular_delta(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -1084,7 +1078,7 @@ function eisenstein_g(k::Int, x::AcbFieldElem)
 
   len = div(k, 2) - 1
   vec = acb_vec(len)
-  @ccall libflint.acb_modular_eisenstein(vec::Ptr{acb_struct}, x::Ref{AcbFieldElem}, len::Int, CC.prec::Int)::Nothing
+  @ccall libflint.acb_modular_eisenstein(vec::Ptr{acb_struct}, x::Ref{AcbFieldElem}, len::Int, precision(CC)::Int)::Nothing
   z = array(CC, vec, len)
   acb_vec_clear(vec, len)
   return z[end]
@@ -1097,7 +1091,7 @@ Return the complete elliptic integral $K(x)$.
 """
 function elliptic_k(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_modular_elliptic_k(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_modular_elliptic_k(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -1108,21 +1102,21 @@ Return the complete elliptic integral $E(x)$.
 """
 function elliptic_e(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_modular_elliptic_e(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_modular_elliptic_e(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
 function sincos(x::AcbFieldElem)
   s = parent(x)()
   c = parent(x)()
-  @ccall libflint.acb_sin_cos(s::Ref{AcbFieldElem}, c::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_sin_cos(s::Ref{AcbFieldElem}, c::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return (s, c)
 end
 
 function sincospi(x::AcbFieldElem)
   s = parent(x)()
   c = parent(x)()
-  @ccall libflint.acb_sin_cos_pi(s::Ref{AcbFieldElem}, c::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_sin_cos_pi(s::Ref{AcbFieldElem}, c::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return (s, c)
 end
 
@@ -1134,7 +1128,7 @@ Return a tuple $s, c$ consisting of the hyperbolic sine and cosine of $x$.
 function sinhcosh(x::AcbFieldElem)
   s = parent(x)()
   c = parent(x)()
-  @ccall libflint.acb_sinh_cosh(s::Ref{AcbFieldElem}, c::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_sinh_cosh(s::Ref{AcbFieldElem}, c::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return (s, c)
 end
 
@@ -1145,7 +1139,7 @@ Return the Hurwitz zeta function $\zeta(s,a)$.
 """
 function zeta(s::AcbFieldElem, a::AcbFieldElem)
   z = parent(s)()
-  @ccall libflint.acb_hurwitz_zeta(z::Ref{AcbFieldElem}, s::Ref{AcbFieldElem}, a::Ref{AcbFieldElem}, parent(s).prec::Int)::Nothing
+  @ccall libflint.acb_hurwitz_zeta(z::Ref{AcbFieldElem}, s::Ref{AcbFieldElem}, a::Ref{AcbFieldElem}, precision(parent(s))::Int)::Nothing
   return z
 end
 
@@ -1156,13 +1150,13 @@ Return the generalised polygamma function $\psi(s,z)$.
 """
 function polygamma(s::AcbFieldElem, a::AcbFieldElem)
   z = parent(s)()
-  @ccall libflint.acb_polygamma(z::Ref{AcbFieldElem}, s::Ref{AcbFieldElem}, a::Ref{AcbFieldElem}, parent(s).prec::Int)::Nothing
+  @ccall libflint.acb_polygamma(z::Ref{AcbFieldElem}, s::Ref{AcbFieldElem}, a::Ref{AcbFieldElem}, precision(parent(s))::Int)::Nothing
   return z
 end
 
 function rising_factorial(x::AcbFieldElem, n::UInt)
   z = parent(x)()
-  @ccall libflint.acb_rising_ui(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, n::UInt, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_rising_ui(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, n::UInt, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -1179,7 +1173,7 @@ end
 function rising_factorial2(x::AcbFieldElem, n::UInt)
   z = parent(x)()
   w = parent(x)()
-  @ccall libflint.acb_rising2_ui(z::Ref{AcbFieldElem}, w::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, n::UInt, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_rising2_ui(z::Ref{AcbFieldElem}, w::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, n::UInt, precision(parent(x))::Int)::Nothing
   return (z, w)
 end
 
@@ -1196,13 +1190,13 @@ end
 
 function polylog(s::AcbFieldElem, a::AcbFieldElem)
   z = parent(s)()
-  @ccall libflint.acb_polylog(z::Ref{AcbFieldElem}, s::Ref{AcbFieldElem}, a::Ref{AcbFieldElem}, parent(s).prec::Int)::Nothing
+  @ccall libflint.acb_polylog(z::Ref{AcbFieldElem}, s::Ref{AcbFieldElem}, a::Ref{AcbFieldElem}, precision(parent(s))::Int)::Nothing
   return z
 end
 
 function polylog(s::Int, a::AcbFieldElem)
   z = parent(a)()
-  @ccall libflint.acb_polylog_si(z::Ref{AcbFieldElem}, s::Int, a::Ref{AcbFieldElem}, parent(a).prec::Int)::Nothing
+  @ccall libflint.acb_polylog_si(z::Ref{AcbFieldElem}, s::Int, a::Ref{AcbFieldElem}, precision(parent(a))::Int)::Nothing
   return z
 end
 
@@ -1219,7 +1213,7 @@ Return the logarithmic integral, evaluated at $x$.
 """
 function log_integral(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_li(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, 0::Int, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_li(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, 0::Int, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -1230,7 +1224,7 @@ Return the offset logarithmic integral, evaluated at $x$.
 """
 function log_integral_offset(x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_li(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, 1::Int, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_li(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, 1::Int, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -1241,7 +1235,7 @@ Return the generalised exponential integral $E_s(x)$.
 """
 function exp_integral_e(s::AcbFieldElem, x::AcbFieldElem)
   z = parent(s)()
-  @ccall libflint.acb_hypgeom_expint(z::Ref{AcbFieldElem}, s::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(s).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_expint(z::Ref{AcbFieldElem}, s::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(s))::Int)::Nothing
   return z
 end
 
@@ -1252,7 +1246,7 @@ Return the upper incomplete gamma function $\Gamma(s,x)$.
 """
 function gamma(s::AcbFieldElem, x::AcbFieldElem)
   z = parent(s)()
-  @ccall libflint.acb_hypgeom_gamma_upper(z::Ref{AcbFieldElem}, s::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, 0::Int, parent(s).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_gamma_upper(z::Ref{AcbFieldElem}, s::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, 0::Int, precision(parent(s))::Int)::Nothing
   return z
 end
 
@@ -1264,7 +1258,7 @@ $\Gamma(s,x) / \Gamma(s)$.
 """
 function gamma_regularized(s::AcbFieldElem, x::AcbFieldElem)
   z = parent(s)()
-  @ccall libflint.acb_hypgeom_gamma_upper(z::Ref{AcbFieldElem}, s::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, 1::Int, parent(s).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_gamma_upper(z::Ref{AcbFieldElem}, s::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, 1::Int, precision(parent(s))::Int)::Nothing
   return z
 end
 
@@ -1275,7 +1269,7 @@ Return the lower incomplete gamma function $\gamma(s,x) / \Gamma(s)$.
 """
 function gamma_lower(s::AcbFieldElem, x::AcbFieldElem)
   z = parent(s)()
-  @ccall libflint.acb_hypgeom_gamma_lower(z::Ref{AcbFieldElem}, s::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, 0::Int, parent(s).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_gamma_lower(z::Ref{AcbFieldElem}, s::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, 0::Int, precision(parent(s))::Int)::Nothing
   return z
 end
 
@@ -1287,7 +1281,7 @@ $\gamma(s,x) / \Gamma(s)$.
 """
 function gamma_lower_regularized(s::AcbFieldElem, x::AcbFieldElem)
   z = parent(s)()
-  @ccall libflint.acb_hypgeom_gamma_lower(z::Ref{AcbFieldElem}, s::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, 1::Int, parent(s).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_gamma_lower(z::Ref{AcbFieldElem}, s::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, 1::Int, precision(parent(s))::Int)::Nothing
   return z
 end
 
@@ -1298,7 +1292,7 @@ Return the Bessel function $J_{\nu}(x)$.
 """
 function bessel_j(nu::AcbFieldElem, x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_bessel_j(z::Ref{AcbFieldElem}, nu::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_bessel_j(z::Ref{AcbFieldElem}, nu::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -1309,7 +1303,7 @@ Return the Bessel function $Y_{\nu}(x)$.
 """
 function bessel_y(nu::AcbFieldElem, x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_bessel_y(z::Ref{AcbFieldElem}, nu::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_bessel_y(z::Ref{AcbFieldElem}, nu::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -1320,7 +1314,7 @@ Return the Bessel function $I_{\nu}(x)$.
 """
 function bessel_i(nu::AcbFieldElem, x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_bessel_i(z::Ref{AcbFieldElem}, nu::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_bessel_i(z::Ref{AcbFieldElem}, nu::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -1331,7 +1325,7 @@ Return the Bessel function $K_{\nu}(x)$.
 """
 function bessel_k(nu::AcbFieldElem, x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_bessel_k(z::Ref{AcbFieldElem}, nu::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_bessel_k(z::Ref{AcbFieldElem}, nu::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -1342,7 +1336,7 @@ Return the Airy function $\operatorname{Ai}(x)$.
 """
 function airy_ai(x::AcbFieldElem)
   ai = parent(x)()
-  @ccall libflint.acb_hypgeom_airy(ai::Ref{AcbFieldElem}, C_NULL::Ptr{Cvoid}, C_NULL::Ptr{Cvoid}, C_NULL::Ptr{Cvoid}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_airy(ai::Ref{AcbFieldElem}, C_NULL::Ptr{Cvoid}, C_NULL::Ptr{Cvoid}, C_NULL::Ptr{Cvoid}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return ai
 end
 
@@ -1353,7 +1347,7 @@ Return the Airy function $\operatorname{Bi}(x)$.
 """
 function airy_bi(x::AcbFieldElem)
   bi = parent(x)()
-  @ccall libflint.acb_hypgeom_airy(C_NULL::Ptr{Cvoid}, C_NULL::Ptr{Cvoid}, bi::Ref{AcbFieldElem}, C_NULL::Ptr{Cvoid}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_airy(C_NULL::Ptr{Cvoid}, C_NULL::Ptr{Cvoid}, bi::Ref{AcbFieldElem}, C_NULL::Ptr{Cvoid}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return bi
 end
 
@@ -1364,7 +1358,7 @@ Return the derivative of the Airy function $\operatorname{Ai}^\prime(x)$.
 """
 function airy_ai_prime(x::AcbFieldElem)
   ai_prime = parent(x)()
-  @ccall libflint.acb_hypgeom_airy(C_NULL::Ptr{Cvoid}, ai_prime::Ref{AcbFieldElem}, C_NULL::Ptr{Cvoid}, C_NULL::Ptr{Cvoid}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_airy(C_NULL::Ptr{Cvoid}, ai_prime::Ref{AcbFieldElem}, C_NULL::Ptr{Cvoid}, C_NULL::Ptr{Cvoid}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return ai_prime
 end
 
@@ -1375,7 +1369,7 @@ Return the derivative of the Airy function $\operatorname{Bi}^\prime(x)$.
 """
 function airy_bi_prime(x::AcbFieldElem)
   bi_prime = parent(x)()
-  @ccall libflint.acb_hypgeom_airy(C_NULL::Ptr{Cvoid}, C_NULL::Ptr{Cvoid}, C_NULL::Ptr{Cvoid}, bi_prime::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_airy(C_NULL::Ptr{Cvoid}, C_NULL::Ptr{Cvoid}, C_NULL::Ptr{Cvoid}, bi_prime::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return bi_prime
 end
 
@@ -1386,7 +1380,7 @@ Return the confluent hypergeometric function ${}_1F_1(a,b,x)$.
 """
 function hypergeometric_1f1(a::AcbFieldElem, b::AcbFieldElem, x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_m(z::Ref{AcbFieldElem}, a::Ref{AcbFieldElem}, b::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, 0::Int, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_m(z::Ref{AcbFieldElem}, a::Ref{AcbFieldElem}, b::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, 0::Int, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -1398,7 +1392,7 @@ ${}_1F_1(a,b,x) / \Gamma(b)$.
 """
 function hypergeometric_1f1_regularized(a::AcbFieldElem, b::AcbFieldElem, x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_m(z::Ref{AcbFieldElem}, a::Ref{AcbFieldElem}, b::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, 1::Int, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_m(z::Ref{AcbFieldElem}, a::Ref{AcbFieldElem}, b::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, 1::Int, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -1409,7 +1403,7 @@ Return the confluent hypergeometric function $U(a,b,x)$.
 """
 function hypergeometric_u(a::AcbFieldElem, b::AcbFieldElem, x::AcbFieldElem)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_u(z::Ref{AcbFieldElem}, a::Ref{AcbFieldElem}, b::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_u(z::Ref{AcbFieldElem}, a::Ref{AcbFieldElem}, b::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -1420,7 +1414,7 @@ Return the Gauss hypergeometric function ${}_2F_1(a,b,c,x)$.
 """
 function hypergeometric_2f1(a::AcbFieldElem, b::AcbFieldElem, c::AcbFieldElem, x::AcbFieldElem; flags=0)
   z = parent(x)()
-  @ccall libflint.acb_hypgeom_2f1(z::Ref{AcbFieldElem}, a::Ref{AcbFieldElem}, b::Ref{AcbFieldElem}, c::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, flags::Int, parent(x).prec::Int)::Nothing
+  @ccall libflint.acb_hypgeom_2f1(z::Ref{AcbFieldElem}, a::Ref{AcbFieldElem}, b::Ref{AcbFieldElem}, c::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, flags::Int, precision(parent(x))::Int)::Nothing
   return z
 end
 
@@ -1435,7 +1429,7 @@ function jacobi_theta(z::AcbFieldElem, tau::AcbFieldElem)
   t2 = parent(z)()
   t3 = parent(z)()
   t4 = parent(z)()
-  @ccall libflint.acb_modular_theta(t1::Ref{AcbFieldElem}, t2::Ref{AcbFieldElem}, t3::Ref{AcbFieldElem}, t4::Ref{AcbFieldElem}, z::Ref{AcbFieldElem}, tau::Ref{AcbFieldElem}, parent(z).prec::Int)::Nothing
+  @ccall libflint.acb_modular_theta(t1::Ref{AcbFieldElem}, t2::Ref{AcbFieldElem}, t3::Ref{AcbFieldElem}, t4::Ref{AcbFieldElem}, z::Ref{AcbFieldElem}, tau::Ref{AcbFieldElem}, precision(parent(z))::Int)::Nothing
   return (t1, t2, t3, t4)
 end
 
@@ -1446,7 +1440,7 @@ Return the Weierstrass elliptic function $\wp(z,\tau)$.
 """
 function weierstrass_p(z::AcbFieldElem, tau::AcbFieldElem)
   r = parent(z)()
-  @ccall libflint.acb_elliptic_p(r::Ref{AcbFieldElem}, z::Ref{AcbFieldElem}, tau::Ref{AcbFieldElem}, parent(z).prec::Int)::Nothing
+  @ccall libflint.acb_elliptic_p(r::Ref{AcbFieldElem}, z::Ref{AcbFieldElem}, tau::Ref{AcbFieldElem}, precision(parent(z))::Int)::Nothing
   return r
 end
 
@@ -1457,7 +1451,7 @@ Return the derivative of the Weierstrass elliptic function $\frac{\partial}{\par
 """
 function weierstrass_p_prime(z::AcbFieldElem, tau::AcbFieldElem)
   r = parent(z)()
-  @ccall libflint.acb_elliptic_p_prime(r::Ref{AcbFieldElem}, z::Ref{AcbFieldElem}, tau::Ref{AcbFieldElem}, parent(z).prec::Int)::Nothing
+  @ccall libflint.acb_elliptic_p_prime(r::Ref{AcbFieldElem}, z::Ref{AcbFieldElem}, tau::Ref{AcbFieldElem}, precision(parent(z))::Int)::Nothing
   return r
 end
 
@@ -1562,22 +1556,27 @@ function neg!(z::TypeOrPtr{AcbFieldElem}, a::TypeOrPtr{AcbFieldElem})
 end
 
 function add!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
-  @ccall libflint.acb_add(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, parent(z).prec::Int)::Nothing
+  @ccall libflint.acb_add(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, precision(parent(z))::Int)::Nothing
   return z
 end
 
 function sub!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
-  @ccall libflint.acb_sub(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, parent(z).prec::Int)::Nothing
+  @ccall libflint.acb_sub(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, precision(parent(z))::Int)::Nothing
   return z
 end
 
 function mul!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
-  @ccall libflint.acb_mul(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, parent(z).prec::Int)::Nothing
+  @ccall libflint.acb_mul(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, precision(parent(z))::Int)::Nothing
   return z
 end
 
 function div!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
-  @ccall libflint.acb_div(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, parent(z).prec::Int)::Nothing
+  @ccall libflint.acb_div(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, precision(parent(z))::Int)::Nothing
+  return z
+end
+
+function pow!(z::AcbFieldElem, x::AcbFieldElem, y::AcbFieldElem)
+  @ccall libflint.acb_pow(z::Ref{AcbFieldElem}, x::Ref{AcbFieldElem}, y::Ref{AcbFieldElem}, precision(parent(z))::Int)::Nothing
   return z
 end
 
@@ -1693,6 +1692,13 @@ function _acb_set(x::TypeOrPtr{AcbFieldElem}, yz::Tuple{AbstractString,AbstractS
   _arb_set(i, yz[2], p)
 end
 
+function _acb_set(x::TypeOrPtr{AcbFieldElem}, yz::Tuple{T,T}, p::Int) where {T <: Union{Float64,BigFloat}}
+  r = _real_ptr(x)
+  _arb_set(r, yz[1], p)
+  i = _imag_ptr(x)
+  _arb_set(i, yz[2], p)
+end
+
 function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::Real, p::Int)
   r = _real_ptr(x)
   _arb_set(r, y, p)
@@ -1741,13 +1747,13 @@ function (r::AcbField)()
 end
 
 function (r::AcbField)(x::Any)
-  z = AcbFieldElem(x, r.prec)
+  z = AcbFieldElem(x, precision(r))
   z.parent = r
   return z
 end
 
 function (r::AcbField)(x::T, y::T) where T
-  z = AcbFieldElem(x, y, r.prec)
+  z = AcbFieldElem(x, y, precision(r))
   z.parent = r
   return z
 end
@@ -1757,8 +1763,8 @@ for S in (Real, ZZRingElem, QQFieldElem, ArbFieldElem, AbstractString)
     if S != T || S == Real
       @eval begin
         function (r::AcbField)(x::$(S), y::$(T))
-          RR = ArbField(r.prec, cached = false)
-          z = AcbFieldElem(RR(x), RR(y), r.prec)
+          RR = ArbField(precision(r), cached = false)
+          z = AcbFieldElem(RR(x), RR(y), precision(r))
           z.parent = r
           return z
         end
@@ -1804,15 +1810,15 @@ function rand(r::AcbField; randtype::Symbol=:urandom)
   x = r()
 
   if randtype == :urandom
-    @ccall libflint.acb_urandom(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int)::Nothing
+    @ccall libflint.acb_urandom(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, precision(r)::Int)::Nothing
   elseif randtype == :randtest
-    @ccall libflint.acb_randtest(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int, 30::Int)::Nothing
+    @ccall libflint.acb_randtest(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, precision(r)::Int, 30::Int)::Nothing
   elseif randtype == :randtest_special
-    @ccall libflint.acb_randtest_special(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int, 30::Int)::Nothing
+    @ccall libflint.acb_randtest_special(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, precision(r)::Int, 30::Int)::Nothing
   elseif randtype == :randtest_precise
-    @ccall libflint.acb_randtest_precise(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int, 30::Int)::Nothing
+    @ccall libflint.acb_randtest_precise(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, precision(r)::Int, 30::Int)::Nothing
   elseif randtype == :randtest_param
-    @ccall libflint.acb_randtest_param(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, r.prec::Int, 30::Int)::Nothing
+    @ccall libflint.acb_randtest_param(x::Ref{AcbFieldElem}, state::Ref{rand_ctx}, precision(r)::Int, 30::Int)::Nothing
   else
     error("Acb random generation `" * String(randtype) * "` is not defined")
   end
