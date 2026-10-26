@@ -596,10 +596,8 @@ end
 #
 ###############################################################################
 
-_content_ptr(c::QQMPolyRingElem) = Ptr{QQFieldElem}(pointer_from_objref(c))
-_content_ptr(c::Ptr{QQMPolyRingElem}) = Ptr{QQFieldElem}(c)
-_content_ptr(c::Ref{QQMPolyRingElem}) = _content_ptr(c[])
-_zpoly_ptr(c::TypeOrPtr{QQMPolyRingElem}) = Ptr{ZZMPolyRingElem}(_content_ptr(c) + sizeof(QQFieldElem))
+_content_ptr(c::TypeOrPtr{QQMPolyRingElem}) = _field_ptr(QQFieldElem, c, Val(:content_num))
+_zpoly_ptr(c::TypeOrPtr{QQMPolyRingElem}) = _field_ptr(ZZMPolyRingElem, c, Val(:coeffs))
 
 function zero!(a::QQMPolyRingElem)
   @ccall libflint.fmpq_mpoly_zero(a::Ref{QQMPolyRingElem}, parent(a)::Ref{QQMPolyRing})::Nothing
