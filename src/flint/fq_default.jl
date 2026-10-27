@@ -224,7 +224,7 @@ end
 # the `fmpz_mod_ctx_struct`. Only valid while `F` is kept alive.
 function _fmpz_mod_ctx_ptr(F::FqField)
   @assert _fq_default_ctx_type(F) == _FQ_DEFAULT_FMPZ_MOD
-  return unsafe_load(Ptr{Ptr{fmpz_mod_ctx_struct}}(pointer_from_objref(F)))
+  return unsafe_load(_field_ptr(Ptr{fmpz_mod_ctx_struct}, F, Val(:data)))
 end
 
 @doc raw"""

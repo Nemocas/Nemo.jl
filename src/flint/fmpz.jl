@@ -61,7 +61,7 @@ is_domain_type(::Type{ZZRingElem}) = true
 
 data(a::ZZRingElem) = a.d
 data(a::Ref{ZZRingElem}) = a[].d
-data(a::Ptr{ZZRingElem}) = unsafe_load(reinterpret(Ptr{Int}, a))
+data(a::Ptr{ZZRingElem}) = _unsafe_load_field(a, Val(:d))
 
 ###############################################################################
 #
@@ -3232,8 +3232,7 @@ function rand(rng::AbstractRNG, sp::SamplerFmpz)
       limbs[sz] != 0 && break
       sz -= 1
     end
-    # write sz in the .size field of the mpz object
-    unsafe_store!(Ptr{Cint}(z.d << 2) + sizeof(Cint), sz)
+    unsafe_store!(_field_ptr(Ptr{BigInt}(z.d << 2), Val(:size)), sz)
   end
   if !isone(sp.step)
     mul!(z, z, sp.step)

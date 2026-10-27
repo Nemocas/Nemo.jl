@@ -500,6 +500,9 @@ end
 @inline _field_ptr(c, ::Val{name}) where {name} =
   _field_ptr(fieldtype(eltype(_base_ptr(c)), name), c, Val(name))
 
+# field `name` of the C struct at `p`, which may point to the C part alone
+@inline _unsafe_load_field(p::Ptr, v::Val) = unsafe_load(_field_ptr(p, v))
+
 ###############################################################################
 #
 #   Matrices wrapping a FLINT matrix struct
