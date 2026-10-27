@@ -28,7 +28,7 @@ is_domain_type(::Type{FpFieldElem}) = true
 
 function Base.hash(a::FpFieldElem, h::UInt)
   b = 0x6b61d2959976f517%UInt
-  return xor(xor(hash(a.data), h), b)
+  return xor(xor(hash(data(a)), h), b)
 end
 
 data(a::FpFieldElem) = a.data
@@ -42,9 +42,9 @@ end
 lift(a::FpFieldElem) = data(a)
 lift(::ZZRing, x::FpFieldElem) = lift(x)
 
-iszero(a::FpFieldElem) = iszero(a.data)
+iszero(a::FpFieldElem) = iszero(data(a))
 
-isone(a::FpFieldElem) = isone(a.data)
+isone(a::FpFieldElem) = isone(data(a))
 
 function zero(R::FpField)
   return FpFieldElem(zero(ZZRingElem), R)
@@ -68,7 +68,7 @@ degree(::FpField) = 1
 
 function deepcopy_internal(a::FpFieldElem, dict::IdDict)
   R = parent(a)
-  return FpFieldElem(deepcopy(a.data), R)
+  return FpFieldElem(deepcopy(data(a)), R)
 end
 
 ###############################################################################
@@ -93,14 +93,14 @@ function expressify(a::FpFieldElem; context = nothing)
 end
 
 function show(io::IO, a::FpFieldElem)
-  print(io, a.data)
+  print(io, data(a))
 end
 
 function Base.alignment(io::IO, a::FpFieldElem)
   return (Base.alignment_from_show(io, a), 0)
 end
 
-pretty_lt(x::FpFieldElem, y::FpFieldElem) = isless(x.data, y.data)
+pretty_lt(x::FpFieldElem, y::FpFieldElem) = isless(data(x), data(y))
 pretty_eq(x::FpFieldElem, y::FpFieldElem) = (x == y)
 
 ###############################################################################
@@ -110,11 +110,11 @@ pretty_eq(x::FpFieldElem, y::FpFieldElem) = (x == y)
 ###############################################################################
 
 function -(x::FpFieldElem)
-  if iszero(x.data)
+  if iszero(data(x))
     return deepcopy(x)
   else
     R = parent(x)
-    return FpFieldElem(R.n - x.data, R)
+    return FpFieldElem(R.n - data(x), R)
   end
 end
 
@@ -128,7 +128,7 @@ function +(x::FpFieldElem, y::FpFieldElem)
   check_parent(x, y)
   R = parent(x)
   n = modulus(R)
-  d = x.data + y.data - n
+  d = data(x) + data(y) - n
   if d < 0
     return FpFieldElem(d + n, R)
   else
@@ -140,7 +140,7 @@ function -(x::FpFieldElem, y::FpFieldElem)
   check_parent(x, y)
   R = parent(x)
   n = modulus(R)
-  d = x.data - y.data
+  d = data(x) - data(y)
   if d < 0
     return FpFieldElem(d + n, R)
   else
@@ -152,7 +152,7 @@ function *(x::FpFieldElem, y::FpFieldElem)
   check_parent(x, y)
   R = parent(x)
   d = ZZRingElem()
-  @ccall libflint.fmpz_mod_mul(d::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_mul(d::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, data(y)::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return FpFieldElem(d, R)
 end
 
@@ -164,7 +164,7 @@ end
 
 function *(x::Integer, y::FpFieldElem)
   R = parent(y)
-  return R(x*y.data)
+  return R(x*data(y))
 end
 
 *(x::FpFieldElem, y::Integer) = y*x
@@ -202,14 +202,14 @@ function ^(x::FpFieldElem, y::Int)
     y = -y
   end
   d = ZZRingElem()
-  @ccall libflint.fmpz_mod_pow_ui(d::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y::UInt, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_pow_ui(d::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, y::UInt, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return FpFieldElem(d, R)
 end
 
 function ^(x::FpFieldElem, y::ZZRingElem)
   R = parent(x)
   z = R()
-  if 0 == @ccall libflint.fmpz_mod_pow_fmpz(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Cint
+  if 0 == @ccall libflint.fmpz_mod_pow_fmpz(data(z)::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, y::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Cint
     if iszero(x)
       throw(DivideError())
     else
@@ -231,7 +231,7 @@ end
 
 function ==(x::FpFieldElem, y::FpFieldElem)
   check_parent(x, y)
-  return x.data == y.data
+  return data(x) == data(y)
 end
 
 ###############################################################################
@@ -259,7 +259,7 @@ function inv(x::FpFieldElem)
   iszero(x) && throw(DivideError())
   s = ZZRingElem()
   g = ZZRingElem()
-  @ccall libflint.fmpz_gcdinv(g::Ref{ZZRingElem}, s::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_gcdinv(g::Ref{ZZRingElem}, s::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
   return FpFieldElem(s, R)
 end
 
@@ -298,7 +298,7 @@ function Base.sqrt(a::FpFieldElem; check::Bool=true)
     return zero(R)
   end
   z = ZZRingElem()
-  flag = @ccall libflint.fmpz_sqrtmod(z::Ref{ZZRingElem}, a.data::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Bool
+  flag = @ccall libflint.fmpz_sqrtmod(z::Ref{ZZRingElem}, data(a)::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Bool
   check && !flag && error("Not a square in sqrt")
   return FpFieldElem(z, R)
 end
@@ -308,7 +308,7 @@ function is_square(a::FpFieldElem)
   if iszero(a) || R.n == 2
     return true
   end
-  r = @ccall libflint.fmpz_jacobi(a.data::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Cint
+  r = @ccall libflint.fmpz_jacobi(data(a)::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Cint
   return isone(r)
 end
 
@@ -318,7 +318,7 @@ function is_square_with_sqrt(a::FpFieldElem)
     return true, a
   end
   z = ZZRingElem()
-  r = @ccall libflint.fmpz_sqrtmod(z::Ref{ZZRingElem}, a.data::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Cint
+  r = @ccall libflint.fmpz_sqrtmod(z::Ref{ZZRingElem}, data(a)::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Cint
   if iszero(r)
     return false, zero(R)
   end
@@ -332,36 +332,36 @@ end
 ###############################################################################
 
 function zero!(z::FpFieldElem)
-  zero!(z.data)
+  zero!(data(z))
   return z
 end
 
 function one!(z::FpFieldElem)
-  one!(z.data)
+  one!(data(z))
   return z
 end
 
 function neg!(z::FpFieldElem, x::FpFieldElem)
   R = parent(z)
-  if is_zero(x.data)
-    zero!(z.data)
+  if is_zero(data(x))
+    zero!(data(z))
   else
-    sub!(z.data, R.n, x.data)
+    sub!(data(z), R.n, data(x))
   end
   return z
 end
 
 function mul!(z::FpFieldElem, x::FpFieldElem, y::FpFieldElem)
   R = parent(z)
-  @ccall libflint.fmpz_mod_mul(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_mul(data(z)::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, data(y)::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
 function mul!(z::FpFieldElem, x::FpFieldElem, y::ZZRingElem)
   R = parent(x)
   if z !== x
-    @ccall libflint.fmpz_mod(z.data::Ref{ZZRingElem}, y::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
-    @ccall libflint.fmpz_mod_mul(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, z.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+    @ccall libflint.fmpz_mod(data(z)::Ref{ZZRingElem}, y::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
+    @ccall libflint.fmpz_mod_mul(data(z)::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, data(z)::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
     return z
   else
     return mul!(z, x, R(y))
@@ -370,7 +370,7 @@ end
 
 function add!(z::FpFieldElem, x::FpFieldElem, y::FpFieldElem)
   R = parent(z)
-  @ccall libflint.fmpz_mod_add(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_add(data(z)::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, data(y)::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
