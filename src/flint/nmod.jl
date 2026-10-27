@@ -50,7 +50,7 @@ end
 
 iszero(a::zzModRingElem) = data(a) == 0
 
-isone(a::zzModRingElem) = (a.parent.n == 1) || (data(a) == 1)
+isone(a::zzModRingElem) = (parent(a).n == 1) || (data(a) == 1)
 
 modulus(R::zzModRing) = R.n
 
