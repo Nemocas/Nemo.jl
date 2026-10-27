@@ -225,7 +225,7 @@ const pkgdir = realpath(joinpath(dirname(@__DIR__)))
 
 
 include("flint/FlintCHelpers.jl")
-include("flint/FlintCTypes.jl")
+include("FlintC.jl")
 
 ###############################################################################
 #
