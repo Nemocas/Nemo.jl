@@ -112,8 +112,9 @@ mutable struct fmpz_factor
     return z
   end
 end
-@flint_fields fmpz_factor p = Ptr{ZZRingElem}
-
+@flint_fields fmpz_factor begin
+  p = Ptr{ZZRingElem}
+end
 struct ZZRingElemUnitRange <: AbstractUnitRange{ZZRingElem}
   start::ZZRingElem
   stop::ZZRingElem
@@ -342,8 +343,9 @@ mutable struct ZZPolyRingElem <: PolyRingElem{ZZRingElem}
     return z
   end
 end
-@flint_fields ZZPolyRingElem coeffs = Ptr{ZZRingElem}
-
+@flint_fields ZZPolyRingElem begin
+  coeffs = Ptr{ZZRingElem}
+end
 mutable struct fmpz_poly_factor
   cstruct::FlintC.fmpz_poly_factor_struct
 
@@ -354,7 +356,9 @@ mutable struct fmpz_poly_factor
     return z
   end
 end
-@flint_fields fmpz_poly_factor p = Ptr{ZZPolyRingElem}
+@flint_fields fmpz_poly_factor begin
+  p = Ptr{ZZPolyRingElem}
+end
 @flint_legacy_fields fmpz_poly_factor begin
   d = cstruct.c
 end
@@ -410,8 +414,9 @@ mutable struct QQPolyRingElem <: PolyRingElem{QQFieldElem}
     return z
   end
 end
-@flint_fields QQPolyRingElem coeffs = Ptr{ZZRingElem}
-
+@flint_fields QQPolyRingElem begin
+  coeffs = Ptr{ZZRingElem}
+end
 ###############################################################################
 #
 #   zzModRing / zzModRingElem
@@ -696,7 +701,9 @@ mutable struct nmod_poly_factor
     return z
   end
 end
-@flint_fields nmod_poly_factor p = Ptr{zzModPolyRingElem}
+@flint_fields nmod_poly_factor begin
+  p = Ptr{zzModPolyRingElem}
+end
 @flint_legacy_fields nmod_poly_factor begin
   poly = Ptr{zzModPolyRingElem}(cstruct.p)
 end
@@ -828,7 +835,9 @@ mutable struct gfp_poly_factor
     return z
   end
 end
-@flint_fields gfp_poly_factor p = Ptr{fpPolyRingElem}
+@flint_fields gfp_poly_factor begin
+  p = Ptr{fpPolyRingElem}
+end
 @flint_legacy_fields gfp_poly_factor begin
   poly = Ptr{fpPolyRingElem}(cstruct.p)
 end
@@ -923,8 +932,9 @@ mutable struct ZZModPolyRingElem <: PolyRingElem{ZZModRingElem}
     return z
   end
 end
-@flint_fields ZZModPolyRingElem coeffs = Ptr{ZZRingElem}
-
+@flint_fields ZZModPolyRingElem begin
+  coeffs = Ptr{ZZRingElem}
+end
 mutable struct fmpz_mod_poly_factor
   cstruct::FlintC.fmpz_mod_poly_factor_struct
 
@@ -942,8 +952,9 @@ mutable struct fmpz_mod_poly_factor
     return fmpz_mod_poly_factor(R.ninv)
   end
 end
-@flint_fields fmpz_mod_poly_factor poly = Ptr{ZZModPolyRingElem}
-
+@flint_fields fmpz_mod_poly_factor begin
+  poly = Ptr{ZZModPolyRingElem}
+end
 ###############################################################################
 #
 #   FpPolyRing / FpPolyRingElem
@@ -1034,8 +1045,9 @@ mutable struct FpPolyRingElem <: PolyRingElem{FpFieldElem}
     return z
   end
 end
-@flint_fields FpPolyRingElem coeffs = Ptr{ZZRingElem}
-
+@flint_fields FpPolyRingElem begin
+  coeffs = Ptr{ZZRingElem}
+end
 mutable struct gfp_fmpz_poly_factor
   cstruct::FlintC.fmpz_mod_poly_factor_struct
 
@@ -1053,8 +1065,9 @@ mutable struct gfp_fmpz_poly_factor
     return gfp_fmpz_poly_factor(R.ninv)
   end
 end
-@flint_fields gfp_fmpz_poly_factor poly = Ptr{FpPolyRingElem}
-
+@flint_fields gfp_fmpz_poly_factor begin
+  poly = Ptr{FpPolyRingElem}
+end
 ###############################################################################
 #
 #   ZZMPolyRing / ZZMPolyRingElem
@@ -1187,8 +1200,9 @@ mutable struct ZZMPolyRingElem <: MPolyRingElem{ZZRingElem}
   ZZMPolyRingElem(ctx::ZZMPolyRing, a::ZZRingElem) = set!(ZZMPolyRingElem(ctx), a)
   ZZMPolyRingElem(ctx::ZZMPolyRing, a::Integer) = set!(ZZMPolyRingElem(ctx), a)
 end
-@flint_fields ZZMPolyRingElem coeffs = Ptr{ZZRingElem}
-
+@flint_fields ZZMPolyRingElem begin
+  coeffs = Ptr{ZZRingElem}
+end
 mutable struct fmpz_mpoly_factor
   cstruct::FlintC.fmpz_mpoly_factor_struct
 
@@ -1202,8 +1216,9 @@ mutable struct fmpz_mpoly_factor
     return z
   end
 end
-@flint_fields fmpz_mpoly_factor exp = Ptr{ZZRingElem}
-
+@flint_fields fmpz_mpoly_factor begin
+  exp = Ptr{ZZRingElem}
+end
 ###############################################################################
 #
 #   QQMPolyRing / QQMPolyRingElem
@@ -1331,7 +1346,9 @@ mutable struct fmpq_mpoly_factor
     return z
   end
 end
-@flint_fields fmpq_mpoly_factor exp = Ptr{ZZRingElem}
+@flint_fields fmpq_mpoly_factor begin
+  exp = Ptr{ZZRingElem}
+end
 @flint_legacy_fields fmpq_mpoly_factor begin
   constant_num = cstruct.constant.num
   constant_den = cstruct.constant.den
@@ -1465,8 +1482,9 @@ mutable struct nmod_mpoly_factor
     return z
   end
 end
-@flint_fields nmod_mpoly_factor exp = Ptr{ZZRingElem}
-
+@flint_fields nmod_mpoly_factor begin
+  exp = Ptr{ZZRingElem}
+end
 ################################################################################
 #
 #   fpMPolyRing / fpMPolyRingElem
@@ -1595,8 +1613,9 @@ mutable struct gfp_mpoly_factor
     return z
   end
 end
-@flint_fields gfp_mpoly_factor exp = Ptr{ZZRingElem}
-
+@flint_fields gfp_mpoly_factor begin
+  exp = Ptr{ZZRingElem}
+end
 ################################################################################
 #
 #   FpMPolyRing / FpMPolyRingElem
@@ -1684,8 +1703,9 @@ mutable struct FpMPolyRingElem <: MPolyRingElem{FpFieldElem}
     return z
   end
 end
-@flint_fields FpMPolyRingElem coeffs = Ptr{ZZRingElem}
-
+@flint_fields FpMPolyRingElem begin
+  coeffs = Ptr{ZZRingElem}
+end
 mutable struct gfp_fmpz_mpoly_factor
   cstruct::FlintC.fmpz_mod_mpoly_factor_struct
 
@@ -1699,8 +1719,9 @@ mutable struct gfp_fmpz_mpoly_factor
     return z
   end
 end
-@flint_fields gfp_fmpz_mpoly_factor exp = Ptr{ZZRingElem}
-
+@flint_fields gfp_fmpz_mpoly_factor begin
+  exp = Ptr{ZZRingElem}
+end
 ###############################################################################
 #
 #   fqPolyRepField / fqPolyRepFieldElem
@@ -2031,7 +2052,9 @@ See [`fqPolyRepField`](@ref) for $p$ being an [`Int`](@ref). See [`FqPolyRepFiel
     end
   end
 end
-@flint_fields FqPolyRepField a = Ptr{ZZRingElem}
+@flint_fields FqPolyRepField begin
+  a = Ptr{ZZRingElem}
+end
 @flint_legacy_fields FqPolyRepField begin
   p = cstruct.ctxp.n
   add_fxn = cstruct.ctxp.add_fxn
@@ -2090,9 +2113,9 @@ mutable struct FqPolyRepFieldElem <: FinFieldElem
     return d
   end
 end
-@flint_fields FqPolyRepFieldElem coeffs = Ptr{ZZRingElem}
-
-
+@flint_fields FqPolyRepFieldElem begin
+  coeffs = Ptr{ZZRingElem}
+end
 ###############################################################################
 #
 #   fqPolyRepMPolyRing / fqPolyRepMPolyRingElem
@@ -2237,7 +2260,9 @@ mutable struct fq_nmod_mpoly_factor
     return z
   end
 end
-@flint_fields fq_nmod_mpoly_factor exp = Ptr{ZZRingElem}
+@flint_fields fq_nmod_mpoly_factor begin
+  exp = Ptr{ZZRingElem}
+end
 @flint_legacy_fields fq_nmod_mpoly_factor begin
   constant_coeffs = cstruct.constant.coeffs
   constant_alloc = cstruct.constant.alloc
@@ -2499,8 +2524,9 @@ mutable struct ZZRelPowerSeriesRingElem <: RelPowerSeriesRingElem{ZZRingElem}
     return z
   end
 end
-@flint_fields ZZRelPowerSeriesRingElem coeffs = Ptr{ZZRingElem}
-
+@flint_fields ZZRelPowerSeriesRingElem begin
+  coeffs = Ptr{ZZRingElem}
+end
 ###############################################################################
 #
 #   ZZAbsPowerSeriesRing / ZZAbsPowerSeriesRingElem
@@ -2549,8 +2575,9 @@ mutable struct ZZAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{ZZRingElem}
     return z
   end
 end
-@flint_fields ZZAbsPowerSeriesRingElem coeffs = Ptr{ZZRingElem}
-
+@flint_fields ZZAbsPowerSeriesRingElem begin
+  coeffs = Ptr{ZZRingElem}
+end
 ###############################################################################
 #
 #   FlintPuiseuxSeriesRing / FlintPuiseuxSeriesRingElem
@@ -2657,8 +2684,9 @@ mutable struct ZZLaurentSeriesRingElem <: RingElem
     return z
   end
 end
-@flint_fields ZZLaurentSeriesRingElem coeffs = Ptr{ZZRingElem}
-
+@flint_fields ZZLaurentSeriesRingElem begin
+  coeffs = Ptr{ZZRingElem}
+end
 ###############################################################################
 #
 #   QQRelPowerSeriesRing / QQRelPowerSeriesRingElem
@@ -2710,8 +2738,9 @@ mutable struct QQRelPowerSeriesRingElem <: RelPowerSeriesRingElem{QQFieldElem}
     return z
   end
 end
-@flint_fields QQRelPowerSeriesRingElem coeffs = Ptr{ZZRingElem}
-
+@flint_fields QQRelPowerSeriesRingElem begin
+  coeffs = Ptr{ZZRingElem}
+end
 ###############################################################################
 #
 #   QQAbsPowerSeriesRing / QQAbsPowerSeriesRingElem
@@ -2761,8 +2790,9 @@ mutable struct QQAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{QQFieldElem}
     return z
   end
 end
-@flint_fields QQAbsPowerSeriesRingElem coeffs = Ptr{ZZRingElem}
-
+@flint_fields QQAbsPowerSeriesRingElem begin
+  coeffs = Ptr{ZZRingElem}
+end
 ###############################################################################
 #
 #   fpRelPowerSeriesRing / fpRelPowerSeriesRingElem
@@ -3029,8 +3059,9 @@ mutable struct FpRelPowerSeriesRingElem <: RelPowerSeriesRingElem{FpFieldElem}
     return z
   end
 end
-@flint_fields FpRelPowerSeriesRingElem coeffs = Ptr{ZZRingElem}
-
+@flint_fields FpRelPowerSeriesRingElem begin
+  coeffs = Ptr{ZZRingElem}
+end
 ###############################################################################
 #
 #   ZZModRelPowerSeriesRing / ZZModRelPowerSeriesRingElem
@@ -3119,8 +3150,9 @@ mutable struct ZZModRelPowerSeriesRingElem <: RelPowerSeriesRingElem{ZZModRingEl
     return z
   end
 end
-@flint_fields ZZModRelPowerSeriesRingElem coeffs = Ptr{ZZRingElem}
-
+@flint_fields ZZModRelPowerSeriesRingElem begin
+  coeffs = Ptr{ZZRingElem}
+end
 ###############################################################################
 #
 #   FpAbsPowerSeriesRing / FpAbsPowerSeriesRingElem
@@ -3203,8 +3235,9 @@ mutable struct FpAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{FpFieldElem}
     return z
   end
 end
-@flint_fields FpAbsPowerSeriesRingElem coeffs = Ptr{ZZRingElem}
-
+@flint_fields FpAbsPowerSeriesRingElem begin
+  coeffs = Ptr{ZZRingElem}
+end
 ###############################################################################
 #
 #   zzModAbsPowerSeriesRing / zzModAbsPowerSeriesRingElem
@@ -3464,8 +3497,9 @@ mutable struct ZZModAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{ZZModRingEl
     return z
   end
 end
-@flint_fields ZZModAbsPowerSeriesRingElem coeffs = Ptr{ZZRingElem}
-
+@flint_fields ZZModAbsPowerSeriesRingElem begin
+  coeffs = Ptr{ZZRingElem}
+end
 ###############################################################################
 #
 #   FqRelPowerSeriesRing / FqRelPowerSeriesRingElem
@@ -3838,8 +3872,9 @@ mutable struct QQMatrix <: FlintMatElem{QQFieldElem}
     return z
   end
 end
-@flint_fields QQMatrix entries = Ptr{QQFieldElem}
-
+@flint_fields QQMatrix begin
+  entries = Ptr{QQFieldElem}
+end
 ###############################################################################
 #
 #   ZZMatrixSpace / ZZMatrix
@@ -3877,8 +3912,9 @@ mutable struct ZZMatrix <: FlintMatElem{ZZRingElem}
   end
 end
 
-@flint_fields ZZMatrix entries = Ptr{ZZRingElem}
-
+@flint_fields ZZMatrix begin
+  entries = Ptr{ZZRingElem}
+end
 ###############################################################################
 #
 #   ZZPolyRingMatrix
@@ -3917,8 +3953,9 @@ mutable struct ZZPolyRingMatrix <: FlintMatElem{ZZPolyRingElem}
     return z
   end
 end
-@flint_fields ZZPolyRingMatrix entries = Ptr{ZZPolyRingElem}
-
+@flint_fields ZZPolyRingMatrix begin
+  entries = Ptr{ZZPolyRingElem}
+end
 ###############################################################################
 #
 #   zzModMatrixSpace / zzModMatrix
@@ -4050,7 +4087,9 @@ mutable struct zzModMatrix <: FlintMatElem{zzModRingElem}
     return zzModMatrix(UInt(n), b)
   end
 end
-@flint_fields zzModMatrix entries = Ptr{UInt}
+@flint_fields zzModMatrix begin
+  entries = Ptr{UInt}
+end
 @flint_legacy_fields zzModMatrix begin
   n = cstruct.mod.n
   ninv = cstruct.mod.ninv
@@ -4198,8 +4237,9 @@ mutable struct ZZModMatrix <: FlintMatElem{ZZModRingElem}
     return z
   end
 end
-@flint_fields ZZModMatrix entries = Ptr{ZZRingElem}
-
+@flint_fields ZZModMatrix begin
+  entries = Ptr{ZZRingElem}
+end
 ###############################################################################
 #
 #   FpMatrixSpace / FpMatrix
@@ -4295,8 +4335,9 @@ mutable struct FpMatrix <: FlintMatElem{FpFieldElem}
     return z
   end
 end
-@flint_fields FpMatrix entries = Ptr{ZZRingElem}
-
+@flint_fields FpMatrix begin
+  entries = Ptr{ZZRingElem}
+end
 ################################################################################
 #
 #   fpMatrixSpace / fpMatrix
@@ -4428,7 +4469,9 @@ mutable struct fpMatrix <: FlintMatElem{fpFieldElem}
     return fpMatrix(UInt(n), b)
   end
 end
-@flint_fields fpMatrix entries = Ptr{UInt}
+@flint_fields fpMatrix begin
+  entries = Ptr{UInt}
+end
 @flint_legacy_fields fpMatrix begin
   n = cstruct.mod.n
   ninv = cstruct.mod.ninv
@@ -4672,8 +4715,9 @@ mutable struct fq_poly_factor
     return z
   end
 end
-@flint_fields fq_poly_factor poly = Ptr{FqPolyRepPolyRingElem}
-
+@flint_fields fq_poly_factor begin
+  poly = Ptr{FqPolyRepPolyRingElem}
+end
 ###############################################################################
 #
 #   fqPolyRepPolyRing / fqPolyRepPolyRingElem
@@ -4771,8 +4815,9 @@ mutable struct fq_nmod_poly_factor
     return z
   end
 end
-@flint_fields fq_nmod_poly_factor poly = Ptr{fqPolyRepPolyRingElem}
-
+@flint_fields fq_nmod_poly_factor begin
+  poly = Ptr{fqPolyRepPolyRingElem}
+end
 ###############################################################################
 #
 #   FqMatrixSpace/FqMatrix
@@ -4959,8 +5004,9 @@ mutable struct FqPolyRepMatrix <: FlintMatElem{FqPolyRepFieldElem}
     return z
   end
 end
-@flint_fields FqPolyRepMatrix entries = Ptr{FqPolyRepFieldElem}
-
+@flint_fields FqPolyRepMatrix begin
+  entries = Ptr{FqPolyRepFieldElem}
+end
 ###############################################################################
 #
 #   fqPolyRepMatrixSpace/fqPolyRepMatrix
@@ -5034,8 +5080,9 @@ mutable struct fqPolyRepMatrix <: FlintMatElem{fqPolyRepFieldElem}
     return z
   end
 end
-@flint_fields fqPolyRepMatrix entries = Ptr{fqPolyRepFieldElem}
-
+@flint_fields fqPolyRepMatrix begin
+  entries = Ptr{fqPolyRepFieldElem}
+end
 ################################################################################
 #
 #   Rand state

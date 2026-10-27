@@ -16,7 +16,8 @@ _wrap(::Type, v) = v
 # `@flint_fields T [f = JuliaType ...]` forwards `x.f` and `x.f = v` to the
 # fields of `x.cstruct::FlintStruct`. A `f = JuliaType` pair converts that field
 # on read, e.g. `entries = Ptr{ZZRingElem}` for Nemo's spelling of `fmpz*`.
-macro flint_fields(T, conversions...)
+macro flint_fields(T, block=:(begin end))
+  @capture(block, begin conversions__ end) || error("expected a `begin` block, got `$block`")
   branches = map(conversions) do c
     @capture(c, f_ = ty_) || error("expected `field = Type`, got `$c`")
     :(s === $(QuoteNode(f)) && return $(esc(ty))(getfield(getfield(x, :cstruct), $(QuoteNode(f)))))
@@ -86,10 +87,8 @@ function _field_path(ex)
   return path === nothing ? nothing : (path..., field)
 end
 
-function _property_defs(T, pairs, namesfun)
-  if length(pairs) == 1 && Meta.isexpr(pairs[1], :block)
-    pairs = rmlines(pairs[1]).args
-  end
+function _property_defs(T, block, namesfun)
+  @capture(block, begin pairs__ end) || error("expected a `begin` block, got `$block`")
   defs = Expr[]
   names = Symbol[]
   setters = Base.Set{Symbol}()
@@ -113,10 +112,10 @@ function _property_defs(T, pairs, namesfun)
   return Expr(:block, defs...)
 end
 
-macro flint_extra_fields(T, pairs...)
-  return _property_defs(T, pairs, :_extra_fieldnames)
+macro flint_extra_fields(T, block)
+  return _property_defs(T, block, :_extra_fieldnames)
 end
 
-macro flint_legacy_fields(T, pairs...)
-  return _property_defs(T, pairs, :_legacy_fieldnames)
+macro flint_legacy_fields(T, block)
+  return _property_defs(T, block, :_legacy_fieldnames)
 end

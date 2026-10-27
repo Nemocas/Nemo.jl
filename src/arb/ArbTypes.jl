@@ -551,8 +551,9 @@ mutable struct RealPolyRingElem <: PolyRingElem{RealFieldElem}
     return z
   end
 end
-@flint_fields RealPolyRingElem coeffs = Ptr{arb_struct}
-
+@flint_fields RealPolyRingElem begin
+  coeffs = Ptr{arb_struct}
+end
 function _RealPoly_clear_fn(x::RealPolyRingElem)
   @ccall libflint.arb_poly_clear(x::Ref{RealPolyRingElem})::Nothing
 end
@@ -627,8 +628,9 @@ mutable struct ArbPolyRingElem <: PolyRingElem{ArbFieldElem}
     return z
   end
 end
-@flint_fields ArbPolyRingElem coeffs = Ptr{arb_struct}
-
+@flint_fields ArbPolyRingElem begin
+  coeffs = Ptr{arb_struct}
+end
 function _arb_poly_clear_fn(x::ArbPolyRingElem)
   @ccall libflint.arb_poly_clear(x::Ref{ArbPolyRingElem})::Nothing
 end
@@ -715,8 +717,9 @@ mutable struct ComplexPolyRingElem <: PolyRingElem{ComplexFieldElem}
     return z
   end
 end
-@flint_fields ComplexPolyRingElem coeffs = Ptr{acb_struct}
-
+@flint_fields ComplexPolyRingElem begin
+  coeffs = Ptr{acb_struct}
+end
 function _acb_poly_clear_fn(x::ComplexPolyRingElem)
   @ccall libflint.acb_poly_clear(x::Ref{ComplexPolyRingElem})::Nothing
 end
@@ -798,8 +801,9 @@ mutable struct AcbPolyRingElem <: PolyRingElem{AcbFieldElem}
     return z
   end
 end
-@flint_fields AcbPolyRingElem coeffs = Ptr{acb_struct}
-
+@flint_fields AcbPolyRingElem begin
+  coeffs = Ptr{acb_struct}
+end
 function _acb_poly_clear_fn(x::AcbPolyRingElem)
   @ccall libflint.acb_poly_clear(x::Ref{AcbPolyRingElem})::Nothing
 end
@@ -904,8 +908,9 @@ mutable struct RealMatrix <: FlintMatElem{RealFieldElem}
     return z
   end
 end
-@flint_fields RealMatrix entries = Ptr{RealFieldElem}
-
+@flint_fields RealMatrix begin
+  entries = Ptr{RealFieldElem}
+end
 function _arb_mat_clear_fn(x::RealMatrix)
   @ccall libflint.arb_mat_clear(x::Ref{RealMatrix})::Nothing
 end
@@ -1000,8 +1005,9 @@ mutable struct ArbMatrix <: FlintMatElem{ArbFieldElem}
     return z
   end
 end
-@flint_fields ArbMatrix entries = Ptr{ArbFieldElem}
-
+@flint_fields ArbMatrix begin
+  entries = Ptr{ArbFieldElem}
+end
 function _arb_mat_clear_fn(x::ArbMatrix)
   @ccall libflint.arb_mat_clear(x::Ref{ArbMatrix})::Nothing
 end
@@ -1196,8 +1202,9 @@ mutable struct ComplexMatrix <: FlintMatElem{ComplexFieldElem}
     return z
   end
 end
-@flint_fields ComplexMatrix entries = Ptr{ComplexFieldElem}
-
+@flint_fields ComplexMatrix begin
+  entries = Ptr{ComplexFieldElem}
+end
 function _acb_mat_clear_fn(x::ComplexMatrix)
   @ccall libflint.acb_mat_clear(x::Ref{ComplexMatrix})::Nothing
 end
@@ -1392,8 +1399,9 @@ mutable struct AcbMatrix <: FlintMatElem{AcbFieldElem}
     return z
   end
 end
-@flint_fields AcbMatrix entries = Ptr{AcbFieldElem}
-
+@flint_fields AcbMatrix begin
+  entries = Ptr{AcbFieldElem}
+end
 function _acb_mat_clear_fn(x::AcbMatrix)
   @ccall libflint.acb_mat_clear(x::Ref{AcbMatrix})::Nothing
 end

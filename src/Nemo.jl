@@ -14,7 +14,7 @@ import AbstractAlgebra
 using Random: Random, AbstractRNG, SamplerTrivial
 import Random: rand!
 
-using MacroTools: @capture, postwalk, rmlines
+using MacroTools: @capture, postwalk
 
 using RandomExtensions: RandomExtensions, make, Make2, Make3
 
