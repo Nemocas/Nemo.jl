@@ -101,12 +101,12 @@ function (a::QQiField)(b::QQiFieldElem)
 end
 
 function (a::ZZRing)(b::QQiFieldElem)
-  iszero(b.num.y) && isone(b.den) || error("cannot coerce")
+  iszero(imag(b.num)) && isone(b.den) || error("cannot coerce")
   return real(b.num)
 end
 
 function (a::QQField)(b::QQiFieldElem)
-  iszero(b.num.y) || error("cannot coerce")
+  iszero(imag(b.num)) || error("cannot coerce")
   return real(b.num)//b.den
 end
 
@@ -188,7 +188,7 @@ function real(a::QQiFieldElem)
 end
 
 function imag(a::QQiFieldElem)
-  return a.num.y//a.den
+  return imag(a.num)//a.den
 end
 
 function abs2(a::QQiFieldElem)
@@ -246,7 +246,7 @@ end
 
 function reduce!(z::QQiFieldElem)
   g = ZZRingElem()
-  @ccall libflint.fmpz_gcd3(g::Ref{ZZRingElem}, real(z.num)::Ref{ZZRingElem}, z.den::Ref{ZZRingElem}, z.num.y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_gcd3(g::Ref{ZZRingElem}, real(z.num)::Ref{ZZRingElem}, z.den::Ref{ZZRingElem}, imag(z.num)::Ref{ZZRingElem})::Nothing
   if is_negative(z.den)
     neg!(g, g)
   end
@@ -373,8 +373,8 @@ end
 function inv!(z::QQiFieldElem, a::QQiFieldElem)
   d = abs2(a.num)
   mul!(real(z.num), real(a.num), a.den)
-  mul!(z.num.y, a.num.y, a.den)
-  neg!(z.num.y, z.num.y)
+  mul!(imag(z.num), imag(a.num), a.den)
+  neg!(imag(z.num), imag(z.num))
   swap!(z.den, d)
   reduce!(z)
   return z
