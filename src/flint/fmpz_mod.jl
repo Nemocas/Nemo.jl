@@ -50,9 +50,9 @@ end
 
 iszero(a::ZZModRingElem) = iszero(data(a))
 
-isone(a::ZZModRingElem) = a.parent.n == 1 ? iszero(data(a)) : isone(data(a))
+isone(a::ZZModRingElem) = parent(a).n == 1 ? iszero(data(a)) : isone(data(a))
 
-is_unit(a::ZZModRingElem) = a.parent.n == 1 ? iszero(data(a)) : isone(gcd(data(a), a.parent.n))
+is_unit(a::ZZModRingElem) = parent(a).n == 1 ? iszero(data(a)) : isone(gcd(data(a), parent(a).n))
 
 modulus(R::ZZModRing) = R.n
 
