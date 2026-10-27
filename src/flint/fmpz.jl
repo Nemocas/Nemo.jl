@@ -303,9 +303,9 @@ size(a::ZZRingElem) = _fmpz_is_small(a) ? 1 : abs(_fmpz_size(a))
 
 is_unit(a::TypeOrPtr{ZZRingElem}) = data(a) == 1 || data(a) == -1
 
-is_zero(a::TypeOrPtr{ZZRingElem}) = data(a) == 0
+is_zero(a::TypeOrPtr{ZZRingElem}) = iszero(data(a))
 
-is_one(a::TypeOrPtr{ZZRingElem}) = data(a) == 1
+is_one(a::TypeOrPtr{ZZRingElem}) = isone(data(a))
 
 isinteger(::ZZRingElem) = true
 

@@ -143,7 +143,7 @@ pretty_eq(x::ZZModRingElem, y::ZZModRingElem) = (x == y)
 ###############################################################################
 
 function -(x::ZZModRingElem)
-  if iszero(data(x))
+  if iszero(x)
     return deepcopy(x)
   else
     R = parent(x)
@@ -274,7 +274,7 @@ function inv(x::ZZModRingElem)
   s = ZZRingElem()
   g = ZZRingElem()
   @ccall libflint.fmpz_gcdinv(g::Ref{ZZRingElem}, s::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, modulus(R)::Ref{ZZRingElem})::Nothing
-  g != 1 && error("Impossible inverse in ", R)
+  !isone(g) && error("Impossible inverse in ", R)
   return ZZModRingElem(s, R)
 end
 
@@ -392,7 +392,7 @@ end
 
 function neg!(z::ZZModRingElem, x::ZZModRingElem)
   R = parent(z)
-  if is_zero(data(x))
+  if is_zero(x)
     zero!(data(z))
   else
     sub!(data(z), modulus(R), data(x))

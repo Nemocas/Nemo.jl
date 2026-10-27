@@ -110,7 +110,7 @@ pretty_eq(x::FpFieldElem, y::FpFieldElem) = (x == y)
 ###############################################################################
 
 function -(x::FpFieldElem)
-  if iszero(data(x))
+  if iszero(x)
     return deepcopy(x)
   else
     R = parent(x)
@@ -343,7 +343,7 @@ end
 
 function neg!(z::FpFieldElem, x::FpFieldElem)
   R = parent(z)
-  if is_zero(data(x))
+  if is_zero(x)
     zero!(data(z))
   else
     sub!(data(z), modulus(R), data(x))
