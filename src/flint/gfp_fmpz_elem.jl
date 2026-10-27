@@ -51,11 +51,7 @@ function zero(R::FpField)
 end
 
 function one(R::FpField)
-  if modulus(R) == 1
-    return FpFieldElem(ZZRingElem(0), R)
-  else
-    return FpFieldElem(ZZRingElem(1), R)
-  end
+  return FpFieldElem(ZZRingElem(1), R)
 end
 
 modulus(R::FpField) = R.n
