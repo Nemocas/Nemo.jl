@@ -28,7 +28,7 @@ parent(a::ZZModRingElem) = a.parent
 
 function Base.hash(a::ZZModRingElem, h::UInt)
   b = 0x2fbb6980039a0fec%UInt
-  return xor(xor(hash(data(a)), h), b)
+  return xor(hash(data(a), h), b)
 end
 
 lift(a::ZZModRingElem) = data(a)

@@ -28,7 +28,7 @@ is_domain_type(::Type{FpFieldElem}) = true
 
 function Base.hash(a::FpFieldElem, h::UInt)
   b = 0x6b61d2959976f517%UInt
-  return xor(xor(hash(data(a)), h), b)
+  return xor(hash(data(a), h), b)
 end
 
 data(a::FpFieldElem) = a.data
