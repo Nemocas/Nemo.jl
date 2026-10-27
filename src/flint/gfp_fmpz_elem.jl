@@ -51,7 +51,7 @@ function zero(R::FpField)
 end
 
 function one(R::FpField)
-  if R.n == 1
+  if modulus(R) == 1
     return FpFieldElem(ZZRingElem(0), R)
   else
     return FpFieldElem(ZZRingElem(1), R)
@@ -82,9 +82,9 @@ function show(io::IO, a::FpField)
   @show_special(io, a)
   if is_terse(io)
     io = pretty(io)
-    print(io, LowercaseOff(), "GF(", a.n, ")")
+    print(io, LowercaseOff(), "GF(", modulus(a), ")")
   else
-    print(io, "Finite field of characteristic ", a.n)
+    print(io, "Finite field of characteristic ", modulus(a))
   end
 end
 
@@ -114,7 +114,7 @@ function -(x::FpFieldElem)
     return deepcopy(x)
   else
     R = parent(x)
-    return FpFieldElem(R.n - data(x), R)
+    return FpFieldElem(modulus(R) - data(x), R)
   end
 end
 
@@ -259,7 +259,7 @@ function inv(x::FpFieldElem)
   iszero(x) && throw(DivideError())
   s = ZZRingElem()
   g = ZZRingElem()
-  @ccall libflint.fmpz_gcdinv(g::Ref{ZZRingElem}, s::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_gcdinv(g::Ref{ZZRingElem}, s::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, modulus(R)::Ref{ZZRingElem})::Nothing
   return FpFieldElem(s, R)
 end
 
@@ -298,27 +298,27 @@ function Base.sqrt(a::FpFieldElem; check::Bool=true)
     return zero(R)
   end
   z = ZZRingElem()
-  flag = @ccall libflint.fmpz_sqrtmod(z::Ref{ZZRingElem}, data(a)::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Bool
+  flag = @ccall libflint.fmpz_sqrtmod(z::Ref{ZZRingElem}, data(a)::Ref{ZZRingElem}, modulus(R)::Ref{ZZRingElem})::Bool
   check && !flag && error("Not a square in sqrt")
   return FpFieldElem(z, R)
 end
 
 function is_square(a::FpFieldElem)
   R = parent(a)
-  if iszero(a) || R.n == 2
+  if iszero(a) || modulus(R) == 2
     return true
   end
-  r = @ccall libflint.fmpz_jacobi(data(a)::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Cint
+  r = @ccall libflint.fmpz_jacobi(data(a)::Ref{ZZRingElem}, modulus(R)::Ref{ZZRingElem})::Cint
   return isone(r)
 end
 
 function is_square_with_sqrt(a::FpFieldElem)
   R = parent(a)
-  if iszero(a) || R.n == 2
+  if iszero(a) || modulus(R) == 2
     return true, a
   end
   z = ZZRingElem()
-  r = @ccall libflint.fmpz_sqrtmod(z::Ref{ZZRingElem}, data(a)::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Cint
+  r = @ccall libflint.fmpz_sqrtmod(z::Ref{ZZRingElem}, data(a)::Ref{ZZRingElem}, modulus(R)::Ref{ZZRingElem})::Cint
   if iszero(r)
     return false, zero(R)
   end
@@ -346,7 +346,7 @@ function neg!(z::FpFieldElem, x::FpFieldElem)
   if is_zero(data(x))
     zero!(data(z))
   else
-    sub!(data(z), R.n, data(x))
+    sub!(data(z), modulus(R), data(x))
   end
   return z
 end
@@ -360,7 +360,7 @@ end
 function mul!(z::FpFieldElem, x::FpFieldElem, y::ZZRingElem)
   R = parent(x)
   if z !== x
-    @ccall libflint.fmpz_mod(data(z)::Ref{ZZRingElem}, y::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
+    @ccall libflint.fmpz_mod(data(z)::Ref{ZZRingElem}, y::Ref{ZZRingElem}, modulus(R)::Ref{ZZRingElem})::Nothing
     @ccall libflint.fmpz_mod_mul(data(z)::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, data(z)::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
     return z
   else
@@ -383,7 +383,7 @@ end
 # define rand(::FpField)
 
 Random.Sampler(::Type{RNG}, R::FpField, n::Random.Repetition) where {RNG<:AbstractRNG} =
-Random.SamplerSimple(R, Random.Sampler(RNG, BigInt(0):BigInt(R.n)-1, n))
+Random.SamplerSimple(R, Random.Sampler(RNG, BigInt(0):BigInt(modulus(R))-1, n))
 
 function rand(rng::AbstractRNG, R::Random.SamplerSimple{FpField})
   n = rand(rng, R.data)
@@ -427,7 +427,7 @@ function (R::FpField)()
 end
 
 function (R::FpField)(a::Integer)
-  n = R.n
+  n = modulus(R)
   d = ZZRingElem(a)%n
   if d < 0
     d += n
@@ -437,7 +437,7 @@ end
 
 function (R::FpField)(a::ZZRingElem)
   d = ZZRingElem()
-  @ccall libflint.fmpz_mod(d::Ref{ZZRingElem}, a::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_mod(d::Ref{ZZRingElem}, a::Ref{ZZRingElem}, modulus(R)::Ref{ZZRingElem})::Nothing
   return FpFieldElem(d, R)
 end
 

@@ -765,7 +765,7 @@ function roots(a::ZZModPolyRingElem)
     @ccall libflint.fmpz_mod_poly_roots(fac::Ref{fmpz_mod_poly_factor}, a::Ref{ZZModPolyRingElem}, 0::Cint, n::Ref{fmpz_mod_ctx_struct})::UInt
   else
     nfac = fmpz_factor()
-    @ccall libflint.fmpz_factor(nfac::Ref{fmpz_factor}, base_ring(R).n::Ref{ZZRingElem})::Nothing
+    @ccall libflint.fmpz_factor(nfac::Ref{fmpz_factor}, modulus(base_ring(R))::Ref{ZZRingElem})::Nothing
     @ccall libflint.fmpz_mod_poly_roots_factored(fac::Ref{fmpz_mod_poly_factor}, a::Ref{ZZModPolyRingElem}, 0::Cint, nfac::Ref{fmpz_factor}, n::Ref{fmpz_mod_ctx_struct})::UInt
   end
   f = R()
