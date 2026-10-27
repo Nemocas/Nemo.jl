@@ -41,7 +41,7 @@ function zero(R::ZZModRing)
 end
 
 function one(R::ZZModRing)
-  if R.n == 1
+  if modulus(R) == 1
     return ZZModRingElem(ZZRingElem(0), R)
   else
     return ZZModRingElem(ZZRingElem(1), R)
@@ -50,9 +50,9 @@ end
 
 iszero(a::ZZModRingElem) = iszero(data(a))
 
-isone(a::ZZModRingElem) = parent(a).n == 1 ? iszero(data(a)) : isone(data(a))
+isone(a::ZZModRingElem) = modulus(parent(a)) == 1 ? iszero(data(a)) : isone(data(a))
 
-is_unit(a::ZZModRingElem) = parent(a).n == 1 ? iszero(data(a)) : isone(gcd(data(a), parent(a).n))
+is_unit(a::ZZModRingElem) = modulus(parent(a)) == 1 ? iszero(data(a)) : isone(gcd(data(a), modulus(parent(a))))
 
 modulus(R::ZZModRing) = R.n
 
@@ -117,7 +117,7 @@ function show(io::IO, R::ZZModRing)
     io = pretty(io)
     print(io, LowercaseOff(), "ZZ/($(R.n))")
   else
-    print(io, "Integers modulo ", R.n)
+    print(io, "Integers modulo ", modulus(R))
   end
 end
 
@@ -147,7 +147,7 @@ function -(x::ZZModRingElem)
     return deepcopy(x)
   else
     R = parent(x)
-    return ZZModRingElem(R.n - data(x), R)
+    return ZZModRingElem(modulus(R) - data(x), R)
   end
 end
 
@@ -267,13 +267,13 @@ end
 
 function inv(x::ZZModRingElem)
   R = parent(x)
-  (iszero(x) && R.n != 1) && throw(DivideError())
-  if R.n == 1
+  (iszero(x) && modulus(R) != 1) && throw(DivideError())
+  if modulus(R) == 1
     return deepcopy(x)
   end
   s = ZZRingElem()
   g = ZZRingElem()
-  @ccall libflint.fmpz_gcdinv(g::Ref{ZZRingElem}, s::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_gcdinv(g::Ref{ZZRingElem}, s::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, modulus(R)::Ref{ZZRingElem})::Nothing
   g != 1 && error("Impossible inverse in ", R)
   return ZZModRingElem(s, R)
 end
@@ -347,8 +347,8 @@ end
 function gcd(x::ZZModRingElem, y::ZZModRingElem)
   check_parent(x, y)
   R = parent(x)
-  d = gcd(gcd(data(x), R.n), data(y))
-  if d == R.n
+  d = gcd(gcd(data(x), modulus(R)), data(y))
+  if d == modulus(R)
     return ZZModRingElem(0, R)
   else
     return ZZModRingElem(d, R)
@@ -382,7 +382,7 @@ end
 
 function one!(z::ZZModRingElem)
   R = parent(z)
-  if R.n == 1
+  if modulus(R) == 1
     zero!(data(z))
   else
     one!(data(z))
@@ -395,7 +395,7 @@ function neg!(z::ZZModRingElem, x::ZZModRingElem)
   if is_zero(data(x))
     zero!(data(z))
   else
-    sub!(data(z), R.n, data(x))
+    sub!(data(z), modulus(R), data(x))
   end
   return z
 end
@@ -438,7 +438,7 @@ end
 # define rand(::ZZModRing)
 
 Random.Sampler(::Type{RNG}, R::ZZModRing, n::Random.Repetition) where {RNG<:AbstractRNG} =
-Random.SamplerSimple(R, Random.Sampler(RNG, BigInt(0):BigInt(R.n)-1, n))
+Random.SamplerSimple(R, Random.Sampler(RNG, BigInt(0):BigInt(modulus(R))-1, n))
 
 function rand(rng::AbstractRNG, R::Random.SamplerSimple{ZZModRing})
   n = rand(rng, R.data)
@@ -478,7 +478,7 @@ function (R::ZZModRing)()
 end
 
 function (R::ZZModRing)(a::Integer)
-  n = R.n
+  n = modulus(R)
   d = ZZRingElem(a)%n
   if d < 0
     d += n
@@ -488,7 +488,7 @@ end
 
 function (R::ZZModRing)(a::ZZRingElem)
   d = ZZRingElem()
-  @ccall libflint.fmpz_mod(d::Ref{ZZRingElem}, a::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_mod(d::Ref{ZZRingElem}, a::Ref{ZZRingElem}, modulus(R)::Ref{ZZRingElem})::Nothing
   return ZZModRingElem(d, R)
 end
 
@@ -527,7 +527,7 @@ end
 Base.iterate(R::ZZModRing) = (zero(R), zero(ZZRingElem))
 
 function Base.iterate(R::ZZModRing, st::ZZRingElem)
-  if st == R.n - 1
+  if st == modulus(R) - 1
     return nothing
   end
 
@@ -538,4 +538,4 @@ Base.IteratorEltype(::Type{ZZModRing}) = Base.HasEltype()
 Base.eltype(::Type{ZZModRing}) = ZZModRingElem
 
 Base.IteratorSize(::Type{ZZModRing}) = Base.HasLength()
-Base.length(R::ZZModRing) = Integer(R.n)
+Base.length(R::ZZModRing) = Integer(modulus(R))

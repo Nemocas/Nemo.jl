@@ -1385,7 +1385,7 @@ end
       ord = _flint_ordering(S)
 
       z = new()
-      @ccall libflint.nmod_mpoly_ctx_init(z::Ref{zzModMPolyRing}, length(s)::Int, ord::Cint, R.n::UInt)::Nothing
+      @ccall libflint.nmod_mpoly_ctx_init(z::Ref{zzModMPolyRing}, length(s)::Int, ord::Cint, modulus(R)::UInt)::Nothing
       z.base_ring = R
       z.S = s
       finalizer(_nmod_mpoly_ctx_clear_fn, z)
@@ -3355,7 +3355,7 @@ mutable struct zzModAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{zzModRingEl
   function zzModAbsPowerSeriesRingElem(a::zzModAbsPowerSeriesRingElem)
     z = new()
     R = base_ring(a)
-    @ccall libflint.nmod_poly_init2(z::Ref{zzModAbsPowerSeriesRingElem}, R.n::UInt, length(a)::Int)::Nothing
+    @ccall libflint.nmod_poly_init2(z::Ref{zzModAbsPowerSeriesRingElem}, modulus(R)::UInt, length(a)::Int)::Nothing
     @ccall libflint.nmod_poly_set(z::Ref{zzModAbsPowerSeriesRingElem}, a::Ref{zzModAbsPowerSeriesRingElem})::Nothing
     z.prec = a.prec
     finalizer(_nmod_poly_clear_fn, z)
@@ -3443,7 +3443,7 @@ mutable struct fpAbsPowerSeriesRingElem <: AbsPowerSeriesRingElem{fpFieldElem}
   function fpAbsPowerSeriesRingElem(a::fpAbsPowerSeriesRingElem)
     z = new()
     R = base_ring(a)
-    @ccall libflint.nmod_poly_init2(z::Ref{fpAbsPowerSeriesRingElem}, R.n::UInt, length(a)::Int)::Nothing
+    @ccall libflint.nmod_poly_init2(z::Ref{fpAbsPowerSeriesRingElem}, modulus(R)::UInt, length(a)::Int)::Nothing
     @ccall libflint.nmod_poly_set(z::Ref{fpAbsPowerSeriesRingElem}, a::Ref{fpAbsPowerSeriesRingElem})::Nothing
     z.prec = a.prec
     finalizer(_nmod_poly_clear_fn, z)

@@ -100,7 +100,7 @@ end
 ###############################################################################
 
 function similar(f::PolyRingElem, R::zzModRing, s::Symbol=var(parent(f)); cached::Bool=true)
-  z = zzModPolyRingElem(R.n)
+  z = zzModPolyRingElem(modulus(R))
   if base_ring(f) === R && s == var(parent(f)) && f isa zzModPolyRingElem
     # steal parent in case it is not cached
     z.parent = parent(f)
@@ -119,7 +119,7 @@ end
 function polynomial(R::zzModRing, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
   coeffs = map(R, arr)
   coeffs = length(coeffs) == 0 ? zzModRingElem[] : coeffs
-  z = zzModPolyRingElem(R.n, coeffs)
+  z = zzModPolyRingElem(modulus(R), coeffs)
   z.parent = zzModPolyRing(R, Symbol(var), cached)
   return z
 end

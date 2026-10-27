@@ -265,14 +265,14 @@ end
 ###############################################################################
 
 function matrix(R::fpField, arr::AbstractMatrix{<: Union{fpFieldElem, ZZRingElem, Integer}})
-  z = fpMatrix(size(arr, 1), size(arr, 2), R.n, arr)
+  z = fpMatrix(size(arr, 1), size(arr, 2), modulus(R), arr)
   z.base_ring = R
   return z
 end
 
 function matrix(R::fpField, r::Int, c::Int, arr::AbstractVector{<: Union{fpFieldElem, ZZRingElem, Integer}})
   _check_dim(r, c, arr)
-  z = fpMatrix(r, c, R.n, arr)
+  z = fpMatrix(r, c, modulus(R), arr)
   z.base_ring = R
   return z
 end

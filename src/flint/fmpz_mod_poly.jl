@@ -788,7 +788,7 @@ function _roots_and_factor(a::ZZModPolyRingElem, with_multiplicity::Bool)
     @ccall libflint.fmpz_mod_poly_roots(fac::Ref{fmpz_mod_poly_factor}, a::Ref{ZZModPolyRingElem}, with_multiplicity::Cint, n::Ref{fmpz_mod_ctx_struct})::Nothing
   else
     nfac = fmpz_factor()
-    @ccall libflint.fmpz_factor(nfac::Ref{fmpz_factor}, base_ring(R).n::Ref{ZZRingElem})::Nothing
+    @ccall libflint.fmpz_factor(nfac::Ref{fmpz_factor}, modulus(base_ring(R))::Ref{ZZRingElem})::Nothing
     # FLINT gives up, returning 0, when the roots modulo a prime power of the
     # modulus are too many to list.
     ok = @ccall libflint.fmpz_mod_poly_roots_factored(fac::Ref{fmpz_mod_poly_factor}, a::Ref{ZZModPolyRingElem}, with_multiplicity::Cint, nfac::Ref{fmpz_factor}, n::Ref{fmpz_mod_ctx_struct})::Cint

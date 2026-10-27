@@ -23,7 +23,7 @@ for (etype, rtype, mtype, brtype) in (
       end
       prec = length(a) - 1
       prec < 0 && throw(DomainError(prec, "Precision must be non-negative"))
-      z = ($etype)(base_ring(a).n, Vector{$(mtype)}(undef, 0), 0, prec)
+      z = ($etype)(modulus(base_ring(a)), Vector{$(mtype)}(undef, 0), 0, prec)
       z.parent = parent(a)
       return z
     end
@@ -250,7 +250,7 @@ for (etype, rtype, mtype, brtype) in (
 
     function *(x::ZZRingElem, y::($etype))
       R = base_ring(y)
-      xmod = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, R.n::UInt)::UInt
+      xmod = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, modulus(R)::UInt)::UInt
       return R(xmod)*y
     end
 

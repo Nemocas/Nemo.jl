@@ -2294,7 +2294,7 @@ function map_entries(R::ZZModRing, A::ZZMatrix)
       for j = 1:ncols(A)
         m = mat_entry_ptr(A, i, j)
         n = mat_entry_ptr(N, i, j)
-        @ccall libflint.fmpz_mod(n::Ptr{ZZRingElem}, m::Ptr{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
+        @ccall libflint.fmpz_mod(n::Ptr{ZZRingElem}, m::Ptr{ZZRingElem}, modulus(R)::Ref{ZZRingElem})::Nothing
       end
     end
   end

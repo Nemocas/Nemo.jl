@@ -44,7 +44,7 @@ end
 @inline function setindex!(a::FpMatrix, u::ZZRingElem, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   R = base_ring(a)
-  setindex_raw!(a, mod(u, R.n), i, j)
+  setindex_raw!(a, mod(u, modulus(R)), i, j)
 end
 
 @inline function setindex!(a::FpMatrix, u::FpFieldElem, i::Int, j::Int)

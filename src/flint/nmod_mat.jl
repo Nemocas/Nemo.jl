@@ -38,13 +38,13 @@ end
 @inline function setindex!(a::T, u::UInt, i::Int, j::Int) where T <: Zmodn_mat
   @boundscheck _checkbounds(a, i, j)
   R = base_ring(a)
-  setindex_raw!(a, mod(u, R.n), i, j)
+  setindex_raw!(a, mod(u, modulus(R)), i, j)
 end
 
 @inline function setindex!(a::T, u::Int, i::Int, j::Int) where T <: Zmodn_mat
   @boundscheck _checkbounds(a, i, j)
   R = base_ring(a)
-  setindex_raw!(a, mod(u, R.n), i, j)
+  setindex_raw!(a, mod(u, modulus(R)), i, j)
 end
 
 @inline function setindex!(a::T, u::ZZRingElem, i::Int, j::Int) where T <: Zmodn_mat
@@ -278,7 +278,7 @@ function Generic.add_one!(a::T, i::Int, j::Int) where T <: Zmodn_mat
   @boundscheck _checkbounds(a, i, j)
   x = getindex_raw(a, i, j)
   x += 1
-  if x == base_ring(a).n
+  if x == modulus(base_ring(a))
     x = UInt(0)
   end
   setindex_raw!(a, x, i, j)
@@ -686,14 +686,14 @@ end
 ###############################################################################
 
 function matrix(R::zzModRing, arr::AbstractMatrix{<: Union{zzModRingElem, ZZRingElem, Integer}})
-  z = zzModMatrix(size(arr, 1), size(arr, 2), R.n, arr)
+  z = zzModMatrix(size(arr, 1), size(arr, 2), modulus(R), arr)
   z.base_ring = R
   return z
 end
 
 function matrix(R::zzModRing, r::Int, c::Int, arr::AbstractVector{<: Union{zzModRingElem, ZZRingElem, Integer}})
   _check_dim(r, c, arr)
-  z = zzModMatrix(r, c, R.n, arr)
+  z = zzModMatrix(r, c, modulus(R), arr)
   z.base_ring = R
   return z
 end

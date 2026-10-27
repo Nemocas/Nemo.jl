@@ -41,7 +41,7 @@ function zero(R::zzModRing)
 end
 
 function one(R::zzModRing)
-  if R.n == 1
+  if modulus(R) == 1
     return zzModRingElem(UInt(0), R)
   else
     return zzModRingElem(UInt(1), R)
@@ -50,11 +50,11 @@ end
 
 iszero(a::zzModRingElem) = data(a) == 0
 
-isone(a::zzModRingElem) = (parent(a).n == 1) || (data(a) == 1)
+isone(a::zzModRingElem) = (modulus(parent(a)) == 1) || (data(a) == 1)
 
 modulus(R::zzModRing) = R.n
 
-order(R::zzModRing) = ZZRingElem(R.n)
+order(R::zzModRing) = ZZRingElem(modulus(R))
 
 function krull_dim(R::zzModRing)
   is_trivial(R) && return -inf
@@ -111,7 +111,7 @@ function show(io::IO, R::zzModRing)
     io = pretty(io)
     print(io, LowercaseOff(), "ZZ/($(signed(widen(R.n))))")
   else
-    print(io, "Integers modulo ", signed(widen(R.n)))
+    print(io, "Integers modulo ", signed(widen(modulus(R))))
   end
 end
 
@@ -138,7 +138,7 @@ function -(x::zzModRingElem)
     return deepcopy(x)
   else
     R = parent(x)
-    return zzModRingElem(R.n - data(x), R)
+    return zzModRingElem(modulus(R) - data(x), R)
   end
 end
 
@@ -218,7 +218,7 @@ end
 # modulus shifted left by norm
 function _mulmod(a::UInt, b::UInt, R::Union{zzModRing, fpField})
   s = R.norm
-  d = @ccall libflint.n_mulmod_preinv((a << s)::UInt, (b << s)::UInt, (R.n << s)::UInt, R.ninv::UInt, s::UInt)::UInt
+  d = @ccall libflint.n_mulmod_preinv((a << s)::UInt, (b << s)::UInt, (modulus(R) << s)::UInt, R.ninv::UInt, s::UInt)::UInt
   return d >> s
 end
 
@@ -245,10 +245,10 @@ end
 function *(x::Int, y::zzModRingElem)
   R = parent(y)
   if x < 0
-    d = mulmod(reinterpret(UInt, -x), data(y), R.n, R.ninv)
+    d = mulmod(reinterpret(UInt, -x), data(y), modulus(R), R.ninv)
     return -zzModRingElem(d, R)
   else
-    d = mulmod(UInt(x), data(y), R.n, R.ninv)
+    d = mulmod(UInt(x), data(y), modulus(R), R.ninv)
     return zzModRingElem(d, R)
   end
 end
@@ -257,7 +257,7 @@ end
 
 function *(x::UInt, y::zzModRingElem)
   R = parent(y)
-  d = mulmod(x, data(y), R.n, R.ninv)
+  d = mulmod(x, data(y), modulus(R), R.ninv)
   return zzModRingElem(d, R)
 end
 
@@ -320,13 +320,13 @@ end
 
 function inv(x::zzModRingElem)
   R = parent(x)
-  (iszero(x) && R.n != 1) && throw(DivideError())
-  if R.n == 1
+  (iszero(x) && modulus(R) != 1) && throw(DivideError())
+  if modulus(R) == 1
     return deepcopy(x)
   end
   #s = [UInt(0)]
   s = Ref{UInt}()
-  g = @ccall libflint.n_gcdinv(s::Ptr{UInt}, data(x)::UInt, R.n::UInt)::UInt
+  g = @ccall libflint.n_gcdinv(s::Ptr{UInt}, data(x)::UInt, modulus(R)::UInt)::UInt
   g != 1 && error("Impossible inverse in ", R)
   return zzModRingElem(s[], R)
 end
@@ -376,8 +376,8 @@ end
 function gcd(x::zzModRingElem, y::zzModRingElem)
   check_parent(x, y)
   R = parent(x)
-  d = gcd(gcd(data(x), R.n), data(y))
-  if d == R.n
+  d = gcd(gcd(data(x), modulus(R)), data(y))
+  if d == modulus(R)
     return zzModRingElem(0, R)
   else
     return zzModRingElem(d, R)
@@ -416,7 +416,7 @@ end
 # define rand(::zzModRing)
 
 Random.Sampler(::Type{RNG}, R::zzModRing, n::Random.Repetition) where {RNG<:AbstractRNG} =
-Random.SamplerSimple(R, Random.Sampler(RNG, UInt(0):R.n - 1, n))
+Random.SamplerSimple(R, Random.Sampler(RNG, UInt(0):modulus(R) - 1, n))
 
 rand(rng::AbstractRNG, R::Random.SamplerSimple{zzModRing}) = zzModRingElem(rand(rng, R.data), R[])
 
@@ -453,7 +453,7 @@ function (R::zzModRing)()
 end
 
 function (R::zzModRing)(a::Integer)
-  n = R.n
+  n = modulus(R)
   d = a%signed(widen(n))
   if d < 0
     d += n
@@ -462,7 +462,7 @@ function (R::zzModRing)(a::Integer)
 end
 
 function (R::zzModRing)(a::Int)
-  n = R.n
+  n = modulus(R)
   ninv = R.ninv
   if reinterpret(Int, n) > 0 && a < 0
     a %= Int(n)
@@ -478,14 +478,14 @@ function (R::zzModRing)(a::Int)
 end
 
 function (R::zzModRing)(a::UInt)
-  n = R.n
+  n = modulus(R)
   ninv = R.ninv
   a = mod2_preinv(a, n, ninv)
   return zzModRingElem(a, R)
 end
 
 function (R::zzModRing)(a::ZZRingElem)
-  d = @ccall libflint.fmpz_fdiv_ui(a::Ref{ZZRingElem}, R.n::UInt)::UInt
+  d = @ccall libflint.fmpz_fdiv_ui(a::Ref{ZZRingElem}, modulus(R)::UInt)::UInt
   return zzModRingElem(d, R)
 end
 
@@ -529,7 +529,7 @@ end
 Base.iterate(R::zzModRing) = (zero(R), zero(UInt))
 
 function Base.iterate(R::zzModRing, st::UInt)
-  if st == R.n - 1
+  if st == modulus(R) - 1
     return nothing
   end
 
