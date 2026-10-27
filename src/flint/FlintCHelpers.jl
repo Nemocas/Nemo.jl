@@ -34,13 +34,13 @@ macro flint_fields(T, block=:(begin end))
     @inline function Base.getproperty(x::$T, s::Symbol)
       s in $jfields && return getfield(x, s)
       $(branches...)
-      (s in _extra_fieldnames($T) || s in _legacy_fieldnames($T)) && return _extra_property(x, Val(s))
+      (s in _extra_fieldnames($T) || s in _legacy_fieldnames($T)) && return _property(x, Val(s))
       s in $cfields && return getproperty(getfield(x, :cstruct), s)
       return getfield(x, s)
     end
     @inline function Base.setproperty!(x::$T, s::Symbol, v)
       s in $jfields && return setfield!(x, s, v)
-      (s in _extra_fieldnames($T) || s in _legacy_fieldnames($T)) && return _set_extra_property!(x, Val(s), v)
+      (s in _extra_fieldnames($T) || s in _legacy_fieldnames($T)) && return _set_property!(x, Val(s), v)
       s in $cfields && return setfield!(x, :cstruct, _setfield(getfield(x, :cstruct), s, v))
       return setfield!(x, s, v)
     end
@@ -59,7 +59,7 @@ end
 # Writing `x.name = v` works when `expr` is a plain field path `cstruct.a.b`.
 # Otherwise `name! = expr` gives the new C struct in terms of `cstruct` and `v`.
 _extra_fieldnames(::Type) = ()
-_set_extra_property!(x, ::Val{s}, v) where {s} = error("property $s of $(typeof(x)) is read-only")
+_set_property!(x, ::Val{s}, v) where {s} = error("property $s of $(typeof(x)) is read-only")
 
 # Field names from before the generated structs, kept so that downstream code
 # keeps working. To drop them, delete `@flint_legacy_fields` and its uses and
@@ -97,15 +97,15 @@ function _property_defs(T, block, namesfun)
     if endswith(string(name), "!")
       name = Symbol(chop(string(name)))
       push!(setters, name)
-      push!(defs, :(@inline $(esc(:_set_extra_property!))($(esc(:x))::$(esc(T)), ::Val{$(QuoteNode(name))}, $(esc(:v))) = setfield!($(esc(:x)), :cstruct, $(esc(_subst_cstruct(ex))))))
+      push!(defs, :(@inline $(esc(:_set_property!))($(esc(:x))::$(esc(T)), ::Val{$(QuoteNode(name))}, $(esc(:v))) = setfield!($(esc(:x)), :cstruct, $(esc(_subst_cstruct(ex))))))
       continue
     end
     push!(names, name)
-    push!(defs, :(@inline $(esc(:_extra_property))($(esc(:x))::$(esc(T)), ::Val{$(QuoteNode(name))}) = $(esc(_subst_cstruct(ex)))))
+    push!(defs, :(@inline $(esc(:_property))($(esc(:x))::$(esc(T)), ::Val{$(QuoteNode(name))}) = $(esc(_subst_cstruct(ex)))))
     pth = _field_path(ex)
     if pth !== nothing && !isempty(pth) && !(name in setters)
       push!(setters, name)
-      push!(defs, :(@inline $(esc(:_set_extra_property!))($(esc(:x))::$(esc(T)), ::Val{$(QuoteNode(name))}, $(esc(:v))) = setfield!($(esc(:x)), :cstruct, _setpath(getfield($(esc(:x)), :cstruct), $(Tuple(pth)), $(esc(:v))))))
+      push!(defs, :(@inline $(esc(:_set_property!))($(esc(:x))::$(esc(T)), ::Val{$(QuoteNode(name))}, $(esc(:v))) = setfield!($(esc(:x)), :cstruct, _setpath(getfield($(esc(:x)), :cstruct), $(Tuple(pth)), $(esc(:v))))))
     end
   end
   push!(defs, :($(esc(namesfun))(::Type{$(esc(T))}) = $(Tuple(names))))
