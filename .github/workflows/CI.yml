@@ -80,7 +80,9 @@ jobs:
 
   docs:
     name: Documentation
-    runs-on: ubuntu-latest
+    # latexminted in Ubuntu 26 fails on Python 3.14, see
+    # https://bugs.launchpad.net/ubuntu/+source/texlive-extra/+bug/2154292
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
       - uses: julia-actions/setup-julia@v3
