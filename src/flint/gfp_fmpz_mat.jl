@@ -24,7 +24,7 @@ function getindex!(v::FpFieldElem, a::FpMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   GC.@preserve a begin
     z = mat_entry_ptr(a, i, j)
-    @ccall libflint.fmpz_mod_set_fmpz(v.data::Ref{ZZRingElem}, z::Ptr{ZZRingElem}, base_ring(a)::Ref{FpField})::Nothing
+    @ccall libflint.fmpz_mod_set_fmpz(data(v)::Ref{ZZRingElem}, z::Ptr{ZZRingElem}, base_ring(a)::Ref{FpField})::Nothing
   end
   return v
 end
@@ -50,7 +50,7 @@ end
 @inline function setindex!(a::FpMatrix, u::FpFieldElem, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   (base_ring(a) != parent(u)) && error("Parent objects must coincide")
-  setindex_raw!(a, u.data, i, j) # no reduction needed
+  setindex_raw!(a, data(u), i, j) # no reduction needed
 end
 
 function setindex!(a::FpMatrix, u::Integer, i::Int, j::Int)
@@ -101,7 +101,7 @@ end
 
 function *(x::FpMatrix, y::FpFieldElem)
   (base_ring(x) != parent(y)) && error("Parent objects must coincide")
-  return x*y.data
+  return x*data(y)
 end
 
 *(x::FpFieldElem, y::FpMatrix) = y*x

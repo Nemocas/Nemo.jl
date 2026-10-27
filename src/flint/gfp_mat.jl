@@ -32,7 +32,7 @@ end
 @inline function setindex!(a::fpMatrix, u::fpFieldElem, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   (base_ring(a) != parent(u)) && error("Parent objects must coincide")
-  setindex_raw!(a, u.data, i, j) # no reduction necessary
+  setindex_raw!(a, data(u), i, j) # no reduction necessary
 end
 
 function setindex!(a::fpMatrix, b::fpMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
@@ -64,7 +64,7 @@ end
 
 function *(x::fpMatrix, y::fpFieldElem)
   (base_ring(x) != parent(y)) && error("Parent objects must coincide")
-  return x*y.data
+  return x*data(y)
 end
 
 *(x::fpFieldElem, y::fpMatrix) = y*x

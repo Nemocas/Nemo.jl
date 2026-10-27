@@ -28,7 +28,7 @@ parent(a::ZZModRingElem) = a.parent
 
 function Base.hash(a::ZZModRingElem, h::UInt)
   b = 0x2fbb6980039a0fec%UInt
-  return xor(xor(hash(a.data), h), b)
+  return xor(xor(hash(data(a)), h), b)
 end
 
 lift(a::ZZModRingElem) = data(a)
@@ -48,11 +48,11 @@ function one(R::ZZModRing)
   end
 end
 
-iszero(a::ZZModRingElem) = iszero(a.data)
+iszero(a::ZZModRingElem) = iszero(data(a))
 
-isone(a::ZZModRingElem) = a.parent.n == 1 ? iszero(a.data) : isone(a.data)
+isone(a::ZZModRingElem) = a.parent.n == 1 ? iszero(data(a)) : isone(data(a))
 
-is_unit(a::ZZModRingElem) = a.parent.n == 1 ? iszero(a.data) : isone(gcd(a.data, a.parent.n))
+is_unit(a::ZZModRingElem) = a.parent.n == 1 ? iszero(data(a)) : isone(gcd(data(a), a.parent.n))
 
 modulus(R::ZZModRing) = R.n
 
@@ -69,7 +69,7 @@ is_trivial(a::ZZModRing) = is_one(modulus(a))  # constructor ensures the modulus
 
 function deepcopy_internal(a::ZZModRingElem, dict::IdDict)
   R = parent(a)
-  return ZZModRingElem(deepcopy(a.data), R)
+  return ZZModRingElem(deepcopy(data(a)), R)
 end
 
 function _reduce(a::ZZRingElem, ctx::fmpz_mod_ctx_struct)
@@ -126,14 +126,14 @@ function expressify(a::ZZModRingElem; context = nothing)
 end
 
 function show(io::IO, a::ZZModRingElem)
-  print(io, a.data)
+  print(io, data(a))
 end
 
 function Base.alignment(io::IO, a::ZZModRingElem)
   return (Base.alignment_from_show(io, a), 0)
 end
 
-pretty_lt(x::ZZModRingElem, y::ZZModRingElem) = isless(x.data, y.data)
+pretty_lt(x::ZZModRingElem, y::ZZModRingElem) = isless(data(x), data(y))
 pretty_eq(x::ZZModRingElem, y::ZZModRingElem) = (x == y)
 
 ###############################################################################
@@ -143,11 +143,11 @@ pretty_eq(x::ZZModRingElem, y::ZZModRingElem) = (x == y)
 ###############################################################################
 
 function -(x::ZZModRingElem)
-  if iszero(x.data)
+  if iszero(data(x))
     return deepcopy(x)
   else
     R = parent(x)
-    return ZZModRingElem(R.n - x.data, R)
+    return ZZModRingElem(R.n - data(x), R)
   end
 end
 
@@ -161,7 +161,7 @@ function +(x::ZZModRingElem, y::ZZModRingElem)
   check_parent(x, y)
   R = parent(x)
   n = modulus(R)
-  d = x.data + y.data - n
+  d = data(x) + data(y) - n
   if d < 0
     return ZZModRingElem(d + n, R)
   else
@@ -173,7 +173,7 @@ function -(x::ZZModRingElem, y::ZZModRingElem)
   check_parent(x, y)
   R = parent(x)
   n = modulus(R)
-  d = x.data - y.data
+  d = data(x) - data(y)
   if d < 0
     return ZZModRingElem(d + n, R)
   else
@@ -185,7 +185,7 @@ function *(x::ZZModRingElem, y::ZZModRingElem)
   check_parent(x, y)
   R = parent(x)
   d = ZZRingElem()
-  @ccall libflint.fmpz_mod_mul(d::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_mul(d::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, data(y)::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return ZZModRingElem(d, R)
 end
 
@@ -197,7 +197,7 @@ end
 
 function *(x::Integer, y::ZZModRingElem)
   R = parent(y)
-  return R(x*y.data)
+  return R(x*data(y))
 end
 
 *(x::ZZModRingElem, y::Integer) = y*x
@@ -242,7 +242,7 @@ end
 
 function ==(x::ZZModRingElem, y::ZZModRingElem)
   check_parent(x, y)
-  return x.data == y.data
+  return data(x) == data(y)
 end
 
 ###############################################################################
@@ -273,7 +273,7 @@ function inv(x::ZZModRingElem)
   end
   s = ZZRingElem()
   g = ZZRingElem()
-  @ccall libflint.fmpz_gcdinv(g::Ref{ZZRingElem}, s::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_gcdinv(g::Ref{ZZRingElem}, s::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, R.n::Ref{ZZRingElem})::Nothing
   g != 1 && error("Impossible inverse in ", R)
   return ZZModRingElem(s, R)
 end
@@ -347,7 +347,7 @@ end
 function gcd(x::ZZModRingElem, y::ZZModRingElem)
   check_parent(x, y)
   R = parent(x)
-  d = gcd(gcd(x.data, R.n), y.data)
+  d = gcd(gcd(data(x), R.n), data(y))
   if d == R.n
     return ZZModRingElem(0, R)
   else
@@ -364,7 +364,7 @@ $\mathbb{Z}$.
 function gcdx(a::ZZModRingElem, b::ZZModRingElem)
   m = modulus(a)
   R = parent(a)
-  g, u, v = gcdx(a.data, b.data)
+  g, u, v = gcdx(data(a), data(b))
   G, U, V = gcdx(g, m)
   return R(G), R(U)*R(u), R(U)*R(v)
 end
@@ -376,39 +376,39 @@ end
 ###############################################################################
 
 function zero!(z::ZZModRingElem)
-  zero!(z.data)
+  zero!(data(z))
   return z
 end
 
 function one!(z::ZZModRingElem)
   R = parent(z)
   if R.n == 1
-    zero!(z.data)
+    zero!(data(z))
   else
-    one!(z.data)
+    one!(data(z))
   end
   return z
 end
 
 function neg!(z::ZZModRingElem, x::ZZModRingElem)
   R = parent(z)
-  if is_zero(x.data)
-    zero!(z.data)
+  if is_zero(data(x))
+    zero!(data(z))
   else
-    sub!(z.data, R.n, x.data)
+    sub!(data(z), R.n, data(x))
   end
   return z
 end
 
 function mul!(z::ZZModRingElem, x::ZZModRingElem, y::ZZModRingElem)
   R = parent(z)
-  @ccall libflint.fmpz_mod_mul(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_mul(data(z)::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, data(y)::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
 function add!(z::ZZModRingElem, x::ZZModRingElem, y::ZZModRingElem)
   R = parent(z)
-  @ccall libflint.fmpz_mod_add(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, y.data::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_add(data(z)::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, data(y)::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
@@ -416,13 +416,13 @@ end
 
 function pow!(z::ZZModRingElem, x::ZZModRingElem, n::Integer)
   R = parent(z)
-  @ccall libflint.fmpz_mod_pow_ui(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, n::UInt, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_pow_ui(data(z)::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, n::UInt, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
 function pow!(z::ZZModRingElem, x::ZZModRingElem, n::TypeOrPtr{ZZRingElem})
   R = parent(z)
-  ok = Bool(@ccall libflint.fmpz_mod_pow_fmpz(z.data::Ref{ZZRingElem}, x.data::Ref{ZZRingElem}, n::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Cint)
+  ok = Bool(@ccall libflint.fmpz_mod_pow_fmpz(data(z)::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, n::Ref{ZZRingElem}, R.ninv::Ref{fmpz_mod_ctx_struct})::Cint)
   if !ok
     error("not invertible")
   end

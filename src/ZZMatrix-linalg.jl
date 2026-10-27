@@ -18,7 +18,7 @@
 #######################################################
 
 function _det(a::fpMatrix)
-  nrows(a) < 9 && return det(a).data  # inspired by FLINT source code
+  nrows(a) < 9 && return data(det(a))  # inspired by FLINT source code
   #_det avoids a copy: det is computed destructively
   r = @ccall libflint._nmod_mat_det(a::Ref{fpMatrix})::UInt
   return r

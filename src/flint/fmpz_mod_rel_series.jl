@@ -266,7 +266,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       z = parent(y)()
       z.prec = y.prec
       z.val = y.val
-      @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(z::Ref{($etype)}, y::Ref{($etype)}, x.data::Ref{ZZRingElem}, base_ring(y).ninv::Ref{($ctype)})::Nothing
+      @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(z::Ref{($etype)}, y::Ref{($etype)}, data(x)::Ref{ZZRingElem}, base_ring(y).ninv::Ref{($ctype)})::Nothing
       renormalize!(z)
       return z
     end
@@ -429,12 +429,12 @@ for (etype, rtype, ctype, mtype, brtype) in (
         if valuation(x) == 0
           z = ZZRingElem()
           @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(z::Ref{ZZRingElem}, x::Ref{($etype)}, 0::Int, base_ring(x).ninv::Ref{($ctype)})::Nothing
-          return Bool(@ccall libflint.fmpz_equal(z::Ref{ZZRingElem}, y.data::Ref{ZZRingElem})::Cint)
+          return Bool(@ccall libflint.fmpz_equal(z::Ref{ZZRingElem}, data(y)::Ref{ZZRingElem})::Cint)
         else
           return false
         end
       else
-        return iszero(y.data)
+        return iszero(data(y))
       end
     end
 
@@ -505,7 +505,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       z = parent(x)()
       z.prec = x.prec
       z.val = x.val
-      @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(z::Ref{($etype)}, x::Ref{($etype)}, y.data::Ref{ZZRingElem}, base_ring(x).ninv::Ref{($ctype)})::Nothing
+      @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(z::Ref{($etype)}, x::Ref{($etype)}, data(y)::Ref{ZZRingElem}, base_ring(x).ninv::Ref{($ctype)})::Nothing
       return z
     end
 
@@ -557,13 +557,13 @@ for (etype, rtype, ctype, mtype, brtype) in (
       preca = precision(a)
       d = Vector{ZZRingElem}(undef, preca)
       c = vala == 0 ? polcoeff(a, 0) : R()
-      d[1] = exp(c).data
+      d[1] = data(exp(c))
       len = pol_length(a) + vala
       z0 = ZZRingElem()
       for k = 1 : preca - 1
         s = ZZRingElem()
         for j = 1 : min(k + 1, len) - 1
-          c = j >= vala ? polcoeff(a, j - vala).data : z0
+          c = j >= vala ? data(polcoeff(a, j - vala)) : z0
           s += j * c * d[k - j + 1]
         end
         !is_unit(base_ring(a)(k)) && error("Unable to divide in exp")
@@ -605,7 +605,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
     end
 
     function setcoeff!(z::($etype), n::Int, x::($mtype))
-      @ccall libflint.fmpz_mod_poly_set_coeff_fmpz(z::Ref{($etype)}, n::Int, x.data::Ref{ZZRingElem}, base_ring(z).ninv::Ref{($ctype)})::Nothing
+      @ccall libflint.fmpz_mod_poly_set_coeff_fmpz(z::Ref{($etype)}, n::Int, data(x)::Ref{ZZRingElem}, base_ring(z).ninv::Ref{($ctype)})::Nothing
       return z
     end
 

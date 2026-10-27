@@ -71,7 +71,7 @@ end
 
 function *(x::FpPolyRingElem, y::FpFieldElem)
   (base_ring(x) != parent(y)) && error("Must have same parent")
-  return x*y.data
+  return x*data(y)
 end
 
 *(x::FpFieldElem, y::FpPolyRingElem) = y*x
@@ -98,7 +98,7 @@ end
 
 function +(x::FpPolyRingElem, y::FpFieldElem)
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
-  return x + y.data
+  return x + data(y)
 end
 
 +(x::FpFieldElem, y::FpPolyRingElem) = y + x
@@ -133,12 +133,12 @@ end
 
 function -(x::FpPolyRingElem, y::FpFieldElem)
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
-  return x - y.data
+  return x - data(y)
 end
 
 function -(x::FpFieldElem, y::FpPolyRingElem)
   (parent(x) != base_ring(y)) && error("Elements must have same parent")
-  return x.data - y
+  return data(x) - y
 end
 
 ################################################################################
@@ -172,7 +172,7 @@ function divexact(x::FpPolyRingElem, y::FpFieldElem; check::Bool=true)
   base_ring(x) != parent(y) && error("Elements must have same parent")
   iszero(y) && throw(DivideError())
   q = parent(x)()
-  @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(q::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y.data::Ref{ZZRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(q::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, data(y)::Ref{ZZRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return q
 end
 
@@ -385,7 +385,7 @@ end
 #
 ################################################################################
 
-setcoeff!(x::FpPolyRingElem, n::Int, y::FpFieldElem) = setcoeff!(x, n, y.data)
+setcoeff!(x::FpPolyRingElem, n::Int, y::FpFieldElem) = setcoeff!(x, n, data(y))
 
 ################################################################################
 #
@@ -411,7 +411,7 @@ promote_rule(::Type{FpPolyRingElem}, ::Type{ZZRingElem}) = FpPolyRingElem
 
 function (R::FpPolyRing)(x::FpFieldElem)
   base_ring(R) != parent(x) && error("Wrong parents")
-  return FpPolyRingElem(R, x.data)
+  return FpPolyRingElem(R, data(x))
 end
 
 (R::FpPolyRing)(arr::Vector{ZZRingElem}) = FpPolyRingElem(R, arr)
