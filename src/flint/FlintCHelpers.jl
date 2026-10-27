@@ -67,8 +67,8 @@ _set_property!(x, ::Val{s}, v) where {s} = error("property $s of $(typeof(x)) is
 _legacy_fieldnames(::Type) = ()
 
 # `d` with the field at `path` replaced by `v`
-@inline _setpath(d, path::Tuple{Symbol}, v) = _setfield(d, path[1], v)
-@inline _setpath(d, path::Tuple, v) = _setfield(d, path[1], _setpath(getproperty(d, path[1]), Base.tail(path), v))
+@inline _setpath(d, path::Tuple{Symbol, Vararg{Symbol}}, v) = _setfield(d, first(path), _setpath(getproperty(d, first(path)), Base.tail(path), v))
+@inline _setpath(d, ::Tuple{}, v) = v
 
 # word `i` of a union, and the union with word `i` replaced
 @inline _union_word(d, i) = getfield(d, :uniondata)[i]
@@ -103,7 +103,7 @@ function _property_defs(T, block, namesfun)
     push!(names, name)
     push!(defs, :(@inline $(esc(:_property))($(esc(:x))::$(esc(T)), ::Val{$(QuoteNode(name))}) = $(esc(_subst_cstruct(ex)))))
     pth = _field_path(ex)
-    if pth !== nothing && !isempty(pth) && !(name in setters)
+    if pth !== nothing && !(name in setters)
       push!(setters, name)
       push!(defs, :(@inline $(esc(:_set_property!))($(esc(:x))::$(esc(T)), ::Val{$(QuoteNode(name))}, $(esc(:v))) = setfield!($(esc(:x)), :cstruct, _setpath(getfield($(esc(:x)), :cstruct), $(Tuple(pth)), $(esc(:v))))))
     end

@@ -99,7 +99,6 @@ end
 @flint_fields ZZRingElem
 @flint_extra_fields ZZRingElem begin
   d = cstruct
-  d! = v
 end
 
 mutable struct fmpz_factor
