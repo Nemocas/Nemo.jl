@@ -434,7 +434,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
           return false
         end
       else
-        return iszero(data(y))
+        return iszero(y)
       end
     end
 

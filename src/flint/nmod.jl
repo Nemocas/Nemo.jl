@@ -48,9 +48,9 @@ function one(R::zzModRing)
   end
 end
 
-iszero(a::zzModRingElem) = data(a) == 0
+iszero(a::zzModRingElem) = iszero(data(a))
 
-isone(a::zzModRingElem) = (modulus(parent(a)) == 1) || (data(a) == 1)
+isone(a::zzModRingElem) = (modulus(parent(a)) == 1) || isone(data(a))
 
 modulus(R::zzModRing) = R.n
 
@@ -134,7 +134,7 @@ end
 ###############################################################################
 
 function -(x::zzModRingElem)
-  if data(x) == 0
+  if iszero(x)
     return deepcopy(x)
   else
     R = parent(x)
@@ -327,7 +327,7 @@ function inv(x::zzModRingElem)
   #s = [UInt(0)]
   s = Ref{UInt}()
   g = @ccall libflint.n_gcdinv(s::Ptr{UInt}, data(x)::UInt, modulus(R)::UInt)::UInt
-  g != 1 && error("Impossible inverse in ", R)
+  !isone(g) && error("Impossible inverse in ", R)
   return zzModRingElem(s[], R)
 end
 
