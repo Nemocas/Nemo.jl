@@ -1,11 +1,49 @@
+# Property access for Nemo's FLINT-backed types.
+#
+# Such a type stores the C struct as its first field, `cstruct`, of a type from
+# the generated module `FlintC` (`src/FlintC.jl`). `ccall`s then see
+# FLINT's layout, and the macros in this file make `x.f` and `x.f = v` reach
+# the C fields, so the rest of Nemo keeps field syntax.
+#
+# A type `T` declared with these macros has three kinds of properties besides
+# its own Julia fields:
+#
+# - C fields: the fields of `T.cstruct`, forwarded by `@flint_fields`.
+# - extra properties: values computed from `cstruct`, declared with
+#   `@flint_extra_fields`; e.g. the `entries` pointer of a matrix that FLINT
+#   stores as a C union.
+# - legacy properties: the field names Nemo had before the generated structs,
+#   declared with `@flint_legacy_fields`. They keep downstream code working
+#   and are to be removed: delete the macro, its uses and
+#   `_legacy_fieldnames`.
+#
+# Lookup order: Julia fields, then conversions, extra and legacy properties,
+# then C fields. So `x.cstruct` is always the C struct, and a legacy name can
+# shadow a C field, e.g. to keep returning a `Cint` where FLINT has an enum.
+
+"""
+    FlintStruct
+
+Supertype of the generated mirrors of FLINT's C structs.
+
+FLINT's `typedef foo_struct foo_t[1];` is generated as
+`const foo_t = Tuple{foo_struct}`. Reading a field of type `foo_t` returns
+its `foo_struct` instead of the tuple.
+"""
 abstract type FlintStruct end
 
-# unwrap singleton tuples, i.e. C's `foo_t x[1]` fields
 @inline Base.getproperty(val::FlintStruct, name::Symbol) = _unwrap(getfield(val, name))
 @inline _unwrap(v::Tuple{T}) where {T} = only(v)
 @inline _unwrap(v) = v
 
-# copy of `d` with field `name` replaced by `v`
+"""
+    _setfield(d::FlintStruct, name::Symbol, v)
+
+Return a copy of `d` with field `name` set to `v`.
+
+For a field of a singleton array type `foo_t = Tuple{foo_struct}`, `v` may
+be a `foo_struct`; it is wrapped into the tuple.
+"""
 function _setfield(d::T, name::Symbol, v) where {T<:FlintStruct}
   return T(ntuple(i -> fieldname(T, i) === name ? _wrap(fieldtype(T, i), v) : getfield(d, i), Val(fieldcount(T)))...)
 end
@@ -13,9 +51,52 @@ _wrap(::Type{Tuple{T}}, v::Tuple{T}) where {T} = v
 _wrap(::Type{Tuple{T}}, v) where {T} = (convert(T, v),)
 _wrap(::Type, v) = v
 
-# `@flint_fields T [f = JuliaType ...]` forwards `x.f` and `x.f = v` to the
-# fields of `x.cstruct::FlintStruct`. A `f = JuliaType` pair converts that field
-# on read, e.g. `entries = Ptr{ZZRingElem}` for Nemo's spelling of `fmpz*`.
+"""
+    _setpath(d::FlintStruct, path::Tuple{Vararg{Symbol}}, v)
+
+Return a copy of `d` in which the nested field given by `path` is set to
+`v`. For example, the path `(:mod, :n)` denotes the field `d.mod.n`.
+
+Each level is set with [`_setfield`](@ref), so singleton array fields along
+the path are unwrapped and wrapped again.
+"""
+@inline _setpath(d, path::Tuple{Symbol, Vararg{Symbol}}, v) = _setfield(d, first(path), _setpath(getproperty(d, first(path)), Base.tail(path), v))
+@inline _setpath(d, ::Tuple{}, v) = v
+
+"""
+    @flint_fields T
+    @flint_fields T begin
+      f = JuliaType
+      [...]
+    end
+
+Forward `x.f` and `x.f = v` for `x::T` to the fields of `x.cstruct`.
+
+A pair `f = JuliaType` wraps every read of `x.f` in a call to `JuliaType`.
+The generated structs declare pointer fields with the C element type, and
+the conversion gives them the type Nemo uses instead.
+
+Also defines `propertynames`: the C fields, the extra properties (see
+[`@flint_extra_fields`](@ref)) and the Julia fields other than `cstruct`; with
+`private = true` also `cstruct` and the legacy properties (see
+[`@flint_legacy_fields`](@ref)).
+
+# Examples
+```julia
+mutable struct ZZMatrix <: FlintMatElem{ZZRingElem}
+  cstruct::FlintC.fmpz_mat_struct  # entries::Ptr{fmpz}, r, c, stride
+  view_parent
+end
+@flint_fields ZZMatrix begin
+  entries = Ptr{ZZRingElem}
+end
+
+A = ZZ[1 2; 3 4]
+A.r          # 2, read from A.cstruct.r
+A.entries    # Ptr{ZZRingElem}(A.cstruct.entries)
+A.r = 2      # replaces A.cstruct by a copy with r = 2
+```
+"""
 macro flint_fields(T, block=:(begin end))
   @capture(block, begin conversions__ end) || error("expected a `begin` block, got `$block`")
   branches = map(conversions) do c
@@ -25,9 +106,7 @@ macro flint_fields(T, block=:(begin end))
   cfields = esc(Symbol("_", T, "_cfields"))
   jfields = esc(Symbol("_", T, "_jfields"))
   T = esc(T)
-  # Julia fields win over C fields of the same name, so `x.cstruct` is always the
-  # C struct. Extra and legacy properties win over C fields too, e.g. to keep
-  # an enum field returning a `Cint` as before.
+  # lookup order as described at the top of this file
   return quote
     const $jfields = fieldnames($T)
     const $cfields = filter(!in($jfields), fieldnames(fieldtype($T, :cstruct)))
@@ -51,35 +130,137 @@ macro flint_fields(T, block=:(begin end))
   end
 end
 
-# Properties beyond the fields of `cstruct`, e.g. views into an opaque union.
-# `@flint_extra_fields T name = expr ...` makes `x.name` evaluate `expr`, where
-# `cstruct` is the C struct. A `begin` block may hold the pairs. The body must not
-# go through `x.` again: inference gives up on that recursion.
-#
-# Writing `x.name = v` works when `expr` is a plain field path `cstruct.a.b`.
-# Otherwise `name! = expr` gives the new C struct in terms of `cstruct` and `v`.
-_extra_fieldnames(::Type) = ()
-_set_property!(x, ::Val{s}, v) where {s} = error("property $s of $(typeof(x)) is read-only")
+"""
+    @flint_extra_fields T begin
+      name = expr
+      [...]
+    end
 
-# Field names from before the generated structs, kept so that downstream code
-# keeps working. To drop them, delete `@flint_legacy_fields` and its uses and
-# `_legacy_fieldnames`.
+Define extra properties of `T`: `x.name` evaluates `expr`, in which `cstruct`
+stands for the C struct of `x`.
+
+`expr` must not access `x` through `getproperty`, i.e. `x.a` is not
+allowed, as inference does not handle the recursion.
+
+`x.name = v` is defined when `expr` is a plain field path `cstruct.a.b`. For
+anything else, add `name! = expr` with `expr` giving the new C struct in
+terms of `cstruct` and `v`.
+
+# Examples
+`FqMatrix` wraps a C union, so its matrix fields are words of that union:
+```julia
+@flint_extra_fields FqMatrix begin
+  entries = Ptr{FqFieldElem}(_union_word(cstruct, 1))
+  entries! = _set_union_word(cstruct, 1, v)
+  r = _union_word(cstruct, 2) % Int
+  r! = _set_union_word(cstruct, 2, v)
+end
+```
+"""
+macro flint_extra_fields(T, block)
+  return _property_defs(T, block, :_extra_fieldnames)
+end
+
+"""
+    @flint_legacy_fields T begin
+      name = expr
+      [...]
+    end
+
+Same as [`@flint_extra_fields`](@ref), but the names are listed by
+`_legacy_fieldnames` instead of `_extra_fieldnames`, and so appear only in
+the private `propertynames`.
+
+# Examples
+Before the generated structs, `zzModPolyRingElem` had the fields of its
+`nmod_t` flattened into `mod_n`, `mod_ninv` and `mod_norm`:
+```julia
+@flint_legacy_fields zzModPolyRingElem begin
+  mod_n = cstruct.mod.n
+  mod_ninv = cstruct.mod.ninv
+  mod_norm = cstruct.mod.norm
+end
+```
+
+Each is a field path, so `x.mod_n = v` works without a `mod_n!` pair.
+"""
+macro flint_legacy_fields(T, block)
+  return _property_defs(T, block, :_legacy_fieldnames)
+end
+
+"""
+    _extra_fieldnames(::Type{T})
+
+Names of the extra properties of `T`, as declared by
+[`@flint_extra_fields`](@ref); empty for other types.
+"""
+_extra_fieldnames(::Type) = ()
+
+"""
+    _legacy_fieldnames(::Type{T})
+
+Names of the legacy properties of `T`, as declared by
+[`@flint_legacy_fields`](@ref); empty for other types.
+"""
 _legacy_fieldnames(::Type) = ()
 
-# `d` with the field at `path` replaced by `v`
-@inline _setpath(d, path::Tuple{Symbol, Vararg{Symbol}}, v) = _setfield(d, first(path), _setpath(getproperty(d, first(path)), Base.tail(path), v))
-@inline _setpath(d, ::Tuple{}, v) = v
+"""
+    _property(x::T, ::Val{name})
 
-# word `i` of a union, and the union with word `i` replaced
+Getter behind the extra or legacy property `name` of `x`; the macros define
+a method for each declared name.
+"""
+function _property end
+
+"""
+    _set_property!(x::T, ::Val{name}, v)
+
+Setter behind the extra or legacy property `name` of `x`; the macros define
+a method for each declared name that has one. The fallback errors.
+"""
+_set_property!(x, ::Val{s}, v) where {s} = error("property $s of $(typeof(x)) is read-only")
+
+"""
+    _union_word(d::FlintStruct, i)
+
+Return the `i`-th machine word of the C union `d` as a `UInt`.
+
+A generated C union has the single field `uniondata::NTuple{n, UInt}`
+holding its bytes, as its members cannot be told apart by the type. The
+caller knows which member is live and reinterprets the word, e.g. as a
+`Ptr` or an `Int`. See [`@flint_extra_fields`](@ref) for the use with
+`FqMatrix`.
+"""
 @inline _union_word(d, i) = getfield(d, :uniondata)[i]
+
+"""
+    _set_union_word(d::FlintStruct, i, v)
+
+Return a copy of the C union `d` with its `i`-th machine word replaced by
+`v`, a `Ptr` or an `Integer`, converted to a `UInt`.
+"""
 @inline _set_union_word(d, i, v) = _setfield(d, :uniondata, Base.setindex(getfield(d, :uniondata), _asword(v), i))
 _asword(v::Ptr) = UInt(v)
 _asword(v::Integer) = v % UInt
 
-# `cstruct` in a property expression stands for the C struct
+"""
+    _subst_cstruct(ex)
+
+Replace the symbol `cstruct` in the expression `ex` by `getfield(x, :cstruct)`.
+
+Used as a helper in [`_property_defs`](@ref).
+"""
 _subst_cstruct(ex) = postwalk(e -> e === :cstruct ? :(getfield(x, :cstruct)) : e, ex)
 
-# `cstruct.a.b` as `(:a, :b)`, or nothing
+"""
+    _field_path(ex)
+
+Return the field names of a plain field path starting at `cstruct`.
+
+The result is `(:a, :b)` for `cstruct.a.b` and `()` for `cstruct`. Any other
+expression, including a path that does not start at `cstruct`, gives
+`nothing`. Used as a helper in [`_property_defs`](@ref).
+"""
 function _field_path(ex)
   ex === :cstruct && return ()
   @capture(ex, inner_.field_) || return nothing
@@ -87,6 +268,17 @@ function _field_path(ex)
   return path === nothing ? nothing : (path..., field)
 end
 
+"""
+    _property_defs(T, block, namesfun)
+
+Expand the `name = expr` pairs in the `block` of
+[`@flint_extra_fields`](@ref) or [`@flint_legacy_fields`](@ref) for `T` into
+[`_property`](@ref) and [`_set_property!`](@ref) methods.
+
+`namesfun` is [`_extra_fieldnames`](@ref) or [`_legacy_fieldnames`](@ref),
+depending on the macro; a method of it for `T` returning the declared names
+is generated as well.
+"""
 function _property_defs(T, block, namesfun)
   @capture(block, begin pairs__ end) || error("expected a `begin` block, got `$block`")
   defs = Expr[]
@@ -110,12 +302,4 @@ function _property_defs(T, block, namesfun)
   end
   push!(defs, :($(esc(namesfun))(::Type{$(esc(T))}) = $(Tuple(names))))
   return Expr(:block, defs...)
-end
-
-macro flint_extra_fields(T, block)
-  return _property_defs(T, block, :_extra_fieldnames)
-end
-
-macro flint_legacy_fields(T, block)
-  return _property_defs(T, block, :_legacy_fieldnames)
 end
