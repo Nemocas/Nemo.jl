@@ -1,30 +1,23 @@
 VERSION >= v"1.10" || error("This script requires Julia 1.10 or later")
 
-function expand_templates(input, flintdir)
+# Translate every `@include_c_header("x.h")` in the template into
+# `include("<outdir>/x.h.jl")`. Return the expanded template and the
+# translation of each header, as pairs `"x.h" => translation`.
+function expand_templates(input, flintdir, outdir)
   matches = eachmatch(r"^@include_c_header\(\"([A-Za-z_.]+)\"\)$"m, input)
   substitutions = Pair{String,String}[]
+  headers = Pair{String,String}[]
   for m in matches
     filename = m.captures[1]
     @info "Including header \"$filename\""
-    template_key = "@include_c_header(\"$filename\")"
-
-    # Read the file
-    content = open(joinpath(flintdir, filename)) do headerfile
-      read(headerfile, String)
-    end
-    # Convert to julia
-    translated_content = c2julia(content)
-    # Build the substitution value
-    template_val =
-      "###############################################################################\n" *
-      "# begin $filename\n\n" *
-      strip(translated_content) *
-      "\n\n# end $filename\n" *
-      "###############################################################################\n"
-    push!(substitutions, template_key => template_val)
+    content = read(joinpath(flintdir, filename), String)
+    push!(headers, filename => strip(c2julia(content)) * "\n")
+    push!(substitutions, m.match => "include(\"$outdir/$(generated_name(filename))\")")
   end
-  return replace(input, substitutions...)
+  return replace(input, substitutions...), headers
 end
+
+generated_name(header::AbstractString) = header * ".jl"
 
 const regex_typedef_struct_fields_name = r"^typedef struct\s*\{((?:[^{}]|\{[^{}]*\})+)\}\s*([A-Za-z0-9_]+);"m
 const regex_typedef_struct_fields_refname = r"^typedef struct\s*\{((?:[^{}]|\{[^{}]*\})+)\}\s*([A-Za-z0-9_]+)\[1\];"m
@@ -170,16 +163,17 @@ function c2julia(str::String)
   return output
 end
 
-file_header_notice(FLINT_jll_version) = """
-# Most of this file is generated from FLINT's header files.
-# Do not edit manually, only the corresponding `etc/*_template.jl` file should be edited.
-#
-# It mirrors FLINT internals, so it is not covered by Nemo's SemVer guarantees
-# and may change in any release.
+function file_header_notice(source::AbstractString, flintversion::VersionNumber)
+  return """
+  # This file has been generated from $source. DO NOT EDIT MANUALLY.
+  #
+  # To regenerate it, e.g. after updating FLINT_jll, run
+  #   julia etc/generate_FLINT_structs.jl
+  #
+  # Generated with FLINT_jll v$flintversion.
 
-# This file was generated using FLINT_jll v$(FLINT_jll_version).
-
-"""
+  """
+end
 
 ################################################################################
 #
@@ -188,15 +182,19 @@ file_header_notice(FLINT_jll_version) = """
 ################################################################################
 
 function expand_template_file(
-  infile::String, outfile::String, flintpath::String, file_header::String
+  infile::String, outfile::String, outdir::String, flintpath::String, flintversion::VersionNumber
 )
-  @info "Expanding file" infile outfile
-  # translate first, so a failure leaves the old file untouched
-  output = expand_templates(read(infile, String), joinpath(flintpath, "include", "flint"))
-  open(outfile, "w") do io
-    write(io, file_header)
-    write(io, output)
+  @info "Expanding file" infile outfile outdir
+  # translate first, so a failure leaves the old files untouched
+  output, headers = expand_templates(
+    read(infile, String), joinpath(flintpath, "include", "flint"), basename(outdir)
+  )
+  rm(outdir; recursive=true, force=true)
+  mkpath(outdir)
+  for (header, translation) in headers
+    write(joinpath(outdir, generated_name(header)), file_header_notice("FLINT's `$header`", flintversion) * translation)
   end
+  write(outfile, file_header_notice("`$(relpath(infile, nemopath))`", flintversion) * output)
 end
 
 function main()
@@ -204,9 +202,10 @@ function main()
   flintversion = pkgversion(FLINT_jll)
   @info "Found FLINT" flintpath flintversion
 
-  infile = joinpath(nemopath, "etc", "FlintCTypes_template.jl")
-  outfile = joinpath(nemopath, "src", "flint", "FlintCTypes.jl")
-  expand_template_file(infile, outfile, flintpath, file_header_notice(flintversion))
+  infile = joinpath(nemopath, "etc", "FlintC_template.jl")
+  outfile = joinpath(nemopath, "src", "FlintC.jl")
+  outdir = joinpath(nemopath, "src", "FlintC")
+  expand_template_file(infile, outfile, outdir, flintpath, flintversion)
 end
 
 const nemopath = dirname(dirname(@__FILE__))
