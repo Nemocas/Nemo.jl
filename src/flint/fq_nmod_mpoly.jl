@@ -783,7 +783,7 @@ function (R::fqPolyRepMPolyRing)()
 end
 
 function (R::fqPolyRepMPolyRing)(b::zzModRingElem)
-  z = fqPolyRepMPolyRingElem(R, b.data)
+  z = fqPolyRepMPolyRingElem(R, data(b))
   return z
 end
 

@@ -148,7 +148,7 @@ end
 
 function *(x::ZZModPolyRingElem, y::ZZModRingElem)
   (base_ring(x) != parent(y)) && error("Must have same parent")
-  return x*y.data
+  return x*data(y)
 end
 
 *(x::ZZModRingElem, y::ZZModPolyRingElem) = y*x
@@ -175,7 +175,7 @@ end
 
 function +(x::ZZModPolyRingElem, y::ZZModRingElem)
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
-  return x + y.data
+  return x + data(y)
 end
 
 +(x::ZZModRingElem, y::ZZModPolyRingElem) = y + x
@@ -210,12 +210,12 @@ end
 
 function -(x::ZZModPolyRingElem, y::ZZModRingElem)
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
-  return x - y.data
+  return x - data(y)
 end
 
 function -(x::ZZModRingElem, y::ZZModPolyRingElem)
   (parent(x) != base_ring(y)) && error("Elements must have same parent")
-  return x.data - y
+  return data(x) - y
 end
 
 ################################################################################
@@ -361,7 +361,7 @@ function divexact(x::ZZModPolyRingElem, y::ZZModRingElem; check::Bool=true)
   base_ring(x) != parent(y) && error("Elements must have same parent")
   iszero(y) && throw(DivideError())
   q = parent(x)()
-  @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(q::Ref{ZZModPolyRingElem}, x::Ref{ZZModPolyRingElem}, y.data::Ref{ZZRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_scalar_div_fmpz(q::Ref{ZZModPolyRingElem}, x::Ref{ZZModPolyRingElem}, data(y)::Ref{ZZRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return q
 end
 
@@ -599,7 +599,7 @@ end
 function evaluate(x::ZZModPolyRingElem, y::ZZModRingElem)
   base_ring(x) != parent(y) && error("Elements must have same parent")
   z = ZZRingElem()
-  @ccall libflint.fmpz_mod_poly_evaluate_fmpz(z::Ref{ZZRingElem}, x::Ref{ZZModPolyRingElem}, y.data::Ref{ZZRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_poly_evaluate_fmpz(z::Ref{ZZRingElem}, x::Ref{ZZModPolyRingElem}, data(y)::Ref{ZZRingElem}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return parent(y)(z)
 end
 
@@ -765,7 +765,7 @@ function roots(a::ZZModPolyRingElem)
     @ccall libflint.fmpz_mod_poly_roots(fac::Ref{fmpz_mod_poly_factor}, a::Ref{ZZModPolyRingElem}, 0::Cint, n::Ref{fmpz_mod_ctx_struct})::UInt
   else
     nfac = fmpz_factor()
-    @ccall libflint.fmpz_factor(nfac::Ref{fmpz_factor}, base_ring(R).n::Ref{ZZRingElem})::Nothing
+    @ccall libflint.fmpz_factor(nfac::Ref{fmpz_factor}, modulus(base_ring(R))::Ref{ZZRingElem})::Nothing
     @ccall libflint.fmpz_mod_poly_roots_factored(fac::Ref{fmpz_mod_poly_factor}, a::Ref{ZZModPolyRingElem}, 0::Cint, nfac::Ref{fmpz_factor}, n::Ref{fmpz_mod_ctx_struct})::UInt
   end
   f = R()
@@ -822,7 +822,7 @@ end
 
 setcoeff!(x::T, n::Int, y::Integer) where {T <: Zmodn_fmpz_poly} = setcoeff!(x, n, ZZRingElem(y))
 
-setcoeff!(x::ZZModPolyRingElem, n::Int, y::ZZModRingElem) = setcoeff!(x, n, y.data)
+setcoeff!(x::ZZModPolyRingElem, n::Int, y::ZZModRingElem) = setcoeff!(x, n, data(y))
 
 function add!(z::T, x::T, y::T) where {T <: Zmodn_fmpz_poly}
   @ccall libflint.fmpz_mod_poly_add(z::Ref{T}, x::Ref{T}, y::Ref{T}, base_ring(x).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
@@ -870,7 +870,7 @@ promote_rule(::Type{ZZModPolyRingElem}, ::Type{ZZModRingElem}) = ZZModPolyRingEl
 
 function (R::ZZModPolyRing)(x::ZZModRingElem)
   base_ring(R) != parent(x) && error("Wrong parents")
-  return ZZModPolyRingElem(R, x.data)
+  return ZZModPolyRingElem(R, data(x))
 end
 
 (R::ZZModPolyRing)(arr::Vector{ZZRingElem}) = ZZModPolyRingElem(R, arr)

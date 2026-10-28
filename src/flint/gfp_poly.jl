@@ -67,7 +67,7 @@ end
 ###############################################################################
 
 function similar(f::PolyRingElem, R::fpField, s::Symbol=var(parent(f)); cached::Bool=true)
-  z = fpPolyRingElem(R.n)
+  z = fpPolyRingElem(modulus(R))
   if base_ring(f) === R && s == var(parent(f)) && f isa fpPolyRingElem
     # steal parent in case it is not cached
     z.parent = parent(f)
@@ -86,7 +86,7 @@ end
 function polynomial(R::fpField, arr::Vector{T}, var::VarName=:x; cached::Bool=true) where T
   coeffs = map(R, arr)
   coeffs = length(coeffs) == 0 ? fpFieldElem[] : coeffs
-  z = fpPolyRingElem(R.n, coeffs)
+  z = fpPolyRingElem(modulus(R), coeffs)
   z.parent = fpPolyRing(R, Symbol(var), cached)
   return z
 end
@@ -99,21 +99,21 @@ end
 
 function *(x::fpPolyRingElem, y::fpFieldElem)
   (base_ring(x) != parent(y)) && error("Must have same parent")
-  return x*y.data
+  return x*data(y)
 end
 
 *(x::fpFieldElem, y::fpPolyRingElem) = y*x
 
 function +(x::fpPolyRingElem, y::fpFieldElem)
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
-  return +(x, y.data)
+  return +(x, data(y))
 end
 
 +(x::fpFieldElem, y::fpPolyRingElem) = y + x
 
 function -(x::fpPolyRingElem, y::fpFieldElem)
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
-  return -(x,y.data)
+  return -(x,data(y))
 end
 
 -(x::fpFieldElem, y::fpPolyRingElem) = -(y - x)
@@ -249,7 +249,7 @@ end
 
 function evaluate(x::fpPolyRingElem, y::fpFieldElem)
   base_ring(x) != parent(y) && error("Elements must have same parent")
-  z = @ccall libflint.nmod_poly_evaluate_nmod(x::Ref{fpPolyRingElem}, y.data::UInt)::UInt
+  z = @ccall libflint.nmod_poly_evaluate_nmod(x::Ref{fpPolyRingElem}, data(y)::UInt)::UInt
   return parent(y)(z)
 end
 
@@ -267,9 +267,9 @@ function interpolate(R::fpPolyRing, x::Vector{fpFieldElem},
   ay = Vector{UInt}(undef, length(y))
 
   for i in 1:length(x)
-    ax[i] = x[i].data
+    ax[i] = data(x[i])
 
-    ay[i] = y[i].data
+    ay[i] = data(y[i])
   end
   @ccall libflint.nmod_poly_interpolate_nmod_vec(z::Ref{fpPolyRingElem}, ax::Ptr{UInt}, ay::Ptr{UInt}, length(x)::Int)::Nothing
   return z
@@ -470,7 +470,7 @@ end
 #
 ################################################################################
 
-setcoeff!(x::fpPolyRingElem, n::Int, y::fpFieldElem) = setcoeff!(x, n, y.data)
+setcoeff!(x::fpPolyRingElem, n::Int, y::fpFieldElem) = setcoeff!(x, n, data(y))
 
 ################################################################################
 #
@@ -506,7 +506,7 @@ end
 
 function (R::fpPolyRing)(x::fpFieldElem)
   base_ring(R) != parent(x) && error("Wrong parents")
-  return fpPolyRingElem(R, x.data)
+  return fpPolyRingElem(R, data(x))
 end
 
 (R::fpPolyRing)(arr::Vector{ZZRingElem}) = fpPolyRingElem(R, arr)

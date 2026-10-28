@@ -38,13 +38,13 @@ end
 @inline function setindex!(a::T, u::UInt, i::Int, j::Int) where T <: Zmodn_mat
   @boundscheck _checkbounds(a, i, j)
   R = base_ring(a)
-  setindex_raw!(a, mod(u, R.n), i, j)
+  setindex_raw!(a, mod(u, modulus(R)), i, j)
 end
 
 @inline function setindex!(a::T, u::Int, i::Int, j::Int) where T <: Zmodn_mat
   @boundscheck _checkbounds(a, i, j)
   R = base_ring(a)
-  setindex_raw!(a, mod(u, R.n), i, j)
+  setindex_raw!(a, mod(u, modulus(R)), i, j)
 end
 
 @inline function setindex!(a::T, u::ZZRingElem, i::Int, j::Int) where T <: Zmodn_mat
@@ -55,7 +55,7 @@ end
 @inline function setindex!(a::zzModMatrix, u::zzModRingElem, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   (base_ring(a) != parent(u)) && error("Parent objects must coincide")
-  setindex_raw!(a, u.data, i, j) # no reduction necessary
+  setindex_raw!(a, data(u), i, j) # no reduction necessary
 end
 
 setindex!(a::Zmodn_mat, u::Integer, i::Int, j::Int) = setindex!(a, ZZRingElem(u), i, j)
@@ -254,7 +254,7 @@ mul!(a::T, b::T, c::Integer) where T <: Zmodn_mat = mul!(a, b, ZZRingElem(c))
 mul!(a::T, b::Union{ZZRingElem, Integer}, c::T) where T <: Zmodn_mat = mul!(a, c, b)
 
 function mul!(a::zzModMatrix, b::zzModMatrix, c::zzModRingElem)
-  return mul!(a, b, c.data)
+  return mul!(a, b, data(c))
 end
 
 function mul!(a::zzModMatrix, b::zzModRingElem, c::zzModMatrix)
@@ -262,7 +262,7 @@ function mul!(a::zzModMatrix, b::zzModRingElem, c::zzModMatrix)
 end
 
 function mul!(a::fpMatrix, b::fpMatrix, c::fpFieldElem)
-  return mul!(a, b, c.data)
+  return mul!(a, b, data(c))
 end
 
 function mul!(a::fpMatrix, b::fpFieldElem, c::fpMatrix)
@@ -270,7 +270,7 @@ function mul!(a::fpMatrix, b::fpFieldElem, c::fpMatrix)
 end
 
 function addmul!(A::fpMatrix, B::fpMatrix, C::fpFieldElem, D::fpMatrix)
-  @ccall libflint.nmod_mat_scalar_addmul_ui(A::Ref{fpMatrix}, B::Ref{fpMatrix}, D::Ref{fpMatrix}, C.data::UInt)::Nothing
+  @ccall libflint.nmod_mat_scalar_addmul_ui(A::Ref{fpMatrix}, B::Ref{fpMatrix}, D::Ref{fpMatrix}, data(C)::UInt)::Nothing
   return A
 end
 
@@ -278,7 +278,7 @@ function Generic.add_one!(a::T, i::Int, j::Int) where T <: Zmodn_mat
   @boundscheck _checkbounds(a, i, j)
   x = getindex_raw(a, i, j)
   x += 1
-  if x == base_ring(a).n
+  if x == modulus(base_ring(a))
     x = UInt(0)
   end
   setindex_raw!(a, x, i, j)
@@ -315,7 +315,7 @@ end
 
 function *(x::zzModMatrix, y::zzModRingElem)
   (base_ring(x) != parent(y)) && error("Parent objects must coincide")
-  return x*y.data
+  return x*data(y)
 end
 
 *(x::zzModRingElem, y::zzModMatrix) = y*x
@@ -686,14 +686,14 @@ end
 ###############################################################################
 
 function matrix(R::zzModRing, arr::AbstractMatrix{<: Union{zzModRingElem, ZZRingElem, Integer}})
-  z = zzModMatrix(size(arr, 1), size(arr, 2), R.n, arr)
+  z = zzModMatrix(size(arr, 1), size(arr, 2), modulus(R), arr)
   z.base_ring = R
   return z
 end
 
 function matrix(R::zzModRing, r::Int, c::Int, arr::AbstractVector{<: Union{zzModRingElem, ZZRingElem, Integer}})
   _check_dim(r, c, arr)
-  z = zzModMatrix(r, c, R.n, arr)
+  z = zzModMatrix(r, c, modulus(R), arr)
   z.base_ring = R
   return z
 end

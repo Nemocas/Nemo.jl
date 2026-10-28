@@ -23,7 +23,7 @@ for (etype, rtype, mtype, brtype) in (
       end
       prec = length(a) - 1
       prec < 0 && throw(DomainError(prec, "Precision must be non-negative"))
-      z = ($etype)(base_ring(a).n, Vector{$(mtype)}(undef, 0), 0, prec)
+      z = ($etype)(modulus(base_ring(a)), Vector{$(mtype)}(undef, 0), 0, prec)
       z.parent = parent(a)
       return z
     end
@@ -242,7 +242,7 @@ for (etype, rtype, mtype, brtype) in (
     function *(x::$(mtype), y::($etype))
       z = parent(y)()
       z.prec = y.prec
-      @ccall libflint.nmod_poly_scalar_mul_nmod(z::Ref{($etype)}, y::Ref{($etype)}, x.data::UInt)::Nothing
+      @ccall libflint.nmod_poly_scalar_mul_nmod(z::Ref{($etype)}, y::Ref{($etype)}, data(x)::UInt)::Nothing
       return z
     end
 
@@ -250,7 +250,7 @@ for (etype, rtype, mtype, brtype) in (
 
     function *(x::ZZRingElem, y::($etype))
       R = base_ring(y)
-      xmod = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, R.n::UInt)::UInt
+      xmod = @ccall libflint.fmpz_fdiv_ui(x::Ref{ZZRingElem}, modulus(R)::UInt)::UInt
       return R(xmod)*y
     end
 
@@ -373,7 +373,7 @@ for (etype, rtype, mtype, brtype) in (
         return false
       elseif length(x) == 1
         z = @ccall libflint.nmod_poly_get_coeff_ui(x::Ref{($etype)}, 0::Int)::UInt
-        return z == y.data
+        return z == data(y)
       else
         return precision(x) == 0 || iszero(y)
       end
@@ -429,7 +429,7 @@ for (etype, rtype, mtype, brtype) in (
       z = parent(x)()
       z.prec = x.prec
       yinv = inv(y)
-      @ccall libflint.nmod_poly_scalar_mul_nmod(z::Ref{($etype)}, x::Ref{($etype)}, yinv.data::UInt)::Nothing
+      @ccall libflint.nmod_poly_scalar_mul_nmod(z::Ref{($etype)}, x::Ref{($etype)}, data(yinv)::UInt)::Nothing
       return z
     end
 
@@ -485,7 +485,7 @@ for (etype, rtype, mtype, brtype) in (
     end
 
     function setcoeff!(z::($etype), n::Int, x::($mtype))
-      @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{($etype)}, n::Int, x.data::UInt)::Nothing
+      @ccall libflint.nmod_poly_set_coeff_ui(z::Ref{($etype)}, n::Int, data(x)::UInt)::Nothing
       return z
     end
 

@@ -28,7 +28,7 @@ parent(a::zzModRingElem) = a.parent
 
 function Base.hash(a::zzModRingElem, h::UInt)
   b = 0x1812aa3492cbf4d9%UInt
-  return xor(xor(hash(a.data), h), b)
+  return xor(xor(hash(data(a)), h), b)
 end
 
 lift(a::zzModRingElem) = ZZRingElem(data(a))
@@ -41,20 +41,20 @@ function zero(R::zzModRing)
 end
 
 function one(R::zzModRing)
-  if R.n == 1
+  if modulus(R) == 1
     return zzModRingElem(UInt(0), R)
   else
     return zzModRingElem(UInt(1), R)
   end
 end
 
-iszero(a::zzModRingElem) = a.data == 0
+iszero(a::zzModRingElem) = data(a) == 0
 
-isone(a::zzModRingElem) = (a.parent.n == 1) || (a.data == 1)
+isone(a::zzModRingElem) = (modulus(parent(a)) == 1) || (data(a) == 1)
 
 modulus(R::zzModRing) = R.n
 
-order(R::zzModRing) = ZZRingElem(R.n)
+order(R::zzModRing) = ZZRingElem(modulus(R))
 
 function krull_dim(R::zzModRing)
   is_trivial(R) && return -inf
@@ -69,7 +69,7 @@ is_trivial(a::zzModRing) = is_unit(modulus(a))
 
 function deepcopy_internal(a::zzModRingElem, dict::IdDict)
   R = parent(a)
-  return zzModRingElem(deepcopy(a.data), R)
+  return zzModRingElem(deepcopy(data(a)), R)
 end
 
 ###############################################################################
@@ -111,7 +111,7 @@ function show(io::IO, R::zzModRing)
     io = pretty(io)
     print(io, LowercaseOff(), "ZZ/($(signed(widen(R.n))))")
   else
-    print(io, "Integers modulo ", signed(widen(R.n)))
+    print(io, "Integers modulo ", signed(widen(modulus(R))))
   end
 end
 
@@ -120,7 +120,7 @@ function expressify(a::zzModRingElem; context = nothing)
 end
 
 function show(io::IO, a::zzModRingElem)
-  print(io, signed(widen(a.data)))
+  print(io, signed(widen(data(a))))
 end
 
 function Base.alignment(io::IO, a::zzModRingElem)
@@ -134,11 +134,11 @@ end
 ###############################################################################
 
 function -(x::zzModRingElem)
-  if x.data == 0
+  if data(x) == 0
     return deepcopy(x)
   else
     R = parent(x)
-    return zzModRingElem(R.n - x.data, R)
+    return zzModRingElem(modulus(R) - data(x), R)
   end
 end
 
@@ -152,8 +152,8 @@ function +(x::zzModRingElem, y::zzModRingElem)
   check_parent(x, y)
   R = parent(x)
   n = modulus(R)
-  d = x.data + y.data - n
-  if d > x.data
+  d = data(x) + data(y) - n
+  if d > data(x)
     return zzModRingElem(d + n, R)
   else
     return zzModRingElem(d, R)
@@ -164,8 +164,8 @@ function -(x::zzModRingElem, y::zzModRingElem)
   check_parent(x, y)
   R = parent(x)
   n = modulus(R)
-  d = x.data - y.data
-  if d > x.data
+  d = data(x) - data(y)
+  if d > data(x)
     return zzModRingElem(d + n, R)
   else
     return zzModRingElem(d, R)
@@ -218,14 +218,14 @@ end
 # modulus shifted left by norm
 function _mulmod(a::UInt, b::UInt, R::Union{zzModRing, fpField})
   s = R.norm
-  d = @ccall libflint.n_mulmod_preinv((a << s)::UInt, (b << s)::UInt, (R.n << s)::UInt, R.ninv::UInt, s::UInt)::UInt
+  d = @ccall libflint.n_mulmod_preinv((a << s)::UInt, (b << s)::UInt, (modulus(R) << s)::UInt, R.ninv::UInt, s::UInt)::UInt
   return d >> s
 end
 
 function *(x::zzModRingElem, y::zzModRingElem)
   check_parent(x, y)
   R = parent(x)
-  d = _mulmod(x.data, y.data, R)
+  d = _mulmod(data(x), data(y), R)
   return zzModRingElem(d, R)
 end
 
@@ -237,7 +237,7 @@ end
 
 function *(x::Integer, y::zzModRingElem)
   R = parent(y)
-  return R(widen(x)*signed(widen(y.data)))
+  return R(widen(x)*signed(widen(data(y))))
 end
 
 *(x::zzModRingElem, y::Integer) = y*x
@@ -245,10 +245,10 @@ end
 function *(x::Int, y::zzModRingElem)
   R = parent(y)
   if x < 0
-    d = mulmod(reinterpret(UInt, -x), y.data, R.n, R.ninv)
+    d = mulmod(reinterpret(UInt, -x), data(y), modulus(R), R.ninv)
     return -zzModRingElem(d, R)
   else
-    d = mulmod(UInt(x), y.data, R.n, R.ninv)
+    d = mulmod(UInt(x), data(y), modulus(R), R.ninv)
     return zzModRingElem(d, R)
   end
 end
@@ -257,7 +257,7 @@ end
 
 function *(x::UInt, y::zzModRingElem)
   R = parent(y)
-  d = mulmod(x, y.data, R.n, R.ninv)
+  d = mulmod(x, data(y), modulus(R), R.ninv)
   return zzModRingElem(d, R)
 end
 
@@ -283,7 +283,7 @@ function ^(x::zzModRingElem, y::Int)
     x = inv(x)
     y = -y
   end
-  d = @ccall libflint.nmod_pow_ui(x.data::UInt, unsigned(y)::UInt, nmod_t(R)::nmod_t)::UInt
+  d = @ccall libflint.nmod_pow_ui(data(x)::UInt, unsigned(y)::UInt, nmod_t(R)::nmod_t)::UInt
   return zzModRingElem(d, R)
 end
 
@@ -295,7 +295,7 @@ end
 
 function ==(x::zzModRingElem, y::zzModRingElem)
   check_parent(x, y)
-  return x.data == y.data
+  return data(x) == data(y)
 end
 
 ###############################################################################
@@ -320,13 +320,13 @@ end
 
 function inv(x::zzModRingElem)
   R = parent(x)
-  (iszero(x) && R.n != 1) && throw(DivideError())
-  if R.n == 1
+  (iszero(x) && modulus(R) != 1) && throw(DivideError())
+  if modulus(R) == 1
     return deepcopy(x)
   end
   #s = [UInt(0)]
   s = Ref{UInt}()
-  g = @ccall libflint.n_gcdinv(s::Ptr{UInt}, x.data::UInt, R.n::UInt)::UInt
+  g = @ccall libflint.n_gcdinv(s::Ptr{UInt}, data(x)::UInt, modulus(R)::UInt)::UInt
   g != 1 && error("Impossible inverse in ", R)
   return zzModRingElem(s[], R)
 end
@@ -376,8 +376,8 @@ end
 function gcd(x::zzModRingElem, y::zzModRingElem)
   check_parent(x, y)
   R = parent(x)
-  d = gcd(gcd(x.data, R.n), y.data)
-  if d == R.n
+  d = gcd(gcd(data(x), modulus(R)), data(y))
+  if d == modulus(R)
     return zzModRingElem(0, R)
   else
     return zzModRingElem(d, R)
@@ -393,7 +393,7 @@ $\mathbb{Z}$.
 function gcdx(a::zzModRingElem, b::zzModRingElem)
   m = modulus(a)
   R = parent(a)
-  g, u, v = gcdx(ZZRingElem(a.data), ZZRingElem(b.data))
+  g, u, v = gcdx(ZZRingElem(data(a)), ZZRingElem(data(b)))
   G, U, V = gcdx(g, ZZRingElem(m))
   return R(G), R(U)*R(u), R(U)*R(v)
 end
@@ -416,7 +416,7 @@ end
 # define rand(::zzModRing)
 
 Random.Sampler(::Type{RNG}, R::zzModRing, n::Random.Repetition) where {RNG<:AbstractRNG} =
-Random.SamplerSimple(R, Random.Sampler(RNG, UInt(0):R.n - 1, n))
+Random.SamplerSimple(R, Random.Sampler(RNG, UInt(0):modulus(R) - 1, n))
 
 rand(rng::AbstractRNG, R::Random.SamplerSimple{zzModRing}) = zzModRingElem(rand(rng, R.data), R[])
 
@@ -453,7 +453,7 @@ function (R::zzModRing)()
 end
 
 function (R::zzModRing)(a::Integer)
-  n = R.n
+  n = modulus(R)
   d = a%signed(widen(n))
   if d < 0
     d += n
@@ -462,7 +462,7 @@ function (R::zzModRing)(a::Integer)
 end
 
 function (R::zzModRing)(a::Int)
-  n = R.n
+  n = modulus(R)
   ninv = R.ninv
   if reinterpret(Int, n) > 0 && a < 0
     a %= Int(n)
@@ -478,14 +478,14 @@ function (R::zzModRing)(a::Int)
 end
 
 function (R::zzModRing)(a::UInt)
-  n = R.n
+  n = modulus(R)
   ninv = R.ninv
   a = mod2_preinv(a, n, ninv)
   return zzModRingElem(a, R)
 end
 
 function (R::zzModRing)(a::ZZRingElem)
-  d = @ccall libflint.fmpz_fdiv_ui(a::Ref{ZZRingElem}, R.n::UInt)::UInt
+  d = @ccall libflint.fmpz_fdiv_ui(a::Ref{ZZRingElem}, modulus(R)::UInt)::UInt
   return zzModRingElem(d, R)
 end
 
@@ -529,7 +529,7 @@ end
 Base.iterate(R::zzModRing) = (zero(R), zero(UInt))
 
 function Base.iterate(R::zzModRing, st::UInt)
-  if st == R.n - 1
+  if st == modulus(R) - 1
     return nothing
   end
 

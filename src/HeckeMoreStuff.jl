@@ -313,7 +313,7 @@ end
 
 function evaluate(f::fpPolyRingElem, v::Vector{fpFieldElem})
   F = base_ring(f)
-  v1 = UInt[x.data for x in v]
+  v1 = UInt[data(x) for x in v]
   res = UInt[UInt(1) for x in v]
   @ccall libflint.nmod_poly_evaluate_nmod_vec(res::Ptr{UInt}, f::Ref{fpPolyRingElem}, v1::Ptr{UInt}, UInt(length(v))::UInt)::Nothing
   return fpFieldElem[fpFieldElem(x, F) for x in res]
@@ -337,13 +337,13 @@ end
 
 function gcd(a::ResElem{T}, b::ResElem{T}) where {T<:IntegerUnion}
   m = modulus(a)
-  return parent(a)(gcd(gcd(a.data, m), b.data))
+  return parent(a)(gcd(gcd(data(a), m), data(b)))
 end
 
 function gcdx(a::ResElem{T}, b::ResElem{T}) where {T<:IntegerUnion}
   m = modulus(a)
   R = parent(a)
-  g, u, v = gcdx(ZZRingElem(a.data), ZZRingElem(b.data))
+  g, u, v = gcdx(ZZRingElem(data(a)), ZZRingElem(data(b)))
   G, U, V = gcdx(g, ZZRingElem(m))
   return R(G), R(U) * R(u), R(U) * R(v)
 end
@@ -503,28 +503,28 @@ size(F::FinField) = order(F)  # TODO: move this to AA
 # in triplicate.... and probably cases missing...
 function elem_to_mat_row!(M::MatElem, i::Int, a::ResElem{T}) where {T<:PolyRingElem}
   z = zero(parent(M[1, 1]))
-  for j = 0:degree(a.data)
-    M[i, j+1] = coeff(a.data, j)
+  for j = 0:degree(data(a))
+    M[i, j+1] = coeff(data(a), j)
   end
-  for j = degree(a.data)+2:ncols(M)
+  for j = degree(data(a))+2:ncols(M)
     M[i, j] = z
   end
 end
 function elem_to_mat_row!(M::MatElem, i::Int, a::ResElem{FqPolyRepPolyRingElem})
   z = zero(parent(M[1, 1]))
-  for j = 0:degree(a.data)
-    M[i, j+1] = coeff(a.data, j)
+  for j = 0:degree(data(a))
+    M[i, j+1] = coeff(data(a), j)
   end
-  for j = degree(a.data)+2:ncols(M)
+  for j = degree(data(a))+2:ncols(M)
     M[i, j] = z
   end
 end
 function elem_to_mat_row!(M::MatElem, i::Int, a::ResElem{fqPolyRepPolyRingElem})
   z = zero(parent(M[1, 1]))
-  for j = 0:degree(a.data)
-    M[i, j+1] = coeff(a.data, j)
+  for j = 0:degree(data(a))
+    M[i, j+1] = coeff(data(a), j)
   end
-  for j = degree(a.data)+2:ncols(M)
+  for j = degree(data(a))+2:ncols(M)
     M[i, j] = z
   end
 end
@@ -764,12 +764,12 @@ function (R::QQPolyRing)(a::Generic.RationalFunctionFieldElem{QQFieldElem})
 end
 
 function lift!(x::fpFieldElem, z::ZZRingElem)  # FIXME: wrong argument order?
-  set!(z, x.data)
+  set!(z, data(x))
   return z
 end
 
 function lift!(x::EuclideanRingResidueFieldElem{ZZRingElem}, z::ZZRingElem)  # FIXME: wrong argument order?
-  set!(z, x.data)
+  set!(z, data(x))
   return z
 end
 
