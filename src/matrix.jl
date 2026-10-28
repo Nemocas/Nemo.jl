@@ -10,8 +10,9 @@
 
 # field `name` of the C struct at `p`, a pointer to a `T` or to its C part alone
 @inline function _unsafe_load_field(p::Ptr{T}, ::Val{name}) where {T, name}
-  i = Base.fieldindex(T, name)
-  return unsafe_load(Ptr{fieldtype(T, i)}(p + fieldoffset(T, i)))
+  S = fieldtype(T, :cstruct)
+  i = Base.fieldindex(S, name)
+  return _unwrap(unsafe_load(Ptr{fieldtype(S, i)}(p + fieldoffset(S, i))))
 end
 
 number_of_rows(a::FlintMatElem) = a.r
@@ -26,7 +27,9 @@ is_square(a::Ref{<:FlintMatElem}) = nrows(a) == ncols(a)
 
 _entries(a::FlintMatElem) = a.entries
 _entries(a::Ref{T}) where {T <: FlintMatElem} = _entries(a[]::T)
-_entries(a::Ptr{<:FlintMatElem}) = _unsafe_load_field(a, Val(:entries))
+_entries(a::Ptr{T}) where {T <: FlintMatElem} = _entries_type(T)(_unsafe_load_field(a, Val(:entries)))
+
+_entries_type(::Type{T}) where {T <: FlintMatElem} = Base.promote_op(_entries, T)
 
 _stride(a::FlintMatElem) = a.stride
 _stride(a::Ref{T}) where {T <: FlintMatElem} = _stride(a[]::T)
@@ -34,8 +37,10 @@ _stride(a::Ptr{<:FlintMatElem}) = _unsafe_load_field(a, Val(:stride))
 
 # `_entry_size(T)` is the size of the C struct of one entry, which is smaller
 # than the Julia element type if that has fields of its own, such as a parent.
-# For FqMatrix it depends on the base ring, so there is none: FqMatrix has a
-# method of its own and no entry pointers through a `Ref` or `Ptr`.
+# For FqMatrix it depends on the base ring: FqMatrix has a method of its own
+# and no entry pointers through a `Ref` or `Ptr`.
+_entry_size(::Type{T}) where {T <: FlintMatElem} = sizeof(eltype(fieldtype(fieldtype(T, :cstruct), :entries)))
+
 function mat_entry_ptr(A::TypeOrPtr{T}, i::Int, j::Int) where {T <: FlintMatElem}
   return _entries(A) + ((i - 1) * _stride(A) + (j - 1)) * _entry_size(T)
 end
@@ -73,8 +78,10 @@ for T in [zzModMatrix, fpMatrix]
   end
 end
 
+# The words after the window header belong to the ring, e.g. the modulus
+# of an `nmod_mat`.
 function _set_ring!(z::FqMatrix, x::FqMatrix)
-  z.opaque = x.opaque
+  z.cstruct = _setfield(z.cstruct, :uniondata, (z.cstruct.uniondata[1:4]..., x.cstruct.uniondata[5:end]...))
   z.base_ring = x.base_ring
   return z
 end

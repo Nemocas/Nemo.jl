@@ -192,11 +192,13 @@ end
 #
 ################################################################################
 
-const _FQ_DEFAULT_FQ_ZECH   = 1
-const _FQ_DEFAULT_FQ_NMOD   = 2
-const _FQ_DEFAULT_FQ        = 3
-const _FQ_DEFAULT_NMOD      = 4
-const _FQ_DEFAULT_FMPZ_MOD  = 5
+# FLINT's representation tags of an `FqField`; kept under their old names,
+# Hecke and Oscar compare against them.
+const _FQ_DEFAULT_FQ_ZECH  = FlintC.FQ_DEFAULT_FQ_ZECH
+const _FQ_DEFAULT_FQ_NMOD  = FlintC.FQ_DEFAULT_FQ_NMOD
+const _FQ_DEFAULT_FQ       = FlintC.FQ_DEFAULT_FQ
+const _FQ_DEFAULT_NMOD     = FlintC.FQ_DEFAULT_NMOD
+const _FQ_DEFAULT_FMPZ_MOD = FlintC.FQ_DEFAULT_FMPZ_MOD
 
 mutable struct CanonicalFqDefaultMap{T}# <: Map{FqField, T, SetMap, CanonicalFqDefaultMap}
   D::FqField

@@ -524,7 +524,7 @@ function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp; check::Bo
   z.parent = ctx
 
   GC.@preserve data begin
-    res = Bool(@ccall libflint._qadic_char2_sqrt_with_precomp(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField}, data.ptr::Ptr{Cvoid})::Cint)
+    res = Bool(@ccall libflint._qadic_char2_sqrt_with_precomp(z::Ref{QadicFieldElem}, a::Ref{QadicFieldElem}, ctx::Ref{QadicField}, data.ptr::Ptr{FlintC.struct_qadic2_sqrt_precomp})::Cint)
   end
 
   check && !res && error("Square root of p-adic does not exist")
