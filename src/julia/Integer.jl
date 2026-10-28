@@ -2,11 +2,11 @@ function is_prime(x::Integer)
   return is_prime(ZZRingElem(x))
 end
 
-function next_prime(x::BigInt, proved::Bool=true)
+function next_prime(x::BigInt, proved::Union{Nothing,Bool}=nothing)
   return BigInt(next_prime(ZZRingElem(x), proved))
 end
 
-function next_prime(x::T, proved::Bool=true) where {T<:Integer}
+function next_prime(x::T, proved::Union{Nothing,Bool}=nothing) where {T<:Integer}
   return T(next_prime(BigInt(x), proved))
 end
 
