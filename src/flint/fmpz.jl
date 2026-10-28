@@ -3365,6 +3365,12 @@ function (::Type{T})(a::ZZRingElem) where T <: Union{Int128, UInt128}
   T(BigInt(a))
 end
 
+function (::Type{Bool})(a::ZZRingElem)
+  is_zero(a) && return false
+  is_one(a) && return true
+  throw(InexactError(:convert, Bool, a))
+end
+
 Base.Integer(a::ZZRingElem) = BigInt(a)
 
 convert(::Type{T}, a::ZZRingElem) where T <: Integer = T(a)
