@@ -41,7 +41,7 @@ function zero(R::ZZModRing)
 end
 
 function one(R::ZZModRing)
-  if modulus(R) == 1
+  if is_trivial(R)
     return ZZModRingElem(ZZRingElem(0), R)
   else
     return ZZModRingElem(ZZRingElem(1), R)
@@ -50,9 +50,9 @@ end
 
 iszero(a::ZZModRingElem) = iszero(data(a))
 
-isone(a::ZZModRingElem) = modulus(parent(a)) == 1 ? iszero(data(a)) : isone(data(a))
+isone(a::ZZModRingElem) = is_trivial(parent(a)) ? iszero(data(a)) : isone(data(a))
 
-is_unit(a::ZZModRingElem) = modulus(parent(a)) == 1 ? iszero(data(a)) : isone(gcd(data(a), modulus(parent(a))))
+is_unit(a::ZZModRingElem) = is_trivial(parent(a)) ? iszero(data(a)) : isone(gcd(data(a), modulus(parent(a))))
 
 modulus(R::ZZModRing) = R.n
 
@@ -143,7 +143,7 @@ pretty_eq(x::ZZModRingElem, y::ZZModRingElem) = (x == y)
 ###############################################################################
 
 function -(x::ZZModRingElem)
-  if iszero(data(x))
+  if iszero(x)
     return deepcopy(x)
   else
     R = parent(x)
@@ -267,14 +267,14 @@ end
 
 function inv(x::ZZModRingElem)
   R = parent(x)
-  (iszero(x) && modulus(R) != 1) && throw(DivideError())
-  if modulus(R) == 1
+  (iszero(x) && !is_trivial(R)) && throw(DivideError())
+  if is_trivial(R)
     return deepcopy(x)
   end
   s = ZZRingElem()
   g = ZZRingElem()
   @ccall libflint.fmpz_gcdinv(g::Ref{ZZRingElem}, s::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, modulus(R)::Ref{ZZRingElem})::Nothing
-  g != 1 && error("Impossible inverse in ", R)
+  !isone(g) && error("Impossible inverse in ", R)
   return ZZModRingElem(s, R)
 end
 
@@ -382,7 +382,7 @@ end
 
 function one!(z::ZZModRingElem)
   R = parent(z)
-  if modulus(R) == 1
+  if is_trivial(R)
     zero!(data(z))
   else
     one!(data(z))
@@ -392,7 +392,7 @@ end
 
 function neg!(z::ZZModRingElem, x::ZZModRingElem)
   R = parent(z)
-  if is_zero(data(x))
+  if is_zero(x)
     zero!(data(z))
   else
     sub!(data(z), modulus(R), data(x))
