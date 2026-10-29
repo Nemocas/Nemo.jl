@@ -231,19 +231,6 @@ Solve.lazy_transpose(A::FlintMatElem) = transpose(A)
 
 ################################################################################
 #
-#  Powering
-#
-################################################################################
-
-function ^(a::MatElem{T}, b::ZZRingElem) where {T <: NCRingElement}
-  fits(Int, b) && return a^Int(b)
-  check_square(a)
-  is_negative(b) && return AbstractAlgebra.internal_power(inv(a), -b)
-  return AbstractAlgebra.internal_power(a, b)
-end
-
-################################################################################
-#
 #  Solve context for matrices over finite fields
 #
 ################################################################################
