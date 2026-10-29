@@ -101,13 +101,13 @@ function (a::QQiField)(b::QQiFieldElem)
 end
 
 function (a::ZZRing)(b::QQiFieldElem)
-  iszero(b.num.y) && isone(b.den) || error("cannot coerce")
-  return b.num.x
+  iszero(imag(b.num)) && isone(b.den) || error("cannot coerce")
+  return real(b.num)
 end
 
 function (a::QQField)(b::QQiFieldElem)
-  iszero(b.num.y) || error("cannot coerce")
-  return b.num.x//b.den
+  iszero(imag(b.num)) || error("cannot coerce")
+  return real(b.num)//b.den
 end
 
 function (a::ZZiRing)(b::QQiFieldElem)
@@ -184,11 +184,11 @@ function deepcopy_internal(a::QQiField, d::IdDict)
 end
 
 function real(a::QQiFieldElem)
-  return a.num.x//a.den
+  return real(a.num)//a.den
 end
 
 function imag(a::QQiFieldElem)
-  return a.num.y//a.den
+  return imag(a.num)//a.den
 end
 
 function abs2(a::QQiFieldElem)
@@ -246,7 +246,7 @@ end
 
 function reduce!(z::QQiFieldElem)
   g = ZZRingElem()
-  @ccall libflint.fmpz_gcd3(g::Ref{ZZRingElem}, z.num.x::Ref{ZZRingElem}, z.den::Ref{ZZRingElem}, z.num.y::Ref{ZZRingElem})::Nothing
+  @ccall libflint.fmpz_gcd3(g::Ref{ZZRingElem}, real(z.num)::Ref{ZZRingElem}, z.den::Ref{ZZRingElem}, imag(z.num)::Ref{ZZRingElem})::Nothing
   if is_negative(z.den)
     neg!(g, g)
   end
@@ -372,9 +372,9 @@ end
 
 function inv!(z::QQiFieldElem, a::QQiFieldElem)
   d = abs2(a.num)
-  mul!(z.num.x, a.num.x, a.den)
-  mul!(z.num.y, a.num.y, a.den)
-  neg!(z.num.y, z.num.y)
+  mul!(real(z.num), real(a.num), a.den)
+  mul!(imag(z.num), imag(a.num), a.den)
+  neg!(imag(z.num), imag(z.num))
   swap!(z.den, d)
   reduce!(z)
   return z
