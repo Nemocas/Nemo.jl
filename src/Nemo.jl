@@ -485,6 +485,24 @@ const CacheDictType = AbstractAlgebra.WeakValueDict
 
 const TypeOrPtr{T} = Union{T, Ref{T}, Ptr{T}} where T
 
+_base_ptr(c::T) where T = Ptr{T}(pointer_from_objref(c))
+_base_ptr(c::Ref{T}) where T = _base_ptr(c[]::T)
+_base_ptr(c::Ptr) = c
+
+# `Ptr{S}` to field `name` of `c`. `S` defaults to the `fieldtype` of `name`
+# but need not be it, e.g. `ZZRingElem` for an `fmpz` field, which is an `Int`.
+@inline function _field_ptr(::Type{S}, c, ::Val{name}) where {S, name}
+  p = _base_ptr(c)
+  T = eltype(p)
+  return Ptr{S}(p + fieldoffset(T, Base.fieldindex(T, name)))
+end
+
+@inline _field_ptr(c, ::Val{name}) where {name} =
+  _field_ptr(fieldtype(eltype(_base_ptr(c)), name), c, Val(name))
+
+# field `name` of the C struct at `p`, which may point to the C part alone
+@inline _unsafe_load_field(p::Ptr, v::Val) = unsafe_load(_field_ptr(p, v))
+
 ###############################################################################
 #
 #   Matrices wrapping a FLINT matrix struct

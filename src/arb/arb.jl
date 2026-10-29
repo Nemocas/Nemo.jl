@@ -52,8 +52,8 @@ end
 
 characteristic(::ArbField) = 0
 
-_mid_ptr(x::TypeOrPtr{ArbFieldElem}) = @ccall libflint.arb_mid_ptr(x::Ref{ArbFieldElem})::Ptr{arf_struct}
-_rad_ptr(x::TypeOrPtr{ArbFieldElem}) = @ccall libflint.arb_rad_ptr(x::Ref{ArbFieldElem})::Ptr{mag_struct}
+_mid_ptr(x::TypeOrPtr{ArbFieldElem}) = _field_ptr(arf_struct, x, Val(:mid_exp))
+_rad_ptr(x::TypeOrPtr{ArbFieldElem}) = _field_ptr(mag_struct, x, Val(:rad_exp))
 
 ################################################################################
 #

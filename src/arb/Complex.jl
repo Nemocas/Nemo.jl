@@ -1544,8 +1544,8 @@ end
 #
 ################################################################################
 
-_real_ptr(x::TypeOrPtr{ComplexFieldElem}) = @ccall libflint.acb_real_ptr(x::Ref{ComplexFieldElem})::Ptr{RealFieldElem}
-_imag_ptr(x::TypeOrPtr{ComplexFieldElem}) = @ccall libflint.acb_imag_ptr(x::Ref{ComplexFieldElem})::Ptr{RealFieldElem}
+_real_ptr(x::TypeOrPtr{ComplexFieldElem}) = _field_ptr(RealFieldElem, x, Val(:real_mid_exp))
+_imag_ptr(x::TypeOrPtr{ComplexFieldElem}) = _field_ptr(RealFieldElem, x, Val(:imag_mid_exp))
 
 function _acb_set(x::TypeOrPtr{ComplexFieldElem}, y::Int)
   @ccall libflint.acb_set_si(x::Ref{ComplexFieldElem}, y::Int)::Nothing
