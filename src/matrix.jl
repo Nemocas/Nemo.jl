@@ -235,9 +235,7 @@ Solve.lazy_transpose(A::FlintMatElem) = transpose(A)
 #
 ################################################################################
 
-^(a::MatElem{T}, b::ZZRingElem) where {T <: NCRingElement} = _generic_power(a, b)
-
-function _generic_power(a::MatElem, b::ZZRingElem)
+function ^(a::MatElem{T}, b::ZZRingElem) where {T <: NCRingElement}
   fits(Int, b) && return a^Int(b)
   check_square(a)
   is_negative(b) && return AbstractAlgebra.internal_power(inv(a), -b)
