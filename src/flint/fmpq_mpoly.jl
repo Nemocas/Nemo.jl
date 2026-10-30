@@ -285,7 +285,10 @@ for jT in (QQFieldElem, ZZRingElem, Integer, Rational)
     *(a::QQMPolyRingElem, b::($jT)) = mul!(parent(a)(), a, b)
     *(a::($jT), b::QQMPolyRingElem) = mul!(parent(b)(), a, b)
 
-    divexact(a::QQMPolyRingElem, b::($jT); check::Bool=true) = divexact!(parent(a)(), a, b)
+    function divexact(a::QQMPolyRingElem, b::($jT); check::Bool=true)
+      iszero(b) && throw(DivideError())
+      return divexact!(parent(a)(), a, b)
+    end
 
     //(a::QQMPolyRingElem, b::($jT)) = a//parent(a)(b)
   end
@@ -496,6 +499,7 @@ end
 
 function divexact(a::QQMPolyRingElem, b::QQMPolyRingElem; check::Bool=true)
   check_parent(a, b)
+  iszero(b) && throw(DivideError())
   b, q = divides(a, b)
   !b && error("Division is not exact in divexact")
   return q

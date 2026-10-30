@@ -375,6 +375,7 @@ end
 
 function divexact(a::(FqMPolyRingElem), b::(FqMPolyRingElem); check::Bool=true)
   check_parent(a, b)
+  iszero(b) && throw(DivideError())
   return FqMPolyRingElem(parent(a), divexact(a.data, b.data))
 end
 

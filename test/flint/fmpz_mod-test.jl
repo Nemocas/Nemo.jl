@@ -407,6 +407,10 @@ end
 end
 
 @testset "ZZModRingElem.exact_division" begin
+  test_divexact_by_zero(residue_ring(ZZ, ZZ(6))[1], 0, ZZ(0))
+  R, = residue_ring(ZZ, ZZ(1))
+  @test divexact(one(R), zero(R)) == 0
+
   for i = 1:100
     R, = residue_ring(ZZ, ZZ(rand(1:24)))
 
