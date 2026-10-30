@@ -961,22 +961,13 @@ end
 #
 ###############################################################################
 
-^(a::T, n::ZZRingElem) where {T<:RingElem} = _generic_power(a, n)
+^(a::Union{NCRingElem, MatElem}, n::ZZRingElem) = _generic_power(a, n)
 
 function _generic_power(a, n::ZZRingElem)
   fits(Int, n) && return a^Int(n)
-  if is_negative(n)
-    a = inv(a)
-    n = -n
-  end
-  r = one(parent(a))
-  for b = bits(n)
-    r = mul!(r, r, r)
-    if b
-      r = mul!(r, r, a)
-    end
-  end
-  return r
+  a isa MatElem && check_square(a)
+  is_negative(n) && return AbstractAlgebra.internal_power(inv(a), -n)
+  return AbstractAlgebra.internal_power(a, n)
 end
 
 ###############################################################################

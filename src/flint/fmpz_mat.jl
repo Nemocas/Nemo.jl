@@ -281,13 +281,7 @@ end
 #
 ###############################################################################
 
-# Cannot use IntegerUnion here to avoid ambiguity.
-
-^(x::ZZMatrix, y::Int) = _powpow(x, y)
-
-^(x::ZZMatrix, y::ZZRingElem) = _powpow(x, y)
-
-function _powpow(x, y)
+function ^(x::ZZMatrix, y::Int)
   check_square(x)
   if y >= 0
     return pow!(similar(x), x, y)
