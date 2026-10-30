@@ -87,10 +87,8 @@ signature(::QQPolyRingElem)
 
 ### Root finding
 
-```@docs
-roots_with_multiplicities(::PolyRingElem)
-```
-
+`roots_with_multiplicities` is documented in AbstractAlgebra, see
+<https://nemocas.github.io/AbstractAlgebra.jl/stable/polynomial>.
 For `zzModPolyRingElem`, `fpPolyRingElem`, `ZZModPolyRingElem`, `FpPolyRingElem`,
 `FqPolyRingElem`, `FqPolyRepPolyRingElem` and `fqPolyRepPolyRingElem` the
 multiplicities are those FLINT computes while finding the roots. Over
