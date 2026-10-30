@@ -390,6 +390,7 @@ algebraic multiplicities as a vector of tuples of (root, multiplicity).
 """
 function eigenvalues_with_multiplicities(M::MatElem{T}) where T <: FieldElem
   @assert is_square(M)
+  @req is_exact_type(T) "The generic eigenvalues_with_multiplicities implementation requires an exact field"
   f = charpoly(M)
   x = gen(parent(f))
   # `roots` may list a root once for each multiplicity
@@ -421,11 +422,13 @@ multiplicities as a vector of tuples.
 """
 function eigenvalues_with_multiplicities(L::Field, M::MatElem{T}) where T <: RingElem
   @assert is_square(M)
-  f = change_base_ring(L, charpoly(M))
+  @req is_exact_type(L) "The generic eigenvalues_with_multiplicities implementation requires an exact field"
+  f = charpoly(M)
+  fL = change_base_ring(L, f)
   # `roots` may list a root once for each multiplicity
-  r = unique(roots(L, charpoly(M)))
-  x = gen(parent(f))
-  return [ (a, valuation(f, x - a)) for a in r ]
+  r = unique(roots(L, f))
+  x = gen(parent(fL))
+  return [ (a, valuation(fL, x - a)) for a in r ]
 end
 
 @doc raw"""
