@@ -776,25 +776,39 @@ function factor_distinct_deg(x::ZZModPolyRingElem)
   return res
 end
 
-function roots(a::ZZModPolyRingElem)
+# The roots of `a` in its base ring, as FLINT's factorization of `a` into
+# linear factors `x - r`, and that factorization, whose exponents are the
+# multiplicities when `with_multiplicity` is set and 1 otherwise.
+function _roots_and_factor(a::ZZModPolyRingElem, with_multiplicity::Bool)
+  @req !iszero(a) "Argument must be non-zero"
   R = parent(a)
   n = base_ring(R).ninv
   fac = fmpz_mod_poly_factor(n)
   if is_probable_prime(n.n)
-    @ccall libflint.fmpz_mod_poly_roots(fac::Ref{fmpz_mod_poly_factor}, a::Ref{ZZModPolyRingElem}, 0::Cint, n::Ref{fmpz_mod_ctx_struct})::UInt
+    @ccall libflint.fmpz_mod_poly_roots(fac::Ref{fmpz_mod_poly_factor}, a::Ref{ZZModPolyRingElem}, with_multiplicity::Cint, n::Ref{fmpz_mod_ctx_struct})::Nothing
   else
     nfac = fmpz_factor()
     @ccall libflint.fmpz_factor(nfac::Ref{fmpz_factor}, base_ring(R).n::Ref{ZZRingElem})::Nothing
-    @ccall libflint.fmpz_mod_poly_roots_factored(fac::Ref{fmpz_mod_poly_factor}, a::Ref{ZZModPolyRingElem}, 0::Cint, nfac::Ref{fmpz_factor}, n::Ref{fmpz_mod_ctx_struct})::UInt
+    # FLINT gives up, returning 0, when the roots modulo a prime power of the
+    # modulus are too many to list.
+    ok = @ccall libflint.fmpz_mod_poly_roots_factored(fac::Ref{fmpz_mod_poly_factor}, a::Ref{ZZModPolyRingElem}, with_multiplicity::Cint, nfac::Ref{fmpz_factor}, n::Ref{fmpz_mod_ctx_struct})::Cint
+    iszero(ok) && error("Too many roots to list")
   end
   f = R()
-  res = ZZModRingElem[]
+  rts = Vector{ZZModRingElem}(undef, fac.num)
   for i in 1:fac.num
     @ccall libflint.fmpz_mod_poly_factor_get_fmpz_mod_poly(f::Ref{ZZModPolyRingElem}, fac::Ref{fmpz_mod_poly_factor}, (i - 1)::Int, n::Ref{fmpz_mod_ctx_struct})::Nothing
     @assert isone(coeff(f, 1))
-    push!(res, -coeff(f, 0))
+    rts[i] = -coeff(f, 0)
   end
-  return res
+  return rts, fac
+end
+
+roots(a::ZZModPolyRingElem) = first(_roots_and_factor(a, false))
+
+function roots_with_multiplicities(a::ZZModPolyRingElem)
+  rts, fac = _roots_and_factor(a, true)
+  return GC.@preserve fac [(rts[i], unsafe_load(fac.exp, i)) for i in eachindex(rts)]
 end
 
 

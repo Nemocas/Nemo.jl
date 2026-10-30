@@ -583,6 +583,25 @@ end
   end
 end
 
+@testset "FpPolyRingElem.roots_with_multiplicities" begin
+  R = Native.GF(ZZRingElem(123456789012345678949))
+  S, y = polynomial_ring(R, "y")
+
+  @test_throws ArgumentError roots(S(0))
+  @test_throws ArgumentError roots_with_multiplicities(S(0))
+  @test isempty(roots_with_multiplicities(S(5)))
+
+  f = 3 * (y - 1)^3 * (y + 2) * (y^3 + 3y + 1)^2
+  rm = roots_with_multiplicities(f)
+  @test issetequal(first.(rm), roots(f))
+  # e is the largest exponent with (y - r)^e dividing f
+  @test all(((r, e),) -> iszero(rem(f, (y - r)^e)) && !iszero(rem(f, (y - r)^(e + 1))), rm)
+  # and the exponent of the linear factor y - r in the factorization of f
+  lin = [(-coeff(g, 0) // leading_coefficient(g), e)
+         for (g, e) in factor(f) if degree(g) == 1]
+  @test issetequal(rm, lin)
+end
+
 @testset "FpPolyRingElem.remove_valuation" begin
   R = Native.GF(ZZRingElem(123456789012345678949))
   S, y = polynomial_ring(R, "y")

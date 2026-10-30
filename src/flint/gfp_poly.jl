@@ -449,19 +449,29 @@ function factor_equal_deg(x::fpPolyRingElem, d::Int)
   return res
 end
 
-function roots(a::fpPolyRingElem)
+# The roots of `a` in its base ring, as FLINT's factorization of `a` into
+# linear factors `x - r`, and that factorization, whose exponents are the
+# multiplicities when `with_multiplicity` is set and 1 otherwise.
+function _roots_and_factor(a::fpPolyRingElem, with_multiplicity::Bool)
+  @req !iszero(a) "Argument must be non-zero"
   R = parent(a)
-  n = modulus(R)
-  fac = nmod_poly_factor(n)
-  @ccall libflint.nmod_poly_roots(fac::Ref{nmod_poly_factor}, a::Ref{fpPolyRingElem}, 0::Cint)::UInt
+  fac = nmod_poly_factor(modulus(R))
+  @ccall libflint.nmod_poly_roots(fac::Ref{nmod_poly_factor}, a::Ref{fpPolyRingElem}, with_multiplicity::Cint)::Nothing
   f = R()
-  res = fpFieldElem[]
+  rts = Vector{fpFieldElem}(undef, fac.num)
   for i in 1:fac.num
     @ccall libflint.nmod_poly_factor_get_poly(f::Ref{fpPolyRingElem}, fac::Ref{nmod_poly_factor}, (i - 1)::Int)::Nothing
     @assert isone(coeff(f, 1))
-    push!(res, -coeff(f, 0))
+    rts[i] = -coeff(f, 0)
   end
-  return res
+  return rts, fac
+end
+
+roots(a::fpPolyRingElem) = first(_roots_and_factor(a, false))
+
+function roots_with_multiplicities(a::fpPolyRingElem)
+  rts, fac = _roots_and_factor(a, true)
+  return GC.@preserve fac [(rts[i], unsafe_load(fac.exp, i)) for i in eachindex(rts)]
 end
 
 ################################################################################
