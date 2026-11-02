@@ -3170,7 +3170,7 @@ julia> ZZ(2)^100
 ###############################################################################
 
 function parse(::Type{ZZRingElem}, s::AbstractString, base::Int = 10)
-  if s[1] == '-'
+  if startswith(s, '-')
     sgn = -1
     s2 = string(SubString(s, 2))
   else
