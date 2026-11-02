@@ -587,6 +587,44 @@ end
 
 ################################################################################
 #
+#  Construction from roots
+#
+################################################################################
+
+@doc raw"""
+    from_roots(R::ZZPolyRing, rs::Vector{ZZRingElem})
+    from_roots(R::zzModPolyRing, rs::Vector{zzModRingElem})
+    from_roots(R::fpPolyRing, rs::Vector{fpFieldElem})
+    from_roots(R::ZZModPolyRing, rs::Vector{ZZModRingElem})
+    from_roots(R::FpPolyRing, rs::Vector{FpFieldElem})
+
+Return the monic polynomial $\prod_i (x - r_i)$ in `R`, where the $r_i$ are
+the entries of `rs`, a repeated root counted as often as it occurs; `one(R)`
+if `rs` is empty. The entries must lie in the base ring of `R`.
+
+# Examples
+
+```jldoctest
+julia> S, = residue_ring(ZZ, 12);
+
+julia> R, x = polynomial_ring(S, :x);
+
+julia> from_roots(R, S.([1, 5, 5]))
+x^3 + x^2 + 11*x + 11
+```
+"""
+function from_roots(R::zzModPolyRing, rs::Vector{zzModRingElem})
+  @req all(r -> parent(r) == base_ring(R), rs) "parents do not match"
+  # FLINT returns a non-zero polynomial of degree length(rs) here
+  isone(modulus(base_ring(R))) && return zero(R)
+  z = R()
+  xs = UInt[r.data for r in rs]
+  @ccall libflint.nmod_poly_product_roots_nmod_vec(z::Ref{zzModPolyRingElem}, xs::Ptr{UInt}, length(xs)::Int)::Nothing
+  return z
+end
+
+################################################################################
+#
 #  Inflation and Deflation
 #
 ################################################################################
@@ -731,25 +769,39 @@ function factor_shape(x::PolyRingElem{T}) where {T <: RingElem}
   return res
 end
 
-function roots(a::zzModPolyRingElem)
+# The roots of `a` in its base ring, as FLINT's factorization of `a` into
+# linear factors `x - r`, and that factorization, whose exponents are the
+# multiplicities when `with_multiplicity` is set and 1 otherwise.
+function _roots_and_factor(a::zzModPolyRingElem, with_multiplicity::Bool)
+  @req !iszero(a) "Argument must be non-zero"
   R = parent(a)
   n = modulus(R)
   fac = nmod_poly_factor(n)
   if is_prime(n)
-    @ccall libflint.nmod_poly_roots(fac::Ref{nmod_poly_factor}, a::Ref{zzModPolyRingElem}, 0::Cint)::UInt
+    @ccall libflint.nmod_poly_roots(fac::Ref{nmod_poly_factor}, a::Ref{zzModPolyRingElem}, with_multiplicity::Cint)::Nothing
   else
     nfac = n_factor()
-    @ccall libflint.n_factor(nfac::Ref{n_factor}, n::UInt)::Nothing
-    @ccall libflint.nmod_poly_roots_factored(fac::Ref{nmod_poly_factor}, a::Ref{zzModPolyRingElem}, 0::Cint, nfac::Ref{n_factor})::UInt
+    @ccall libflint.n_factor(nfac::Ref{n_factor}, n::UInt, 1::Cint)::Nothing
+    # FLINT gives up, returning 0, when the roots modulo a prime power of `n`
+    # are too many to list.
+    ok = @ccall libflint.nmod_poly_roots_factored(fac::Ref{nmod_poly_factor}, a::Ref{zzModPolyRingElem}, with_multiplicity::Cint, nfac::Ref{n_factor})::Cint
+    iszero(ok) && error("Too many roots to list")
   end
   f = R()
-  res = zzModRingElem[]
+  rts = Vector{zzModRingElem}(undef, fac.num)
   for i in 1:fac.num
     @ccall libflint.nmod_poly_factor_get_poly(f::Ref{zzModPolyRingElem}, fac::Ref{nmod_poly_factor}, (i - 1)::Int)::Nothing
     @assert isone(coeff(f, 1))
-    push!(res, -coeff(f, 0))
+    rts[i] = -coeff(f, 0)
   end
-  return res
+  return rts, fac
+end
+
+roots(a::zzModPolyRingElem) = first(_roots_and_factor(a, false))
+
+function roots_with_multiplicities(a::zzModPolyRingElem)
+  rts, fac = _roots_and_factor(a, true)
+  return GC.@preserve fac [(rts[i], unsafe_load(fac.exp, i)) for i in eachindex(rts)]
 end
 
 ################################################################################

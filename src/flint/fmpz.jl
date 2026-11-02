@@ -1290,6 +1290,58 @@ function sqrtmod(x::ZZRingElem, m::ZZRingElem)
   return z
 end
 
+@doc raw"""
+    sqrtmod_all(a::IntegerUnion, n::IntegerUnion) -> Vector{ZZRingElem}
+
+Return every $x$ with $0 \le x < n$ and $x^2 \equiv a \pmod n$, in increasing
+order, and none if $a$ is not a square modulo $n$. The modulus must be
+positive and fit in a `UInt`; $a$ is any integer, not necessarily a unit
+modulo $n$.
+
+There can be many roots: $2^k$ for $a = 0$ and $n = 4^k$. For one square root
+modulo a prime, see [`sqrtmod`](@ref).
+
+# Examples
+
+```jldoctest
+julia> sqrtmod_all(4, 15)
+4-element Vector{ZZRingElem}:
+  2
+  7
+  8
+ 13
+
+julia> sqrtmod_all(-7, 1024)
+4-element Vector{ZZRingElem}:
+ 181
+ 331
+ 693
+ 843
+
+julia> sqrtmod_all(2, 5)
+ZZRingElem[]
+```
+"""
+function sqrtmod_all(a::IntegerUnion, n::IntegerUnion)
+  N = ZZ(n)
+  @req N > 0 && fits(UInt, N) "Modulus must be positive and fit in UInt"
+  return sort!(ZZRingElem[ZZ(x) for x in _sqrtmod_all(UInt(mod(ZZ(a), N)), UInt(N))])
+end
+
+# Every square root of `a` modulo `n`, in no particular order, for `0 <= a < n`
+# and `n > 0`, which are not checked.
+function _sqrtmod_all(a::UInt, n::UInt)
+  fac = n_factor()
+  @ccall libflint.n_factor(fac::Ref{n_factor}, n::UInt, 1::Cint)::Nothing
+  # FLINT allocates the array of roots, NULL when there are none, and the
+  # caller frees it.
+  roots = Ref(Ptr{UInt}(C_NULL))
+  k = @ccall libflint.n_sqrtmodn(roots::Ref{Ptr{UInt}}, a::UInt, fac::Ref{n_factor})::Int
+  res = UInt[unsafe_load(roots[], i) for i in 1:k]
+  roots[] == C_NULL || @ccall libflint.flint_free(roots[]::Ptr{UInt})::Nothing
+  return res
+end
+
 function sqrtmod_pk(a::IntegerUnion, p::IntegerUnion, k::Int)
   @req a != 0 && valuation(a, p) == 0 "Element must be a unit modulo p^k"
   return _sqrtmod_pk_big(ZZ(a), ZZ(p), k)

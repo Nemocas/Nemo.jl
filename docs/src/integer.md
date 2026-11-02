@@ -281,6 +281,10 @@ sqrtmod(::ZZRingElem, ::ZZRingElem)
 ```
 
 ```@docs
+sqrtmod_all(::IntegerUnion, ::IntegerUnion)
+```
+
+```@docs
 crt(r1::ZZRingElem, m1::ZZRingElem, r2::ZZRingElem, m2::ZZRingElem, signed=false; check::Bool=true)
 ```
 

@@ -603,6 +603,7 @@ export sqr_classical
 export sqrt
 export sqrt1pm1
 export sqrtmod
+export sqrtmod_all
 export sqrtpos
 export strong_echelon_form
 export strong_echelon_form!

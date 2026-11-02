@@ -501,6 +501,34 @@ end
   @test lift(T, f) == y^2 + 2y + 1
 end
 
+@testset "ZZModPolyRingElem.from_roots" begin
+  # a composite modulus of two words
+  R, = residue_ring(ZZ, ZZ(2)^64 * 3 * 5)
+  S, x = polynomial_ring(R, "x")
+
+  @test from_roots(S, ZZModRingElem[]) == one(S)
+  for n in 1:20
+    rs = [rand(R) for i in 1:n]
+    f = from_roots(S, rs)
+    @test parent(f) == S
+    @test f == prod(x - r for r in rs)
+  end
+  # a repeated root keeps its multiplicity
+  @test from_roots(S, [R(3), R(3), R(5)]) == (x - 3)^2 * (x - 5)
+
+  # modulus 1: every polynomial is zero, though FLINT's product is not
+  R1, = residue_ring(ZZ, ZZ(1))
+  S1, = polynomial_ring(R1, "x")
+  for rs in (elem_type(R1)[], [R1(0)], [R1(0), R1(0), R1(5)])
+    f = from_roots(S1, rs)
+    @test iszero(f)
+    @test f == one(S1)
+    @test degree(f) == -1
+  end
+
+  @test_throws ArgumentError from_roots(S, [residue_ring(ZZ, ZZ(2)^64 * 7)[1](1)])
+end
+
 @testset "ZZModPolyRingElem.is_irreducible" begin
   R, = residue_ring(ZZ, 123456789012345678949)
   S, x = polynomial_ring(R, "x")
@@ -574,6 +602,52 @@ end
     _, x = polynomial_ring(residue_ring(ZZ, ZZ(10)^n)[1], "x")
     @test length(roots(10*x)) == 10
   end
+end
+
+@testset "ZZModPolyRingElem.roots_with_multiplicities" begin
+  # e is the largest exponent with (y - r)^e dividing f
+  is_multiplicity(f, y, r, e) =
+    iszero(rem(f, (y - r)^e)) && !iszero(rem(f, (y - r)^(e + 1)))
+
+  S, y = polynomial_ring(residue_ring(ZZ, ZZ(1031))[1], "y")
+  @test_throws ArgumentError roots(S(0))
+  @test_throws ArgumentError roots_with_multiplicities(S(0))
+  @test isempty(roots_with_multiplicities(S(5)))
+  f = (y^2 + 7) * (y - 5)^3
+  rm = roots_with_multiplicities(f)
+  @test issetequal(first.(rm), roots(f))
+  @test all(((r, e),) -> is_multiplicity(f, y, r, e), rm)
+  @test (base_ring(S)(5), 3) in rm
+
+  # Composite modulus: 4y vanishes modulo 4, so each multiplicity is the one
+  # modulo 3, FLINT combining the prime powers by the minimum.
+  S, y = polynomial_ring(residue_ring(ZZ, ZZ(12))[1], "y")
+  f = 4 * y
+  rm = roots_with_multiplicities(f)
+  @test issetequal(first.(rm), roots(f))
+  @test length(rm) == 4
+  @test all(((r, e),) -> is_multiplicity(f, y, r, e), rm)
+  f = (y^2 + 7) * (y - 5)^3
+  @test all(((r, e),) -> is_multiplicity(f, y, r, e), roots_with_multiplicities(f))
+
+  # a prime modulus above the word size
+  S, y = polynomial_ring(residue_ring(ZZ, next_prime(ZZ(2)^64))[1], "y")
+  f = (y^2 + 7) * (y - 5)^3
+  rm = roots_with_multiplicities(f)
+  @test (base_ring(S)(5), 3) in rm
+  @test all(((r, e),) -> is_multiplicity(f, y, r, e), rm)
+
+  # Modulus 1: every polynomial is zero, so this is the zero polynomial's error
+  S, y = polynomial_ring(residue_ring(ZZ, ZZ(1))[1], "y")
+  @test iszero(y + 1)
+  @test_throws ArgumentError roots(y + 1)
+  @test_throws ArgumentError roots_with_multiplicities(y + 1)
+
+  # Too many roots to list: p*y vanishes modulo p > 2^32, where FLINT gives up.
+  p = next_prime(2^32)
+  S, y = polynomial_ring(residue_ring(ZZ, ZZ(3) * p)[1], "y")
+  @test_throws ErrorException roots(p * y)
+  @test_throws ErrorException roots_with_multiplicities(p * y)
 end
 
 @testset "ZZModPolyRingElem.remove_valuation" begin

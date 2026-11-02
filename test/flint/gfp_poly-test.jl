@@ -512,6 +512,23 @@ end
   @test f == x^2
 end
 
+@testset "fpPolyRingElem.from_roots" begin
+  R = Native.GF(23)
+  S, x = polynomial_ring(R, "x")
+
+  @test from_roots(S, fpFieldElem[]) == one(S)
+  for n in 1:20
+    rs = [rand(R) for i in 1:n]
+    f = from_roots(S, rs)
+    @test parent(f) == S
+    @test f == prod(x - r for r in rs)
+  end
+  # a repeated root keeps its multiplicity
+  @test from_roots(S, [R(3), R(3), R(5)]) == (x - 3)^2 * (x - 5)
+
+  @test_throws ArgumentError from_roots(S, [Native.GF(29)(1)])
+end
+
 @testset "fpPolyRingElem.inflate" begin
   R = Native.GF(23)
   Rx, x = polynomial_ring(R, "x")
@@ -673,6 +690,26 @@ end
     @test collect(factor(x * (x + 1) * (x + 3) * (x^2 + 1) * (x^3 + x + 3))) ==
           [x => 1, x + 1 => 1, x + 3 => 1, x^2 + 1 => 1, x^3 + x + 3 => 1]
   end
+end
+
+@testset "fpPolyRingElem.roots_with_multiplicities" begin
+  R = Native.GF(23)
+  S, y = polynomial_ring(R, "y")
+
+  @test_throws ArgumentError roots(S(0))
+  @test_throws ArgumentError roots_with_multiplicities(S(0))
+  @test isempty(roots_with_multiplicities(S(5)))
+
+  f = 5 * y * (y^2 + 1) * (y^2 + 2) * (y + 1)^10 * (y - 3)^2
+  rm = roots_with_multiplicities(f)
+  @test issetequal(first.(rm), roots(f))
+  # e is the largest exponent with (y - r)^e dividing f
+  @test all(((r, e),) -> iszero(rem(f, (y - r)^e)) && !iszero(rem(f, (y - r)^(e + 1))), rm)
+  # and the exponent of the linear factor y - r in the factorization of f
+  lin = [(-coeff(g, 0) // leading_coefficient(g), e)
+         for (g, e) in factor(f) if degree(g) == 1]
+  @test issetequal(rm, lin)
+  @test issetequal(rm, [(R(0), 1), (R(-1), 10), (R(3), 2)])
 end
 
 @testset "fpPolyRingElem.canonicalization" begin

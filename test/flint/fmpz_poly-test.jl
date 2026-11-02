@@ -390,6 +390,20 @@ end
   @test f == x^2
 end
 
+@testset "ZZPolyRingElem.from_roots" begin
+  S, x = polynomial_ring(ZZ, "x")
+
+  @test from_roots(S, ZZRingElem[]) == one(S)
+  for n in 1:20
+    # roots of one word and of several
+    rs = [rand(-ZZ(2)^100:ZZ(2)^100) for i in 1:n]
+    f = from_roots(S, rs)
+    @test parent(f) == S
+    @test f == prod(x - r for r in rs)
+  end
+  @test from_roots(S, ZZ.([3, 3, -5])) == (x - 3)^2 * (x + 5)
+end
+
 @testset "ZZPolyRingElem.factor" begin
   Rx, x = polynomial_ring(ZZ, "x")
 
