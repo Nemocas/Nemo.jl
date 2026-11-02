@@ -945,12 +945,12 @@ $e^{2 \pi i p / q}$. The denominator `q` will be minimal, with
 $0 \le p < q$. Throws if `a` is not a root of unity.
 """
 function root_of_unity_as_args(a::QQBarFieldElem)
-  p = Vector{Int}(undef, 1)
-  q = Vector{Int}(undef, 1)
-  if !Bool(@ccall libflint.qqbar_is_root_of_unity(p::Ptr{Int}, q::Ptr{Int}, a::Ref{QQBarFieldElem})::Cint)
+  p = Ref{Int}()
+  q = Ref{Int}()
+  if !Bool(@ccall libflint.qqbar_is_root_of_unity(p::Ref{Int}, q::Ref{Int}, a::Ref{QQBarFieldElem})::Cint)
     throw(DomainError(a, "value is not a root of unity"))
   end
-  return (q[1], p[1])
+  return (q[], p[])
 end
 
 @doc raw"""
@@ -1067,12 +1067,12 @@ Return $\operatorname{atan}(a) / \pi$ as an algebraic number.
 Throws if this value is transcendental or undefined.
 """
 function atanpi(a::QQBarFieldElem)
-  p = Vector{Int}(undef, 1)
-  q = Vector{Int}(undef, 1)
-  if !Bool(@ccall libflint.qqbar_atan_pi(p::Ptr{Int}, q::Ptr{Int}, a::Ref{QQBarFieldElem})::Cint)
+  p = Ref{Int}()
+  q = Ref{Int}()
+  if !Bool(@ccall libflint.qqbar_atan_pi(p::Ref{Int}, q::Ref{Int}, a::Ref{QQBarFieldElem})::Cint)
     throw(DomainError(a, "function value is not algebraic"))
   end
-  return QQBarFieldElem(p[1]) // q[1]
+  return QQBarFieldElem(p[]) // q[]
 end
 
 @doc raw"""
@@ -1082,12 +1082,12 @@ Return $\operatorname{asin}(a) / \pi$ as an algebraic number.
 Throws if this value is transcendental.
 """
 function asinpi(a::QQBarFieldElem)
-  p = Vector{Int}(undef, 1)
-  q = Vector{Int}(undef, 1)
-  if !Bool(@ccall libflint.qqbar_asin_pi(p::Ptr{Int}, q::Ptr{Int}, a::Ref{QQBarFieldElem})::Cint)
+  p = Ref{Int}()
+  q = Ref{Int}()
+  if !Bool(@ccall libflint.qqbar_asin_pi(p::Ref{Int}, q::Ref{Int}, a::Ref{QQBarFieldElem})::Cint)
     throw(DomainError(a, "function value is not algebraic"))
   end
-  return QQBarFieldElem(p[1]) // q[1]
+  return QQBarFieldElem(p[]) // q[]
 end
 
 @doc raw"""
@@ -1097,12 +1097,12 @@ Return $\operatorname{acos}(a) / \pi$ as an algebraic number.
 Throws if this value is transcendental.
 """
 function acospi(a::QQBarFieldElem)
-  p = Vector{Int}(undef, 1)
-  q = Vector{Int}(undef, 1)
-  if !Bool(@ccall libflint.qqbar_acos_pi(p::Ptr{Int}, q::Ptr{Int}, a::Ref{QQBarFieldElem})::Cint)
+  p = Ref{Int}()
+  q = Ref{Int}()
+  if !Bool(@ccall libflint.qqbar_acos_pi(p::Ref{Int}, q::Ref{Int}, a::Ref{QQBarFieldElem})::Cint)
     throw(DomainError(a, "function value is not algebraic"))
   end
-  return QQBarFieldElem(p[1]) // q[1]
+  return QQBarFieldElem(p[]) // q[]
 end
 
 @doc raw"""
@@ -1112,12 +1112,12 @@ Return $\log(a) / (\pi i)$ as an algebraic number.
 Throws if this value is transcendental or undefined.
 """
 function log_pi_i(a::QQBarFieldElem)
-  p = Vector{Int}(undef, 1)
-  q = Vector{Int}(undef, 1)
-  if !Bool(@ccall libflint.qqbar_log_pi_i(p::Ptr{Int}, q::Ptr{Int}, a::Ref{QQBarFieldElem})::Cint)
+  p = Ref{Int}()
+  q = Ref{Int}()
+  if !Bool(@ccall libflint.qqbar_log_pi_i(p::Ref{Int}, q::Ref{Int}, a::Ref{QQBarFieldElem})::Cint)
     throw(DomainError(a, "function value is not algebraic"))
   end
-  return QQBarFieldElem(p[1]) // q[1]
+  return QQBarFieldElem(p[]) // q[]
 end
 
 
