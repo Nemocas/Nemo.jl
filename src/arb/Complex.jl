@@ -1037,7 +1037,7 @@ function eisenstein_g(k::Int, x::ComplexFieldElem, prec::Int = precision(Balls))
   @ccall libflint.acb_modular_eisenstein(vec::Ptr{acb_struct}, x::Ref{ComplexFieldElem}, len::Int, prec::Int)::Nothing
   z = array(CC, vec, len)
   acb_vec_clear(vec, len)
-  return z[end]
+  return last(z)
 end
 
 @doc raw"""
