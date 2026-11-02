@@ -532,7 +532,7 @@ function is_square_with_sqrt(a::QadicFieldElem)
   if is_zero(a)
     pr = precision(a)
     p = QQ(prime(ctx))  # needs to be QQ in case pr < -1
-    return (true, O(ctx, p^div(pr+1, 2)))
+    return (true, O(ctx, p^fld(pr+1, 2)))  # floor division
   end
   if prime(ctx) == 2
     precomp_data = get_attribute!(ctx, :char2_sqrt_precomp) do
