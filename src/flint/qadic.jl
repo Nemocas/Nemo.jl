@@ -514,7 +514,7 @@ function _qadic_char2_sqrt(a::QadicFieldElem, data::Qadic2SqrtPrecomp)
   # Squareness of a unit depends on its first 3 digits. FLINT treats the
   # stored digits as exact, so with fewer known digits its answer is wrong.
   rel_pr = precision(a)-av
-  rel_pr < 3 && error("Insufficient precision to decide whether a q-adic is a square")
+  rel_pr < 3 && error("Insufficient precision to decide whether a 2-adic is a square")
   z = QadicFieldElem(precision(a) - div(av, 2))
   z.parent = ctx
 
