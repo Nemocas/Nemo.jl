@@ -353,10 +353,10 @@ function pseudorem(x::ZZPolyRingElem, y::ZZPolyRingElem)
   iszero(y) && throw(DivideError())
   diff = length(x) - length(y) + 1
   r = parent(x)()
-  d = Vector{Int}(undef, 1)
-  @ccall libflint.fmpz_poly_pseudo_rem(r::Ref{ZZPolyRingElem}, d::Ptr{Int}, x::Ref{ZZPolyRingElem}, y::Ref{ZZPolyRingElem})::Nothing
-  if (diff > d[1])
-    return leading_coefficient(y)^(diff - d[1])*r
+  d = Ref{Int}()
+  @ccall libflint.fmpz_poly_pseudo_rem(r::Ref{ZZPolyRingElem}, d::Ref{Int}, x::Ref{ZZPolyRingElem}, y::Ref{ZZPolyRingElem})::Nothing
+  if (diff > d[])
+    return leading_coefficient(y)^(diff - d[])*r
   else
     return r
   end
@@ -368,10 +368,10 @@ function pseudodivrem(x::ZZPolyRingElem, y::ZZPolyRingElem)
   diff = length(x) - length(y) + 1
   q = parent(x)()
   r = parent(x)()
-  d = Vector{Int}(undef, 1)
-  @ccall libflint.fmpz_poly_pseudo_divrem_divconquer(q::Ref{ZZPolyRingElem}, r::Ref{ZZPolyRingElem}, d::Ptr{Int}, x::Ref{ZZPolyRingElem}, y::Ref{ZZPolyRingElem})::Nothing
-  if (diff > d[1])
-    m = leading_coefficient(y)^(diff - d[1])
+  d = Ref{Int}()
+  @ccall libflint.fmpz_poly_pseudo_divrem_divconquer(q::Ref{ZZPolyRingElem}, r::Ref{ZZPolyRingElem}, d::Ref{Int}, x::Ref{ZZPolyRingElem}, y::Ref{ZZPolyRingElem})::Nothing
+  if (diff > d[])
+    m = leading_coefficient(y)^(diff - d[])
     return m*q, m*r
   else
     return q, r
@@ -567,10 +567,10 @@ julia> signature(x^3 + 3x + 1)
 ```
 """
 function signature(f::ZZPolyRingElem)
-  r = Vector{Int}(undef, 1)
-  s = Vector{Int}(undef, 1)
-  @ccall libflint.fmpz_poly_signature(r::Ptr{Int}, s::Ptr{Int}, f::Ref{ZZPolyRingElem})::Nothing
-  return (r[1], s[1])
+  r = Ref{Int}()
+  s = Ref{Int}()
+  @ccall libflint.fmpz_poly_signature(r::Ref{Int}, s::Ref{Int}, f::Ref{ZZPolyRingElem})::Nothing
+  return (r[], s[])
 end
 
 function n_real_roots(f::ZZPolyRingElem)
