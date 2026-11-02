@@ -403,6 +403,12 @@ end
   @test A^5 == A^2*A^3
 
   @test A^0 == one(S)
+
+  b = QQ[0 -1; 1 -1] # order 3
+  @test b^ZZ(-2) == b
+  @test b^(ZZ(2)^70 + 1) == b^2
+  @test b^-(ZZ(2)^70 + 1) == b
+  @test_throws DomainError QQ[1 2]^(ZZ(2)^70)
 end
 
 @testset "QQMatrix.adhoc_exact_division" begin

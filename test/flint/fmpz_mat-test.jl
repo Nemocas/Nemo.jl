@@ -389,6 +389,11 @@ end
   @test a^n == inv(a)^2
   n = ZZ(-2)
   @test a^n == inv(a)^2
+
+  b = ZZ[0 -1; 1 -1] # order 3
+  @test b^(ZZ(2)^63 - 1) == b
+  @test b^(ZZ(2)^63) == b^2
+  @test b^-(ZZ(2)^70 + 1) == b
 end
 
 @testset "ZZMatrix.adhoc_exact_division" begin
