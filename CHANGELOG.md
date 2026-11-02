@@ -9,6 +9,19 @@ The following gives an overview of the changes compared to the previous releases
 complete, many more internal or minor changes were made, but we tried to only list those changes
 which we think might affect some users directly.
 
+## [0.57.2](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.57.2) - 2026-11-02
+
+### New or extended functionality
+
+- [#2418](https://github.com/Nemocas/Nemo.jl/pull/2418) Add `sqrtmod_all`: every square root modulo a word-size integer
+- [#2419](https://github.com/Nemocas/Nemo.jl/pull/2419) Add `from_roots` for polynomials over `ZZ`, `Z/nZ` and `GF(p)`
+- [#2437](https://github.com/Nemocas/Nemo.jl/pull/2437) Add `roots_with_multiplicities`
+- [#2454](https://github.com/Nemocas/Nemo.jl/pull/2454) Support `ZZRingElem` powers of matrices
+
+### Performance improvements or improved testing
+
+- [#2431](https://github.com/Nemocas/Nemo.jl/pull/2431) Speed up `fpField` and `zzModRing` arithmetic with a complete `nmod_t`
+
 ## [0.57.1](https://github.com/Nemocas/Nemo.jl/releases/tag/v0.57.1) - 2026-10-16
 
 ### New or extended functionality
