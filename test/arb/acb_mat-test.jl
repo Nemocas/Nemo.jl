@@ -590,12 +590,12 @@ end
 
   E = @inferred eigenvalues(A)
   @test length(E) == 1
-  @test contains(E[1], 2)
+  @test contains(only(E), 2)
 
   E = @inferred eigenvalues_with_multiplicities(A)
   @test length(E) == 1
-  @test E[1][2] == 3
-  @test contains(E[1][1], 2)
+  @test only(E)[2] == 3
+  @test contains(only(E)[1], 2)
 
   @test_throws ErrorException eigenvalues_simple(A)
 end

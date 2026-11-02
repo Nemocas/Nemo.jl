@@ -3,10 +3,10 @@
   M = matrix(K, 4, 4, [ 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1 ])
   l = @inferred eigenvalues(M)
   @test length(l) == 1
-  @test l[1] == one(K)
+  @test only(l) == one(K)
   l_m = @inferred eigenvalues_with_multiplicities(M)
   @test length(l_m) == 1
-  @test l_m[1] == (one(K), 2)
+  @test only(l_m) == (one(K), 2)
 
   L = GF(5, 2)
   a = 2*gen(L) + 1 # third root of 1
