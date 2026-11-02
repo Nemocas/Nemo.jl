@@ -961,7 +961,7 @@ end
 #
 ###############################################################################
 
-^(a::Union{RingElem, MatElem}, n::ZZRingElem) = _generic_power(a, n)
+^(a::Union{NCRingElem, MatElem}, n::ZZRingElem) = _generic_power(a, n)
 
 function _generic_power(a, n::ZZRingElem)
   fits(Int, n) && return a^Int(n)
