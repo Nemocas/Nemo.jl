@@ -569,7 +569,7 @@ function evaluate(a::QQMPolyRingElem, vals::Vector{QQMPolyRingElem})
   R = parent(a)
   @req length(vals) == nvars(R) "Number of variables does not match number of values"
   @req allequal(map(parent, vals)) "Parents do not match"
-  S = parent(vals[1])
+  S = parent(first(vals))
 
   c = S()
   fl = @ccall libflint.fmpq_mpoly_compose_fmpq_mpoly(c::Ref{QQMPolyRingElem}, a::Ref{QQMPolyRingElem}, vals::Ptr{Ref{QQMPolyRingElem}}, R::Ref{QQMPolyRing}, S::Ref{QQMPolyRing})::Cint
@@ -582,7 +582,7 @@ function evaluate(a::QQMPolyRingElem, vals::Vector{QQPolyRingElem})
   R = parent(a)
   @req length(vals) == nvars(R) "Number of variables does not match number of values"
   @req allequal(map(parent, vals)) "Parents do not match"
-  S = parent(vals[1])
+  S = parent(first(vals))
 
   c = S()
   fl = @ccall libflint.fmpq_mpoly_compose_fmpq_poly(c::Ref{QQPolyRingElem}, a::Ref{QQMPolyRingElem}, vals::Ptr{Ref{QQPolyRingElem}}, R::Ref{QQMPolyRing})::Cint

@@ -688,7 +688,7 @@ function root(a::FinFieldElem, n::Integer)
   k = parent(a)
   kt, t = polynomial_ring(k, "t", cached=false)
   r = roots(t^n - a)
-  return r[1]
+  return first(r)
 end
 
 function base_field(K::fqPolyRepField)

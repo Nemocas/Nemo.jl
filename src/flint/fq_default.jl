@@ -1033,7 +1033,7 @@ function is_power(a::Union{fpFieldElem, FpFieldElem, fqPolyRepFieldElem, FqPolyR
   f = t^m - a
   rt = roots(f)
   if length(rt) > 0
-    return true, rt[1]
+    return true, first(rt)
   else
     return false, a
   end

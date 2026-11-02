@@ -556,7 +556,7 @@ for (etype, rtype, ftype, ctype, utype) in (
       R = parent(a)
       @req length(vals) == nvars(R) "Number of variables does not match number of values"
       @req allequal(map(parent, vals)) "Parents do not match"
-      S = parent(vals[1])
+      S = parent(first(vals))
 
       c = S()
       fl = @ccall libflint.nmod_mpoly_compose_nmod_mpoly(c::Ref{$etype}, a::Ref{$etype}, vals::Ptr{Ref{$etype}}, R::Ref{$rtype}, S::Ref{$rtype})::Cint
@@ -569,7 +569,7 @@ for (etype, rtype, ftype, ctype, utype) in (
       R = parent(a)
       @req length(vals) == nvars(R) "Number of variables does not match number of values"
       @req allequal(map(parent, vals)) "Parents do not match"
-      S = parent(vals[1])
+      S = parent(first(vals))
 
       c = S()
       fl = @ccall libflint.nmod_mpoly_compose_nmod_poly(c::Ref{$utype}, a::Ref{$etype}, vals::Ptr{Ref{$utype}}, R::Ref{$rtype})::Cint
