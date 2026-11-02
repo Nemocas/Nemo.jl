@@ -618,7 +618,7 @@ function from_roots(R::zzModPolyRing, rs::Vector{zzModRingElem})
   # FLINT returns a non-zero polynomial of degree length(rs) here
   isone(modulus(base_ring(R))) && return zero(R)
   z = R()
-  xs = UInt[r.data for r in rs]
+  xs = UInt[data(r) for r in rs]
   @ccall libflint.nmod_poly_product_roots_nmod_vec(z::Ref{zzModPolyRingElem}, xs::Ptr{UInt}, length(xs)::Int)::Nothing
   return z
 end

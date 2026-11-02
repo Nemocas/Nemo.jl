@@ -657,7 +657,7 @@ function from_roots(R::ZZModPolyRing, rs::Vector{ZZModRingElem})
   z = R()
   GC.@preserve rs begin
     # the entries of xs point into the integers of rs
-    xs = Int[r.data.d for r in rs]
+    xs = Int[data(r).d for r in rs]
     @ccall libflint.fmpz_mod_poly_product_roots_fmpz_vec(z::Ref{ZZModPolyRingElem}, xs::Ptr{Int}, length(xs)::Int, base_ring(R).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   end
   return z
