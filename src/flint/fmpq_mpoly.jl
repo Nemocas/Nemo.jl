@@ -340,7 +340,7 @@ end
 ################################################################################
 
 function (::Type{Fac{QQMPolyRingElem}})(fac::fmpq_mpoly_factor, preserve_input::Bool = true)
-  F = Fac{QQMPolyRingElem}()
+  d = Dict{QQMPolyRingElem, Int}()
   R = fac.parent
   for i in 0:fac.num-1
     f = R()
@@ -349,12 +349,11 @@ function (::Type{Fac{QQMPolyRingElem}})(fac::fmpq_mpoly_factor, preserve_input::
     else
       @ccall libflint.fmpq_mpoly_factor_swap_base(f::Ref{QQMPolyRingElem}, fac::Ref{fmpq_mpoly_factor}, i::Int, R::Ref{QQMPolyRing})::Nothing
     end
-    F.fac[f] = @ccall libflint.fmpq_mpoly_factor_get_exp_si(fac::Ref{fmpq_mpoly_factor}, i::Int, R::Ref{QQMPolyRing})::Int
+    d[f] = @ccall libflint.fmpq_mpoly_factor_get_exp_si(fac::Ref{fmpq_mpoly_factor}, i::Int, R::Ref{QQMPolyRing})::Int
   end
   c = QQFieldElem()
   @ccall libflint.fmpq_mpoly_factor_get_constant_fmpq(c::Ref{QQFieldElem}, fac::Ref{fmpq_mpoly_factor})::Nothing
-  F.unit = R(c)
-  return F
+  return Fac(R(c), d)
 end
 
 function factor(a::QQMPolyRingElem)

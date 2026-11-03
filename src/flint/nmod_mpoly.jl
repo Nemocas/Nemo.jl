@@ -368,7 +368,7 @@ for (etype, rtype, ftype, ctype, utype) in (
 
     function (::Type{Fac{($etype)}})(fac::($ftype), preserve_input::Bool = true)
       R = fac.parent
-      F = Fac{($etype)}()
+      d = Dict{($etype), Int}()
       for i in 0:fac.num-1
         f = R()
         if preserve_input
@@ -376,11 +376,10 @@ for (etype, rtype, ftype, ctype, utype) in (
         else
           @ccall libflint.nmod_mpoly_factor_swap_base(f::Ref{($etype)}, fac::Ref{($ftype)}, i::Int, R::Ref{($rtype)})::Nothing
         end
-        F.fac[f] = @ccall libflint.nmod_mpoly_factor_get_exp_si(fac::Ref{($ftype)}, i::Int, R::Ref{($rtype)})::Int
+        d[f] = @ccall libflint.nmod_mpoly_factor_get_exp_si(fac::Ref{($ftype)}, i::Int, R::Ref{($rtype)})::Int
       end
       c = @ccall libflint.nmod_mpoly_factor_get_constant_ui(fac::Ref{($ftype)})::UInt
-      F.unit = R(c)
-      return F
+      return Fac(R(c), d)
     end
 
     function factor(a::($etype))
