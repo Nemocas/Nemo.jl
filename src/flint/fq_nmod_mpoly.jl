@@ -318,7 +318,7 @@ end
 #
 ################################################################################
 
-function (::Type{Fac{fqPolyRepMPolyRingElem}})(fac::fq_nmod_mpoly_factor, preserve_input::Bool = false)
+function Fac{fqPolyRepMPolyRingElem}(fac::fq_nmod_mpoly_factor, preserve_input::Bool = false)
   R = fac.parent
   d = Dict{fqPolyRepMPolyRingElem, Int}()
   for i in 0:fac.num-1

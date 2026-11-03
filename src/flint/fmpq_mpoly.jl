@@ -339,7 +339,7 @@ end
 #
 ################################################################################
 
-function (::Type{Fac{QQMPolyRingElem}})(fac::fmpq_mpoly_factor, preserve_input::Bool = true)
+function Fac{QQMPolyRingElem}(fac::fmpq_mpoly_factor, preserve_input::Bool = true)
   d = Dict{QQMPolyRingElem, Int}()
   R = fac.parent
   for i in 0:fac.num-1

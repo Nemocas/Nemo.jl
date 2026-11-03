@@ -328,7 +328,7 @@ end
 #
 ################################################################################
 
-function (::Type{Fac{ZZMPolyRingElem}})(fac::fmpz_mpoly_factor, preserve_input::Bool = true)
+function Fac{ZZMPolyRingElem}(fac::fmpz_mpoly_factor, preserve_input::Bool = true)
   R = fac.parent
   d = Dict{ZZMPolyRingElem, Int}()
   for i in 0:fac.num-1

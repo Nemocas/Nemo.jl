@@ -395,7 +395,7 @@ for (etype, rtype, ftype, ctype) in (
     #
     ################################################################################
 
-    function (::Type{Fac{($etype)}})(fac::($ftype), preserve_input::Bool = true)
+    function Fac{($etype)}(fac::($ftype), preserve_input::Bool = true)
       R = fac.parent
       d = Dict{($etype), Int}()
       for i in 0:fac.num-1
