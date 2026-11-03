@@ -111,10 +111,7 @@ function valuation(G::QQMatrix, p)
 end
 
 function roots(f::ZZModPolyRingElem, p::ZZRingElem, e::Int)
-  F = Fac{ZZRingElem}()
-  F.unit = one(ZZRingElem)
-  F[p] = e
-  return roots(f, F)
+  return roots(f, Fac(one(ZZRingElem), Dict(p => e)))
 end
 
 function roots(f::ZZModPolyRingElem, fac::Fac{ZZRingElem})
