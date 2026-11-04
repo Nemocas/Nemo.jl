@@ -14,6 +14,8 @@ import AbstractAlgebra
 using Random: Random, AbstractRNG, SamplerTrivial
 import Random: rand!
 
+using MacroTools: @capture, postwalk
+
 using RandomExtensions: RandomExtensions, make, Make2, Make3
 
 import SHA
@@ -224,6 +226,9 @@ using FLINT_jll: libflint
 const pkgdir = realpath(joinpath(dirname(@__DIR__)))
 
 
+include("flint/FlintCHelpers.jl")
+include("FlintC.jl")
+
 ###############################################################################
 #
 #   Flint Exception handling
@@ -234,16 +239,8 @@ function flint_abort()
   error("Problem in the FLINT-Subsystem")
 end
 
-@enum FlintExceptionType begin
-  FLINT_ERROR
-  FLINT_OVERFLOW
-  FLINT_IMPINV
-  FLINT_DOMERR
-  FLINT_DIVZERO
-  FLINT_EXPOF
-  FLINT_INEXACT
-  FLINT_TEST_FAIL
-end
+const FlintExceptionType = FlintC.flint_err_t
+using .FlintC: FLINT_ERROR, FLINT_OVERFLOW, FLINT_IMPINV, FLINT_DOMERR, FLINT_DIVZERO, FLINT_EXPOF, FLINT_INEXACT, FLINT_TEST_FAIL
 
 struct FlintException <: Exception
   type::FlintExceptionType

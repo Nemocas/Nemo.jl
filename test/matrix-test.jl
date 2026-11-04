@@ -359,7 +359,7 @@ struct_words(A, k) = GC.@preserve A [unsafe_load(Ptr{UInt}(pointer_from_objref(A
   for A in flint_mat_examples()
     # an nmod_mat has its modulus after `entries, r, c, stride`
     nmod = A isa Union{zzModMatrix, fpMatrix} ||
-           (A isa FqMatrix && Nemo._fq_default_ctx_type(base_ring(A)) == Nemo._FQ_DEFAULT_NMOD)
+           (A isa FqMatrix && Nemo._fq_default_ctx_type(base_ring(A)) == Nemo.FlintC.FQ_DEFAULT_NMOD)
     k = nmod ? 7 : 4
 
     # the stride of `B` differs from its number of columns
