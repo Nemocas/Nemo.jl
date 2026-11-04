@@ -530,6 +530,9 @@ end
 function is_square_with_sqrt(a::QadicFieldElem)
   ctx = parent(a)
   if is_zero(a)
+    throw(DomainError("Square-root of Q-adic zero not well defined"))
+    # DELIBERATELY leave the next 3 lines here (as most reasonable
+    # implementation) in case we decide to accept zero as input.
     pr = precision(a)
     p = QQ(prime(ctx))  # needs to be QQ in case pr < -1
     return (true, O(ctx, p^fld(pr+1, 2)))  # floor division
@@ -551,7 +554,7 @@ function is_square_with_sqrt(a::QadicFieldElem)
 end
 
 function is_square(a::QadicFieldElem)
-  is_zero(a) && return true
+  is_zero(a) && throw(DomainError("Square-root of Q-adic zero not well defined"))
   va = valuation(a)
   is_odd(va) && return false
   # squareness is decided by the first digit of a, or the first 3 if p == 2
