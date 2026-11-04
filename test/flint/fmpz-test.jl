@@ -115,6 +115,31 @@ end
     @test_throws DomainError Nemo.randseed!(-rand(1:1234))
   end
 
+  @testset "Random states on every thread" begin
+    # one state per thread id; with an interactive thread, the default
+    # threads have ids 2 and 3, so a session with -t 2,1 reaches index 3
+    @test length(Nemo._flint_rand_states) >= Nemo._maxthreadid()
+    @test length(Nemo._ecm_B1s) >= Nemo._maxthreadid()
+    @test length(Nemo._ecm_nCs) >= Nemo._maxthreadid()
+    code = """
+      using Nemo
+      # 66 digits without small factors, so factor uses ECM
+      N = next_prime(ZZ(10)^14) * next_prime(ZZ(10)^50)
+      ok = zeros(Bool, Threads.nthreads())
+      Threads.@threads :static for i in eachindex(ok)
+        Nemo.randseed!(i)
+        ok[i] = nbits(rand_bits(ZZ, 64)) == 64 &&
+                is_prime(rand_bits_prime(ZZ, 64)) &&
+                rand_bits(QQ, 64) isa QQFieldElem &&
+                length(factor(N)) == 2
+      end
+      exit(all(ok) ? 0 : 1)
+      """
+    cmd = `$(Base.julia_cmd()) -t 2,1 --startup-file=no
+           --project=$(Base.active_project()) -e $code`
+    @test success(cmd)
+  end
+
   @testset "ZZRingElemUnitRange.rand" begin
     r = ZZ(-4):ZZ(2)^64
     for _ in 1:10
