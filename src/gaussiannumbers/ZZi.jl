@@ -777,9 +777,9 @@ end
 ###############################################################################
 
 # a[b] += c
-function addeqindex!(a::Fac, c::Int, b)
+function addeqindex!(a::Dict, c::Int, b)
   c > 0 || return
-  setindex!(a.fac, c + get(a.fac, b, 0), b)
+  a[b] = c + get(a, b, 0)
 end
 
 function _sum_of_squares(p::ZZRingElem)
@@ -793,36 +793,36 @@ end
 
 function factor(a::ZZiRingElem)
   iszero(a) && throw(ArgumentError("Argument must be non-zero"))
-  f = Fac{ZZiRingElem}()
+  d = Dict{ZZiRingElem, Int}()
   g = gcd(a.x, a.y)
-  f.unit = divexact(a, g)   # throw if a=0
+  u = divexact(a, g)   # throw if a=0
   c = ZZiRingElem(1, 1)
   for (p, e) in factor(g)
     if isone(mod(p, UInt(4)))
       c1 = _sum_of_squares(p)
-      addeqindex!(f, e, c1)
-      addeqindex!(f, e, conj(c1))
+      addeqindex!(d, e, c1)
+      addeqindex!(d, e, conj(c1))
     elseif p == 2
-      addeqindex!(f, 2*e, c)
-      mul_i_pow!(f.unit, -e)
+      addeqindex!(d, 2*e, c)
+      mul_i_pow!(u, -e)
     else
-      setindex!(f, e, ZZiRingElem(p, 0))
+      d[ZZiRingElem(p, 0)] = e
     end
   end
-  if mod(f.unit.x, UInt(2)) == mod(f.unit.y, UInt(2))
-    f.unit = divexact(f.unit, c, check=false)
-    addeqindex!(f, 1, c)
+  if mod(u.x, UInt(2)) == mod(u.y, UInt(2))
+    u = divexact(u, c, check=false)
+    addeqindex!(d, 1, c)
   end
-  for (p, e) in factor(abs2(f.unit))
+  for (p, e) in factor(abs2(u))
     c1 = _sum_of_squares(p)
-    if !is_divisible_by(f.unit, c1)
+    if !is_divisible_by(u, c1)
       c1 = conj(c1)
     end
-    f.unit = divexact(f.unit, c1^e)
-    addeqindex!(f, e, c1)
+    u = divexact(u, c1^e)
+    addeqindex!(d, e, c1)
   end
-  @assert is_unit(f.unit)
-  return f
+  @assert is_unit(u)
+  return Fac(u, d)
 end
 
 ###############################################################################

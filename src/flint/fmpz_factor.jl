@@ -34,14 +34,10 @@ end
 # Three internal worker functions: one for Int, one for UInt, one for ZZRingElem
 function _factor(::Type{T}, a::Int) where T <: Integer
   abs_a = reinterpret(UInt, a < 0 ? -a : a) # like abs(a), but correct also when a == typemin(Int)
-  fac = _factor(T, abs_a)
-  if a < 0
-    fac.unit = T(-1)  # OK since fac is mutable; gives error if T is Unsigned
-  end
-  return fac
+  return _factor(T, abs_a, a < 0 ? T(-1) : T(1))  # gives error if T is Unsigned and a < 0
 end
 
-function _factor(::Type{T}, a::UInt)  where T <: Integer
+function _factor(::Type{T}, a::UInt, u::T = T(1))  where T <: Integer
   @req  (T != Bool)  "Cannot have a factorization into booleans"
   @req  !iszero(a)  "Argument must be non-zero"
   F = n_factor()
@@ -51,7 +47,7 @@ function _factor(::Type{T}, a::UInt)  where T <: Integer
     z = T(F.p[i])
     res[z] = F.exp[i]
   end
-  return Fac(T(1), _pretty_sort(res))
+  return Fac(u, _pretty_sort(res))
 end
 
 function _factor(::Type{T}, a::ZZRingElem)  where T <: Integer

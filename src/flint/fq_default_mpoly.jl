@@ -258,12 +258,11 @@ end
 ################################################################################
 
 function _convert_fac(a::FqMPolyRing, b::Fac)
-  f = Fac{FqMPolyRingElem}()
-  f.unit = FqMPolyRingElem(a, b.unit)
+  d = Dict{FqMPolyRingElem, Int}()
   for (p, e) in b
-    f[FqMPolyRingElem(a, p)] = e
+    d[FqMPolyRingElem(a, p)] = e
   end
-  return f
+  return Fac(FqMPolyRingElem(a, unit(b)), d)
 end
 
 function factor(a::FqMPolyRingElem)

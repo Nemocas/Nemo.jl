@@ -318,9 +318,9 @@ end
 #
 ################################################################################
 
-function (::Type{Fac{fqPolyRepMPolyRingElem}})(fac::fq_nmod_mpoly_factor, preserve_input::Bool = false)
+function Fac{fqPolyRepMPolyRingElem}(fac::fq_nmod_mpoly_factor, preserve_input::Bool = false)
   R = fac.parent
-  F = Fac{fqPolyRepMPolyRingElem}()
+  d = Dict{fqPolyRepMPolyRingElem, Int}()
   for i in 0:fac.num-1
     f = R()
     if preserve_input
@@ -328,12 +328,11 @@ function (::Type{Fac{fqPolyRepMPolyRingElem}})(fac::fq_nmod_mpoly_factor, preser
     else
       @ccall libflint.fq_nmod_mpoly_factor_swap_base(f::Ref{fqPolyRepMPolyRingElem}, fac::Ref{fq_nmod_mpoly_factor}, i::Int, R::Ref{fqPolyRepMPolyRing})::Nothing
     end
-    F.fac[f] = @ccall libflint.fq_nmod_mpoly_factor_get_exp_si(fac::Ref{fq_nmod_mpoly_factor}, i::Int, R::Ref{fqPolyRepMPolyRing})::Int
+    d[f] = @ccall libflint.fq_nmod_mpoly_factor_get_exp_si(fac::Ref{fq_nmod_mpoly_factor}, i::Int, R::Ref{fqPolyRepMPolyRing})::Int
   end
   c = base_ring(R)()
   @ccall libflint.fq_nmod_mpoly_factor_get_constant_fq_nmod(c::Ref{fqPolyRepFieldElem}, fac::Ref{fq_nmod_mpoly_factor})::Nothing
-  F.unit = R(c)
-  return F
+  return Fac(R(c), d)
 end
 
 function factor(a::fqPolyRepMPolyRingElem)

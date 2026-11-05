@@ -328,10 +328,9 @@ end
 #
 ################################################################################
 
-function (::Type{Fac{ZZMPolyRingElem}})(fac::fmpz_mpoly_factor, preserve_input::Bool = true)
+function Fac{ZZMPolyRingElem}(fac::fmpz_mpoly_factor, preserve_input::Bool = true)
   R = fac.parent
-  F = Fac{ZZMPolyRingElem}()
-  empty!(F.fac)
+  d = Dict{ZZMPolyRingElem, Int}()
   for i in 0:fac.num-1
     f = R()
     if preserve_input
@@ -339,7 +338,7 @@ function (::Type{Fac{ZZMPolyRingElem}})(fac::fmpz_mpoly_factor, preserve_input::
     else
       @ccall libflint.fmpz_mpoly_factor_swap_base(f::Ref{ZZMPolyRingElem}, fac::Ref{fmpz_mpoly_factor}, i::Int, R::Ref{ZZMPolyRing})::Nothing
     end
-    F.fac[f] = @ccall libflint.fmpz_mpoly_factor_get_exp_si(fac::Ref{fmpz_mpoly_factor}, i::Int, R::Ref{ZZMPolyRing})::Int
+    d[f] = @ccall libflint.fmpz_mpoly_factor_get_exp_si(fac::Ref{fmpz_mpoly_factor}, i::Int, R::Ref{ZZMPolyRing})::Int
   end
   c = ZZRingElem()
   @ccall libflint.fmpz_mpoly_factor_get_constant_fmpz(c::Ref{ZZRingElem}, fac::Ref{fmpz_mpoly_factor})::Nothing
@@ -349,11 +348,10 @@ function (::Type{Fac{ZZMPolyRingElem}})(fac::fmpz_mpoly_factor, preserve_input::
     @ccall libflint.fmpz_factor(G::Ref{fmpz_factor}, c::Ref{ZZRingElem})::Nothing
     for i in 1:G.num
       @ccall libflint.fmpz_factor_get_fmpz(c::Ref{ZZRingElem}, G::Ref{fmpz_factor}, (i - 1)::Int)::Nothing
-      F.fac[R(c)] = unsafe_load(G.exp, i)
+      d[R(c)] = unsafe_load(G.exp, i)
     end
   end
-  F.unit = R(sgnc)
-  return F
+  return Fac(R(sgnc), d)
 end
 
 function factor(a::ZZMPolyRingElem)
