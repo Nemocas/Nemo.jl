@@ -28,7 +28,7 @@ end
 
 function getindex!(v::ZZModRingElem, a::ZZModMatrix, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
-  GC.@preserve a set!(v.data, mat_entry_ptr(a, i, j))
+  GC.@preserve a set!(data(v), mat_entry_ptr(a, i, j))
   return v
 end
 
@@ -48,7 +48,7 @@ end
 @inline function setindex!(a::T, u::ZZModRingElem, i::Int, j::Int) where T <: Zmod_fmpz_mat
   @boundscheck _checkbounds(a, i, j)
   (base_ring(a) != parent(u)) && error("Parent objects must coincide")
-  setindex_raw!(a, u.data, i, j) # no reduction needed
+  setindex_raw!(a, data(u), i, j) # no reduction needed
 end
 
 function setindex!(a::T, u::Integer, i::Int, j::Int) where T <: Zmod_fmpz_mat
@@ -321,10 +321,10 @@ mul!(a::T, b::T, c::Integer) where T <: Zmod_fmpz_mat = mul!(a, b, flintify(c))
 
 mul!(a::T, b::IntegerUnion, c::T) where T <: Zmod_fmpz_mat = mul!(a, c, b)
 
-mul!(a::ZZModMatrix, b::ZZModMatrix, c::ZZModRingElem) = mul!(a, b, c.data)
+mul!(a::ZZModMatrix, b::ZZModMatrix, c::ZZModRingElem) = mul!(a, b, data(c))
 mul!(a::ZZModMatrix, b::ZZModRingElem, c::ZZModMatrix) = mul!(a, c, b)
 
-mul!(a::FpMatrix, b::FpMatrix, c::FpFieldElem) = mul!(a, b, c.data)
+mul!(a::FpMatrix, b::FpMatrix, c::FpFieldElem) = mul!(a, b, data(c))
 mul!(a::FpMatrix, b::FpFieldElem, c::FpMatrix) = mul!(a, c, b)
 
 function Generic.add_one!(a::ZZModMatrix, i::Int, j::Int)
@@ -356,7 +356,7 @@ end
 
 function *(x::ZZModMatrix, y::ZZModRingElem)
   (base_ring(x) != parent(y)) && error("Parent objects must coincide")
-  return x*y.data
+  return x*data(y)
 end
 
 *(x::ZZModRingElem, y::ZZModMatrix) = y*x
@@ -490,7 +490,7 @@ function inv(a::ZZModMatrix)
     end
     return divexact(X, d)
   else
-    b = map_entries(x -> x.data, a)
+    b = map_entries(x -> data(x), a)
     c, d = pseudo_inv(b)
     R = base_ring(a)
     if !isone(gcd(d, modulus(R)))

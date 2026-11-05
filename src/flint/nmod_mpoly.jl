@@ -272,9 +272,9 @@ for (etype, rtype, ftype, ctype, utype) in (
 
     +(b::UInt, a::($etype)) = a + b
 
-    +(a::($etype), b::($ctype)) = a + b.data
+    +(a::($etype), b::($ctype)) = a + data(b)
 
-    +(b::($ctype), a::($etype)) = a + b.data
+    +(b::($ctype), a::($etype)) = a + data(b)
 
     +(a::($etype), b::Integer) = a + base_ring(parent(a))(b)
 
@@ -293,9 +293,9 @@ for (etype, rtype, ftype, ctype, utype) in (
       return z
     end
 
-    -(a::($etype), b::($ctype)) = a - b.data
+    -(a::($etype), b::($ctype)) = a - data(b)
 
-    -(b::($ctype), a::($etype)) = b.data - a
+    -(b::($ctype), a::($etype)) = data(b) - a
 
     -(a::($etype), b::Integer) = a - base_ring(parent(a))(b)
 
@@ -309,9 +309,9 @@ for (etype, rtype, ftype, ctype, utype) in (
 
     *(b::UInt, a::($etype)) = a * b
 
-    *(a::($etype), b::($ctype)) = a * b.data
+    *(a::($etype), b::($ctype)) = a * data(b)
 
-    *(b::($ctype), a::($etype)) = a * b.data
+    *(b::($ctype), a::($etype)) = a * data(b)
 
     *(a::($etype), b::Integer) = a * base_ring(parent(a))(b)
 
@@ -441,7 +441,7 @@ for (etype, rtype, ftype, ctype, utype) in (
     ###############################################################################
 
     function ==(a::($etype), b::($ctype))
-      return Bool(@ccall libflint.nmod_mpoly_equal_ui(a::Ref{($etype)}, b.data::UInt, parent(a)::Ref{($rtype)})::Cint)
+      return Bool(@ccall libflint.nmod_mpoly_equal_ui(a::Ref{($etype)}, data(b)::UInt, parent(a)::Ref{($rtype)})::Cint)
     end
 
     ==(a::($ctype), b::($etype)) = b == a
@@ -544,7 +544,7 @@ for (etype, rtype, ftype, ctype, utype) in (
     function evaluate(a::($etype), vals::Vector{$ctype})
       R = parent(a)
       @req length(vals) == nvars(R) "Number of variables does not match number of values"
-      vals2 = [val.data for val in vals]
+      vals2 = [data(val) for val in vals]
       z = @ccall libflint.nmod_mpoly_evaluate_all_ui(a::Ref{($etype)}, vals2::Ptr{UInt}, R::Ref{($rtype)})::UInt
       return base_ring(R)(z)
     end
@@ -619,7 +619,7 @@ for (etype, rtype, ftype, ctype, utype) in (
       if n > length(a)
         @ccall libflint.nmod_mpoly_resize(a::Ref{($etype)}, n::Int, parent(a)::Ref{($rtype)})::Nothing
       end
-      @ccall libflint.nmod_mpoly_set_term_coeff_ui(a::Ref{($etype)}, (n - 1)::Int, c.data::UInt, parent(a)::Ref{($rtype)})::Nothing
+      @ccall libflint.nmod_mpoly_set_term_coeff_ui(a::Ref{($etype)}, (n - 1)::Int, data(c)::UInt, parent(a)::Ref{($rtype)})::Nothing
       return a
     end
 
@@ -729,14 +729,14 @@ for (etype, rtype, ftype, ctype, utype) in (
     # Set the coefficient of the term with the given exponent vector to the
     # given ZZRingElem. Removal of a zero term is performed.
     function setcoeff!(a::($etype), exps::Vector{UInt}, b::($ctype))
-      @ccall libflint.nmod_mpoly_set_coeff_ui_ui(a::Ref{($etype)}, b.data::UInt, exps::Ptr{UInt}, parent(a)::Ref{($rtype)})::Nothing
+      @ccall libflint.nmod_mpoly_set_coeff_ui_ui(a::Ref{($etype)}, data(b)::UInt, exps::Ptr{UInt}, parent(a)::Ref{($rtype)})::Nothing
       return a
     end
 
     # Set the coefficient of the term with the given exponent vector to the
     # given ZZRingElem. Removal of a zero term is performed.
     function setcoeff!(a::($etype), exps::Vector{Int}, b::($ctype))
-      @ccall libflint.nmod_mpoly_set_coeff_ui_ui(a::Ref{($etype)}, b.data::UInt, exps::Ptr{Int}, parent(a)::Ref{($rtype)})::Nothing
+      @ccall libflint.nmod_mpoly_set_coeff_ui_ui(a::Ref{($etype)}, data(b)::UInt, exps::Ptr{Int}, parent(a)::Ref{($rtype)})::Nothing
       return a
     end
 
@@ -796,7 +796,7 @@ for (etype, rtype, ftype, ctype, utype) in (
     ###############################################################################
 
     function _push_term!(z::($etype), c::($ctype), exp::Vector{Int})
-      @ccall libflint.nmod_mpoly_push_term_ui_ui(z::Ref{$etype}, c.data::UInt, exp::Ptr{UInt}, parent(z)::Ref{$rtype})::Nothing
+      @ccall libflint.nmod_mpoly_push_term_ui_ui(z::Ref{$etype}, data(c)::UInt, exp::Ptr{UInt}, parent(z)::Ref{$rtype})::Nothing
       return z
     end
 

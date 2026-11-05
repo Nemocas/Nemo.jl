@@ -32,7 +32,7 @@ end
 @inline function setindex!(a::fpMatrix, u::fpFieldElem, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
   (base_ring(a) != parent(u)) && error("Parent objects must coincide")
-  setindex_raw!(a, u.data, i, j) # no reduction necessary
+  setindex_raw!(a, data(u), i, j) # no reduction necessary
 end
 
 function setindex!(a::fpMatrix, b::fpMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
@@ -64,7 +64,7 @@ end
 
 function *(x::fpMatrix, y::fpFieldElem)
   (base_ring(x) != parent(y)) && error("Parent objects must coincide")
-  return x*y.data
+  return x*data(y)
 end
 
 *(x::fpFieldElem, y::fpMatrix) = y*x
@@ -265,14 +265,14 @@ end
 ###############################################################################
 
 function matrix(R::fpField, arr::AbstractMatrix{<: Union{fpFieldElem, ZZRingElem, Integer}})
-  z = fpMatrix(size(arr, 1), size(arr, 2), R.n, arr)
+  z = fpMatrix(size(arr, 1), size(arr, 2), modulus(R), arr)
   z.base_ring = R
   return z
 end
 
 function matrix(R::fpField, r::Int, c::Int, arr::AbstractVector{<: Union{fpFieldElem, ZZRingElem, Integer}})
   _check_dim(r, c, arr)
-  z = fpMatrix(r, c, R.n, arr)
+  z = fpMatrix(r, c, modulus(R), arr)
   z.base_ring = R
   return z
 end

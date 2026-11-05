@@ -28,7 +28,7 @@ is_domain_type(::Type{fpFieldElem}) = true
 
 function Base.hash(a::fpFieldElem, h::UInt)
   b = 0x749c75e438001387%UInt
-  return xor(xor(hash(a.data), h), b)
+  return xor(xor(hash(data(a)), h), b)
 end
 
 data(a::fpFieldElem) = a.data
@@ -51,20 +51,20 @@ function one(R::fpField)
   return fpFieldElem(UInt(1), R)
 end
 
-iszero(a::fpFieldElem) = a.data == 0
+iszero(a::fpFieldElem) = data(a) == 0
 
-isone(a::fpFieldElem) = a.data == 1
+isone(a::fpFieldElem) = data(a) == 1
 
 modulus(R::fpField) = R.n
 
 function deepcopy_internal(a::fpFieldElem, dict::IdDict)
   R = parent(a)
-  return fpFieldElem(deepcopy(a.data), R)
+  return fpFieldElem(deepcopy(data(a)), R)
 end
 
-order(R::fpField) = ZZRingElem(R.n)
+order(R::fpField) = ZZRingElem(modulus(R))
 
-characteristic(R::fpField) = ZZRingElem(R.n)
+characteristic(R::fpField) = ZZRingElem(modulus(R))
 
 degree(::fpField) = 1
 
@@ -107,7 +107,7 @@ function show(io::IO, a::fpField)
     io = pretty(io)
     print(io, LowercaseOff(), "GF($(signed(widen(a.n))))")
   else
-    print(io, "Finite field of characteristic ", signed(widen(a.n)))
+    print(io, "Finite field of characteristic ", signed(widen(modulus(a))))
   end
 end
 
@@ -116,14 +116,14 @@ function expressify(a::fpFieldElem; context = nothing)
 end
 
 function show(io::IO, a::fpFieldElem)
-  print(io, signed(widen(a.data)))
+  print(io, signed(widen(data(a))))
 end
 
 function Base.alignment(io::IO, a::fpFieldElem)
   return (Base.alignment_from_show(io, a), 0)
 end
 
-pretty_lt(x::fpFieldElem, y::fpFieldElem) = isless(x.data, y.data)
+pretty_lt(x::fpFieldElem, y::fpFieldElem) = isless(data(x), data(y))
 pretty_eq(x::fpFieldElem, y::fpFieldElem) = (x == y)
 
 ###############################################################################
@@ -133,11 +133,11 @@ pretty_eq(x::fpFieldElem, y::fpFieldElem) = (x == y)
 ###############################################################################
 
 function -(x::fpFieldElem)
-  if x.data == 0
+  if data(x) == 0
     return deepcopy(x)
   else
     R = parent(x)
-    return fpFieldElem(R.n - x.data, R)
+    return fpFieldElem(modulus(R) - data(x), R)
   end
 end
 
@@ -151,8 +151,8 @@ function +(x::fpFieldElem, y::fpFieldElem)
   check_parent(x, y)
   R = parent(x)
   n = modulus(R)
-  d = x.data + y.data - n
-  if d > x.data
+  d = data(x) + data(y) - n
+  if d > data(x)
     return fpFieldElem(d + n, R)
   else
     return fpFieldElem(d, R)
@@ -163,8 +163,8 @@ function -(x::fpFieldElem, y::fpFieldElem)
   check_parent(x, y)
   R = parent(x)
   n = modulus(R)
-  d = x.data - y.data
-  if d > x.data
+  d = data(x) - data(y)
+  if d > data(x)
     return fpFieldElem(d + n, R)
   else
     return fpFieldElem(d, R)
@@ -174,7 +174,7 @@ end
 function *(x::fpFieldElem, y::fpFieldElem)
   check_parent(x, y)
   R = parent(x)
-  d = _mulmod(x.data, y.data, R)
+  d = _mulmod(data(x), data(y), R)
   return fpFieldElem(d, R)
 end
 
@@ -186,7 +186,7 @@ end
 
 function *(x::Integer, y::fpFieldElem)
   R = parent(y)
-  return R(widen(x)*signed(widen(y.data)))
+  return R(widen(x)*signed(widen(data(y))))
 end
 
 *(x::fpFieldElem, y::Integer) = y*x
@@ -194,10 +194,10 @@ end
 function *(x::Int, y::fpFieldElem)
   R = parent(y)
   if x < 0
-    d = mulmod(reinterpret(UInt, -x), y.data, R.n, R.ninv)
+    d = mulmod(reinterpret(UInt, -x), data(y), modulus(R), R.ninv)
     return -fpFieldElem(d, R)
   else
-    d = mulmod(UInt(x), y.data, R.n, R.ninv)
+    d = mulmod(UInt(x), data(y), modulus(R), R.ninv)
     return fpFieldElem(d, R)
   end
 end
@@ -206,7 +206,7 @@ end
 
 function *(x::UInt, y::fpFieldElem)
   R = parent(y)
-  d = mulmod(x, y.data, R.n, R.ninv)
+  d = mulmod(x, data(y), modulus(R), R.ninv)
   return fpFieldElem(d, R)
 end
 
@@ -244,7 +244,7 @@ function ^(x::fpFieldElem, y::Int)
     x = inv(x)
     y = -y
   end
-  d = @ccall libflint.nmod_pow_ui(x.data::UInt, unsigned(y)::UInt, nmod_t(R)::nmod_t)::UInt
+  d = @ccall libflint.nmod_pow_ui(data(x)::UInt, unsigned(y)::UInt, nmod_t(R)::nmod_t)::UInt
   return fpFieldElem(d, R)
 end
 
@@ -256,7 +256,7 @@ end
 
 function ==(x::fpFieldElem, y::fpFieldElem)
   check_parent(x, y)
-  return x.data == y.data
+  return data(x) == data(y)
 end
 
 ###############################################################################
@@ -282,7 +282,7 @@ end
 function inv(x::fpFieldElem)
   R = parent(x)
   iszero(x) && throw(DivideError())
-  xinv = @ccall libflint.n_invmod(x.data::UInt, R.n::UInt)::UInt
+  xinv = @ccall libflint.n_invmod(data(x)::UInt, modulus(R)::UInt)::UInt
   return fpFieldElem(xinv, R)
 end
 
@@ -296,8 +296,8 @@ function divexact(x::fpFieldElem, y::fpFieldElem; check::Bool=true)
   check_parent(x, y)
   y == 0 && throw(DivideError())
   R = parent(x)
-  yinv = @ccall libflint.n_invmod(y.data::UInt, R.n::UInt)::UInt
-  d = _mulmod(x.data, yinv, R)
+  yinv = @ccall libflint.n_invmod(data(y)::UInt, modulus(R)::UInt)::UInt
+  d = _mulmod(data(x), yinv, R)
   return fpFieldElem(d, R)
 end
 
@@ -323,26 +323,26 @@ function Base.sqrt(a::fpFieldElem; check::Bool=true)
   if iszero(a)
     return zero(R)
   end
-  r = @ccall libflint.n_sqrtmod(a.data::UInt, R.n::UInt)::UInt
+  r = @ccall libflint.n_sqrtmod(data(a)::UInt, modulus(R)::UInt)::UInt
   check && iszero(r) && error("Not a square in sqrt")
   return fpFieldElem(r, R)
 end
 
 function is_square(a::fpFieldElem)
   R = parent(a)
-  if iszero(a) || R.n == 2
+  if iszero(a) || modulus(R) == 2
     return true
   end
-  r = @ccall libflint.n_jacobi(a.data::UInt, R.n::UInt)::Cint
+  r = @ccall libflint.n_jacobi(data(a)::UInt, modulus(R)::UInt)::Cint
   return isone(r)
 end
 
 function is_square_with_sqrt(a::fpFieldElem)
   R = parent(a)
-  if iszero(a) || R.n == 2
+  if iszero(a) || modulus(R) == 2
     return true, a
   end
-  r = @ccall libflint.n_sqrtmod(a.data::UInt, R.n::UInt)::UInt
+  r = @ccall libflint.n_sqrtmod(data(a)::UInt, modulus(R)::UInt)::UInt
   if iszero(r)
     return false, zero(R)
   end
@@ -367,7 +367,7 @@ end
 # define rand(::fpField)
 
 Random.Sampler(::Type{RNG}, R::fpField, n::Random.Repetition) where {RNG<:AbstractRNG} =
-Random.SamplerSimple(R, Random.Sampler(RNG, UInt(0):R.n - 1, n))
+Random.SamplerSimple(R, Random.Sampler(RNG, UInt(0):modulus(R) - 1, n))
 
 rand(rng::AbstractRNG, R::Random.SamplerSimple{fpField}) =
 fpFieldElem(rand(rng, R.data), R[])
@@ -406,7 +406,7 @@ function (R::fpField)()
 end
 
 function (R::fpField)(a::Integer)
-  n = R.n
+  n = modulus(R)
   d = a%signed(widen(n))
   if d < 0
     d += n
@@ -415,7 +415,7 @@ function (R::fpField)(a::Integer)
 end
 
 function (R::fpField)(a::Int)
-  n = R.n
+  n = modulus(R)
   ninv = R.ninv
   if reinterpret(Int, n) > 0 && a < 0
     a %= Int(n)
@@ -431,24 +431,24 @@ function (R::fpField)(a::Int)
 end
 
 function (R::fpField)(a::UInt)
-  n = R.n
+  n = modulus(R)
   ninv = R.ninv
   a = mod2_preinv(a, n, ninv)
   return fpFieldElem(a, R)
 end
 
 function (R::fpField)(a::ZZRingElem)
-  d = @ccall libflint.fmpz_fdiv_ui(a::Ref{ZZRingElem}, R.n::UInt)::UInt
+  d = @ccall libflint.fmpz_fdiv_ui(a::Ref{ZZRingElem}, modulus(R)::UInt)::UInt
   return fpFieldElem(d, R)
 end
 
 function (R::fpField)(a::QQFieldElem)
   num = numerator(a, false)
   den = denominator(a, false)
-  n = @ccall libflint.fmpz_fdiv_ui(num::Ref{ZZRingElem}, R.n::UInt)::UInt
-  d = @ccall libflint.fmpz_fdiv_ui(den::Ref{ZZRingElem}, R.n::UInt)::UInt
+  n = @ccall libflint.fmpz_fdiv_ui(num::Ref{ZZRingElem}, modulus(R)::UInt)::UInt
+  d = @ccall libflint.fmpz_fdiv_ui(den::Ref{ZZRingElem}, modulus(R)::UInt)::UInt
   V = Ref(UInt(0))
-  g = @ccall libflint.n_gcdinv(V::Ref{UInt}, d::UInt, R.n::UInt)::UInt
+  g = @ccall libflint.n_gcdinv(V::Ref{UInt}, d::UInt, modulus(R)::UInt)::UInt
   g != 1 && error("Unable to coerce")
   return R(n)*R(V[])
 end
@@ -487,7 +487,7 @@ end
 Base.iterate(R::fpField) = (zero(R), zero(UInt))
 
 function Base.iterate(R::fpField, st::UInt)
-  if st == R.n - 1
+  if st == modulus(R) - 1
     return nothing
   end
 

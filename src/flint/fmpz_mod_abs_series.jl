@@ -247,7 +247,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
     function *(x::$(mtype), y::($etype))
       z = parent(y)()
       z.prec = y.prec
-      @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(z::Ref{($etype)}, y::Ref{($etype)}, x.data::Ref{ZZRingElem}, base_ring(y).ninv::Ref{($ctype)})::Nothing
+      @ccall libflint.fmpz_mod_poly_scalar_mul_fmpz(z::Ref{($etype)}, y::Ref{($etype)}, data(x)::Ref{ZZRingElem}, base_ring(y).ninv::Ref{($ctype)})::Nothing
       return z
     end
 
@@ -379,7 +379,7 @@ for (etype, rtype, ctype, mtype, brtype) in (
       elseif length(x) == 1
         z = ZZRingElem()
         @ccall libflint.fmpz_mod_poly_get_coeff_fmpz(z::Ref{ZZRingElem}, x::Ref{($etype)}, 0::Int, base_ring(x).ninv::Ref{($ctype)})::Nothing
-        return Bool(@ccall libflint.fmpz_equal(z::Ref{ZZRingElem}, y.data::Ref{ZZRingElem})::Cint)
+        return Bool(@ccall libflint.fmpz_equal(z::Ref{ZZRingElem}, data(y)::Ref{ZZRingElem})::Cint)
       else
         return precision(x) == 0 || iszero(y)
       end
