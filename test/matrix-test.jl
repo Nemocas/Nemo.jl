@@ -43,6 +43,79 @@
   @test rref!(V) == 4
 end
 
+@testset "Eigenvalue multiplicities over inexact fields" begin
+  for R in (real_field(), ArbField(64))
+    for n in (0, 1)
+      A = zero_matrix(R, n, n)
+      @test_throws ArgumentError eigenvalues_with_multiplicities(A)
+    end
+  end
+
+  for R in (real_field(), ArbField(64), complex_field(), AcbField(64))
+    for n in (0, 1)
+      A = zero_matrix(R, n, n)
+      @test_throws ArgumentError eigenvalues_with_multiplicities(R, A)
+    end
+  end
+end
+
+@testset "Complex eigenvalue multiplicities of exact matrices" begin
+  A = matrix(ZZ, [111 91 50; 31 6 97; 117 63 6])
+
+  for R in (complex_field(), AcbField(64))
+    for M in (A, change_base_ring(QQ, A))
+      E = @inferred eigenvalues_with_multiplicities(R, M)
+      reference = eigenvalues(R, M)
+      @test E isa Vector{Tuple{elem_type(R), Int}}
+      @test length(E) == 3
+      @test all(e -> last(e) == 1, E)
+      @test all(e -> parent(first(e)) === R, E)
+      for a in reference
+        @test count(e -> overlaps(first(e), a), E) == 1
+      end
+    end
+
+    for K in (ZZ, QQ)
+      # Repeated eigenvalues in a diagonal matrix and in a Jordan block.
+      for (M, expected) in ((matrix(K, [2 0 0; 0 2 0; 0 0 -1]), [(2, 2), (-1, 1)]),
+                            (matrix(K, [2 1 0; 0 2 1; 0 0 2]), [(2, 3)]),
+                            (zero_matrix(K, 3, 3), [(0, 3)]))
+        E = @inferred eigenvalues_with_multiplicities(R, M)
+        @test length(E) == length(expected)
+        @test sum(last, E) == nrows(M)
+        for (a, m) in expected
+          @test any(e -> last(e) == m && contains(first(e), a), E)
+        end
+      end
+
+      E = @inferred eigenvalues_with_multiplicities(R, zero_matrix(K, 0, 0))
+      @test E isa Vector{Tuple{elem_type(R), Int}}
+      @test isempty(E)
+      @test_throws DomainError eigenvalues_with_multiplicities(R, zero_matrix(K, 2, 3))
+    end
+
+    M = matrix(QQ, [1//2 1; 0 1//2])
+    E = @inferred eigenvalues_with_multiplicities(R, M)
+    @test length(E) == 1
+    @test last(only(E)) == 2
+    @test contains(first(only(E)), QQ(1, 2))
+  end
+
+  set_precision!(Balls, 32) do
+    r = one(QQ)
+    s = r + QQ(1, ZZ(2)^100)
+    M = matrix(QQ, [r 0; 0 s])
+    for R in (complex_field(), AcbField(32))
+      E = @inferred eigenvalues_with_multiplicities(R, M)
+      @test length(E) == 2
+      @test all(e -> last(e) == 1, E)
+      @test overlaps(first(E[1]), first(E[2]))
+      @test any(e -> contains(first(e), r), E)
+      @test any(e -> contains(first(e), s), E)
+    end
+  end
+end
+
 @testset "Diagonal" begin
   A = QQ[1 2 3; 4 5 6]
   @test (@inferred diagonal(A)) == [QQ(1), QQ(5)]

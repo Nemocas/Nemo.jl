@@ -909,6 +909,11 @@ function eigenvalues_with_multiplicities(R::QQBarField, A::Union{ZZMatrix, QQMat
   return res
 end
 
+function eigenvalues_with_multiplicities(R::Union{ComplexField, AcbField}, A::Union{ZZMatrix, QQMatrix})
+  eig = eigenvalues_with_multiplicities(algebraic_closure(QQ), A)
+  return [(R(a), m) for (a, m) in eig]
+end
+
 ###############################################################################
 #
 #   Roots of unity and trigonometric functions
