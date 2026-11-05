@@ -210,6 +210,31 @@ end
   @test contains(A*B, R([49 41 50; 65 49 56; 75 81 114]))
 end
 
+@testset "ArbMatrix.inplace_binary_ops" begin
+  A = matrix(RR, [1 2; 3 4])
+  B = matrix(RR, [5 6; 7 8])
+
+  for (op!, op) in ((add!, +), (sub!, -), (mul!, *))
+    expected = op(A, B)
+
+    C = zero_matrix(RR, 2, 2)
+    @test op!(C, A, B) === C
+    @test C == expected
+
+    C = deepcopy(A)
+    @test op!(C, C, B) === C
+    @test C == expected
+
+    C = deepcopy(B)
+    @test op!(C, A, C) === C
+    @test C == expected
+
+    C = deepcopy(A)
+    @test op!(C, C, C) === C
+    @test C == op(A, A)
+  end
+end
+
 @testset "ArbMatrix.adhoc_binary" begin
   S = matrix_space(RR, 3, 3)
   R = matrix_space(ZZ, 3, 3)
