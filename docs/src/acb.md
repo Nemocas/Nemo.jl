@@ -207,6 +207,9 @@ julia> g = CC(RR(3))
 
 ### Basic manipulation
 
+`is_unit(x)` returns `true` only if `x` is certainly invertible, i.e. does not
+contain zero.
+
 ```@docs
 isfinite(::AcbFieldElem)
 ```

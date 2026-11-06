@@ -467,6 +467,8 @@ end
 #
 ################################################################################
 
+is_unit(x::AcbFieldElem) = !contains_zero(x)
+
 @doc raw"""
     iszero(x::AcbFieldElem)
 
