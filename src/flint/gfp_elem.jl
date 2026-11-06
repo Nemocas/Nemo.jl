@@ -51,9 +51,9 @@ function one(R::fpField)
   return fpFieldElem(UInt(1), R)
 end
 
-iszero(a::fpFieldElem) = data(a) == 0
+iszero(a::fpFieldElem) = iszero(data(a))
 
-isone(a::fpFieldElem) = data(a) == 1
+isone(a::fpFieldElem) = isone(data(a))
 
 modulus(R::fpField) = R.n
 
@@ -133,7 +133,7 @@ pretty_eq(x::fpFieldElem, y::fpFieldElem) = (x == y)
 ###############################################################################
 
 function -(x::fpFieldElem)
-  if data(x) == 0
+  if iszero(x)
     return deepcopy(x)
   else
     R = parent(x)
@@ -294,7 +294,7 @@ end
 
 function divexact(x::fpFieldElem, y::fpFieldElem; check::Bool=true)
   check_parent(x, y)
-  y == 0 && throw(DivideError())
+  iszero(y) && throw(DivideError())
   R = parent(x)
   yinv = @ccall libflint.n_invmod(data(y)::UInt, modulus(R)::UInt)::UInt
   d = _mulmod(data(x), yinv, R)
@@ -449,7 +449,7 @@ function (R::fpField)(a::QQFieldElem)
   d = @ccall libflint.fmpz_fdiv_ui(den::Ref{ZZRingElem}, modulus(R)::UInt)::UInt
   V = Ref(UInt(0))
   g = @ccall libflint.n_gcdinv(V::Ref{UInt}, d::UInt, modulus(R)::UInt)::UInt
-  g != 1 && error("Unable to coerce")
+  !isone(g) && error("Unable to coerce")
   return R(n)*R(V[])
 end
 

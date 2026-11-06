@@ -41,16 +41,16 @@ function zero(R::zzModRing)
 end
 
 function one(R::zzModRing)
-  if modulus(R) == 1
+  if is_trivial(R)
     return zzModRingElem(UInt(0), R)
   else
     return zzModRingElem(UInt(1), R)
   end
 end
 
-iszero(a::zzModRingElem) = data(a) == 0
+iszero(a::zzModRingElem) = iszero(data(a))
 
-isone(a::zzModRingElem) = (modulus(parent(a)) == 1) || (data(a) == 1)
+isone(a::zzModRingElem) = is_trivial(parent(a)) || isone(data(a))
 
 modulus(R::zzModRing) = R.n
 
@@ -65,7 +65,7 @@ is_noetherian(::zzModRing) = true
 
 characteristic(R::zzModRing) = ZZRingElem(modulus(R))
 
-is_trivial(a::zzModRing) = is_unit(modulus(a))
+is_trivial(a::zzModRing) = isone(modulus(a))
 
 function deepcopy_internal(a::zzModRingElem, dict::IdDict)
   R = parent(a)
@@ -134,7 +134,7 @@ end
 ###############################################################################
 
 function -(x::zzModRingElem)
-  if data(x) == 0
+  if iszero(x)
     return deepcopy(x)
   else
     R = parent(x)
@@ -320,14 +320,14 @@ end
 
 function inv(x::zzModRingElem)
   R = parent(x)
-  (iszero(x) && modulus(R) != 1) && throw(DivideError())
-  if modulus(R) == 1
+  (iszero(x) && !is_trivial(R)) && throw(DivideError())
+  if is_trivial(R)
     return deepcopy(x)
   end
   #s = [UInt(0)]
   s = Ref{UInt}()
   g = @ccall libflint.n_gcdinv(s::Ptr{UInt}, data(x)::UInt, modulus(R)::UInt)::UInt
-  g != 1 && error("Impossible inverse in ", R)
+  !isone(g) && error("Impossible inverse in ", R)
   return zzModRingElem(s[], R)
 end
 

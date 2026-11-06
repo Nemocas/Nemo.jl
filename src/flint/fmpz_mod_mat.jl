@@ -490,7 +490,7 @@ function inv(a::ZZModMatrix)
     end
     return divexact(X, d)
   else
-    b = map_entries(x -> data(x), a)
+    b = map_entries(data, a)
     c, d = pseudo_inv(b)
     R = base_ring(a)
     if !isone(gcd(d, modulus(R)))

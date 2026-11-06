@@ -51,11 +51,7 @@ function zero(R::FpField)
 end
 
 function one(R::FpField)
-  if modulus(R) == 1
-    return FpFieldElem(ZZRingElem(0), R)
-  else
-    return FpFieldElem(ZZRingElem(1), R)
-  end
+  return FpFieldElem(ZZRingElem(1), R)
 end
 
 modulus(R::FpField) = R.n
@@ -110,7 +106,7 @@ pretty_eq(x::FpFieldElem, y::FpFieldElem) = (x == y)
 ###############################################################################
 
 function -(x::FpFieldElem)
-  if iszero(data(x))
+  if iszero(x)
     return deepcopy(x)
   else
     R = parent(x)
@@ -343,7 +339,7 @@ end
 
 function neg!(z::FpFieldElem, x::FpFieldElem)
   R = parent(z)
-  if is_zero(data(x))
+  if is_zero(x)
     zero!(data(z))
   else
     sub!(data(z), modulus(R), data(x))
