@@ -369,6 +369,26 @@ end
   @test v*A == [31, 29, 28]
 end
 
+@testset "fqPolyRepMatrix.vector_mul" begin
+  R, = Native.finite_field(next_prime(2^40), 3, "a")
+
+  for (r, c) in ((1, 2), (3, 5), (5, 3), (9, 9))
+    a = matrix(R, [rand(R) for i in 1:r, j in 1:c])
+    v = [rand(R) for j in 1:c]
+    w = [rand(R) for i in 1:r]
+    Av = a * matrix(R, c, 1, v)
+    Av = [Av[i, 1] for i in 1:r]
+    wA = matrix(R, 1, r, w) * a
+    wA = [wA[1, j] for j in 1:c]
+    for f in (mul!, Nemo.mul!_flint, Nemo.mul!_through_matrix)
+      z = [rand(R) for i in 1:r]
+      @test f(z, a, v) == z == Av
+      z = [rand(R) for j in 1:c]
+      @test f(z, w, a) == z == wA
+    end
+  end
+end
+
 @testset "fqPolyRepMatrix.adhoc_binary" begin
   F17, _ = Native.finite_field(17, 1, "a")
 
