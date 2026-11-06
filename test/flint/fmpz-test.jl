@@ -177,6 +177,12 @@ end
 
   @test_throws InexactError Int(ZZRingElem(1234484735687346876324432764872))
   @test_throws InexactError UInt(ZZRingElem(typemin(Int)))
+
+  @test @inferred(Bool(ZZ(0))) === false
+  @test @inferred(Bool(ZZ(1))) === true
+  @test convert(Bool, ZZ(1)) === true
+  @test_throws InexactError Bool(ZZ(2))
+  @test_throws InexactError Bool(ZZ(-1))
 end
 
 @testset "ZZRingElem.vector_arithmetics" begin
