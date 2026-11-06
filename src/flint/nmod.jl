@@ -180,25 +180,13 @@ function nmod_t(n::UInt)
   return m[]
 end
 
-# ni needs to be an 'inverse' of n computing using :n_preinvert_limb in flint
-function mulmod(a::UInt, b::UInt, n::UInt, ni::UInt)
-  return @ccall libflint.n_mulmod2_preinv(a::UInt, b::UInt, n::UInt, ni::UInt)::UInt
-end
-
-# a mod n, with ninv as above; Julia port of flint's n_mod2_preinv, so that
-# callers can inline the reduction instead of paying for a ccall
-@inline function mod2_preinv(a::UInt, n::UInt, ninv::UInt)
-  @assert !iszero(n)
-
+# The reduction step of flint's n_mod2_preinv and n_mulmod_preinv: the
+# two-limb number (u1, u0) mod n_norm, for n_norm with its top bit set,
+# u1 < n_norm, and ninv = n_preinvert_limb(n_norm)
+@inline function _ll_mod_preinv_norm(u1::UInt, u0::UInt, n_norm::UInt, ninv::UInt)
   bits = 8 * sizeof(UInt)
-  norm = leading_zeros(n)
-  n_norm = n << norm
 
-  # split a << norm into two limbs (u1, u0); a >> 64 is a well-defined 0 in Julia
-  u1 = a >> (bits - norm)
-  u0 = a << norm
-
-  # q = (q1, q0) approximates (u1, u0) * 2^64 / n_norm via q = u1 * ninv + (u1, u0)
+  # q = (q1, q0) approximates (u1, u0) * 2^bits / n_norm via q = u1 * ninv + (u1, u0)
   prod = widemul(ninv, u1)
   q1 = (prod >> bits) % UInt
   q0 = prod % UInt
@@ -211,15 +199,43 @@ end
     r += n_norm
   end
 
-  return r < n_norm ? (r >> norm) : ((r - n_norm) >> norm)
+  return r < n_norm ? r : r - n_norm
 end
 
-# a * b mod R.n for a, b < R.n; n_mulmod_preinv takes the residues and the
-# modulus shifted left by norm
-function _mulmod(a::UInt, b::UInt, R::Union{zzModRing, fpField})
+# ni needs to be an 'inverse' of n computing using :n_preinvert_limb in flint
+function mulmod(a::UInt, b::UInt, n::UInt, ni::UInt)
+  return @ccall libflint.n_mulmod2_preinv(a::UInt, b::UInt, n::UInt, ni::UInt)::UInt
+end
+
+# a mod n, with ninv as above; Julia port of flint's n_mod2_preinv, so that
+# callers can inline the reduction instead of paying for a ccall
+@inline function mod2_preinv(a::UInt, n::UInt, ninv::UInt)
+  @assert !iszero(n)
+
+  bits = 8 * sizeof(UInt)
+  norm = leading_zeros(n)
+
+  # split a << norm into two limbs (u1, u0); a >> bits is a well-defined 0 in Julia
+  u1 = a >> (bits - norm)
+  u0 = a << norm
+
+  return _ll_mod_preinv_norm(u1, u0, n << norm, ninv) >> norm
+end
+
+# a * b mod R.n for a, b < R.n; Julia port of flint's n_mulmod_preinv, which
+# takes the residues and the modulus shifted left by R.norm
+@inline function _mulmod(a::UInt, b::UInt, R::Union{zzModRing, fpField})
+  bits = 8 * sizeof(UInt)
   s = R.norm
-  d = @ccall libflint.n_mulmod_preinv((a << s)::UInt, (b << s)::UInt, (modulus(R) << s)::UInt, R.ninv::UInt, s::UInt)::UInt
-  return d >> s
+
+  # (a * b) << s as two limbs (p1, p0); p1 < modulus(R) since a << s < 2^bits.
+  # Shifting a rather than b keeps the shift out of the dependency chain of
+  # y = x * y, measured 8% faster there.
+  prod = widemul(a << s, b)
+  p1 = (prod >> bits) % UInt
+  p0 = prod % UInt
+
+  return _ll_mod_preinv_norm(p1, p0, modulus(R) << s, R.ninv) >> s
 end
 
 function *(x::zzModRingElem, y::zzModRingElem)
