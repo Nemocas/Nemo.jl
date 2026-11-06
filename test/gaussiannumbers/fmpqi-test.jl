@@ -130,6 +130,10 @@ end
   end
 end
 
+@testset "QQiFieldElem.exact_division" begin
+  test_divexact_by_zero(QQi, 0, ZZ(0), QQ(0), ZZi(0))
+end
+
 @testset "QQiFieldElem.conformance_tests" begin
   ConformanceTests.test_Field_interface(QQi)
 end

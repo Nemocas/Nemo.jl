@@ -422,6 +422,12 @@ end
   end
 end
 
+@testset "fqPolyRepMPolyRingElem.divexact_by_zero" begin
+  R = Native.finite_field(23, 5, "a")[1]
+  S, = polynomial_ring(R, 2)
+  test_divexact_by_zero(S, zero(R), 0)
+end
+
 @testset "fqPolyRepMPolyRingElem.euclidean_division" begin
   R, a = Native.finite_field(23, 5, "a")
 

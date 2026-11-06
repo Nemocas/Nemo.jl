@@ -429,6 +429,13 @@ begin
     end
   end
 
+  @testset "FqMPolyRingElem.divexact_by_zero" begin
+    for (R, a) in test_fields
+      S, = polynomial_ring(R, 2)
+      test_divexact_by_zero(S, zero(R), 0, ZZ(0))
+    end
+  end
+
   @testset "FqMPolyRingElem.euclidean_division" begin
     for (R, a) in test_fields
       for num_vars = 1:10
