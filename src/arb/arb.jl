@@ -458,6 +458,8 @@ end
 #
 ################################################################################
 
+is_unit(x::ArbFieldElem) = !contains_zero(x)
+
 @doc raw"""
     iszero(x::ArbFieldElem)
 
