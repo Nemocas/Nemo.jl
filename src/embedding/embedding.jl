@@ -85,7 +85,7 @@ Compute the minimal polynomial of a linear recurring sequence $a$.
 """
 function berlekamp_massey(a::Vector{Y}, n::Int) where Y <: FieldElem
   @req allequal(map(parent, a)) "parents do not match"
-  S, T = polynomial_ring(parent(a[1]), "T")
+  S, T = polynomial_ring(parent(first(a)), "T")
   m = 2*n - 1
   R0 = T^(2*n)
   R1 = S(reverse(a))

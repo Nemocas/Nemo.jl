@@ -946,5 +946,5 @@ This function is experimental.
 """
 function eigenvalues(A::AcbMatrix)
   e, _ = _eig_multiple(A)
-  return [ x[1] for x in e ]
+  return first.(e)
 end
