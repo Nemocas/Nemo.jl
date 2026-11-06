@@ -105,21 +105,31 @@ end
 end
 
 @testset "Nemo._mulmod" begin
-  for n in UInt[1, 2, 3, 7, 0x00000000ffffffff, 0x0000000100000001,
-                0x7fffffffffffffff, 0x8000000000000000, 0xffffffffffffffff]
+  # _mulmod, the Julia port of FLINT's n_mulmod_preinv, against FLINT itself
+  # and against widemul(a, b) % n
+  function check_case(a::UInt, b::UInt, R::zzModRing)
+    n, s = modulus(R), R.norm
+    expected = @ccall Nemo.libflint.n_mulmod_preinv((a << s)::UInt, (b << s)::UInt, (n << s)::UInt, R.ninv::UInt, s::UInt)::UInt
+    @test Nemo._mulmod(a, b, R) == expected >> s
+    @test Nemo._mulmod(a, b, R) == widemul(a, b) % n
+  end
+
+  # moduli at the edges of every normalisation shift, for any word size
+  h = UInt(1) << (4 * sizeof(UInt))
+  t = typemax(UInt)
+  for n in UInt[1, 2, 3, 5, 7, 8, 15, 16, 17, h - 1, h, h + 1,
+                t >> 1, (t >> 1) + 1, (t >> 1) + 2, t - 2, t - 1, t]
     R = zzModRing(n, false)
     vals = filter(<(n), UInt[0, 1, 2, n >> 1, n - 2, n - 1])
     for a in vals, b in vals
-      @test Nemo._mulmod(a, b, R) == widemul(a, b) % n
+      check_case(a, b, R)
     end
   end
 
   for _ in 1:10_000
     n = rand(UInt(1):typemax(UInt))
     R = zzModRing(n, false)
-    a = rand(UInt(0):n - 1)
-    b = rand(UInt(0):n - 1)
-    @test Nemo._mulmod(a, b, R) == widemul(a, b) % n
+    check_case(rand(UInt(0):n - 1), rand(UInt(0):n - 1), R)
   end
 end
 
