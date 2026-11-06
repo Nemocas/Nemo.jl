@@ -1586,8 +1586,8 @@ end
 #
 ################################################################################
 
-_real_ptr(x::TypeOrPtr{AcbFieldElem}) = @ccall libflint.acb_real_ptr(x::Ref{AcbFieldElem})::Ptr{ArbFieldElem}
-_imag_ptr(x::TypeOrPtr{AcbFieldElem}) = @ccall libflint.acb_imag_ptr(x::Ref{AcbFieldElem})::Ptr{ArbFieldElem}
+_real_ptr(x::TypeOrPtr{AcbFieldElem}) = _field_ptr(ArbFieldElem, x, Val(:real_mid_exp))
+_imag_ptr(x::TypeOrPtr{AcbFieldElem}) = _field_ptr(ArbFieldElem, x, Val(:imag_mid_exp))
 
 function _acb_set(x::TypeOrPtr{AcbFieldElem}, y::Int)
   @ccall libflint.acb_set_si(x::Ref{AcbFieldElem}, y::Int)::Nothing

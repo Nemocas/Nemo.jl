@@ -62,8 +62,8 @@ end
 
 characteristic(::RealField) = 0
 
-_mid_ptr(x::TypeOrPtr{RealFieldElem}) = @ccall libflint.arb_mid_ptr(x::Ref{RealFieldElem})::Ptr{arf_struct}
-_rad_ptr(x::TypeOrPtr{RealFieldElem}) = @ccall libflint.arb_rad_ptr(x::Ref{RealFieldElem})::Ptr{mag_struct}
+_mid_ptr(x::TypeOrPtr{RealFieldElem}) = _field_ptr(arf_struct, x, Val(:mid_exp))
+_rad_ptr(x::TypeOrPtr{RealFieldElem}) = _field_ptr(mag_struct, x, Val(:rad_exp))
 
 ################################################################################
 #

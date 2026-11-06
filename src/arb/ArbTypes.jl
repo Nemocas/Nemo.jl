@@ -79,11 +79,11 @@ const mag_structOrPtr = TypeOrPtr{mag_struct}
 const arb_structOrPtr = TypeOrPtr{arb_struct}
 const acb_structOrPtr = TypeOrPtr{acb_struct}
 
-_mid_ptr(x::arb_structOrPtr) = @ccall libflint.arb_mid_ptr(x::Ref{arb_struct})::Ptr{arf_struct}
-_rad_ptr(x::arb_structOrPtr) = @ccall libflint.arb_rad_ptr(x::Ref{arb_struct})::Ptr{mag_struct}
+_mid_ptr(x::arb_structOrPtr) = _field_ptr(arf_struct, x, Val(:mid_exp))
+_rad_ptr(x::arb_structOrPtr) = _field_ptr(mag_struct, x, Val(:rad_exp))
 
-_real_ptr(x::acb_structOrPtr) = @ccall libflint.acb_real_ptr(x::Ref{acb_struct})::Ptr{arb_struct}
-_imag_ptr(x::acb_structOrPtr) = @ccall libflint.acb_imag_ptr(x::Ref{acb_struct})::Ptr{arb_struct}
+_real_ptr(x::acb_structOrPtr) = _field_ptr(arb_struct, x, Val(:real_mid_exp))
+_imag_ptr(x::acb_structOrPtr) = _field_ptr(arb_struct, x, Val(:imag_mid_exp))
 
 ################################################################################
 #
