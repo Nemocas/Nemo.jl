@@ -1234,6 +1234,11 @@ function rank(x::ZZMatrix)
   return @ccall libflint.fmpz_mat_rank(x::Ref{ZZMatrix})::Int
 end
 
+function rank(x::Matrix{ZZRingElem})
+  @warn "rank(::Matrix{ZZRingElem}) converts to a ZZMatrix on every call; construct a ZZMatrix with matrix(ZZ, A) instead" maxlog=1
+  return rank(matrix(ZZ, x))
+end
+
 ###############################################################################
 #
 #   Reduced row echelon form
