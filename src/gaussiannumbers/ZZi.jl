@@ -500,7 +500,7 @@ end
 
 function divides(a::ZZiRingElem, b::Union{Integer, ZZRingElem, ZZiRingElem})
   if iszero(b)
-    return iszero(a), b
+    return iszero(a), zero(a)
   end
   q, r = divrem(a, b)
   return iszero(r), q
