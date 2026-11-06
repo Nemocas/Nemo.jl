@@ -637,7 +637,7 @@ for (s,f) in (("add!","arb_mat_add"), ("mul!","arb_mat_mul"),
   @eval begin
     function ($(Symbol(s)))(z::ArbMatrix, x::ArbMatrix, y::ArbMatrix)
       prec = precision(base_ring(x))
-      @ccall libflint.f(z::Ref{ArbMatrix}, x::Ref{ArbMatrix}, y::Ref{ArbMatrix}, prec::Int)::Nothing
+      @ccall libflint.$f(z::Ref{ArbMatrix}, x::Ref{ArbMatrix}, y::Ref{ArbMatrix}, prec::Int)::Nothing
       return z
     end
   end
