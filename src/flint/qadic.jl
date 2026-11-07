@@ -529,14 +529,7 @@ end
 
 function is_square_with_sqrt(a::QadicFieldElem)
   ctx = parent(a)
-  if is_zero(a)
-    throw(DomainError("Square-root of Q-adic zero not well defined"))
-    # DELIBERATELY leave the next 3 lines here (as most reasonable
-    # implementation) in case we decide to accept zero as input.
-    pr = precision(a)
-    p = QQ(prime(ctx))  # needs to be QQ in case pr < -1
-    return (true, O(ctx, p^fld(pr+1, 2)))  # floor division
-  end
+  is_zero(a) && throw(DomainError(a, "Insufficient precision to decide whether a q-adic is a square"))
   if prime(ctx) == 2
     precomp_data = get_attribute!(ctx, :char2_sqrt_precomp) do
       Qadic2SqrtPrecomp(ctx)
