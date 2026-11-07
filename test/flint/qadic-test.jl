@@ -407,19 +407,10 @@ end
 @testset "QadicFieldElem.square_root_char2_precomp" begin
   R, _ = QadicField(2, 3)
 
-  # Tests for square-root of zero: we are unsure of the correct definition
-  zero9 = O(R, 2^9)
-  zero8 = O(R, 2^8)
-  @test_throws  DomainError  is_square_with_sqrt(zero8)[1]
-  @test_throws  DomainError  is_square_with_sqrt(zero9)[1]
-  # @test is_square_with_sqrt(zero8)[1]
-  # @test is_square_with_sqrt(zero9)[1]
-  # sqrt_zero8 = is_square_with_sqrt(zero8)[2]
-  # sqrt_zero9 = is_square_with_sqrt(zero9)[2]
-  # @test is_zero(sqrt_zero8)
-  # @test is_zero(sqrt_zero9)
-  # @test precision(sqrt_zero8) == 4
-  # @test precision(sqrt_zero9) == 5
+  for z in (O(R, 2^8), O(R, 2^9))
+    @test_throws DomainError is_square(z)
+    @test_throws DomainError is_square_with_sqrt(z)
+  end
 
   # for p = 2 the root is known to one digit less than for odd p
   a = 1 + 2^3 + O(R, 2^4)
