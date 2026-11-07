@@ -436,15 +436,21 @@ function __init__()
     show_banner()
   end
 
+  nt = _maxthreadid()
+
   # Initialize the thread local random state
-  resize!(_flint_rand_states, Threads.nthreads())
-  for i in 1:Threads.nthreads()
+  resize!(_flint_rand_states, nt)
+  for i in 1:nt
     _flint_rand_states[i] = rand_ctx()
   end
 
   # Initialize the thread local ECM parameters
-  Threads.resize_nthreads!(_ecm_B1s)
-  Threads.resize_nthreads!(_ecm_nCs)
+  resize!(_ecm_B1s, nt)
+  resize!(_ecm_nCs, nt)
+  for i in 2:nt
+    _ecm_B1s[i] = copy(_ecm_B1)
+    _ecm_nCs[i] = copy(_ecm_nC)
+  end
 end
 
 function flint_set_num_threads(a::Int)
@@ -635,6 +641,14 @@ end
 #  Thread local storages
 #
 ################################################################################
+
+# The storages are indexed by Threads.threadid(), which runs over the
+# interactive threads as well as the default ones.
+@static if VERSION >= v"1.11"
+  _maxthreadid() = Threads.maxthreadid()
+else
+  _maxthreadid() = Threads.nthreads(:default) + Threads.nthreads(:interactive)
+end
 
 const _flint_rand_states = rand_ctx[]
 
