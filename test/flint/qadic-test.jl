@@ -395,11 +395,13 @@ end
     @test fl && precision(r) == precision(x) - div(valuation(x), 2)
   end
 
-  # SKIP tests for square-root of zero: we are unsure of the correct definition
-  # for N in (31, 30, -3, -4)
-  #   fl, r = is_square_with_sqrt(O(R, QQ(7)^N))
-  #   @test fl && is_zero(r) && precision(r) == cld(N, 2)
-  # end
+  # zero has no relative precision, so whether it is a square is undecided
+  for N in (31, 30, -3, -4)
+    z = O(R, QQ(7)^N)
+    @test_throws DomainError is_square(z)
+    @test_throws DomainError is_square_with_sqrt(z)
+    @test_throws DomainError sqrt(z)
+  end
 end
 
 @testset "QadicFieldElem.square_root_char2_precomp" begin
