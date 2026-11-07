@@ -85,6 +85,13 @@ end
   @test !fl
   fl, q = divides(zero(ZZi), zero(ZZi))
   @test fl
+
+  for b in (ZZ(0), 0)
+    fl, q = @inferred divides(zero(ZZi), b)
+    @test fl && q isa elem_type(ZZi) && is_zero(q)
+    fl, q = @inferred divides(ZZi(3, 4), b)
+    @test !fl && q isa elem_type(ZZi)
+  end
 end
 
 @testset "ZZiRingElem.gcd" begin
