@@ -547,7 +547,7 @@ function is_square_with_sqrt(a::QadicFieldElem)
 end
 
 function is_square(a::QadicFieldElem)
-  is_zero(a) && throw(DomainError("Square-root of Q-adic zero not well defined"))
+  is_zero(a) && throw(DomainError(a, "Insufficient precision to decide whether a q-adic is a square"))
   va = valuation(a)
   is_odd(va) && return false
   # squareness is decided by the first digit of a, or the first 3 if p == 2
