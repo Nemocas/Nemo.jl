@@ -823,7 +823,13 @@ _set_mod!(z::Union{zzModPolyRingElem, fpPolyRingElem}, R::Union{zzModRing, fpFie
 _set_mod!(z::Union{zzModPolyRingElem, fpPolyRingElem}, n::UInt) = _set_mod!(z, nmod_t(n))
 
 # Moves `z` to the polynomial ring `P`, keeping the coefficients.
-function _set_mod!(z::Union{zzModPolyRingElem, fpPolyRingElem}, P::Union{zzModPolyRing, fpPolyRing})
+function _set_mod!(z::zzModPolyRingElem, P::zzModPolyRing)
+  _set_mod!(z, base_ring(P))
+  z.parent = P
+  return z
+end
+
+function _set_mod!(z::fpPolyRingElem, P::fpPolyRing)
   _set_mod!(z, base_ring(P))
   z.parent = P
   return z
