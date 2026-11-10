@@ -169,6 +169,18 @@ end
   end
 end
 
+@testset "ZZModMatrix.is_zero_entry" begin
+  R, = residue_ring(ZZ, ZZ(2)^384)
+  M = matrix(R, [ZZ(7) ZZ(0) ZZ(2)^190; ZZ(0) ZZ(-1) ZZ(0)])
+  @test which(is_zero_entry, (ZZModMatrix, Int, Int)).module === Nemo
+  for A in (M, view(M, 1:2, 2:3))
+    for i in 1:nrows(A), j in 1:ncols(A)
+      @test is_zero_entry(A, i, j) == iszero(A[i, j])
+    end
+    @test_throws BoundsError is_zero_entry(A, 1, ncols(A) + 1)
+  end
+end
+
 @testset "ZZModMatrix.printing" begin
   Z2, = residue_ring(ZZ, ZZ(2))
   R = ZZModMatrixSpace(Z2, 2, 2)
