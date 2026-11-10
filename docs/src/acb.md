@@ -220,6 +220,10 @@ isinteger(::AcbFieldElem)
 ```
 
 ```@docs
+is_real(::AcbFieldElem)
+```
+
+```@docs
 accuracy_bits(::AcbFieldElem)
 ```
 
