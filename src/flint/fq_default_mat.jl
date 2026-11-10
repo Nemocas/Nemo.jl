@@ -587,20 +587,18 @@ end
 #
 ################################################################################
 
+# size of the C struct of one entry, which depends on the representation of `F`
+function _entry_size(F::FqField)
+  T = raw_field_type(F)
+  T === fqPolyRepField && return _entry_size(fqPolyRepMatrix)
+  T === FqPolyRepField && return _entry_size(FqPolyRepMatrix)
+  T === fpField && return _entry_size(fpMatrix)
+  T === FpField && return _entry_size(FpMatrix)
+  return sizeof(UInt) # Zech logarithms: an `fq_zech_struct` is a single `ulong`
+end
+
 function mat_entry_ptr(a::FqMatrix, i::Int, j::Int)
-  t = _fq_default_ctx_type(base_ring(a))
-  if t == _FQ_DEFAULT_FQ_ZECH
-    pptr = @ccall libflint.fq_zech_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
-  elseif t == _FQ_DEFAULT_FQ_NMOD
-    pptr = @ccall libflint.fq_nmod_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
-  elseif t == _FQ_DEFAULT_FQ
-    pptr = @ccall libflint.fq_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
-  elseif t == _FQ_DEFAULT_NMOD
-    pptr = @ccall libflint.nmod_mat_entry_ptr(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
-  else#if t == _FQ_DEFAULT_FMPZ_MOD
-    pptr = @ccall libflint.fmpz_mod_mat_entry(a::Ref{FqMatrix}, (i - 1)::Int, (j - 1)::Int)::Ptr{FqFieldElem}
-  end
-  return pptr
+  return _entries(a) + ((i - 1) * _stride(a) + (j - 1)) * _entry_size(base_ring(a))
 end
 
 ################################################################################
