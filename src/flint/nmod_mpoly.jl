@@ -215,7 +215,7 @@ for (etype, rtype, ftype, ctype, utype) in (
     ###############################################################################
 
     function coeff(a::($etype), vars::Vector{Int}, exps::Vector{Int})
-      unique(vars) != vars && error("Variables not unique")
+      allunique(vars) || error("Variables not unique")
       length(vars) != length(exps) &&
       error("Number of variables does not match number of exponents")
       z = parent(a)()

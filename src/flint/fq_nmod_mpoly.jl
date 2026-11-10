@@ -203,7 +203,7 @@ end
 ###############################################################################
 
 function coeff(a::fqPolyRepMPolyRingElem, vars::Vector{Int}, exps::Vector{Int})
-  unique(vars) != vars && error("Variables not unique")
+  allunique(vars) || error("Variables not unique")
   length(vars) != length(exps) &&
   error("Number of variables does not match number of exponents")
   vars = [UInt(i) - 1 for i in vars]
