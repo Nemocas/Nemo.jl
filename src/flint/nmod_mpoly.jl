@@ -554,7 +554,7 @@ for (etype, rtype, ftype, ctype, utype) in (
       @req !isempty(vals) "No values supplied"
       R = parent(a)
       @req length(vals) == nvars(R) "Number of variables does not match number of values"
-      @req allequal(map(parent, vals)) "Parents do not match"
+      @req allequal(parent, vals) "Parents do not match"
       S = parent(first(vals))
 
       c = S()
@@ -567,7 +567,7 @@ for (etype, rtype, ftype, ctype, utype) in (
       @req !isempty(vals) "No values supplied"
       R = parent(a)
       @req length(vals) == nvars(R) "Number of variables does not match number of values"
-      @req allequal(map(parent, vals)) "Parents do not match"
+      @req allequal(parent, vals) "Parents do not match"
       S = parent(first(vals))
 
       c = S()
