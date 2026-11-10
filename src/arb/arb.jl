@@ -458,7 +458,7 @@ end
 #
 ################################################################################
 
-is_unit(x::ArbFieldElem) = !contains_zero(x)
+is_unit(x::ArbFieldElem) = isfinite(x) && !contains_zero(x)
 
 @doc raw"""
     iszero(x::ArbFieldElem)

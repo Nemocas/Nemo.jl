@@ -122,6 +122,8 @@ end
   @test is_unit(CC(1))
   @test !is_unit(CC("0 +/- 0.01"))
   @test is_unit(CC(RR("0 +/- 0.01"), RR(1)))
+  @test !is_unit(CC(RR(1), RR(NaN)))
+  @test !is_unit(CC(RR(1), RR(Inf)))
 
   @test isone(CC(1))
   @test !isone(CC(0))

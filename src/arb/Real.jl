@@ -453,7 +453,7 @@ end
 #
 ################################################################################
 
-is_unit(x::RealFieldElem) = !contains_zero(x)
+is_unit(x::RealFieldElem) = isfinite(x) && !contains_zero(x)
 
 @doc raw"""
     iszero(x::RealFieldElem)

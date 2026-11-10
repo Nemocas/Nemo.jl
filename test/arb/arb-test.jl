@@ -211,6 +211,7 @@ end
   @test !is_unit(RR(0))
   @test is_unit(RR(1))
   @test !is_unit(RR("0 +/- 0.01"))
+  @test !is_unit(RR(Inf))
 
   @test isone(RR(1))
   @test !isone(RR(0))
