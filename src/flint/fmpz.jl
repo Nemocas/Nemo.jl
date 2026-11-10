@@ -964,7 +964,8 @@ end
 ^(a::Union{RingElem, MatElem}, n::ZZRingElem) = _generic_power(a, n)
 
 function _generic_power(a, n::ZZRingElem)
-  fits(Int, n) && return a^Int(n)
+  # `Int` methods negate negative exponents, which overflows for `typemin(Int)`
+  fits(Int, n) && n != typemin(Int) && return a^Int(n)
   a isa MatElem && check_square(a)
   is_negative(n) && return AbstractAlgebra.internal_power(inv(a), -n)
   return AbstractAlgebra.internal_power(a, n)
