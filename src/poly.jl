@@ -1,6 +1,6 @@
-_pretty_sort(D::Dict) = sort!(collect(D); by = pretty_sort ∘ first)
+_pretty_sort(D::Dict) = sort!(collect(D); by = x -> pretty_sort(first(x)))
 
-_pretty_sort!(D::Vector) = sort!(D; by = pretty_sort ∘ first)
+_pretty_sort!(D::Vector) = sort!(D; by = x -> pretty_sort(first(x)))
 
 
 function rem!(z::T, f::T, g::T) where {T<:PolyRingElem}
