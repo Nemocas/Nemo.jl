@@ -227,6 +227,10 @@ is_real(::ComplexFieldElem)
 ```
 
 ```@docs
+is_imaginary(::ComplexFieldElem)
+```
+
+```@docs
 accuracy_bits(::ComplexFieldElem)
 ```
 
@@ -241,6 +245,9 @@ julia> b = CC(3)
 
 julia> isreal(a)
 true
+
+julia> is_imaginary(a)
+false
 
 julia> isfinite(b)
 true
