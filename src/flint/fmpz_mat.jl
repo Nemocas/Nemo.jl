@@ -1673,11 +1673,9 @@ function Base.cat(A::ZZMatrix...;dims)
 end
 
 function AbstractAlgebra._vcat(A::AbstractVector{ZZMatrix})
-  if any(x -> ncols(x) != ncols(A[1]), A)
-    error("Matrices must have the same number of columns")
-  end
+  allequal(ncols, A) || error("Matrices must have the same number of columns")
 
-  M = zero_matrix(ZZ, sum(nrows, A, init = 0), ncols(first(A)))
+  M = zero_matrix(ZZ, sum(nrows, A; init = 0), ncols(first(A)))
 
   s = 0
   for N in A
@@ -1702,11 +1700,9 @@ end
 
 
 function AbstractAlgebra._hcat(A::AbstractVector{ZZMatrix})
-  if any(x -> nrows(x) != nrows(A[1]), A)
-    error("Matrices must have the same number of rows")
-  end
+  allequal(nrows, A) || error("Matrices must have the same number of rows")
 
-  M = zero_matrix(ZZ, nrows(first(A)), sum(ncols, A, init = 0))
+  M = zero_matrix(ZZ, nrows(first(A)), sum(ncols, A; init = 0))
 
   s = 0
   for N in A
