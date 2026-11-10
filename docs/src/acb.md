@@ -224,6 +224,10 @@ is_real(::AcbFieldElem)
 ```
 
 ```@docs
+is_imaginary(::AcbFieldElem)
+```
+
+```@docs
 accuracy_bits(::AcbFieldElem)
 ```
 
@@ -241,6 +245,9 @@ julia> b = CC(3)
 
 julia> isreal(a)
 true
+
+julia> is_imaginary(a)
+false
 
 julia> isfinite(b)
 true
