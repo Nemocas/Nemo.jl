@@ -338,6 +338,9 @@ end
   @test a^ZZ(3) == 20
   @test a^BigInt(3) == 20
   @test_throws DivideError zero(R)^ZZ(-1)
+
+  x = Native.GF(ZZ(7))(2)
+  @test x^typemin(Int) == x # order 3
 end
 
 @testset "gfp_fmpz.comparison" begin

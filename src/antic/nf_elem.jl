@@ -416,7 +416,8 @@ end
 ###############################################################################
 
 function ^(a::AbsSimpleNumFieldElem, n::Int)
-  z = pow!(parent(a)(), a, abs(n))
+  # `abs(typemin(Int))` is negative, `unsigned` makes it `2^63`
+  z = pow!(parent(a)(), a, unsigned(abs(n)))
   if n < 0
     z = inv!(z)
   end

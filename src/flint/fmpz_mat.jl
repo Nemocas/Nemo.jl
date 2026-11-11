@@ -288,7 +288,8 @@ function ^(x::ZZMatrix, y::Int)
   else
     fl, xi = is_invertible_with_inverse(x)
     @req fl "Matrix must be invertible"
-    return pow!(xi, xi, -y)
+    # `-typemin(Int)` overflows, `unsigned` makes it `2^63`
+    return pow!(xi, xi, unsigned(-y))
   end
 end
 

@@ -195,10 +195,11 @@ function ^(x::FpFieldElem, y::Int)
   R = parent(x)
   if y < 0
     x = inv(x)
-    y = -y
   end
+  # `abs(typemin(Int))` is negative, `unsigned` makes it `2^63`
+  e = unsigned(abs(y))
   d = ZZRingElem()
-  @ccall libflint.fmpz_mod_pow_ui(d::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, y::UInt, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  @ccall libflint.fmpz_mod_pow_ui(d::Ref{ZZRingElem}, data(x)::Ref{ZZRingElem}, e::UInt, R.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return FpFieldElem(d, R)
 end
 
