@@ -190,6 +190,7 @@ end
   @test iszero((x-x)^1)
   @test isone((1-x)*(1-x)^-1)
   @test isone((1-2*x+x^2)*(1-x)^-2)
+  @test R(-1)^typemin(Int) == 1
 end
 
 @testset "fmpz_puiseux_series.inversion" begin
