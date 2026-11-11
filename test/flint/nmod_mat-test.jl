@@ -506,6 +506,8 @@ end
   # issue Oscar.jl#4590
   a = matrix(Z17, [2 3])
   @test_throws DomainError a^2
+
+  @test_throws ErrorException matrix(Z17, [0 -1; 1 -1])^typemin(Int)
 end
 
 @testset "zzModMatrix.row_echelon_form" begin

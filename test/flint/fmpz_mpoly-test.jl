@@ -364,6 +364,9 @@ end
       @test_throws DomainError f^ZZRingElem(-1)
     end
   end
+
+  S, _ = polynomial_ring(R, ["x", "y"])
+  @test_throws DomainError S(-1)^typemin(Int)
 end
 
 @testset "ZZMPolyRingElem.divides" begin

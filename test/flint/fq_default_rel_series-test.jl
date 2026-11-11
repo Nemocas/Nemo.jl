@@ -409,6 +409,7 @@ end
   @test isequal(d^12, 4096*x^12+24576*x^14+O(x^15))
 
   @test_throws DomainError a^-1
+  @test_throws DomainError S(-1)^typemin(Int)
 end
 
 @testset "FqRelPowerSeriesRingElem.shift" begin
