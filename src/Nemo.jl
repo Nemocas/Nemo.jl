@@ -11,6 +11,8 @@ module Nemo
 
 import AbstractAlgebra
 
+using Compat: allequal
+
 using Random: Random, AbstractRNG, SamplerTrivial
 import Random: rand!
 

@@ -215,7 +215,7 @@ for (etype, rtype, ftype, ctype, utype) in (
     ###############################################################################
 
     function coeff(a::($etype), vars::Vector{Int}, exps::Vector{Int})
-      unique(vars) != vars && error("Variables not unique")
+      allunique(vars) || error("Variables not unique")
       length(vars) != length(exps) &&
       error("Number of variables does not match number of exponents")
       z = parent(a)()
@@ -554,7 +554,7 @@ for (etype, rtype, ftype, ctype, utype) in (
       @req !isempty(vals) "No values supplied"
       R = parent(a)
       @req length(vals) == nvars(R) "Number of variables does not match number of values"
-      @req allequal(map(parent, vals)) "Parents do not match"
+      @req allequal(parent, vals) "Parents do not match"
       S = parent(first(vals))
 
       c = S()
@@ -567,7 +567,7 @@ for (etype, rtype, ftype, ctype, utype) in (
       @req !isempty(vals) "No values supplied"
       R = parent(a)
       @req length(vals) == nvars(R) "Number of variables does not match number of values"
-      @req allequal(map(parent, vals)) "Parents do not match"
+      @req allequal(parent, vals) "Parents do not match"
       S = parent(first(vals))
 
       c = S()

@@ -203,7 +203,7 @@ end
 ###############################################################################
 
 function coeff(a::fqPolyRepMPolyRingElem, vars::Vector{Int}, exps::Vector{Int})
-  unique(vars) != vars && error("Variables not unique")
+  allunique(vars) || error("Variables not unique")
   length(vars) != length(exps) &&
   error("Number of variables does not match number of exponents")
   vars = [UInt(i) - 1 for i in vars]
@@ -507,7 +507,7 @@ function evaluate(a::fqPolyRepMPolyRingElem, vals::Vector{fqPolyRepMPolyRingElem
   @req !isempty(vals) "No values supplied"
   R = parent(a)
   @req length(vals) == nvars(R) "Number of variables does not match number of values"
-  @req allequal(map(parent, vals)) "Parents do not match"
+  @req allequal(parent, vals) "Parents do not match"
   S = parent(first(vals))
 
   c = S()
@@ -520,7 +520,7 @@ function evaluate(a::fqPolyRepMPolyRingElem, vals::Vector{fqPolyRepPolyRingElem}
   @req !isempty(vals) "No values supplied"
   R = parent(a)
   @req length(vals) == nvars(R) "Number of variables does not match number of values"
-  @req allequal(map(parent, vals)) "Parents do not match"
+  @req allequal(parent, vals) "Parents do not match"
   S = parent(first(vals))
 
   c = S()

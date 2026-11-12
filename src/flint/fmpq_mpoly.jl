@@ -214,7 +214,7 @@ end
 ###############################################################################
 
 function coeff(a::QQMPolyRingElem, vars::Vector{Int}, exps::Vector{Int})
-  unique(vars) != vars && error("Variables not unique")
+  allunique(vars) || error("Variables not unique")
   length(vars) != length(exps) &&
   error("Number of variables does not match number of exponents")
   z = parent(a)()
@@ -567,7 +567,7 @@ function evaluate(a::QQMPolyRingElem, vals::Vector{QQMPolyRingElem})
   @req !isempty(vals) "No values supplied"
   R = parent(a)
   @req length(vals) == nvars(R) "Number of variables does not match number of values"
-  @req allequal(map(parent, vals)) "Parents do not match"
+  @req allequal(parent, vals) "Parents do not match"
   S = parent(first(vals))
 
   c = S()
@@ -580,7 +580,7 @@ function evaluate(a::QQMPolyRingElem, vals::Vector{QQPolyRingElem})
   @req !isempty(vals) "No values supplied"
   R = parent(a)
   @req length(vals) == nvars(R) "Number of variables does not match number of values"
-  @req allequal(map(parent, vals)) "Parents do not match"
+  @req allequal(parent, vals) "Parents do not match"
   S = parent(first(vals))
 
   c = S()
