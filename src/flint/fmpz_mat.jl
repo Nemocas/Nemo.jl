@@ -1677,7 +1677,7 @@ function AbstractAlgebra._vcat(A::AbstractVector{ZZMatrix})
     error("Matrices must have the same number of columns")
   end
 
-  M = zero_matrix(ZZ, sum(nrows, A, init = 0), ncols(A[1]))
+  M = zero_matrix(ZZ, sum(nrows, A, init = 0), ncols(first(A)))
 
   s = 0
   for N in A
@@ -1706,7 +1706,7 @@ function AbstractAlgebra._hcat(A::AbstractVector{ZZMatrix})
     error("Matrices must have the same number of rows")
   end
 
-  M = zero_matrix(ZZ, nrows(A[1]), sum(ncols, A, init = 0))
+  M = zero_matrix(ZZ, nrows(first(A)), sum(ncols, A, init = 0))
 
   s = 0
   for N in A

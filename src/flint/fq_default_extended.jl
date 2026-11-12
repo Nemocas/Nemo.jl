@@ -472,7 +472,7 @@ function _embed(K::FqField, L::FqField)
     # must be absolute minpoly
     g = absolute_minpoly(_gen(K))
     e = _embed(prime_field(K), L)
-    a = roots(map_coefficients(e, g, cached = false))[1]
+    a = first(roots(map_coefficients(e, g, cached = false)))
     return x -> begin
       return sum(_coeff(x, i)*a^i for i in 0:(absolute_degree(K) - 1))
     end::FqFieldElem
@@ -611,7 +611,7 @@ function FqField(f::FqPolyRingElem, s::Symbol, cached::Bool = false, absolute::B
       # Push f to L
       Lx, _ = polynomial_ring(L, "\$", cached = false)
       foverL = map_coefficients(e, f, parent = Lx)
-      a = roots(foverL)[1]
+      a = first(roots(foverL))
       # Found the map K[x]/(f) -> L
       forwardmap = y -> evaluate(map_coefficients(e, y, parent = Lx), a)
       Kabs = _absolute_basis(K)

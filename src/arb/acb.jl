@@ -1081,7 +1081,7 @@ function eisenstein_g(k::Int, x::AcbFieldElem)
   @ccall libflint.acb_modular_eisenstein(vec::Ptr{acb_struct}, x::Ref{AcbFieldElem}, len::Int, precision(CC)::Int)::Nothing
   z = array(CC, vec, len)
   acb_vec_clear(vec, len)
-  return z[end]
+  return last(z)
 end
 
 @doc raw"""

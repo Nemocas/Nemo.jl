@@ -470,7 +470,7 @@ end
 
       q1, r = divrem(p, [f])
 
-      @test q1[1] == g
+      @test only(q1) == g
       @test r == 0
     end
 
