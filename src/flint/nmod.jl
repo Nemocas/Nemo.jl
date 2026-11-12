@@ -202,6 +202,26 @@ end
   return r < n_norm ? r : r - n_norm
 end
 
+# As _ll_mod_preinv_norm, with the corrections as branches: the first is taken
+# almost always, the second almost never. A call on the rare side keeps the
+# compiler from turning a branch back into a select.
+@inline function _ll_mod_preinv_norm_branched(u1::UInt, u0::UInt, n_norm::UInt, ninv::UInt)
+  bits = 8 * sizeof(UInt)
+
+  prod = widemul(ninv, u1)
+  q1 = (prod >> bits) % UInt
+  q0 = prod % UInt
+  q0 += u0
+  q1 = q1 + u1 + (q0 < u0)
+
+  r = u0 - (q1 + 1) * n_norm
+  r = r > q0 ? r + n_norm : _identity_rare(r)
+  return r < n_norm ? r : _sub_rare(r, n_norm)
+end
+
+@noinline _identity_rare(r::UInt) = r
+@noinline _sub_rare(r::UInt, n::UInt) = r - n
+
 # ni needs to be an 'inverse' of n computing using :n_preinvert_limb in flint
 function mulmod(a::UInt, b::UInt, n::UInt, ni::UInt)
   return @ccall libflint.n_mulmod2_preinv(a::UInt, b::UInt, n::UInt, ni::UInt)::UInt
@@ -235,7 +255,7 @@ end
   p1 = (prod >> bits) % UInt
   p0 = prod % UInt
 
-  return _ll_mod_preinv_norm(p1, p0, modulus(R) << s, R.ninv) >> s
+  return _ll_mod_preinv_norm_branched(p1, p0, modulus(R) << s, R.ninv) >> s
 end
 
 function *(x::zzModRingElem, y::zzModRingElem)

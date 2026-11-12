@@ -107,7 +107,7 @@ end
 @testset "Nemo._mulmod" begin
   # _mulmod, the Julia port of FLINT's n_mulmod_preinv, against FLINT itself
   # and against widemul(a, b) % n
-  function check_case(a::UInt, b::UInt, R::zzModRing)
+  function check_case(a::UInt, b::UInt, R::Union{zzModRing, fpField})
     n, s = modulus(R), R.norm
     expected = @ccall Nemo.libflint.n_mulmod_preinv((a << s)::UInt, (b << s)::UInt, (n << s)::UInt, R.ninv::UInt, s::UInt)::UInt
     @test Nemo._mulmod(a, b, R) == expected >> s
@@ -124,6 +124,18 @@ end
     for a in vals, b in vals
       check_case(a, b, R)
     end
+  end
+
+  # inputs on which the second correction of the reduction is taken, about
+  # once in 50000 random ones; the moduli are prime, for both rings
+  rare = Sys.WORD_SIZE == 64 ?
+    [(0x400b9f162eb48ec5, 0x3e4b7ab7e33be1fd, 0x3569fd2fe1112724),
+     (0x88b71fcc0ba22991, 0x87cf3ece8773cd91, 0x7cd2fc0e5b170b6b)] :
+    [(0x87c7fd11, 0x6604978d, 0x6f0c5f67),
+     (0x9398748b, 0x8a4a46dd, 0x900ed15b)]
+  for (n, a, b) in rare
+    check_case(UInt(a), UInt(b), zzModRing(UInt(n), false))
+    check_case(UInt(a), UInt(b), Nemo.Native.GF(UInt(n)))
   end
 
   for _ in 1:10_000
