@@ -224,6 +224,9 @@ using FLINT_jll: libflint
 const pkgdir = realpath(joinpath(dirname(@__DIR__)))
 
 
+include("flint/FlintCHelpers.jl")
+include("FlintC.jl")
+
 ###############################################################################
 #
 #   Flint Exception handling
