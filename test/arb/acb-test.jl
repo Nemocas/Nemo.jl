@@ -132,6 +132,10 @@ end
 
   @test isinteger(CC(3))
   @test !isinteger(CC("3 +/- 0.01"))
+
+  @test is_real(CC(3))
+  @test !is_real(CC(3, 1))
+  @test !is_real(CC(3, "0 +/- 0.01"))
 end
 
 @testset "AcbFieldElem.unary_ops" begin
