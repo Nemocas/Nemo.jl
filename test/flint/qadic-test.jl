@@ -381,18 +381,61 @@ end
   @test sqrt(c)^2 == c
 
   @test sqrt(R(121))^2 == R(121)
+
+  @test is_square(a)
+
+  fl, r = is_square_with_sqrt(a^2)
+  @test fl && r^2 == a^2
+
+  @test !is_square(b+1)
+
+  @test is_square_with_sqrt(b+1)[1] == false
+
+  # for odd p the root is known to precision N - v/2
+  for x in (a, b, c, 49*a, 49*b, 49*c, QQ(1//49)*a, QQ(1//49)*b, QQ(1//49)*c)
+    fl, r = is_square_with_sqrt(x)
+    @test fl && precision(r) == precision(x) - div(valuation(x), 2)
+  end
+
+  # zero has no relative precision, so whether it is a square is undecided
+  for N in (31, 30, -3, -4)
+    z = O(R, QQ(7)^N)
+    @test_throws DomainError is_square(z)
+    @test_throws DomainError is_square_with_sqrt(z)
+    @test_throws DomainError sqrt(z)
+  end
 end
 
 @testset "QadicFieldElem.square_root_char2_precomp" begin
   R, _ = QadicField(2, 3)
-  user_data = Nemo.Qadic2SqrtPrecomp(R)
 
+  for z in (O(R, 2^8), O(R, 2^9))
+    @test_throws DomainError is_square(z)
+    @test_throws DomainError is_square_with_sqrt(z)
+  end
+
+  # for p = 2 the root is known to one digit less than for odd p
   a = 1 + 2^3 + O(R, 2^4)
-  @test Nemo._qadic_char2_sqrt(a, user_data)^2 == a
+  @test is_square_with_sqrt(a)[1]
+  @test is_square_with_sqrt(a)[2]^2 == a
+  @test precision(is_square_with_sqrt(a)[2]) == 3
 
   a = 1 + 2^3 + 2^4 + O(R, 2^10)
-  @test Nemo._qadic_char2_sqrt(a, user_data)^2 == a
+  @test is_square_with_sqrt(a)[2]^2 == a
+  @test precision(is_square_with_sqrt(a)[2]) == 9
 
+  @test !is_square(R(2))
+  @test !is_square(R(3))
+
+  # squareness of a unit depends on its first 3 digits
+  x = gen(R) + O(R, 2)
+  @test_throws DomainError is_square(x^2)
+  @test_throws DomainError is_square_with_sqrt(1 + O(R, 2^2))
+  @test_throws DomainError sqrt(1 + O(R, 2^2))
+  @test !is_square(2 + O(R, 2^2))
+
+  # error paths not reachable through the public API
+  user_data = Nemo.Qadic2SqrtPrecomp(R)
   @test_throws DomainError Nemo.Qadic2SqrtPrecomp(QadicField(3, 2)[1])
   S, _ = QadicField(2, 5)
   @test_throws ArgumentError Nemo._qadic_char2_sqrt(S(1), user_data)
