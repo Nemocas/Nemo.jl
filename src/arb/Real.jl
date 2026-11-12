@@ -346,6 +346,17 @@ function Base.hash(x::RealFieldElem, h::UInt)
   return h
 end
 
+@doc raw"""
+    isapprox(x::RealFieldElem, y::RealFieldElem; atol::Real=0, rtol::Real=0)
+
+Return `true` if the balls $x$ and $y$ may contain numbers that differ by at
+most `max(atol, rtol*max(abs(x), abs(y)))`. With the default tolerances this
+is `overlaps(x, y)`.
+"""
+function Base.isapprox(x::RealFieldElem, y::RealFieldElem; atol::Real=0, rtol::Real=0)
+  return _isapprox_ball(x, y, atol, rtol)
+end
+
 function ==(x::RealFieldElem, y::RealFieldElem)
   return Bool(@ccall libflint.arb_eq(x::Ref{RealFieldElem}, y::Ref{RealFieldElem})::Cint)
 end
@@ -2022,4 +2033,15 @@ function _rand_rational_in_ball(x::RealFieldElem)
   z = QQ()
   @ccall libflint.arb_get_rand_fmpq(z::Ref{QQFieldElem}, state::Ref{rand_ctx}, x::Ref{RealFieldElem}, precision(parent(x))::Int)::Nothing
   return z
+end
+
+################################################################################
+#
+#  Conformance test element generation
+#
+################################################################################
+
+# `:randtest_special` is left out: NaN and infinities are not field elements.
+function ConformanceTests.generate_element(R::RealField)
+  return rand(R; randtype=rand((:urandom, :randtest, :randtest_exact, :randtest_precise, :randtest_wide)))
 end

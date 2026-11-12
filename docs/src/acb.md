@@ -320,6 +320,7 @@ minimum of the precisions of its operands.
 
 ```@docs
 isequal(::AcbFieldElem, ::AcbFieldElem)
+isapprox(::AcbFieldElem, ::AcbFieldElem)
 ```
 
 A full range of ad hoc comparison operators is provided. These are implemented directly
