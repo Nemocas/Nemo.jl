@@ -137,6 +137,13 @@ end
   @test is_real(CC(3))
   @test !is_real(CC(3, 1))
   @test !is_real(CC(3, "0 +/- 0.01"))
+
+  @test is_imaginary(CC(0))
+  @test is_imaginary(CC(0, 3))
+  @test is_imaginary(CC(0, "3 +/- 0.01"))
+  @test !is_imaginary(CC(1, 3))
+  @test !is_imaginary(CC(QQ(1, 3), 1))
+  @test !is_imaginary(CC("0 +/- 0.01", 1))
 end
 
 @testset "ComplexFieldElem.unary_ops" begin

@@ -525,6 +525,21 @@ function is_real(x::AcbFieldElem)
   return Bool(@ccall libflint.acb_is_real(x::Ref{AcbFieldElem})::Cint)
 end
 
+@doc raw"""
+    is_imaginary(x::AcbFieldElem)
+
+Return `true` if the real part of $x$ is exactly zero, i.e. has zero
+midpoint and radius, otherwise return `false`. This includes $x = 0$.
+A ball whose real part only contains zero, such as `CC("0 +/- 0.01")`,
+returns `false`.
+"""
+function is_imaginary(x::AcbFieldElem)
+  GC.@preserve x begin
+    re = _real_ptr(x)
+    return Bool(@ccall libflint.arb_is_zero(re::Ptr{ArbFieldElem})::Cint)
+  end
+end
+
 is_negative(x::AcbFieldElem) = isreal(x) && is_negative(real(x))
 
 ################################################################################
