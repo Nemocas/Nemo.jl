@@ -81,7 +81,7 @@ iszero(a::T) where T <: Zmodn_poly = Bool(@ccall libflint.nmod_poly_is_zero(a::R
 
 modulus(a::T) where T <: Zmodn_poly = modulus(parent(a))
 
-nmod_t(a::Zmodn_poly) = nmod_t(a.mod_n, a.mod_ninv, a.mod_norm)
+nmod_t(a::Zmodn_poly) = a.mod
 
 modulus(R::zzModPolyRing) = modulus(base_ring(R))
 
