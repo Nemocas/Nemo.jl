@@ -345,9 +345,6 @@ end
 
 //(a::QadicFieldElem, b::QadicFieldElem) = divexact(a, b)
 
-# TODO: As of 15 May 2024 the following two methods don't work in Nemo because
-# `(::QadicField)(::PadicFieldElem)` which is needed for the promotion is in
-# Hecke
 //(a::PadicFieldElem, b::QadicFieldElem) = divexact(a, b)
 //(a::QadicFieldElem, b::PadicFieldElem) = divexact(a, b)
 
@@ -782,6 +779,14 @@ end
 function (R::QadicField)(n::QadicFieldElem)
   parent(n) != R && error("Unable to coerce into q-adic field")
   return n
+end
+
+function (R::QadicField)(a::PadicFieldElem)
+  @req prime(parent(a)) == prime(R) "Unable to coerce into q-adic field"
+  z = QadicFieldElem(precision(a))
+  @ccall libflint.padic_poly_set_padic(z::Ref{QadicFieldElem}, a::Ref{PadicFieldElem}, R::Ref{QadicField})::Nothing
+  z.parent = R
+  return z
 end
 
 ###############################################################################
