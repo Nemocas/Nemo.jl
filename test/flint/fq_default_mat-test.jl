@@ -374,6 +374,27 @@ end
   @test mul!(b, z, a) == a * z
 end
 
+@testset "FqMatrix.vector_mul" begin
+  # one field for each of fq_zech, fq_nmod, fq, nmod and fmpz_mod
+  for R in (GF(7, 3), GF(next_prime(2^20), 3), GF(next_prime(ZZ(2)^70), 2), GF(17), GF(next_prime(ZZ(2)^70)))
+    for (r, c) in ((1, 2), (3, 5), (5, 3), (9, 9))
+      a = matrix(R, [rand(R) for i in 1:r, j in 1:c])
+      v = [rand(R) for j in 1:c]
+      w = [rand(R) for i in 1:r]
+      Av = a * matrix(R, c, 1, v)
+      Av = [Av[i, 1] for i in 1:r]
+      wA = matrix(R, 1, r, w) * a
+      wA = [wA[1, j] for j in 1:c]
+      for f in (mul!, Nemo.mul!_flint, Nemo.mul!_through_matrix)
+        z = [rand(R) for i in 1:r]
+        @test f(z, a, v) == z == Av
+        z = [rand(R) for j in 1:c]
+        @test f(z, w, a) == z == wA
+      end
+    end
+  end
+end
+
 @testset "FqMatrix.row_col_swapping" begin
   R, _ = finite_field(ZZRingElem(17), 1, "a")
 
