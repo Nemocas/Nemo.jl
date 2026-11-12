@@ -448,6 +448,9 @@ end
   g = f^1000
 
   @test g == matrix_space(F17, 3, 3)([1 2 2; 2 13 12; 2 12 15])
+
+  b = matrix(F17, [0 -1; 1 -1]) # order 3
+  @test b^typemin(Int) == b
 end
 
 @testset "FqPolyRepMatrix.row_echelon_form" begin

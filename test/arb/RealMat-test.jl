@@ -208,6 +208,9 @@ end
   @test contains(A - B, R([1 (-1) (-2); (-8) (-2) 0; 5 3 0]))
 
   @test contains(A*B, R([49 41 50; 65 49 56; 75 81 114]))
+
+  b = matrix(RR, [0 -1; 1 -1]) # order 3
+  @test contains(b^typemin(Int), ZZ[0 -1; 1 -1])
 end
 
 @testset "RealMatrix.adhoc_binary" begin
