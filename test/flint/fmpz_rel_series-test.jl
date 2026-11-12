@@ -367,6 +367,7 @@ end
   @test d^12 == 4096*x^12+24576*x^14+O(x^15)
 
   @test_throws DomainError a^-1
+  @test_throws DomainError R(-1)^typemin(Int)
 end
 
 @testset "ZZRelPowerSeriesRingElem.shift" begin

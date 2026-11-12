@@ -280,6 +280,9 @@ end
   @test d^5 == -13195*a^2 + 72460*a + 336
   @test d^(-2) == ZZRingElem(2773)//703921*a^2 + ZZRingElem(1676)//703921*a + ZZRingElem(12632)//703921
   @test d^0 == 1
+
+  z = cyclotomic_field(3)[2]
+  @test z^typemin(Int) == z # order 3
 end
 
 @testset "AbsSimpleNumFieldElem.comparison" begin

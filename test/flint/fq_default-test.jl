@@ -199,6 +199,9 @@ end
   @test a^3 == x^4+6*x^3+5*x^2+5*x+6
 
   @test a^ZZRingElem(-5) == x^4+4*x^3+6*x^2+6*x+2
+
+  @test R(2)^typemin(Int) == 2 # order 3
+  @test GF(7)(2)^typemin(Int) == 2
 end
 
 @testset "FqFieldElem.comparison" begin

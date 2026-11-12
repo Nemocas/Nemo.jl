@@ -225,6 +225,7 @@ end
 
   @test C(2) ^ C(3) == 8
   @test C(2) ^ 3 == 8
+  @test C(-1)^typemin(Int) == 1
   @test C(2) ^ ZZRingElem(3) == 8
   @test C(2) ^ QQFieldElem(3) == 8
   @test C(2) ^ QQBarFieldElem(3) == 8

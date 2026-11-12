@@ -221,7 +221,8 @@ end
 function ^(x::ZZModRingElem, y::Int)
   if y < 0
     z = inv(x)
-    z = pow!(z, z, -y)
+    # `-typemin(Int)` overflows, `unsigned` makes it `2^63`
+    z = pow!(z, z, unsigned(-y))
   else
     z = pow!(parent(x)(), x, y)
   end

@@ -151,6 +151,7 @@ end
   @test x - y == -2
   @test x * y == 8
   @test x // y == 0.5
+  @test contains(CC(-1)^typemin(Int), 1)
 
   for T in [ZZRingElem, QQFieldElem, Int, BigInt, Rational{Int}, Rational{BigInt}]
     @test x + T(4) == 6

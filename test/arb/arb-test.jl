@@ -265,6 +265,7 @@ end
   @test x * y == 8
   @test x // y == 0.5
   @test x ^ y == 16
+  @test contains(RR(-1)^typemin(Int), 1)
 
   for T in [ZZRingElem, QQFieldElem, Int, BigInt, Rational{Int}, Rational{BigInt}]
 

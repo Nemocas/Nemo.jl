@@ -483,6 +483,9 @@ end
   @test g == matrix(Z17, [1 2 2; 2 13 12; 2 12 15])
 
   @test_throws ErrorException f^(ZZ(2)^1000)
+
+  b = matrix(Z17, [0 -1; 1 -1]) # order 3
+  @test b^typemin(Int) == b
 end
 
 @testset "ZZModMatrix.row_echelon_form" begin

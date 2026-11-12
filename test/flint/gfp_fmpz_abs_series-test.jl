@@ -265,6 +265,7 @@ end
   @test c^12 == 2079*x^4+484*x^3+90*x^2+12*x+1+O(x^5)
   @test d^12 == 4096*x^12+24576*x^14+O(x^15)
   @test_throws DomainError a^-1
+  @test_throws DomainError R(-1)^typemin(Int)
 end
 
 @testset "FpAbsPowerSeriesRingElem.shift" begin

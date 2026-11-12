@@ -1980,6 +1980,7 @@ end
    @test ZZ(1)^-2 == 1
    @test ZZ(-1)^-1 == -1
    @test ZZ(-1)^-2 == 1
+   @test ZZ(-1)^typemin(Int) == 1
    @test ZZ(0)^2 == 0
    @test ZZ(0)^1 == 0
 

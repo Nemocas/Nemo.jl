@@ -439,6 +439,7 @@ end
   @test isequal((2*x+O(x^5))^2, 4*x^2+O(x^6))
 
   @test_throws DomainError a^-1
+  @test_throws DomainError S(-1)^typemin(Int)
 end
 
 @testset "FpRelPowerSeriesRingElem.shift" begin

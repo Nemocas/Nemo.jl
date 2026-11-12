@@ -428,6 +428,9 @@ end
   @test g == matrix_space(Z17, 3, 3)([1 2 2; 2 13 12; 2 12 15])
 
   @test_throws ErrorException f^(ZZ(2)^1000)
+
+  b = matrix(Z17, [0 -1; 1 -1]) # order 3
+  @test b^typemin(Int) == b
 end
 
 @testset "FpMatrix.row_echelon_form" begin
