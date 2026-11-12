@@ -14,6 +14,8 @@ import AbstractAlgebra
 using Random: Random, AbstractRNG, SamplerTrivial
 import Random: rand!
 
+using MacroTools: @capture, postwalk
+
 using RandomExtensions: RandomExtensions, make, Make2, Make3
 
 import SHA
@@ -499,16 +501,19 @@ _base_type(::Ptr{T}) where T = T
 
 # `Ptr{S}` to field `name` of `c`. `S` defaults to the `fieldtype` of `name`
 # but need not be it, e.g. `ZZRingElem` for an `fmpz` field, which is an `Int`.
+# `name` may be a C field or a legacy property declared by a field path.
 @inline function _field_ptr(::Type{S}, c, ::Val{name}) where {S, name}
   T = _base_type(c)
-  return Ptr{S}(_base_ptr(c) + fieldoffset(T, Base.fieldindex(T, name)))
+  return Ptr{S}(_base_ptr(c) + _path_offset(_cstruct_type(T), _cfield_path(T, Val(name))))
 end
 
-@inline _field_ptr(c, ::Val{name}) where {name} =
-  _field_ptr(fieldtype(_base_type(c), name), c, Val(name))
+@inline function _field_ptr(c, ::Val{name}) where {name}
+  T = _base_type(c)
+  return _field_ptr(_path_type(_cstruct_type(T), _cfield_path(T, Val(name))), c, Val(name))
+end
 
 # field `name` of the C struct at `p`, which may point to the C part alone
-@inline _unsafe_load_field(p::Ptr, v::Val) = unsafe_load(_field_ptr(p, v))
+@inline _unsafe_load_field(p::Ptr, v::Val) = _unwrap(unsafe_load(_field_ptr(p, v)))
 
 ###############################################################################
 #
