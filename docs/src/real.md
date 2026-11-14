@@ -119,6 +119,9 @@ julia> convert(Float64, RR(1//3))
 
 ### Basic manipulation
 
+`is_unit(x)` returns `true` only if `x` is certainly invertible, i.e. is finite and
+does not contain zero.
+
 ```@docs
 is_nonzero(::RealFieldElem)
 ```
