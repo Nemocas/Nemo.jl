@@ -25,8 +25,7 @@ end
 function embed_gens(k::fqPolyRepField, K::fqPolyRepField)
   a = k()
   b = K()
-  p::Int = characteristic(k)
-  R = Native.GF(p)
+  R = prime_field(k)
   PR = polynomial_ring(R, "T")[1]
   P = PR()
 
@@ -91,7 +90,7 @@ function embed_pre_mat(x::fqPolyRepFieldElem, K::fqPolyRepField, M::fpMatrix)
   res = K()
 
   for j in degree(K):-1:1
-    setcoeff!(res, j - 1, Int(data(product[j, 1])))
+    setcoeff!(res, j - 1, data(product[j, 1]))
   end
 
   return res

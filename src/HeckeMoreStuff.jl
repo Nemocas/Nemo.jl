@@ -15,7 +15,7 @@ end
 ################################################################################
 
 function prime_field(F::fqPolyRepField; cached::Bool=true)
-  return Native.GF(Int(characteristic(F)), cached=cached)
+  return Native.GF(F.n; cached)
 end
 
 function prime_field(F::FqPolyRepField; cached::Bool=true)
@@ -689,7 +689,7 @@ function root(a::FinFieldElem, n::Integer)
 end
 
 function base_field(K::fqPolyRepField)
-  return Native.GF(Int(characteristic(K)))
+  return prime_field(K)
 end
 
 ################################################################################

@@ -430,6 +430,39 @@ function embed(k::fpField, K::fqPolyRepField)
   @assert characteristic(K) == characteristic(k)
 end
 
+# Callers use the returned embedding to transfer elements. These embeddings
+# are not added to the overfield lattice.
+function AbstractAlgebra.ext_of_degree(K::FqField, n::Int)
+  n > 0 || throw(DomainError(n, "extension degree must be positive"))
+  n == 1 && return K, AbstractAlgebra.identity_map(K)
+
+  m = absolute_degree(K)
+  d = Base.checked_mul(m, n)
+  L = GF(characteristic(K), d; cached = false, check = false)
+  # Only an absolute degree of one permits the scalar embedding.
+  m == 1 && return L, embed(K, L)
+  return L, embed_any(K, L)
+end
+
+function AbstractAlgebra.ext_of_degree(K::Union{fqPolyRepField, FqPolyRepField}, n::Int)
+  n > 0 || throw(DomainError(n, "extension degree must be positive"))
+  n == 1 && return K, AbstractAlgebra.identity_map(K)
+
+  m = degree(K)
+  d = Base.checked_mul(m, n)
+  L = Native.finite_field(K, d; cached = false, check = false)
+  # The prime-field shortcut in embed leaves the lattice untouched.
+  return L, m == 1 ? embed(K, L) : embed_any(K, L)
+end
+
+function AbstractAlgebra.ext_of_degree(K::Union{fpField, FpField}, n::Int)
+  n > 0 || throw(DomainError(n, "extension degree must be positive"))
+  n == 1 && return K, AbstractAlgebra.identity_map(K)
+
+  L = Native.GF(modulus(K), n; cached = false, check = false)
+  return L, FinFieldMorphism(K, L, x -> L(x), y -> K(coeff(y, 0)))
+end
+
 ################################################################################
 #
 #   Preimage map

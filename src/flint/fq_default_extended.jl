@@ -896,9 +896,16 @@ end
 
 # create a degree n extension of K (as an absolute field)
 function _extension(K::FqField, n::Int)
-  n = absolute_degree(K) * n
-  p = characteristic(K)
-  L = GF(p, n; cached = false)
-  h = embed(K, L)
-  return L, h
+  n > 0 || throw(DomainError(n, "extension degree must be positive"))
+  n == 1 && return K, AbstractAlgebra.identity_map(K)
+
+  d = Base.checked_mul(absolute_degree(K), n)
+  L = GF(characteristic(K), d; cached = false, check = false)
+  if is_absolute(K)
+    return L, embed(K, L)
+  end
+
+  # embed uses degree(K), so it mistakes a relative degree-one field for a
+  # prime field. Use the embedding of the underlying FLINT fields instead.
+  return L, embed_any(K, L)
 end

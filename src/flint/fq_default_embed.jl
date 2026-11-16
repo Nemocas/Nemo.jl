@@ -94,7 +94,8 @@ function _fq_default_embed_matrices(
 end
 
 function embed_matrices(k::FqField, K::FqField)
-  m, n = degree(k), degree(K)
+  # FLINT stores both fields in a power basis over the prime field.
+  m, n = _degree(k), _degree(K)
   if m == n
     T1 = modulus(k)
     T2 = modulus(parent(T1), K)
@@ -125,7 +126,7 @@ end
 
 function embed_pre_mat(x::FqFieldElem, K::FqField, M::FpMatrix)
 
-  d = degree(parent(x))
+  d = _degree(parent(x))
   col = zero_matrix(base_ring(M), d, 1)
 
   for j in 0:(d - 1)
@@ -133,7 +134,7 @@ function embed_pre_mat(x::FqFieldElem, K::FqField, M::FpMatrix)
   end
 
   product = M*col
-  res = FqFieldElem(K, ZZPolyRingElem([data(product[j, 1]) for j in 1:degree(K)]))
+  res = FqFieldElem(K, ZZPolyRingElem([data(product[j, 1]) for j in 1:_degree(K)]))
   return res
 end
 

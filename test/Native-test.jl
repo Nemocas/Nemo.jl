@@ -32,3 +32,40 @@
   F4 = Native.GF(2, 2)
   @test F4([1, 0]) == one(F4)
 end
+
+@testset "Native ext_of_degree" begin
+  p = next_prime(UInt(typemax(Int)))
+  for (K, T) in ((Native.GF(p), fqPolyRepField), (Native.GF(ZZ(p)), FqPolyRepField))
+    L, f = AbstractAlgebra.ext_of_degree(K, 2)
+    @test L isa T
+    @test domain(f) === K
+    @test codomain(f) === L
+    @test order(L) == order(K)^2
+    @test f(-one(K)) == -one(L)
+    @test preimage(f, -one(L)) == -one(K)
+
+    M, g = AbstractAlgebra.ext_of_degree(L, 2)
+    @test M isa T
+    @test domain(g) === L
+    @test codomain(g) === M
+    @test order(M) == order(L)^2
+    a = gen(L) - 1
+    @test g(a^2) == g(a)^2
+    @test g(-one(L)) == -one(M)
+    @test preimage(g, g(a)) == a
+
+    N, i = AbstractAlgebra.ext_of_degree(L, 1)
+    @test order(N) == order(L)
+    @test domain(i) === L
+    @test codomain(i) === N
+    @test i(one(L)) == one(N)
+    @test_throws DomainError AbstractAlgebra.ext_of_degree(L, 0)
+    @test_throws OverflowError AbstractAlgebra.ext_of_degree(L, typemax(Int))
+  end
+
+  K = Native.GF(p, 2; cached = false)
+  L = Native.GF(p, 2; cached = false)
+  f = embed(K, L)
+  @test f(-one(K)) == -one(L)
+  @test preimage(f, f(gen(K))) == gen(K)
+end

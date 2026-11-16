@@ -350,16 +350,46 @@ end
 end
 
 @testset "extension" begin
+  P = GF(3; cached = false)
+  Q, e = AbstractAlgebra.ext_of_degree(P, 2)
+  @test e(-one(P)) == -one(Q)
+  @test preimage(e, -one(Q)) == -one(P)
+
   K = GF(9)
-  L, h = Nemo._extension(K, 3)
+  L, h = AbstractAlgebra.ext_of_degree(K, 3)
   @test domain(h) === K
   @test codomain(h) === L
   @test order(L) == ZZ(9)^3
+  J, j = AbstractAlgebra.ext_of_degree(K, 1)
+  @test order(J) == order(K)
+  @test domain(j) === K
+  @test codomain(j) === J
+  @test j(one(K)) == one(J)
+  @test_throws DomainError AbstractAlgebra.ext_of_degree(K, 0)
   for i in 1:10
     a = rand(K)
     b = rand(K)
     @test h(a) + h(b) == h(a + b)
     @test h(a) * h(b) == h(a * b)
     @test preimage(h, h(a)) == a
+  end
+
+  _, x = polynomial_ring(K, "x")
+  for f in (x - gen(K), x^3 - x - 1)
+    E, a = finite_field(f)
+    F, g = AbstractAlgebra.ext_of_degree(E, 2)
+    @test domain(g) === E
+    @test codomain(g) === F
+    @test order(F) == order(E)^2
+    @test base_field(F) === prime_field(E)
+    @test degree(F) == 2 * absolute_degree(E)
+    b = E(gen(K))
+    @test g(a + b) == g(a) + g(b)
+    @test g(a * b) == g(a) * g(b)
+    @test g(b)^8 == one(F)
+    @test g(b)^4 != one(F)
+    @test preimage(g, g(b)) == b
+    @test preimage(g, g(a)) == a
+    @test_throws ArgumentError preimage(g, gen(F))
   end
 end
