@@ -50,8 +50,8 @@ end
 
 similar(F::FqPolyRepField, deg::Int, s::VarName = :o; cached::Bool = true) = finite_field(F, deg, s, cached = cached, check = false)
 
-function finite_field(char::Int, deg::Int, s::VarName = :o; cached::Bool = true, check::Bool = true)
-  parent_obj = fqPolyRepField(ZZRingElem(char), deg, Symbol(s), cached, check = check)
+function finite_field(char::Union{Int, UInt}, deg::Int, s::VarName = :o; cached::Bool = true, check::Bool = true)
+  parent_obj = fqPolyRepField(char, deg, Symbol(s), cached, check = check)
   return parent_obj, gen(parent_obj)
 end
 
@@ -61,7 +61,7 @@ function finite_field(pol::Zmodn_poly, s::VarName = :o; cached::Bool = true, che
 end
 
 function finite_field(F::fqPolyRepField, deg::Int, s::VarName = :o; cached::Bool = true, check::Bool = true)
-  return fqPolyRepField(characteristic(F), deg, Symbol(s), cached, check = check)
+  return fqPolyRepField(F.n, deg, Symbol(s), cached, check = check)
 end
 
 similar(F::fqPolyRepField, deg::Int, s::VarName = :o; cached::Bool = true) = FiniteField(F, deg, s, cached = cached, check = false)
