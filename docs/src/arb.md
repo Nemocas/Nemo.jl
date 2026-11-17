@@ -323,6 +323,7 @@ the minimum of the precisions of its operands.
 
 ```@docs
 isequal(::ArbFieldElem, ::ArbFieldElem)
+isapprox(::ArbFieldElem, ::ArbFieldElem)
 ```
 
 We also provide a full range of ad hoc comparison operators. These are implemented

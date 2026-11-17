@@ -1,6 +1,10 @@
 RR = real_field()
 CC = complex_field()
 
+@testset "ComplexFieldElem.conformance_tests" begin
+  ConformanceTests.test_Field_interface(CC)
+end
+
 @testset "ComplexFieldElem.constructors" begin
   @test complex_field() === CC
   @test isa(CC, ComplexField)
@@ -95,6 +99,17 @@ end
   @test overlaps(exact3, approx3)
   @test overlaps(approx3, approx3)
   @test !overlaps(approx3, approx4)
+
+  @test isapprox(approx3, exact3)
+  @test isapprox(approx3, approx3)
+  @test !isapprox(approx3, approx4)
+  @test !isapprox(exact3, exact4)
+  @test isapprox(exact3, exact4; atol=1)
+  @test !isapprox(exact3, exact4; atol=0.5)
+  @test isapprox(approx3, approx4; atol=0.999999)
+  @test !isapprox(approx3, approx4; atol=0.9)
+  @test isapprox(exact3, exact4; rtol=0.25)
+  @test !isapprox(exact3, exact4; rtol=0.2)
 
   @test contains(approx3, exact3)
   @test contains(approx3, approx3)
