@@ -223,6 +223,10 @@ isinteger(::ComplexFieldElem)
 ```
 
 ```@docs
+is_real(::ComplexFieldElem)
+```
+
+```@docs
 accuracy_bits(::ComplexFieldElem)
 ```
 

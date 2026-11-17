@@ -514,7 +514,14 @@ function isinteger(x::AcbFieldElem)
   return Bool(@ccall libflint.acb_is_int(x::Ref{AcbFieldElem})::Cint)
 end
 
-function isreal(x::AcbFieldElem)
+@doc raw"""
+    is_real(x::AcbFieldElem)
+
+Return `true` if the imaginary part of $x$ is exactly zero, i.e. has zero
+midpoint and radius, otherwise return `false`. A ball whose imaginary part
+only contains zero, such as `CC(1, "0 +/- 0.01")`, returns `false`.
+"""
+function is_real(x::AcbFieldElem)
   return Bool(@ccall libflint.acb_is_real(x::Ref{AcbFieldElem})::Cint)
 end
 
