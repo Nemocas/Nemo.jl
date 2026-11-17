@@ -593,6 +593,11 @@ end
   A = S([QQFieldElem(2) 3 5; 1 4 7; 4 1 1])
 
   @test rank(A) == 2
+
+  @test_logs (:warn, r"matrix\(QQ, A\)") begin
+    @test rank([QQFieldElem(2) 3 5; 1 4 7; 4 1 1]) == 2
+    @test rank(zeros(QQ, 2, 3)) == 0
+  end
 end
 
 @testset "QQMatrix.rref" begin
