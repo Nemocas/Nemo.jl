@@ -430,6 +430,25 @@ function embed(k::fpField, K::fqPolyRepField)
   @assert characteristic(K) == characteristic(k)
 end
 
+AbstractAlgebra.ext_of_degree(K::FqField, n::Int) = _extension(K, n)
+
+function AbstractAlgebra.ext_of_degree(K::Union{fqPolyRepField, FqPolyRepField}, n::Int)
+  n > 0 || throw(DomainError(n, "extension degree must be positive"))
+  n == 1 && return K, AbstractAlgebra.identity_map(K)
+
+  d = Base.checked_mul(degree(K), n)
+  L = Native.finite_field(K, d; cached = false, check = false)
+  return L, embed(K, L)
+end
+
+function AbstractAlgebra.ext_of_degree(K::Union{fpField, FpField}, n::Int)
+  n > 0 || throw(DomainError(n, "extension degree must be positive"))
+  n == 1 && return K, AbstractAlgebra.identity_map(K)
+
+  L = Native.GF(modulus(K), n; cached = false, check = false)
+  return L, FinFieldMorphism(K, L, x -> L(x), y -> K(coeff(y, 0)))
+end
+
 ################################################################################
 #
 #   Preimage map
