@@ -2379,11 +2379,3 @@ function prod_diagonal(A::ZZMatrix)
   end
   return a
 end
-
-################################################################################
-#
-#  Entry pointers
-#
-################################################################################
-
-_entry_size(::Type{ZZMatrix}) = sizeof(ZZRingElem)

@@ -597,6 +597,14 @@ function _entry_size(F::FqField)
   return sizeof(UInt) # Zech logarithms: an `fq_zech_struct` is a single `ulong`
 end
 
+# Every member of the `fq_default_mat_struct` union starts with the four
+# words `entries`, `r`, `c`, `stride`.
+_fq_default_mat_word(a::Ptr{FqMatrix}, i::Int) = unsafe_load(Ptr{UInt}(a), i)
+number_of_rows(a::Ptr{FqMatrix}) = _fq_default_mat_word(a, 2) % Int
+number_of_columns(a::Ptr{FqMatrix}) = _fq_default_mat_word(a, 3) % Int
+_stride(a::Ptr{FqMatrix}) = _fq_default_mat_word(a, 4) % Int
+_entries(a::Ptr{FqMatrix}) = Ptr{FqFieldElem}(_fq_default_mat_word(a, 1))
+
 function mat_entry_ptr(a::FqMatrix, i::Int, j::Int)
   return _entries(a) + ((i - 1) * _stride(a) + (j - 1)) * _entry_size(base_ring(a))
 end

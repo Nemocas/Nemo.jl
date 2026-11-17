@@ -24,11 +24,7 @@ number_of_variables(a::fqPolyRepMPolyRing) = a.nvars
 
 base_ring(a::fqPolyRepMPolyRing) = a.base_ring
 
-function internal_ordering(a::fqPolyRepMPolyRing)
-  b = a.ord
-  #   b = @ccall libflint.fq_nmod_mpoly_ctx_ord(a::Ref{fqPolyRepMPolyRing})::Cint
-  return _flint_ordering_symbol(b)
-end
+internal_ordering(a::fqPolyRepMPolyRing) = _flint_ordering_symbol(a.minfo.ord)
 
 function gens(R::fqPolyRepMPolyRing)
   A = Vector{fqPolyRepMPolyRingElem}(undef, nvars(R))
