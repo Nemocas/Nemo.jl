@@ -409,6 +409,10 @@ end
   @test b^(ZZ(2)^70 + 1) == b^2
   @test b^-(ZZ(2)^70 + 1) == b
   @test_throws DomainError QQ[1 2]^(ZZ(2)^70)
+  @test b^typemin(Int) == b
+
+  c = matrix_ring(QQ, 2)(b)
+  @test c^typemin(Int) == c
 end
 
 @testset "QQMatrix.adhoc_exact_division" begin
