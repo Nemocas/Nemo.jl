@@ -367,6 +367,7 @@ export is_perfect_power_with_data
 export is_positive
 export is_positive_entry
 export is_prime
+export is_prime_power
 export is_prime_power_with_data
 export is_probable_prime
 export is_rational
