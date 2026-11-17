@@ -522,9 +522,10 @@ function divexact!(z::ZZiRingElem, a::ZZiRingElem, b::ZZiRingElem)
 end
 
 function divexact(a::ZZiRingElem, b::Union{Integer, ZZRingElem, ZZiRingElem}; check=true)
+  iszero(b) && throw(DivideError())
   if check
     ok, q = divides(a, b)
-    ok || throw("non-exact division")
+    ok || error("Division is not exact in divexact")
     return q
   else
     return divexact!(ZZiRingElem(), a, b)
