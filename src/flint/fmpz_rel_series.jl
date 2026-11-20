@@ -499,14 +499,26 @@ end
 #
 ###############################################################################
 
-function Base.sqrt(a::ZZRelPowerSeriesRingElem; check::Bool=true)
-  asqrt = parent(a)()
-  val = div(valuation(a), 2)
-  asqrt.prec = precision(a) - val
-  asqrt.val = val
-  flag = Bool(@ccall libflint.fmpz_poly_sqrt_series(asqrt::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, (precision(a) - 2*val)::Int)::Cint)
-  check && flag == false && error("Not a square in sqrt")
-  return asqrt
+function sqrt_classical(a::ZZRelPowerSeriesRingElem; check::Bool=true)
+  S = parent(a)
+  v = valuation(a)
+  z = S()
+  v2 = div(v, 2)
+  if iszero(a)
+    z.prec = precision(a) - v2
+    z.val = z.prec
+    return true, z
+  end
+  if check && !iseven(v)
+    return false, S()
+  end
+  z.prec = precision(a) - v2
+  z.val = v2
+  flag = Bool(@ccall libflint.fmpz_poly_sqrt_series(z::Ref{ZZRelPowerSeriesRingElem}, a::Ref{ZZRelPowerSeriesRingElem}, (precision(a) - v)::Int)::Cint)
+  if check && !flag
+    return false, S()
+  end
+  return true, z
 end
 
 ###############################################################################
