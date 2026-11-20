@@ -505,8 +505,8 @@ function sqrt_classical(a::ZZRelPowerSeriesRingElem; check::Bool=true)
   z = S()
   v2 = div(v, 2)
   if iszero(a)
-    z.prec = v2
-    z.val = v2
+    z.prec = precision(a) - v2
+    z.val = z.prec
     return true, z
   end
   if check && !iseven(v)

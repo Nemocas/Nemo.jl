@@ -529,8 +529,8 @@ function sqrt_classical(a::FqRelPowerSeriesRingElem; check::Bool=true)
   z = S()
   v2 = div(v, 2)
   if iszero(a)
-    z.prec = v2
-    z.val = v2
+    z.prec = precision(a) - v2
+    z.val = z.prec
     return true, z
   end
   if check && !iseven(v)
@@ -551,7 +551,7 @@ function sqrt_classical(a::FqRelPowerSeriesRingElem; check::Bool=true)
     s = sqrt(c; check=check)
   end
   a = divexact(a, c)
-  @ccall libflint.fq_default_poly_sqrt_series(z::Ref{FqRelPowerSeriesRingElem}, a::Ref{FqRelPowerSeriesRingElem}, precision(a)::Int, base_ring(a)::Ref{FqField})::Nothing
+  @ccall libflint.fq_default_poly_sqrt_series(z::Ref{FqRelPowerSeriesRingElem}, a::Ref{FqRelPowerSeriesRingElem}, (precision(a) - v)::Int, base_ring(a)::Ref{FqField})::Nothing
   if !isone(s)
     z *= s
   end

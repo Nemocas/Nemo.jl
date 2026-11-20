@@ -479,13 +479,14 @@ end
   @test isequal(sqrt(b)^2, b)
 
   @test is_square(O(x^3))
-  @test isequal(sqrt(O(x^3)), O(x^1))
-  @test isequal(is_square_with_sqrt(O(x^3)), (true, O(x^1)))
+  @test isequal(sqrt(O(x^3)), O(x^2))
+  @test isequal(is_square_with_sqrt(O(x^3)), (true, O(x^2)))
   @test !is_square(x)
   @test !is_square_with_sqrt(x)[1]
   @test_throws ErrorException sqrt(x)
   @test !is_square(2 + x)
   @test isequal(is_square_with_sqrt(4x^2 + O(x^5)), (true, 2x + O(x^4)))
+  @test isequal(sqrt(x^2 + 2x^3 + O(x^4)), x + x^2 + O(x^3)) # (x + x^2)^2 = x^2 + 2x^3 + x^4
 end
 
 @testset "ZZRelPowerSeriesRingElem.unsafe_operators" begin
