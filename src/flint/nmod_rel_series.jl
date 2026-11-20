@@ -819,38 +819,6 @@ end # for
 #
 ###############################################################################
 
-function sqrt_classical_char2(a::fpRelPowerSeriesRingElem; check::Bool=true)
-  S = parent(a)
-  R = base_ring(a)
-  prec = div(precision(a) + 1, 2)
-  if iszero(a)
-    asqrt = parent(a)()
-    asqrt = set_precision!(asqrt, prec)
-    asqrt = set_valuation!(asqrt, prec)
-    return true, asqrt
-  end
-  aval = valuation(a)
-  if check && !iseven(aval)
-    return false, S()
-  end
-  aval2 = div(aval, 2)
-  asqrt = parent(a)()
-  fit!(asqrt, prec)
-  asqrt = set_precision!(asqrt, prec)
-  asqrt = set_valuation!(asqrt, aval2)
-  if check
-    for i = 1:2:precision(a) - aval - 1 # series must have even exponents
-      if !iszero(polcoeff(a, i))
-        return false, S()
-      end
-    end
-  end
-  for i = 0:prec - aval2 - 1
-    asqrt = setcoeff!(asqrt, i, polcoeff(a, 2*i))
-  end
-  return true, asqrt
-end
-
 function sqrt_classical(a::fpRelPowerSeriesRingElem; check::Bool=true)
   S = parent(a)
   if characteristic(S) == 2

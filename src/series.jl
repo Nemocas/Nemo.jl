@@ -27,3 +27,39 @@ end
 function is_square_with_sqrt(a::FlintRelPowerSeriesRingElem)
   return sqrt_classical(a; check=true)
 end
+
+function sqrt_classical_char2(a::FlintFinFieldRelPowerSeriesRingElem; check::Bool=true)
+  S = parent(a)
+  prec = div(precision(a) + 1, 2)
+  if iszero(a)
+    asqrt = parent(a)()
+    asqrt = set_precision!(asqrt, prec)
+    asqrt = set_valuation!(asqrt, prec)
+    return true, asqrt
+  end
+  aval = valuation(a)
+  if check && !iseven(aval)
+    return false, S()
+  end
+  aval2 = div(aval, 2)
+  asqrt = parent(a)()
+  fit!(asqrt, prec)
+  asqrt = set_precision!(asqrt, prec)
+  asqrt = set_valuation!(asqrt, aval2)
+  if check
+    for i in 1:2:precision(a) - aval - 1 # series must have even exponents
+      if !iszero(polcoeff(a, i))
+        return false, S()
+      end
+    end
+  end
+  for i in 0:prec - aval2 - 1
+    asqrt = setcoeff!(asqrt, i, _sqrt_char2(polcoeff(a, 2*i)))
+  end
+  return true, asqrt
+end
+
+# Every element of a finite field of characteristic 2 is a square;
+# over `GF(2)` it is its own root.
+_sqrt_char2(c::Union{fpFieldElem, FpFieldElem}) = c
+_sqrt_char2(c::FinFieldElem) = sqrt(c)
