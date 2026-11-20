@@ -819,38 +819,8 @@ end # for
 #
 ###############################################################################
 
-function sqrt_classical(a::fpRelPowerSeriesRingElem; check::Bool=true)
-  S = parent(a)
-  if characteristic(S) == 2
-    return sqrt_classical_char2(a; check=check)
-  end
-  v = valuation(a)
-  z = S()
-  v2 = div(v, 2)
-  if iszero(a)
-    z.prec = precision(a) - v2
-    z.val = z.prec
-    return true, z
-  end
-  if check && !iseven(v)
-    return false, S()
-  end
-  z.prec = precision(a) - v2
-  z.val = v2
-  c = coeff(a, v)
-  if check
-    flag, s = is_square_with_sqrt(c)
-    if !flag
-      return false, S()
-    end
-  else
-    s = sqrt(c; check=check)
-  end
-  a = divexact(a, c)
-  @ccall libflint.nmod_poly_sqrt_series(z::Ref{fpRelPowerSeriesRingElem}, a::Ref{fpRelPowerSeriesRingElem}, (precision(a) - v)::Int)::Nothing
-  if !isone(s)
-    z *= s
-  end
-  return true, z
+function _sqrt_series!(z::fpRelPowerSeriesRingElem, a::fpRelPowerSeriesRingElem, n::Int)
+  @ccall libflint.nmod_poly_sqrt_series(z::Ref{fpRelPowerSeriesRingElem}, a::Ref{fpRelPowerSeriesRingElem}, n::Int)::Nothing
+  return z
 end
 

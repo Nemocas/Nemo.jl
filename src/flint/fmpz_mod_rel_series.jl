@@ -768,38 +768,7 @@ end # for
 #
 ###############################################################################
 
-function sqrt_classical(a::FpRelPowerSeriesRingElem; check::Bool=true)
-  S = parent(a)
-  R = base_ring(a)
-  v = valuation(a)
-  z = S()
-  v2 = div(v, 2)
-  if iszero(a)
-    z.prec = precision(a) - v2
-    z.val = z.prec
-    return true, z
-  end
-  if check && !iseven(v)
-    return false, S()
-  end
-  if characteristic(R) == 2
-    return sqrt_classical_char2(a; check=check)
-  end
-  z.prec = precision(a) - v2
-  z.val = v2
-  c = coeff(a, v)
-  if check
-    flag, s = is_square_with_sqrt(c)
-    if !flag
-      return false, S()
-    end
-  else
-    s = sqrt(c; check=check)
-  end
-  a = divexact(a, c)
-  @ccall libflint.fmpz_mod_poly_sqrt_series(z::Ref{FpRelPowerSeriesRingElem}, a::Ref{FpRelPowerSeriesRingElem}, (precision(a) - v)::Int, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  if !isone(s)
-    z *= s
-  end
-  return true, z
+function _sqrt_series!(z::FpRelPowerSeriesRingElem, a::FpRelPowerSeriesRingElem, n::Int)
+  @ccall libflint.fmpz_mod_poly_sqrt_series(z::Ref{FpRelPowerSeriesRingElem}, a::Ref{FpRelPowerSeriesRingElem}, n::Int, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
+  return z
 end

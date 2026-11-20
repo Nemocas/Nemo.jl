@@ -5471,9 +5471,11 @@ const FlintFinFieldRelPowerSeriesRingElem = Union{fpRelPowerSeriesRingElem, FpRe
                                                    fqPolyRepRelPowerSeriesRingElem, FqPolyRepRelPowerSeriesRingElem,
                                                    FqRelPowerSeriesRingElem}
 
-const FlintRelPowerSeriesRingElem = Union{ZZRelPowerSeriesRingElem, QQRelPowerSeriesRingElem,
+const FlintFieldRelPowerSeriesRingElem = Union{QQRelPowerSeriesRingElem, FlintFinFieldRelPowerSeriesRingElem}
+
+const FlintRelPowerSeriesRingElem = Union{ZZRelPowerSeriesRingElem,
                                            zzModRelPowerSeriesRingElem, ZZModRelPowerSeriesRingElem,
-                                           FlintFinFieldRelPowerSeriesRingElem}
+                                           FlintFieldRelPowerSeriesRingElem}
 
 const Zmodn_mat = Union{zzModMatrix, fpMatrix}
 
