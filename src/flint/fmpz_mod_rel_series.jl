@@ -834,27 +834,3 @@ function sqrt_classical(a::FpRelPowerSeriesRingElem; check::Bool=true)
   end
   return true, z
 end
-
-@doc raw"""
-    sqrt(a::FpRelPowerSeriesRingElem)
-
-Return the square root of the power series $a$. By default the function raises
-an exception if the input is not a square. If `check=false` this check is
-omitted.
-"""
-function Base.sqrt(a::FpRelPowerSeriesRingElem; check::Bool=true)
-  flag, q = sqrt_classical(a; check=check)
-  if check && !flag
-    error("Not a square in sqrt")
-  end
-  return q
-end
-
-function is_square(a::FpRelPowerSeriesRingElem)
-  flag, q = sqrt_classical(a; check=true)
-  return flag
-end
-
-function is_square_with_sqrt(a::FpRelPowerSeriesRingElem)
-  return sqrt_classical(a; check=true)
-end

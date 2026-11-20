@@ -5467,6 +5467,12 @@ const Zmodn_mpoly = Union{zzModMPolyRingElem, fpMPolyRingElem}
 const FlintPuiseuxSeriesElem{T} = Union{FlintPuiseuxSeriesRingElem{T},
                                         FlintPuiseuxSeriesFieldElem{T}} where T <: RingElem
 
+const FlintRelPowerSeriesRingElem = Union{ZZRelPowerSeriesRingElem, QQRelPowerSeriesRingElem,
+                                           zzModRelPowerSeriesRingElem, ZZModRelPowerSeriesRingElem,
+                                           fpRelPowerSeriesRingElem, FpRelPowerSeriesRingElem,
+                                           fqPolyRepRelPowerSeriesRingElem, FqPolyRepRelPowerSeriesRingElem,
+                                           FqRelPowerSeriesRingElem}
+
 const Zmodn_mat = Union{zzModMatrix, fpMatrix}
 
 const Zmod_fmpz_mat = Union{ZZModMatrix, FpMatrix}

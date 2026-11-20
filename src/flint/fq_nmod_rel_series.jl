@@ -522,23 +522,6 @@ function sqrt_classical(a::fqPolyRepRelPowerSeriesRingElem; check::Bool=true)
   return true, z
 end
 
-function Base.sqrt(a::fqPolyRepRelPowerSeriesRingElem; check::Bool=true)
-  flag, q = sqrt_classical(a; check=check)
-  if check && !flag
-    error("Not a square in sqrt")
-  end
-  return q
-end
-
-function is_square(a::fqPolyRepRelPowerSeriesRingElem)
-  flag, q = sqrt_classical(a; check=true)
-  return flag
-end
-
-function is_square_with_sqrt(a::fqPolyRepRelPowerSeriesRingElem)
-  return sqrt_classical(a; check=true)
-end
-
 ###############################################################################
 #
 #   Unsafe functions
