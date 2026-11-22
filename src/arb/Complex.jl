@@ -420,6 +420,8 @@ end
 #
 ################################################################################
 
+is_unit(x::ComplexFieldElem) = isfinite(x) && !contains_zero(x)
+
 @doc raw"""
     iszero(x::ComplexFieldElem)
 
