@@ -204,6 +204,7 @@ import AbstractAlgebra: Ring
 import AbstractAlgebra: Set
 import AbstractAlgebra: set_attribute!
 import AbstractAlgebra: Solve
+import AbstractAlgebra: sqrt_classical
 import AbstractAlgebra: terse
 import AbstractAlgebra: transpose!
 import AbstractAlgebra: truncate!
