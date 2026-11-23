@@ -58,7 +58,7 @@ function sqrt_classical_char2(a::FlintFinFieldRelPowerSeriesRingElem; check::Boo
   end
   aval2 = div(aval, 2)
   asqrt = parent(a)()
-  fit!(asqrt, prec)
+  fit!(asqrt, prec - aval2)
   asqrt = set_precision!(asqrt, prec)
   asqrt = set_valuation!(asqrt, aval2)
   if check
