@@ -239,6 +239,7 @@ function _unpack_entries!(z::Vector{FqFieldElem}, Me::Vector{Int})
   w = isempty(z) ? 0 : _entry_size(parent(z[1])) ÷ sizeof(Int)
   for i in 1:length(z)
     unsafe_copyto!(Ptr{Int}(pointer_from_objref(z[i])), pointer(Me, w * (i - 1) + 1), w)
+    z[i].poly = nothing
   end
   return z
 end
@@ -260,6 +261,9 @@ function mul!_flint(z::Vector{FqFieldElem}, a::FqMatrix, b::Vector{FqFieldElem})
       @ccall libflint.fmpz_mod_mat_mul_fmpz_vec_ptr(z::Ptr{Ref{FqFieldElem}}, a::Ref{FqMatrix}, b::Ptr{Ref{FqFieldElem}}, length(b)::Int, ctx::Ptr{Nothing})::Nothing
     end
   end
+  for x in z
+    x.poly = nothing
+  end
   return z
 end
 
@@ -279,6 +283,9 @@ function mul!_flint(z::Vector{FqFieldElem}, a::Vector{FqFieldElem}, b::FqMatrix)
     else#if t == _FQ_DEFAULT_FMPZ_MOD
       @ccall libflint.fmpz_mod_mat_fmpz_vec_mul_ptr(z::Ptr{Ref{FqFieldElem}}, a::Ptr{Ref{FqFieldElem}}, length(a)::Int, b::Ref{FqMatrix}, ctx::Ptr{Nothing})::Nothing
     end
+  end
+  for x in z
+    x.poly = nothing
   end
   return z
 end

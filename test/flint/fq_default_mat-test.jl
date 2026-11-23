@@ -393,6 +393,22 @@ end
       end
     end
   end
+
+  # the cached polynomial of an element of a relative field is cleared
+  K = GF(3, 2)
+  _, y = polynomial_ring(K, "y")
+  L, _ = finite_field(y^3 + y^2 + y + 2, "b")
+  A = matrix(L, 1, 1, [L(2)])
+  for f in (mul!, Nemo.mul!_flint, Nemo.mul!_through_matrix)
+    z = [L(1)]
+    coeff(z[1], 0)
+    f(z, A, [L(1)])
+    @test coeff(z[1], 0) == K(2)
+    z = [L(1)]
+    coeff(z[1], 0)
+    f(z, [L(1)], A)
+    @test coeff(z[1], 0) == K(2)
+  end
 end
 
 @testset "FqMatrix.row_col_swapping" begin
