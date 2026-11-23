@@ -215,15 +215,6 @@ function mul!(a::FqMatrix, b::FqMatrix, c::FqMatrix)
   return a
 end
 
-# size of the FLINT struct of an element of F, stored at the start of its
-# `opaque` field
-function _entry_size(F::FqField)
-  T = raw_field_type(F)
-  # fq_zech_struct is one ulong
-  T === nothing && return sizeof(UInt)
-  return _entry_size(dense_matrix_type(T))::Int
-end
-
 # a must be GC.@preserved
 function _pack_entries(a::Vector{FqFieldElem})
   w = isempty(a) ? 0 : _entry_size(parent(a[1])) ÷ sizeof(Int)
