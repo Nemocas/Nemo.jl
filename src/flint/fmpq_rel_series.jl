@@ -742,25 +742,8 @@ function atanh(a::QQRelPowerSeriesRingElem)
   return z
 end
 
-function Base.sqrt(a::QQRelPowerSeriesRingElem; check::Bool=true)
-  v = valuation(a)
-  z = parent(a)()
-  v2 = div(v, 2)
-  if iszero(a)
-    z.prec = v2
-    z.val = v2
-    return z
-  end
-  check && !iseven(v) && error("Not a square")
-  z.prec = precision(a) - v2
-  z.val = v2
-  c = coeff(a, v)
-  s = sqrt(c; check=check)
-  a = divexact(a, c)
-  @ccall libflint.fmpq_poly_sqrt_series(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, precision(a)::Int)::Nothing
-  if !isone(s)
-    z *= s
-  end
+function _sqrt_series!(z::QQRelPowerSeriesRingElem, a::QQRelPowerSeriesRingElem, n::Int)
+  @ccall libflint.fmpq_poly_sqrt_series(z::Ref{QQRelPowerSeriesRingElem}, a::Ref{QQRelPowerSeriesRingElem}, n::Int)::Nothing
   return z
 end
 

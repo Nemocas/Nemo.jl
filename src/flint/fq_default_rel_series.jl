@@ -487,92 +487,9 @@ end
 #
 ###############################################################################
 
-function sqrt_classical_char2(a::FqRelPowerSeriesRingElem; check::Bool=true)
-  S = parent(a)
-  R = base_ring(a)
-  prec = div(precision(a) + 1, 2)
-  if iszero(a)
-    asqrt = parent(a)()
-    asqrt = set_precision!(asqrt, prec)
-    asqrt = set_valuation!(asqrt, prec)
-    return true, asqrt
-  end
-  aval = valuation(a)
-  if check && !iseven(aval)
-    return false, S()
-  end
-  aval2 = div(aval, 2)
-  asqrt = parent(a)()
-  asqrt = set_precision!(asqrt, prec)
-  asqrt = set_valuation!(asqrt, aval2)
-  if check
-    for i = 1:2:precision(a) - aval - 1 # series must have even exponents
-      if !iszero(polcoeff(a, i))
-        return false, S()
-      end
-    end
-  end
-  for i = 0:prec - aval2 - 1
-    c = polcoeff(a, 2*i)
-    if check && !is_square(c)
-      return false, S()
-    end
-    asqrt = setcoeff!(asqrt, i, sqrt(c; check=false))
-  end
-  return true, asqrt
-end
-
-function sqrt_classical(a::FqRelPowerSeriesRingElem; check::Bool=true)
-  S = parent(a)
-  R = base_ring(a)
-  v = valuation(a)
-  z = S()
-  v2 = div(v, 2)
-  if iszero(a)
-    z.prec = v2
-    z.val = v2
-    return true, z
-  end
-  if check && !iseven(v)
-    return false, S()
-  end
-  if characteristic(R) == 2
-    return sqrt_classical_char2(a; check=check)
-  end
-  z.prec = precision(a) - v2
-  z.val = v2
-  c = coeff(a, v)
-  if check
-    flag, s = is_square_with_sqrt(c)
-    if !flag
-      return false, S()
-    end
-  else
-    s = sqrt(c; check=check)
-  end
-  a = divexact(a, c)
-  @ccall libflint.fq_default_poly_sqrt_series(z::Ref{FqRelPowerSeriesRingElem}, a::Ref{FqRelPowerSeriesRingElem}, precision(a)::Int, base_ring(a)::Ref{FqField})::Nothing
-  if !isone(s)
-    z *= s
-  end
-  return true, z
-end
-
-function Base.sqrt(a::FqRelPowerSeriesRingElem; check::Bool=true)
-  flag, q = sqrt_classical(a; check=check)
-  if check && !flag
-    error("Not a square in sqrt")
-  end
-  return q
-end
-
-function is_square(a::FqRelPowerSeriesRingElem)
-  flag, q = sqrt_classical(a; check=true)
-  return flag
-end
-
-function is_square_with_sqrt(a::FqRelPowerSeriesRingElem)
-  return sqrt_classical(a; check=true)
+function _sqrt_series!(z::FqRelPowerSeriesRingElem, a::FqRelPowerSeriesRingElem, n::Int)
+  @ccall libflint.fq_default_poly_sqrt_series(z::Ref{FqRelPowerSeriesRingElem}, a::Ref{FqRelPowerSeriesRingElem}, n::Int, base_ring(a)::Ref{FqField})::Nothing
+  return z
 end
 
 ###############################################################################

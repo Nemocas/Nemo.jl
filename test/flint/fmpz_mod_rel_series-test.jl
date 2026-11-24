@@ -559,6 +559,15 @@ end
   @test isequal(divexact(x, exp(x + O(x^5)) - 1), 113168723261316872370*x^2+61728394506172839474*x+1+O(x^4))
 end
 
+@testset "ZZModRelPowerSeriesRingElem.square_root" begin
+  R, = residue_ring(ZZ, ZZ(9))
+  S, x = power_series_ring(R, 5, "x")
+
+  @test !is_square(x)
+  @test !is_square_with_sqrt(x)[1]
+  @test_throws ErrorException sqrt(x)
+end
+
 @testset "ZZModRelPowerSeriesRingElem.unsafe_operators" begin
   S, = residue_ring(ZZ, 31)
   R, x = power_series_ring(S, 30, "x")
