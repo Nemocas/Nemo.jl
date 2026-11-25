@@ -1,5 +1,5 @@
 function (k::fqPolyRepField)(a::Vector{fpFieldElem})
-  return k(polynomial(Native.GF(Int(characteristic(k))), a))
+  return k(polynomial(prime_field(k), a))
 end
 
 function (A::fqPolyRepField)(x::Union{zzModPolyRingElem, fpPolyRingElem})
