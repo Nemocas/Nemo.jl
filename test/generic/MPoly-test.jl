@@ -71,6 +71,7 @@ end
 
       @test q * f == p
 
+      iszero(f) && continue
       q1 = divexact(p, f)
 
       @test q1 * f == p
