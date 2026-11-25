@@ -180,6 +180,8 @@ end
       r2 *= f
     end
   end
+
+  @test R(-1)^typemin(Int) == 1
 end
 
 @testset "ZZLaurentSeriesRingElem.shift" begin

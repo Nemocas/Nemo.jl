@@ -85,7 +85,7 @@ function one(a::FpMatrixSpace)
   return one!(a())
 end
 
-@inline function is_zero_entry(A::FpMatrix, i::Int, j::Int)
+@inline function is_zero_entry(A::Zmod_fmpz_mat, i::Int, j::Int)
   @boundscheck _checkbounds(A, i, j)
   GC.@preserve A begin
     x = mat_entry_ptr(A, i, j)

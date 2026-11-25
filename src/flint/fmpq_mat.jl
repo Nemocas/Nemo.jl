@@ -832,24 +832,97 @@ end
 #
 # matrix x vector, vector x matrix
 #
-function mul!(z::Vector{QQFieldElem}, a::Vector{QQFieldElem}, b::QQMatrixOrPtr)
+function mul!_flint(z::Vector{QQFieldElem}, a::Vector{QQFieldElem}, b::QQMatrixOrPtr)
   @ccall libflint.fmpq_mat_fmpq_vec_mul_ptr(z::Ptr{Ref{QQFieldElem}}, a::Ptr{Ref{QQFieldElem}}, length(a)::Int, b::Ref{QQMatrix})::Nothing
   return z
 end
 
-function mul!(z::Vector{QQFieldElem}, a::QQMatrixOrPtr, b::Vector{QQFieldElem})
+function mul!_flint(z::Vector{QQFieldElem}, a::QQMatrixOrPtr, b::Vector{QQFieldElem})
   @ccall libflint.fmpq_mat_mul_fmpq_vec_ptr(z::Ptr{Ref{QQFieldElem}}, a::Ref{QQMatrix}, b::Ptr{Ref{QQFieldElem}}, length(b)::Int)::Nothing
   return z
 end
 
-function mul!(z::Vector{QQFieldElem}, a::Vector{ZZRingElem}, b::QQMatrixOrPtr)
+function mul!_flint(z::Vector{QQFieldElem}, a::Vector{ZZRingElem}, b::QQMatrixOrPtr)
   @ccall libflint.fmpq_mat_fmpz_vec_mul_ptr(z::Ptr{Ref{QQFieldElem}}, a::Ptr{Ref{ZZRingElem}}, length(a)::Int, b::Ref{QQMatrix})::Nothing
   return z
 end
 
-function mul!(z::Vector{QQFieldElem}, a::QQMatrixOrPtr, b::Vector{ZZRingElem})
+function mul!_flint(z::Vector{QQFieldElem}, a::QQMatrixOrPtr, b::Vector{ZZRingElem})
   @ccall libflint.fmpq_mat_mul_fmpz_vec_ptr(z::Ptr{Ref{QQFieldElem}}, a::Ref{QQMatrix}, b::Ptr{Ref{ZZRingElem}}, length(b)::Int)::Nothing
   return z
+end
+
+function _pack_entries(a::Vector{QQFieldElem})
+  Me = Vector{Int}(undef, 2 * length(a))
+  for i in 1:length(a)
+    Me[2 * i - 1] = a[i].num
+    Me[2 * i] = a[i].den
+  end
+  return Me
+end
+
+function _unpack_entries!(z::Vector{QQFieldElem}, Me::Vector{Int})
+  for i in 1:length(z)
+    z[i].num = Me[2 * i - 1]
+    z[i].den = Me[2 * i]
+  end
+  return z
+end
+
+# the matrix product loses with denominators above 8 bits and with integral
+# entries that are not stored in the word itself
+function _use_mul!_flint(a::QQMatrixOrPtr, len::Int, out::Int; vec_times_mat::Bool)
+  len < 8 && return true
+  integral = true
+  large = false
+  GC.@preserve a begin
+    for i in 1:nrows(a)
+      num = Ptr{ZZRingElem}(mat_entry_ptr(a, i, 1))
+      for j in 1:ncols(a)
+        den = num + sizeof(ZZRingElem)
+        (_fmpz_is_small(den) && data(den) <= 255) || return true
+        if data(den) > 1
+          integral = false
+        elseif integral
+          large |= !_fmpz_is_small(num)
+        end
+        num += sizeof(QQFieldElem)
+      end
+    end
+  end
+  return integral && large
+end
+
+function mul!(z::Vector{QQFieldElem}, a::Vector{QQFieldElem}, b::QQMatrixOrPtr)
+  if _use_mul!_flint(b, nrows(b), ncols(b); vec_times_mat = true)
+    return mul!_flint(z, a, b)
+  end
+
+  return mul!_through_matrix(z, a, b)
+end
+
+function mul!(z::Vector{QQFieldElem}, a::QQMatrixOrPtr, b::Vector{QQFieldElem})
+  if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)
+    return mul!_flint(z, a, b)
+  end
+
+  return mul!_through_matrix(z, a, b)
+end
+
+function mul!(z::Vector{QQFieldElem}, a::Vector{ZZRingElem}, b::QQMatrixOrPtr)
+  if _use_mul!_flint(b, nrows(b), ncols(b); vec_times_mat = true)
+    return mul!_flint(z, a, b)
+  end
+
+  return mul!_through_matrix(z, a, b; vector_as = ZZMatrix)
+end
+
+function mul!(z::Vector{QQFieldElem}, a::QQMatrixOrPtr, b::Vector{ZZRingElem})
+  if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)
+    return mul!_flint(z, a, b)
+  end
+
+  return mul!_through_matrix(z, a, b; vector_as = ZZMatrix)
 end
 
 #

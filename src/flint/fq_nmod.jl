@@ -392,7 +392,7 @@ end
 
 function frobenius_matrix(F::fqPolyRepField, n::Int=1)
   a = frobenius(gen(F), n)
-  k = Native.GF(Int(characteristic(F)))
+  k = prime_field(F)
   m = zero_matrix(k, degree(F), degree(F))
   @ccall libflint.fq_nmod_embed_composition_matrix_sub(m::Ref{fpMatrix}, a::Ref{fqPolyRepFieldElem}, F::Ref{fqPolyRepField}, degree(F)::Int)::Nothing
   @ccall libflint.nmod_mat_transpose(m::Ref{fpMatrix}, m::Ref{fpMatrix})::Nothing
@@ -571,8 +571,7 @@ end
 Return the modulus defining the finite field $k$.
 """
 function modulus(k::fqPolyRepField, var::VarName=:T)
-  p::Int = characteristic(k)
-  Q = polynomial(Native.GF(p), [], var)
+  Q = polynomial(prime_field(k), [], var)
   GC.@preserve k begin
     P = @ccall libflint.fq_nmod_ctx_modulus(k::Ref{fqPolyRepField})::Ptr{fpPolyRingElem}
     @ccall libflint.nmod_poly_set(Q::Ref{fpPolyRingElem}, P::Ptr{fpPolyRingElem})::Nothing
@@ -581,7 +580,7 @@ function modulus(k::fqPolyRepField, var::VarName=:T)
 end
 
 function defining_polynomial(k::fqPolyRepField)
-  F = fpField(UInt(characteristic(k)))
+  F = fpField(k.n)
   Fx, = polynomial_ring(F, "x", cached = false)
   return defining_polynomial(Fx, k)
 end
@@ -651,7 +650,7 @@ function (a::fqPolyRepField)(b::Vector{<:IntegerUnion})
   da = degree(a)
   db = length(b)
   da == db || error("Coercion impossible")
-  F = Native.GF(Int(characteristic(a)), cached = false)
+  F = prime_field(a; cached = false)
   z = fqPolyRepFieldElem(a, polynomial(F, b))
   return z
 end
@@ -693,7 +692,7 @@ end
 ###############################################################################
 
 function minpoly(a::fqPolyRepFieldElem)
-  Fp = Native.GF(Int(characteristic(parent(a))), cached=false)
+  Fp = prime_field(parent(a); cached = false)
   Rx, _ = polynomial_ring(Fp, cached=false)
   return minpoly(Rx, a)
 end
@@ -716,7 +715,7 @@ function minpoly(Rx::fpPolyRing, a::fqPolyRepFieldElem)
 end
 
 function charpoly(a::fqPolyRepFieldElem)
-  Fp = Native.GF(Int(characteristic(parent(a))), cached=false)
+  Fp = prime_field(parent(a); cached = false)
   Rx, _ = polynomial_ring(Fp, cached=false)
   return charpoly(Rx, a)
 end
@@ -734,7 +733,7 @@ end
 
 function representation_matrix(a::fqPolyRepFieldElem)
   F = parent(a)
-  k = Native.GF(Int(characteristic(F)))
+  k = prime_field(F)
   m = zero_matrix(k, degree(F), degree(F))
   @ccall libflint.fq_nmod_embed_mul_matrix(m::Ref{fpMatrix}, a::Ref{fqPolyRepFieldElem}, F::Ref{fqPolyRepField})::Nothing
   @ccall libflint.nmod_mat_transpose(m::Ref{fpMatrix}, m::Ref{fpMatrix})::Nothing

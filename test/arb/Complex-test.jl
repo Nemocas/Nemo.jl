@@ -119,6 +119,13 @@ end
   # @test is_nonzero(RR(1))
   # @test !is_nonzero(RR("0 +/- 0.01"))
 
+  @test !is_unit(CC(0))
+  @test is_unit(CC(1))
+  @test !is_unit(CC("0 +/- 0.01"))
+  @test is_unit(CC(RR("0 +/- 0.01"), RR(1)))
+  @test !is_unit(CC(RR(1), RR(NaN)))
+  @test !is_unit(CC(RR(1), RR(Inf)))
+
   @test isone(CC(1))
   @test !isone(CC(0))
 
@@ -133,6 +140,17 @@ end
 
   @test isinteger(CC(3))
   @test !isinteger(CC("3 +/- 0.01"))
+
+  @test is_real(CC(3))
+  @test !is_real(CC(3, 1))
+  @test !is_real(CC(3, "0 +/- 0.01"))
+
+  @test is_imaginary(CC(0))
+  @test is_imaginary(CC(0, 3))
+  @test is_imaginary(CC(0, "3 +/- 0.01"))
+  @test !is_imaginary(CC(1, 3))
+  @test !is_imaginary(CC(QQ(1, 3), 1))
+  @test !is_imaginary(CC("0 +/- 0.01", 1))
 end
 
 @testset "ComplexFieldElem.unary_ops" begin
@@ -157,6 +175,7 @@ end
   @test x - y == -2
   @test x * y == 8
   @test x // y == 0.5
+  @test contains(CC(-1)^typemin(Int), 1)
 
   for T in [ZZRingElem, QQFieldElem, Int, BigInt, Rational{Int}, Rational{BigInt}]
 

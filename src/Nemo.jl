@@ -11,6 +11,8 @@ module Nemo
 
 import AbstractAlgebra
 
+using Compat: allequal
+
 using Random: Random, AbstractRNG, SamplerTrivial
 import Random: rand!
 
@@ -202,6 +204,7 @@ import AbstractAlgebra: Ring
 import AbstractAlgebra: Set
 import AbstractAlgebra: set_attribute!
 import AbstractAlgebra: Solve
+import AbstractAlgebra: sqrt_classical
 import AbstractAlgebra: terse
 import AbstractAlgebra: transpose!
 import AbstractAlgebra: truncate!
@@ -546,6 +549,7 @@ include("NumFields.jl")
 
 include("matrix.jl")
 include("poly.jl")
+include("series.jl")
 include("ZZMatrix-linalg.jl")
 
 include("HeckeMiscFiniteField.jl")

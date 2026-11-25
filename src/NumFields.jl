@@ -24,7 +24,7 @@ dot(x::Integer, y::NumFieldElem) = x * y
 dot(x::NumFieldElem, y::Integer) = x * y
 
 function dot(a::Vector{<:NumFieldElem}, b::Vector{ZZRingElem})
-  @req allequal(map(parent, a)) "parents do not match"
+  @req allequal(parent, a) "parents do not match"
   d = zero(parent(a[1]))
   t = zero(d)
   for i in 1:length(a)

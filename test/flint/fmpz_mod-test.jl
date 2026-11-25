@@ -314,6 +314,9 @@ end
       end
     end
   end
+
+  x = residue_ring(ZZ, ZZ(7))[1](2)
+  @test x^typemin(Int) == x # order 3
 end
 
 @testset "ZZModRingElem.comparison" begin

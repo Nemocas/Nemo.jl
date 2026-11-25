@@ -55,6 +55,7 @@ end
   @test abs2(a) == real(a)^2 + imag(a)^2
   @test nbits(a) < 100
   @test parent(canonical_unit(a)) == QQi
+  @test QQi(-1)^typemin(Int) == 1
 end
 
 @testset "QQiFieldElem.adhoc" begin

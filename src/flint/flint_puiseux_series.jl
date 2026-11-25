@@ -361,11 +361,6 @@ function ^(a::FlintPuiseuxSeriesElem{T}, b::Int) where T <: RingElem
     return inv(a)
   end
 
-  if b < 0
-    a = inv(a)
-    b = -b
-  end
-
   z = parent(a)(a.data^b, scale(a))
   z = rescale!(z)
   return z

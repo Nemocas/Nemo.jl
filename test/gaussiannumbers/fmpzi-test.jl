@@ -48,6 +48,7 @@ end
   @test_throws Exception ZZi(1,1)^-1
   @test ZZi(0,1)^-1 == -im
   @test ZZi(0,1)^2 == -1
+  @test ZZi(-1)^typemin(Int) == 1
 end
 
 @testset "ZZiRingElem.canonical_mod" begin

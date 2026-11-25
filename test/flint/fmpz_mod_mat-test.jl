@@ -169,6 +169,18 @@ end
   end
 end
 
+@testset "ZZModMatrix.is_zero_entry" begin
+  R, = residue_ring(ZZ, ZZ(2)^384)
+  M = matrix(R, [ZZ(7) ZZ(0) ZZ(2)^190; ZZ(0) ZZ(-1) ZZ(0)])
+  @test which(is_zero_entry, (ZZModMatrix, Int, Int)).module === Nemo
+  for A in (M, view(M, 1:2, 2:3))
+    for i in 1:nrows(A), j in 1:ncols(A)
+      @test is_zero_entry(A, i, j) == iszero(A[i, j])
+    end
+    @test_throws BoundsError is_zero_entry(A, 1, ncols(A) + 1)
+  end
+end
+
 @testset "ZZModMatrix.printing" begin
   Z2, = residue_ring(ZZ, ZZ(2))
   R = ZZModMatrixSpace(Z2, 2, 2)
@@ -309,6 +321,30 @@ end
   d = transpose(a)*a
 
   @test d == matrix_space(Z17, 4, 4)([11 11 8 7; 11 0 14 6; 8 14 14 5; 7 6 5 5])
+end
+
+@testset "ZZModMatrix.vector_mul" begin
+  R, = residue_ring(ZZ, ZZ(7)^30)
+
+  for (r, c) in ((1, 2), (3, 5), (5, 3), (9, 9))
+    a = matrix(R, [rand(R) for i in 1:r, j in 1:c])
+    v = [rand(R) for j in 1:c]
+    w = [rand(R) for i in 1:r]
+    Av = a * matrix(R, c, 1, v)
+    Av = [Av[i, 1] for i in 1:r]
+    wA = matrix(R, 1, r, w) * a
+    wA = [wA[1, j] for j in 1:c]
+    for f in (mul!, Nemo.mul!_flint, Nemo.mul!_through_matrix)
+      z = [rand(R) for i in 1:r]
+      @test f(z, a, v) == z == Av
+      z = [rand(R) for j in 1:c]
+      @test f(z, w, a) == z == wA
+      z = [ZZ(i) for i in 1:r]
+      @test f(z, a, lift.(v)) == z == lift.(Av)
+      z = [ZZ(j) for j in 1:c]
+      @test f(z, lift.(w), a) == z == lift.(wA)
+    end
+  end
 end
 
 @testset "ZZModMatrix.mul!" begin
@@ -471,6 +507,9 @@ end
   @test g == matrix(Z17, [1 2 2; 2 13 12; 2 12 15])
 
   @test_throws ErrorException f^(ZZ(2)^1000)
+
+  b = matrix(Z17, [0 -1; 1 -1]) # order 3
+  @test b^typemin(Int) == b
 end
 
 @testset "ZZModMatrix.row_echelon_form" begin

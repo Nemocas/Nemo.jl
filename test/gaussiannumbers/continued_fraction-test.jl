@@ -26,13 +26,13 @@ end
   (v, t) = Nemo.shortest_l_infinity_with_transform(m)
   @test v == [ZZ(0), ZZ(0)]
   @test length(t) == 1
-  @test v == [t[1]*m[1,i] for i in 1:2]
+  @test v == [only(t)*m[1,i] for i in 1:2]
 
   m = matrix(ZZ, 1, 2, [1, 0])
   (v, t) = Nemo.shortest_l_infinity_with_transform(m)
   @test v == [ZZ(1), ZZ(0)] || v == [ZZ(-1), ZZ(0)]
   @test length(t) == 1
-  @test v == [t[1]*m[1,i] for i in 1:2]
+  @test v == [only(t)*m[1,i] for i in 1:2]
 
   m = matrix(ZZ, 2, 2, [0, 0, 0, 0])
   (v, t) = Nemo.shortest_l_infinity_with_transform(m)

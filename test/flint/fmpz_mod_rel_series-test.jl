@@ -446,6 +446,7 @@ end
   @test isequal((2*x+O(x^5))^2, 4*x^2+O(x^6))
 
   @test_throws DomainError a^-1
+  @test_throws DomainError S(-1)^typemin(Int)
 end
 
 @testset "ZZModRelPowerSeriesRingElem.shift" begin
@@ -556,6 +557,15 @@ end
   @test isequal(exp(O(x^5)), 1+O(x^5))
 
   @test isequal(divexact(x, exp(x + O(x^5)) - 1), 113168723261316872370*x^2+61728394506172839474*x+1+O(x^4))
+end
+
+@testset "ZZModRelPowerSeriesRingElem.square_root" begin
+  R, = residue_ring(ZZ, ZZ(9))
+  S, x = power_series_ring(R, 5, "x")
+
+  @test !is_square(x)
+  @test !is_square_with_sqrt(x)[1]
+  @test_throws ErrorException sqrt(x)
 end
 
 @testset "ZZModRelPowerSeriesRingElem.unsafe_operators" begin

@@ -1070,6 +1070,7 @@ end
    @test QQ(-1)^2 == 1
    @test QQ(-1)^-1 == -1
    @test QQ(-1)^-2 == 1
+   @test QQ(-1)^typemin(Int) == 1
    @test QQ(2)^3 == 8
    @test QQ(2)^-3 == 1//8
 

@@ -279,6 +279,7 @@ end
   @test f^12 == x^24+24*x^23+276*x^22+2024*x^21+10626*x^20+42504*x^19+134596*x^18+346104*x^17+735471*x^16+1307504*x^15+1961256*x^14+2496144*x^13+2704156*x^12+2496144*x^11+1961256*x^10+1307504*x^9+735471*x^8+346104*x^7+134596*x^6+42504*x^5+10626*x^4+2024*x^3+276*x^2+24*x+1
 
   @test_throws DomainError f^-1
+  @test_throws DomainError R(-1)^typemin(Int)
 end
 
 @testset "RealPolyRingElem.exact_division" begin

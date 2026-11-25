@@ -297,6 +297,7 @@ end
   @test f^6 == x^12+12*x^11+66*x^10+220*x^9+495*x^8+792*x^7+924*x^6+792*x^5+495*x^4+220*x^3+66*x^2+12*x+1
 
   @test_throws DomainError f^-1
+  @test_throws DomainError S(-1)^typemin(Int)
 end
 
 @testset "FpPolyRingElem.exact_division" begin

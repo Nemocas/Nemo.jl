@@ -420,6 +420,8 @@ end
 #
 ################################################################################
 
+is_unit(x::ComplexFieldElem) = isfinite(x) && !contains_zero(x)
+
 @doc raw"""
     iszero(x::ComplexFieldElem)
 
@@ -467,8 +469,30 @@ function isinteger(x::ComplexFieldElem)
   return Bool(@ccall libflint.acb_is_int(x::Ref{ComplexFieldElem})::Cint)
 end
 
-function isreal(x::ComplexFieldElem)
+@doc raw"""
+    is_real(x::ComplexFieldElem)
+
+Return `true` if the imaginary part of $x$ is exactly zero, i.e. has zero
+midpoint and radius, otherwise return `false`. A ball whose imaginary part
+only contains zero, such as `CC(1, "0 +/- 0.01")`, returns `false`.
+"""
+function is_real(x::ComplexFieldElem)
   return Bool(@ccall libflint.acb_is_real(x::Ref{ComplexFieldElem})::Cint)
+end
+
+@doc raw"""
+    is_imaginary(x::ComplexFieldElem)
+
+Return `true` if the real part of $x$ is exactly zero, i.e. has zero
+midpoint and radius, otherwise return `false`. This includes $x = 0$.
+A ball whose real part only contains zero, such as `CC("0 +/- 0.01")`,
+returns `false`.
+"""
+function is_imaginary(x::ComplexFieldElem)
+  GC.@preserve x begin
+    re = _real_ptr(x)
+    return Bool(@ccall libflint.arb_is_zero(re::Ptr{RealFieldElem})::Cint)
+  end
 end
 
 is_negative(x::ComplexFieldElem) = isreal(x) && is_negative(real(x))
@@ -1037,7 +1061,7 @@ function eisenstein_g(k::Int, x::ComplexFieldElem, prec::Int = precision(Balls))
   @ccall libflint.acb_modular_eisenstein(vec::Ptr{acb_struct}, x::Ref{ComplexFieldElem}, len::Int, prec::Int)::Nothing
   z = array(CC, vec, len)
   acb_vec_clear(vec, len)
-  return z[end]
+  return last(z)
 end
 
 @doc raw"""

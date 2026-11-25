@@ -439,6 +439,7 @@ end
   @test isequal((2*x+O(x^5))^2, 4*x^2+O(x^6))
 
   @test_throws DomainError a^-1
+  @test_throws DomainError S(-1)^typemin(Int)
 end
 
 @testset "FpRelPowerSeriesRingElem.shift" begin
@@ -550,6 +551,8 @@ end
     @test sqrt(f^2) == f || sqrt(f^2) == -f
   end
 
+  @test isequal(sqrt(x^2 + 2x^3 + O(x^4)), x + x^2 + O(x^3)) # (x + x^2)^2 = x^2 + 2x^3 + x^4
+
   for p in [2, 7, 19, 65537]
     R = Native.GF(ZZRingElem(p))
 
@@ -578,6 +581,10 @@ end
         @test_throws ErrorException sqrt(s*x)
       end
     end
+
+    @test is_square(O(x^3))
+    @test isequal(sqrt(O(x^3)), O(x^2))
+    @test isequal(is_square_with_sqrt(O(x^3)), (true, O(x^2)))
   end
 end
 

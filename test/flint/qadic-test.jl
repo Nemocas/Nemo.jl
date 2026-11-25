@@ -282,6 +282,8 @@ end
   @test b^3 == O(R, 7^5)
 
   @test c^7 == 2 + 4*7^1 + 2*7^2
+
+  @test R(-1)^typemin(Int) == 1
 end
 
 @testset "QadicFieldElem.inversion" begin

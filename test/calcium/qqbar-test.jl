@@ -333,6 +333,9 @@ end
   @test ZZRingElem(2) ^ QQBarFieldElem(3) == 8
   @test QQFieldElem(2) ^ QQBarFieldElem(3) == 8
 
+  z = root_of_unity(QQBarField(), 3)
+  @test z^typemin(Int) == z # order 3
+
   @test QQBarFieldElem(2) < QQBarFieldElem(3)
   @test QQBarFieldElem(2) < 3
   @test QQBarFieldElem(2) < ZZRingElem(3)

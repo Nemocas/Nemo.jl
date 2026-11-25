@@ -338,6 +338,7 @@ end
   @test f^ZZ(5) == 243*y^10 + 2835*y^9 + 14445*y^8 + 42210*y^7 + 78135*y^6 + 95557*y^5 + 78135*y^4 + 42210*y^3 + 14445*y^2 + 2835*y + 243
 
   @test_throws DomainError f^(-1)
+  @test_throws DomainError S(-1)^typemin(Int)
 end
 
 @testset "QQPolyRingElem.modular_arithmetic" begin

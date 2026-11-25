@@ -465,7 +465,7 @@ end
 
 function (R::fpField)(a::Vector{<:IntegerUnion})
   is_one(length(a)) || error("Coercion impossible")
-  return R(a[1])
+  return R(only(a))
 end
 
 ###############################################################################

@@ -261,6 +261,7 @@ end
   @test d^12 == 2*x^12 + 12*x^14 + O(x^15)
 
   @test_throws DomainError a^-1
+  @test_throws DomainError R(-1)^typemin(Int)
 end
 
 @testset "fpAbsPowerSeriesRingElem.shift" begin

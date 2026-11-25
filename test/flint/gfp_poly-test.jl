@@ -243,6 +243,7 @@ end
   @test f^23 == x^46 + 13*x^23 + 5
 
   @test_throws DomainError f^(-1)
+  @test_throws DomainError Rx(-1)^typemin(Int)
 end
 
 @testset "fpPolyRingElem.comparison" begin

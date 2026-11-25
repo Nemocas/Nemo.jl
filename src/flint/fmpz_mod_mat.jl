@@ -295,14 +295,76 @@ end
 
 # matrix x vector, vector x matrix
 
-function mul!(z::Vector{ZZRingElem}, a::T, b::Vector{ZZRingElem}) where T <: Zmod_fmpz_mat
+function mul!_flint(z::Vector{ZZRingElem}, a::T, b::Vector{ZZRingElem}) where T <: Zmod_fmpz_mat
   @ccall libflint.fmpz_mod_mat_mul_fmpz_vec_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ref{T}, b::Ptr{Ref{ZZRingElem}}, length(b)::Int, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
 end
 
-function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::T) where T <: Zmod_fmpz_mat
+function mul!_flint(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::T) where T <: Zmod_fmpz_mat
   @ccall libflint.fmpz_mod_mat_fmpz_vec_mul_ptr(z::Ptr{Ref{ZZRingElem}}, a::Ptr{Ref{ZZRingElem}}, length(a)::Int, b::Ref{T}, base_ring(b).ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return z
+end
+
+function _use_mul!_flint(a::Zmod_fmpz_mat, len::Int, out::Int; vec_times_mat::Bool)
+  if nbits(modulus(base_ring(a))) <= 32
+    return len * out < 64 || min(len, out) < 2
+  end
+  return len * out < 16
+end
+
+function mul!(z::Vector{ZZRingElem}, a::T, b::Vector{ZZRingElem}) where T <: Zmod_fmpz_mat
+  if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)
+    return mul!_flint(z, a, b)
+  end
+
+  return mul!_through_matrix(z, a, b)
+end
+
+function mul!(z::Vector{ZZRingElem}, a::Vector{ZZRingElem}, b::T) where T <: Zmod_fmpz_mat
+  if _use_mul!_flint(b, nrows(b), ncols(b); vec_times_mat = true)
+    return mul!_flint(z, a, b)
+  end
+
+  return mul!_through_matrix(z, a, b)
+end
+
+for (T, E) in ((ZZModMatrix, ZZModRingElem), (FpMatrix, FpFieldElem))
+  @eval begin
+    _pack_entries(a::Vector{$E}) = [x.data.d for x in a]
+
+    function _unpack_entries!(z::Vector{$E}, Me::Vector{Int})
+      for i in 1:length(z)
+        z[i].data.d = Me[i]
+      end
+      return z
+    end
+
+    function mul!_flint(z::Vector{$E}, a::$T, b::Vector{$E})
+      mul!_flint([x.data for x in z], a, [x.data for x in b])
+      return z
+    end
+
+    function mul!_flint(z::Vector{$E}, a::Vector{$E}, b::$T)
+      mul!_flint([x.data for x in z], [x.data for x in a], b)
+      return z
+    end
+
+    function mul!(z::Vector{$E}, a::$T, b::Vector{$E})
+      if _use_mul!_flint(a, ncols(a), nrows(a); vec_times_mat = false)
+        return mul!_flint(z, a, b)
+      end
+
+      return mul!_through_matrix(z, a, b)
+    end
+
+    function mul!(z::Vector{$E}, a::Vector{$E}, b::$T)
+      if _use_mul!_flint(b, nrows(b), ncols(b); vec_times_mat = true)
+        return mul!_flint(z, a, b)
+      end
+
+      return mul!_through_matrix(z, a, b)
+    end
+  end
 end
 
 # matrix x scalar, scalar x matrix

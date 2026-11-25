@@ -210,6 +210,9 @@ element.
 
 ### Basic manipulation
 
+`is_unit(x)` returns `true` only if `x` is certainly invertible, i.e. is finite and
+does not contain zero.
+
 ```@docs
 isfinite(::ComplexFieldElem)
 ```
@@ -220,6 +223,14 @@ is_exact(::ComplexFieldElem)
 
 ```@docs
 isinteger(::ComplexFieldElem)
+```
+
+```@docs
+is_real(::ComplexFieldElem)
+```
+
+```@docs
+is_imaginary(::ComplexFieldElem)
 ```
 
 ```@docs
@@ -237,6 +248,9 @@ julia> b = CC(3)
 
 julia> isreal(a)
 true
+
+julia> is_imaginary(a)
+false
 
 julia> isfinite(b)
 true

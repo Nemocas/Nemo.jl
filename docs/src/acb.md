@@ -207,6 +207,9 @@ julia> g = CC(RR(3))
 
 ### Basic manipulation
 
+`is_unit(x)` returns `true` only if `x` is certainly invertible, i.e. is finite and
+does not contain zero.
+
 ```@docs
 isfinite(::AcbFieldElem)
 ```
@@ -217,6 +220,14 @@ is_exact(::AcbFieldElem)
 
 ```@docs
 isinteger(::AcbFieldElem)
+```
+
+```@docs
+is_real(::AcbFieldElem)
+```
+
+```@docs
+is_imaginary(::AcbFieldElem)
 ```
 
 ```@docs
@@ -237,6 +248,9 @@ julia> b = CC(3)
 
 julia> isreal(a)
 true
+
+julia> is_imaginary(a)
+false
 
 julia> isfinite(b)
 true

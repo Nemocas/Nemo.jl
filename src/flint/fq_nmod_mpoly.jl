@@ -203,7 +203,7 @@ end
 ###############################################################################
 
 function coeff(a::fqPolyRepMPolyRingElem, vars::Vector{Int}, exps::Vector{Int})
-  unique(vars) != vars && error("Variables not unique")
+  allunique(vars) || error("Variables not unique")
   length(vars) != length(exps) &&
   error("Number of variables does not match number of exponents")
   vars = [UInt(i) - 1 for i in vars]
@@ -507,8 +507,8 @@ function evaluate(a::fqPolyRepMPolyRingElem, vals::Vector{fqPolyRepMPolyRingElem
   @req !isempty(vals) "No values supplied"
   R = parent(a)
   @req length(vals) == nvars(R) "Number of variables does not match number of values"
-  @req allequal(map(parent, vals)) "Parents do not match"
-  S = parent(vals[1])
+  @req allequal(parent, vals) "Parents do not match"
+  S = parent(first(vals))
 
   c = S()
   fl = @ccall libflint.fq_nmod_mpoly_compose_fq_nmod_mpoly(c::Ref{fqPolyRepMPolyRingElem}, a::Ref{fqPolyRepMPolyRingElem}, vals::Ptr{Ref{fqPolyRepMPolyRingElem}}, R::Ref{fqPolyRepMPolyRing}, S::Ref{fqPolyRepMPolyRing})::Cint
@@ -520,8 +520,8 @@ function evaluate(a::fqPolyRepMPolyRingElem, vals::Vector{fqPolyRepPolyRingElem}
   @req !isempty(vals) "No values supplied"
   R = parent(a)
   @req length(vals) == nvars(R) "Number of variables does not match number of values"
-  @req allequal(map(parent, vals)) "Parents do not match"
-  S = parent(vals[1])
+  @req allequal(parent, vals) "Parents do not match"
+  S = parent(first(vals))
 
   c = S()
   fl = @ccall libflint.fq_nmod_mpoly_compose_fq_nmod_poly(c::Ref{fqPolyRepPolyRingElem}, a::Ref{fqPolyRepMPolyRingElem}, vals::Ptr{Ref{fqPolyRepPolyRingElem}}, R::Ref{fqPolyRepMPolyRing})::Cint

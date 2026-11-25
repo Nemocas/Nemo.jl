@@ -417,6 +417,7 @@ end
   @test isequal(d^12, 4096*x^12+24576*x^14+O(x^15))
 
   @test_throws DomainError a^-1
+  @test_throws DomainError S(-1)^typemin(Int)
 end
 
 @testset "zzModRelPowerSeriesRingElem.shift" begin
@@ -525,6 +526,15 @@ end
   @test isequal(exp(O(x^0)), O(x^0))
 
   @test isequal(divexact(x, exp(x + O(x^5)) - 1), 1+8*x+10*x^2+O(x^4))
+end
+
+@testset "zzModRelPowerSeriesRingElem.square_root" begin
+  R, = residue_ring(ZZ, 9)
+  S, x = power_series_ring(R, 5, "x")
+
+  @test !is_square(x)
+  @test !is_square_with_sqrt(x)[1]
+  @test_throws ErrorException sqrt(x)
 end
 
 @testset "zzModRelPowerSeriesRingElem.unsafe_operators" begin
