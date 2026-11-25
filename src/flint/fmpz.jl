@@ -1988,6 +1988,11 @@ true
 """
 function is_prime(x::ZZRingElem)
   !is_probable_prime(x) && return false
+  (x <= (Int128(1) << 80)) && return true  # FLINT doc says that the result is correct if nbits(x) < 81
+  if AbstractAlgebra.get_dodgy_mode(:is_prime)
+    AbstractAlgebra.@RecordDodgyStep(:is_prime, (x,), true)  # true here is return value
+    return true
+  end
   return Bool(@ccall libflint.fmpz_is_prime(x::Ref{ZZRingElem})::Cint)
 end
 
@@ -2013,9 +2018,14 @@ is_probable_prime(x::ZZRingElem) = Bool(@ccall libflint.fmpz_is_probabprime(x::R
 Return the smallest prime strictly greater than $x$.
 If a second argument of `false` is specified, the return is only probably prime.
 """
-function next_prime(x::ZZRingElem, proved::Bool = true)
+function next_prime(x::ZZRingElem, proved::Union{Nothing,Bool} = nothing)
   z = ZZRingElem()
-  @ccall libflint.fmpz_nextprime(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, proved::Cint)::Nothing
+  if !isnothing(proved) || !AbstractAlgebra.get_dodgy_mode(:is_prime)
+    @ccall libflint.fmpz_nextprime(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, (proved!=false)::Cint)::Nothing
+  else
+    @ccall libflint.fmpz_nextprime(z::Ref{ZZRingElem}, x::Ref{ZZRingElem}, false::Cint)::Nothing
+    AbstractAlgebra.@RegisterDodgyStep(:next_prime, (x,));
+  end
   return z
 end
 
