@@ -8,8 +8,8 @@ DocTestSetup = Nemo.doctestsetup()
 
 An implementation of the field of all algebraic numbers, that is, an algebraic closure of the field of rational numbers, is provided through the type `QQBarField` and the corresponding element type `QQBarFieldElem`.
 
-Note that the field of algebraic closure is implemented as an ordered field;
-see [Comparing algebraic numbers](@ref).
+The real algebraic numbers are implemented as an ordered subfield of
+`algebraic_closure(QQ)` under the usual order. See [Comparing algebraic numbers](@ref).
 
 ## Constructing the field of algebraic numbers
 
