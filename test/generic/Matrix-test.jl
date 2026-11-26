@@ -152,8 +152,8 @@ end
     for i = 1:10
       M = rand(S, -5:5)
 
-      p1 = charpoly_danilevsky_ff!(U, deepcopy(M))
-      p2 = charpoly_danilevsky!(U, deepcopy(M))
+      p1 = AbstractAlgebra.charpoly_danilevsky_ff!(U, deepcopy(M))
+      p2 = AbstractAlgebra.charpoly_danilevsky!(U, deepcopy(M))
       p3 = charpoly(U, M)
 
       @test p1 == p2
@@ -170,7 +170,7 @@ end
   for iter = 1:10
     A = rand(S, -10:10)
 
-    H, U = hnf_cohen_with_transform(A)
+    H, U = AbstractAlgebra.hnf_cohen_with_transform(A)
 
     @test is_upper_triangular(H)
     @test is_unit(det(U))
