@@ -413,6 +413,7 @@ end
 
   c = matrix_ring(QQ, 2)(b)
   @test c^typemin(Int) == c
+  @test c^(ZZ(2)^70 + 1) == c^2
 end
 
 @testset "QQMatrix.adhoc_exact_division" begin
