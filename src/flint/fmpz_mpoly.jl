@@ -24,10 +24,7 @@ number_of_variables(a::ZZMPolyRing) = @ccall libflint.fmpz_mpoly_ctx_nvars(a::Re
 
 base_ring(a::ZZMPolyRing) = ZZ
 
-function internal_ordering(a::ZZMPolyRing)
-  b = @ccall libflint.fmpz_mpoly_ctx_ord(a::Ref{ZZMPolyRing})::Cint
-  return _flint_ordering_symbol(b)
-end
+internal_ordering(a::ZZMPolyRing) = _flint_ordering_symbol(a.minfo.ord)
 
 function gens(R::ZZMPolyRing)
   A = Vector{ZZMPolyRingElem}(undef, nvars(R))

@@ -300,11 +300,3 @@ function rank(a::FpMatrix)
   r = @ccall libflint.fmpz_mod_mat_rank(a::Ref{FpMatrix}, base_ring(a).ninv::Ref{fmpz_mod_ctx_struct})::Int
   return r
 end
-
-################################################################################
-#
-#  Entry pointers
-#
-################################################################################
-
-_entry_size(::Type{FpMatrix}) = sizeof(ZZRingElem)
