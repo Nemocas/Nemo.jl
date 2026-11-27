@@ -253,7 +253,8 @@ function Base.iterate(A::PrimesSet{T}, p) where T<: IntegerUnion
         nextp = A.r.curr_st
       else
         A.r.last_st = -1
-        n_primes_init!(A.r, p-1, A.to)
+        # only the `PrimesSet{Int}` constructor sets `r`
+        n_primes_init!(A.r, p-1, A.to::Int)
         A.r.curr_st = nextp = Int(next_prime(A.r))
       end
     elseif p == 2
