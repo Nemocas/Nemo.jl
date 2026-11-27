@@ -480,7 +480,17 @@ function //(a::CalciumFieldElem, b::CalciumFieldElem)
   return r
 end
 
-divexact(a::CalciumFieldElem, b::CalciumFieldElem; check::Bool=true) = a // b
+# `iszero` errors when undecidable; there `divexact` keeps the behaviour of `//`
+function _is_certainly_zero(a::CalciumFieldElem)
+  C = parent(a)
+  t = @ccall libflint.ca_check_is_zero(a::Ref{CalciumFieldElem}, C::Ref{CalciumField})::Cint
+  return t == T_TRUE
+end
+
+function divexact(a::CalciumFieldElem, b::CalciumFieldElem; check::Bool=true)
+  _is_certainly_zero(b) && throw(DivideError())
+  return a // b
+end
 
 function inv(a::CalciumFieldElem)
   C = parent(a)
@@ -548,14 +558,19 @@ end
 
 //(a::QQBarFieldElem, b::CalciumFieldElem) = parent(b)(a) // b
 
-divexact(a::CalciumFieldElem, b::Int; check::Bool=true) = a // b
-divexact(a::CalciumFieldElem, b::ZZRingElem; check::Bool=true) = a // b
-divexact(a::CalciumFieldElem, b::QQFieldElem; check::Bool=true) = a // b
-divexact(a::CalciumFieldElem, b::QQBarFieldElem; check::Bool=true) = a // b
-divexact(a::Int, b::CalciumFieldElem; check::Bool=true) = a // b
-divexact(a::ZZRingElem, b::CalciumFieldElem; check::Bool=true) = a // b
-divexact(a::QQFieldElem, b::CalciumFieldElem; check::Bool=true) = a // b
-divexact(a::QQBarFieldElem, b::CalciumFieldElem; check::Bool=true) = a // b
+for T in (Int, ZZRingElem, QQFieldElem, QQBarFieldElem)
+  @eval begin
+    function divexact(a::CalciumFieldElem, b::$T; check::Bool=true)
+      iszero(b) && throw(DivideError())
+      return a // b
+    end
+
+    function divexact(a::$T, b::CalciumFieldElem; check::Bool=true)
+      _is_certainly_zero(b) && throw(DivideError())
+      return a // b
+    end
+  end
+end
 
 ###############################################################################
 #

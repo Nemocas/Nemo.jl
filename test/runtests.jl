@@ -41,5 +41,14 @@ end
                           complex_field(),                              # ComplexField
                         ]
 
+# `divexact` by a zero element of `R`, or by each zero scalar in `zeros`
+@everywhere function test_divexact_by_zero(R, zeros...)
+  is_trivial(R) && return
+  for check in (true, false), b in (zero(R), zeros...)
+    @test_throws DivideError divexact(one(R), b; check)
+    @test_throws DivideError divexact(zero(R), b; check)
+  end
+end
+
 @everywhere include("rand.jl")
 include("Nemo-test.jl")
