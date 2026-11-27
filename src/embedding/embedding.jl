@@ -427,7 +427,8 @@ function embed(k::T, K::T) where T <: FinField
 end
 
 function embed(k::fpField, K::fqPolyRepField)
-  @assert characteristic(K) == characteristic(k)
+  @req characteristic(K) == characteristic(k) "Embedding impossible"
+  return FinFieldMorphism(k, K, x -> K(x), y -> k(coeff(y, 0)))
 end
 
 # Callers use the returned embedding to transfer elements. These embeddings
