@@ -257,7 +257,7 @@ end
 #
 ################################################################################
 
-function _convert_fac(a::FqMPolyRing, b::Fac)
+function _convert_fac(a::FqMPolyRing, b::Fac{<:MPolyRingElem})
   d = Dict{FqMPolyRingElem, Int}()
   for (p, e) in b
     d[FqMPolyRingElem(a, p)] = e

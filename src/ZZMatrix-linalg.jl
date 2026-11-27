@@ -877,7 +877,7 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
   end
 
   if is_zero(R)
-    mu = vcat([_to_base!(t, m) for t = allV]...)
+    mu = reduce(vcat, [_to_base!(t, m) for t = allV])
     tau = _induce_rational_reconstruction(mu, m; unbalanced = true)
     @assert tau[1]
     GC.enable(GC_d)
@@ -937,11 +937,11 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
     end
 
     mex = m^(2*ex)
-    mu = vcat([_to_base!(t[:, 1:1], m) for t = allV]...)
+    mu = reduce(vcat, [_to_base!(t[:, 1:1], m) for t = allV])
     tau = _induce_rational_reconstruction(mu, mex; unbalanced = true)
     if tau[1]
       GC.enable(true)
-      mu = vcat([_to_base!(deepcopy(t), m) for t = allV]...)
+      mu = reduce(vcat, [_to_base!(deepcopy(t), m) for t = allV])
       tau = _induce_rational_reconstruction(mu, mex; unbalanced = true)
       if tau[1]
         GC.enable(GC_d)
@@ -1205,7 +1205,7 @@ function det_hcol_hnf(A::ZZMatrix, U::AbstractArray= -100:100; solver=:NEMO_DIXO
       end
     end
     @vprintln(:det,1,"Solving a random linear system...")
-    b = rand(matrix_space(ZZ,n,1),U)
+    b = rand(matrix_space(ZZ,n,1),U)::ZZMatrix
     if solver == :NEMO_DIXON
       @vprintln(:det,2,"  ...solving by Nemo.dixon_solve")
       @vtime :det 2   soln2 = Nemo.dixon_solve(A, b)
