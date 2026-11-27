@@ -481,6 +481,20 @@ end
   z = gen(K)
   @test K(x + 1) == z + 1
   @test K(x + 1, precision = 30) == gen(K, precision = 30) + one(K, precision = 30)
+
+  # a p-adic keeps its own precision, also for negative valuation
+  P = padic_field(7, precision = 10)
+  for b in [P(0), P(3), P(3, precision = 30), P(QQ(5, 7)), P(QQ(5, 7^2), precision = 4)]
+    a = K(b)
+    @test parent(a) === K
+    @test a == K(lift(QQ, b))
+    @test valuation(a) == valuation(b)
+    @test precision(a) == precision(b)
+  end
+  @test_throws ArgumentError K(padic_field(5)(1))
+
+  @test P(3) // K(2) == K(QQ(3, 2))
+  @test K(2) // P(3) == K(QQ(2, 3))
 end
 
 @testset "QadicFieldElem.base_field" begin
