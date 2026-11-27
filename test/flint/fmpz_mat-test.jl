@@ -755,7 +755,7 @@ end
 
   @test_logs (:warn, r"matrix\(ZZ, A\)") begin
     @test rank([ZZRingElem(2) 3 5; 1 4 7; 4 1 1]) == 2
-    @test rank(zeros(ZZ, 2, 3)) == 0
+    @test rank(zeros(ZZRingElem, 2, 3)) == 0
   end
 end
 

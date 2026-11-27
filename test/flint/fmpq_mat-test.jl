@@ -601,7 +601,7 @@ end
 
   @test_logs (:warn, r"matrix\(QQ, A\)") begin
     @test rank([QQFieldElem(2) 3 5; 1 4 7; 4 1 1]) == 2
-    @test rank(zeros(QQ, 2, 3)) == 0
+    @test rank(zeros(QQFieldElem, 2, 3)) == 0
   end
 end
 
