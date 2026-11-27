@@ -77,6 +77,16 @@
     @test f[k3, k9](f[k1, k3](x1)) == f[k1, k9](x1)
     @test f[k6, k12](f[k1, k6](x1)) == f[k1, k12](x1)
   end
+
+  # the prime field as an `fpField`
+  k = Native.GF(7)
+  K, a = Native.finite_field(7, 3, "a")
+  f = embed(k, K)
+  @test domain(f) === k
+  @test codomain(f) === K
+  @test f(k(3)) == K(3)
+  @test preimage(f, K(5)) == k(5)
+  @test_throws ArgumentError embed(Native.GF(5), K)
 end
 
 @testset "fq_nmod_embed.preimage_map" begin
