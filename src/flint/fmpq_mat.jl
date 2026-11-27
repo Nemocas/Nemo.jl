@@ -505,6 +505,11 @@ function rank(x::QQMatrix)
   return r
 end
 
+function rank(x::Matrix{QQFieldElem})
+  @warn "rank(::Matrix{QQFieldElem}) converts to a QQMatrix on every call; construct a QQMatrix with matrix(QQ, A) instead" maxlog=1
+  return rank(matrix(QQ, x))
+end
+
 ###############################################################################
 #
 #   Reduced row echelon form
