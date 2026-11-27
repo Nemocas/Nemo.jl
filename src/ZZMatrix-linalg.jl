@@ -877,7 +877,7 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
   end
 
   if is_zero(R)
-    mu = vcat([_to_base!(t, m) for t = allV]...)::ZZMatrix
+    mu = reduce(vcat, [_to_base!(t, m) for t = allV])
     tau = _induce_rational_reconstruction(mu, m; unbalanced = true)
     @assert tau[1]
     GC.enable(GC_d)
@@ -937,11 +937,11 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
     end
 
     mex = m^(2*ex)
-    mu = vcat([_to_base!(t[:, 1:1], m) for t = allV]...)::ZZMatrix
+    mu = reduce(vcat, [_to_base!(t[:, 1:1], m) for t = allV])
     tau = _induce_rational_reconstruction(mu, mex; unbalanced = true)
     if tau[1]
       GC.enable(true)
-      mu = vcat([_to_base!(deepcopy(t), m) for t = allV]...)::ZZMatrix
+      mu = reduce(vcat, [_to_base!(deepcopy(t), m) for t = allV])
       tau = _induce_rational_reconstruction(mu, mex; unbalanced = true)
       if tau[1]
         GC.enable(GC_d)
